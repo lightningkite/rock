@@ -1,0 +1,7 @@
+Pods
+.gradle
+.idea
+build
+*.xcworkspace
+*.hprof
+local.properties

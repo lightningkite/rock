@@ -1,40 +1,7 @@
 package com.lightningkite.mppexample
 
 import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLParagraphElement
 
-//actual var NView.rotation: Double
-//    get() = TODO("Not yet implemented")
-//    set(value) {}
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias SimpleLabel = HTMLParagraphElement
-
-actual inline fun ViewContext.simpleLabel(setup: SimpleLabel.() -> Unit): Unit = element("p", setup)
-actual var SimpleLabel.text: String
-    get() = this.textContent ?: ""
-    set(value) {
-        this.textContent = value
-    }
-
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias Column = HTMLDivElement
-
-actual inline fun ViewContext.column(setup: Column.() -> Unit): Unit = element<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "column"
-    setup()
-}
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias Row = HTMLDivElement
-
-actual inline fun ViewContext.row(setup: Row.() -> Unit): Unit = element<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "row"
-    setup()
-}
 
 private fun joinGradientStops(stops: List<GradientStop>): String {
     return stops.joinToString {
@@ -98,3 +65,40 @@ actual fun ViewContext.margin(insets: Insets): ViewWrapper =
     }
 
 actual fun ViewContext.margin(insets: String): ViewWrapper = margin(Insets(Dimension(insets)))
+
+actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
+    elementToDoList.add {
+        if (constraints.minHeight == null)
+            style.removeProperty("minHeight")
+        else
+            style.minHeight = constraints.minHeight.value
+
+        if (constraints.maxHeight == null)
+            style.removeProperty("maxHeight")
+        else
+            style.maxHeight = constraints.maxHeight.value
+
+        if (constraints.minWidth == null)
+            style.removeProperty("minWidth")
+        else
+            style.minWidth = constraints.minWidth.value
+
+        if (constraints.maxWidth == null)
+            style.removeProperty("maxWidth")
+        else
+            style.maxWidth = constraints.maxWidth.value
+
+        if (constraints.width == null)
+            style.removeProperty("width")
+        else
+            style.width = constraints.width.value
+
+        if (constraints.height == null)
+            style.removeProperty("height")
+        else
+            style.height = constraints.height.value
+
+    }
+    return ViewWrapper
+}
+

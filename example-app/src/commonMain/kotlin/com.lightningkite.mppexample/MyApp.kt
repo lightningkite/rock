@@ -13,30 +13,57 @@ fun ViewContext.myView(counter: Readable<Int>) {
     }
 
     column {
+        text {
+            ::text { "Counter: ${counter.current}" }
+        }
+        text {
+            text = "This is outside the row"
+            gravity = TextGravity.Center
+        }
         row {
-            simpleLabel {
+            text {
+                textStyle = TextStyle(
+                    color = Color.teal,
+                    bold = true,
+                    italic = true
+                )
                 ::text { "Lat: ${lat.current}" }
             } in padding(Insets(right = 36.px))
             column {
-                simpleLabel {
+                text {
                     text = "Hello world"
                 }
-                simpleLabel {
+                text {
                     text = "Hello world 2"
                 } in withBackground(Background(fill = Color(1f, 1f, 1f, 1f)))
-                simpleLabel {
+                text {
                     ::text { "Lon: ${lon.current}" }
                 } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
-        } in withBackground(Background(
-            fill = RadialGradient(
+        } in withBackground(
+            Background(
+                fill = RadialGradient(
 
-                stops = listOf(
-                    GradientStop(ratio = 0.5f, color=Color(1f, 1f, 0f, 0f)),
-                    GradientStop(ratio = 0.6f, color=Color(1f, 0f, 1f, 0f)),
-                    GradientStop(ratio = 0.7f, color=Color(1f, 0f, 0f, 1f)),
+                    stops = listOf(
+                        GradientStop(ratio = 0.5f, color = Color(1f, 1f, 0f, 0f)),
+                        GradientStop(ratio = 0.6f, color = Color(1f, 0f, 1f, 0f)),
+                        GradientStop(ratio = 0.7f, color = Color(1f, 0f, 0f, 1f)),
+                    )
                 )
             )
+        )
+        text {
+            ::text { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
+            ::visible { counter.current % 2 == 0 }
+        }
+
+        box {
+            image {
+                scaleType = ImageMode.Fit
+                source = ImageRemote("https://picsum.photos/200/300")
+            }
+        } in sizedBox(SizeConstraints(
+            height = 400.px
         ))
     }
 }

@@ -1,0 +1,12 @@
+package com.lightningkite.mppexample
+
+import org.w3c.dom.HTMLDivElement
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias Column = HTMLDivElement
+
+actual inline fun ViewContext.column(setup: Column.() -> Unit): Unit = element<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.flexDirection = "column"
+    setup()
+}

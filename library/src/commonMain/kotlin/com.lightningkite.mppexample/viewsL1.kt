@@ -1,9 +1,12 @@
 package com.lightningkite.mppexample
 
 
-@ViewDsl expect fun ViewContext.simpleLabel(setup: SimpleLabel.()->Unit = {}): Unit
-expect class SimpleLabel: NView
-expect var SimpleLabel.text: String
+@ViewModifierDsl3 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.padding(insets: String = "0"): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.margin(insets: String = "0"): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.withBackground(background: Background): ViewWrapper
 
 @ViewDsl expect fun ViewContext.column(setup: Column.()->Unit = {}): Unit
 expect class Column: NView
@@ -11,23 +14,19 @@ expect class Column: NView
 @ViewDsl expect fun ViewContext.row(setup: Row.()->Unit = {}): Unit
 expect class Row: NView
 
-@ViewModifierDsl3 expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.padding(insets: String = "0"): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.margin(insets: String = "0"): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.withBackground(background: Background): ViewWrapper
-
+@ViewDsl expect fun ViewContext.text(setup: Text.()->Unit = {}): Unit
+expect class Text: NView
+expect var Text.text: String
+expect var Text.textStyle: TextStyle
+expect var Text.gravity: TextGravity
+//expect var Text.maxLines: Double? // this isn't easy to do in CSS
 
 //
 //expect var NView.rotation: Double
 //expect var NView.alpha: Double
-//expect var NView.background: Drawable
-////expect var NView.minWidth: Dimension
-////expect var NView.minHeight: Dimension
 //expect var NView.elevation: Dimension
 //expect var NView.exists: Boolean
-//expect var NView.visible: Boolean
-//expect var NView.padding: Insets
+expect var NView.visible: Boolean
 //
 //expect class ImageButton: NView
 //expect fun ViewContext.imageButton(setup: ImageButton.()->Unit = {}): ImageButton
@@ -42,17 +41,11 @@ expect class Row: NView
 //expect var Button.gravity: String
 //expect fun Button.onClick(action: ()->Unit)
 //
-//expect class Text: NView
-//expect fun ViewContext.textView(setup: Text.()->Unit = {}): Text
-//expect var Text.text: String
-//expect var Text.textStyle: TextStyle
-//expect var Text.maxLines: Double
-//expect var Text.gravity: String
 //
-//expect class Image: NView
-//expect fun ViewContext.imageView(setup: Image.()->Unit = {}): Image
-//expect var Image.src: ImageSource
-//expect var Image.scaleType: ImageMode
+expect class Image: NView
+expect fun ViewContext.image(setup: Image.()->Unit = {}): Unit
+expect var Image.source: ImageSource
+expect var Image.scaleType: ImageMode
 //
 //expect class Video: NView
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video
@@ -122,17 +115,9 @@ expect class Row: NView
 //expect class HorizontalScrollView: NView
 //expect fun ViewContext.horizontalScrollView(setup: HorizontalScrollView.()->Unit = {}): HorizontalScrollView
 //
-//expect class Box: NView
-//expect fun ViewContext.box(setup: Box.()->Unit = {}): Box
+expect class Box: NView
+expect fun ViewContext.box(setup: Box.()->Unit = {}): Unit
 //expect var Box.children: List<NView>
-//
-//expect class Row: NView
-//expect fun ViewContext.row(setup: Row.()->Unit = {}): Row
-//expect var Row.children: List<NView>
-//
-//expect class Column: NView
-//expect fun ViewContext.column(setup: Column.()->Unit = {}): Column
-//expect var Column.children: List<NView>
 //
 //expect class RecyclerView: NView
 //expect fun ViewContext.recyclerView(setup: RecyclerView.()->Unit = {}): RecyclerView

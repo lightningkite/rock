@@ -13,6 +13,14 @@ data class ImageRemote(val url: String) : ImageSource()
 class ImageRaw(val data: ByteArray) : ImageSource()
 expect class ImageResource : ImageSource
 
+data class SizeConstraints(
+    val minWidth: Dimension? = null,
+    val maxWidth: Dimension? = null,
+    val minHeight: Dimension? = null,
+    val maxHeight: Dimension? = null,
+    val width: Dimension? = null,
+    val height: Dimension? = null,
+)
 
 data class Insets(
     val left: Dimension? = null,
@@ -29,14 +37,18 @@ data class Insets(
 
 data class TextStyle(
     val color: Color = Color.black,
-    val font: Font,
-    val bold: Boolean,
-    val italic: Boolean,
-    val allCaps: Boolean,
-    val lineSpacingMultiplier: Double,
-    val letterSpacing: Dimension,
+    val size: Double = 14.0,
+    val font: Font = systemDefaultFont,
+    val bold: Boolean = false,
+    val italic: Boolean = false,
+    val allCaps: Boolean = false,
+    val lineSpacingMultiplier: Double = 1.0,
+    val letterSpacing: Dimension = 0.px,
 )
 
+enum class TextGravity {
+    Left, Center, Right
+}
 
 data class KeyboardHints(
     val case: KeyboardCase,

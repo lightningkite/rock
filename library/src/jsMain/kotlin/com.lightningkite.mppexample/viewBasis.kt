@@ -71,6 +71,12 @@ actual val NView.onRemove: OnRemoveHandler
         }
     }
 
+actual var NView.visible: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        style.display = if (value) "flex" else "none"
+    }
+
 
 private val HTMLElement.removeListeners: MutableList<() -> Unit>
     get() = removeListenersMaybe ?: run {

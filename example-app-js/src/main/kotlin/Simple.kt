@@ -13,30 +13,51 @@ fun main() {
     }, 1000)
     val context = ViewContext(document.body!!)
     context.myView(counter)
-    with(context) {
-        val prop = Property(1)
-        column {
-            simpleLabel {
-                text = "Hi!  Welcome! ${counter.once}"
-            }
-
-            element<HTMLAnchorElement>("a") {
-                innerText = "Test"
-                href = "https://google.com"
-            }
-
-            simpleLabel {
-                ::text { "Counter value: ${counter.current}" }
-            } in padding() in padding()
-
-            padding()
-            simpleLabel {
-                ::text { "Counter value plus one: ${counter.current + prop.current}" }
-            }
-
-            simpleLabel {
-                reactiveScope { text = "Counter value plus one: ${counter.current + prop.current}" }
-            }
-        }
-    }
+//    with(context) {
+////        val prop = Property(1)
+////
+////        val lat = Property<Double?>(null)
+////        val lon = Property<Double?>(null)
+////
+////        watchGeolocation { pos ->
+////            lat set pos.latitude
+////            lon set pos.longitude
+////        }
+////
+////        column {
+////
+////            simpleLabel {
+////                text = "Hi!  Welcome! ${counter.once}"
+////            }
+////            row {
+////                simpleLabel {
+////                    ::text { "Lat: ${lat.current}" }
+////                }
+////                simpleLabel {
+////                    ::text { "Lon: ${lon.current}" }
+////                }
+////            }
+////            simpleLabel {
+////                text = "Hi!  Welcome! ${counter.once}"
+////            }
+//////
+//////            element<HTMLAnchorElement>("a") {
+//////                innerText = "Test"
+//////                href = "https://google.com"
+//////            }
+//////
+//////            simpleLabel {
+//////                ::text { "Counter value: ${counter.current}" }
+//////            } in padding() in padding()
+//////
+//////            padding()
+//////            simpleLabel {
+//////                ::text { "Counter value plus one: ${counter.current + prop.current}" }
+//////            }
+//////
+//////            simpleLabel {
+//////                reactiveScope { text = "Counter value plus one: ${counter.current + prop.current}" }
+//////            }
+////        }
+//    }
 }

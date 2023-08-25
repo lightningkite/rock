@@ -7,14 +7,15 @@ actual class ViewContext(
     parent: HTMLElement
 ) {
     val stack = arrayListOf(parent)
-    inline fun <T: HTMLElement> stackUse(item: T, action: T.()->Unit) = ListeningLifecycleStack.useIn(this.onRemove) {
-        stack.add(item)
-        try {
-            action(item)
-        } finally {
-            stack.removeLast()
+    inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
+        ListeningLifecycleStack.useIn(this.onRemove) {
+            stack.add(item)
+            try {
+                action(item)
+            } finally {
+                stack.removeLast()
+            }
         }
-    }
 
     val onRemoveList = ArrayList<() -> Unit>()
     actual val onRemove: OnRemoveHandler = {
@@ -64,6 +65,30 @@ actual val NView.onRemove: OnRemoveHandler
         }
     }
 
+actual var NView.background: Background?
+    get() {
+        return null
+    }
+    set(value) {
+        if (value != null) {
+            this.style.removeProperty("background")
+            this.style.removeProperty("backgroundImage")
+            if (value.fill is Color)
+                this.style.background = value.fill.toWeb()
+            if (value.fill is LinearGradient) {
+                this.style.backgroundImage = "linear-gradient(${value.fill.angle.turns}turn, ${
+                    value.fill.stops.joinToString {
+                        it.color.toWeb()
+                    }
+                })"
+            }
+//                this.style.backgroundImage = "linear-gradient(${value.fill.angle.turns}turn, ${
+//                    value.fill.stops.map {
+//                        it.color.toWeb()
+//                    }})"
+        }
+    }
+
 private val HTMLElement.removeListeners: MutableList<() -> Unit>
     get() = removeListenersMaybe ?: run {
         val newList = ArrayList<() -> Unit>()
@@ -97,6 +122,7 @@ private object RemoveListeners {
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias SimpleLabel = HTMLParagraphElement
+
 actual inline fun ViewContext.simpleLabel(setup: SimpleLabel.() -> Unit): Unit = element("p", setup)
 actual var SimpleLabel.text: String
     get() = this.textContent ?: ""
@@ -107,9 +133,19 @@ actual var SimpleLabel.text: String
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Column = HTMLDivElement
+
 actual inline fun ViewContext.column(setup: Column.() -> Unit): Unit = element<HTMLDivElement>("div") {
     style.display = "flex"
     style.flexDirection = "column"
+    setup()
+}
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias Row = HTMLDivElement
+
+actual inline fun ViewContext.row(setup: Row.() -> Unit): Unit = element<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.flexDirection = "row"
     setup()
 }
 

@@ -17,10 +17,10 @@ class ImageRaw(val data: ByteArray): ImageSource()
 expect class ImageResource: ImageSource
 
 data class Background(
-    val fill: Paint,
-    val stroke: Color,
-    val strokeWidth: Dimension,
-    val corners: CornerRadii?,
+    val fill: Paint? = null,
+    val stroke: Color? = null,
+    val strokeWidth: Dimension? = null,
+    val corners: CornerRadii? = null,
 ) {
     companion object {
         fun capsule(

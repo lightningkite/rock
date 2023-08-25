@@ -155,5 +155,6 @@ expect fun ViewContext.box(setup: Box.() -> Unit = {}): Unit
 //expect class Pager: NView
 //expect fun ViewContext.pager(setup: Pager.()->Unit = {}): Pager
 //
-//expect class WebView: NView
-//expect fun ViewContext.webView(setup: WebView.()->Unit = {}): WebView
+expect class WebView: NView
+expect fun ViewContext.webView(setup: WebView.()->Unit = {}): Unit
+expect var WebView.url: String

@@ -162,6 +162,15 @@ fun ViewContext.myView(counter: Readable<Int>) {
                 height = 400.px
             )
         )
+
+        webView {
+            url = "http://localhost:8080"
+        } in sizedBox(
+            SizeConstraints(
+                width = 512.px,
+                height = 512.px
+            )
+        )
     }
 }
 

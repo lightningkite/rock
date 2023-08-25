@@ -16,7 +16,7 @@ fun ViewContext.myView(counter: Readable<Int>) {
         row {
             simpleLabel {
                 ::text { "Lat: ${lat.current}" }
-            }
+            } in padding(Insets(right = 36.px))
             column {
                 simpleLabel {
                     text = "Hello world"

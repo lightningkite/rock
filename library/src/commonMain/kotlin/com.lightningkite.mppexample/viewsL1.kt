@@ -11,7 +11,10 @@ expect class Column: NView
 @ViewDsl expect fun ViewContext.row(setup: Row.()->Unit = {}): Unit
 expect class Row: NView
 
-@ViewModifierDsl3 expect fun ViewContext.padding(): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.padding(insets: String = "0"): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
+@ViewModifierDsl3 expect fun ViewContext.margin(insets: String = "0"): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.withBackground(background: Background): ViewWrapper
 
 

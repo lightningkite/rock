@@ -79,4 +79,22 @@ actual fun ViewContext.withBackground(background: Background): ViewWrapper {
 //    }
 //}
 
-actual fun ViewContext.padding(): ViewWrapper = containsNext<HTMLDivElement>("div") { style.padding = "1rem" }
+actual fun ViewContext.padding(insets: Insets): ViewWrapper =
+    containsNext<HTMLDivElement>("div") {
+        style.paddingLeft = insets.left?.value ?: "0"
+        style.paddingRight = insets.right?.value ?: "0"
+        style.paddingTop = insets.top?.value ?: "0"
+        style.paddingBottom = insets.bottom?.value ?: "0"
+    }
+
+actual fun ViewContext.padding(insets: String): ViewWrapper = padding(Insets(Dimension(insets)))
+
+actual fun ViewContext.margin(insets: Insets): ViewWrapper =
+    containsNext<HTMLDivElement>("div") {
+        style.marginLeft = insets.left?.value ?: "0"
+        style.marginRight = insets.right?.value ?: "0"
+        style.marginTop = insets.top?.value ?: "0"
+        style.marginBottom = insets.bottom?.value ?: "0"
+    }
+
+actual fun ViewContext.margin(insets: String): ViewWrapper = margin(Insets(Dimension(insets)))

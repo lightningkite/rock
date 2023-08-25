@@ -1,12 +1,13 @@
 package com.lightningkite.mppexample
 
-import kotlinx.browser.document
-import org.w3c.dom.css.CSSStyleSheet
-import org.w3c.dom.css.get
+actual typealias DimensionRaw = String
+actual val Int.px: Dimension
+    get() = Dimension("${this}px")
 
-actual typealias Dimension = Double
+actual val Int.rem: Dimension
+    get() = Dimension("${this}rem")
 
-actual val DimensionZero get() = 0.0
+actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension("calc(${this.value} + ${other.value})")
 
 actual typealias Font = String
 

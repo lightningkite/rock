@@ -1,64 +1,30 @@
 package com.lightningkite.mppexample
 
-expect class Dimension
-
-expect val DimensionZero: Dimension
-
 expect class Font
 
 expect val systemDefaultFont: Font
 
 expect sealed class ImageSource()
-data class ImageVector(val paths: List<Path>): ImageSource() {
+data class ImageVector(val paths: List<Path>) : ImageSource() {
     data class Path(val fillColor: Paint, val strokeColor: Color, val strokeWidth: Dimension, val path: String)
 }
-data class ImageRemote(val url: String): ImageSource()
-class ImageRaw(val data: ByteArray): ImageSource()
-expect class ImageResource: ImageSource
 
-data class Background(
-    val fill: Paint? = null,
-    val stroke: Color? = null,
-    val strokeWidth: Dimension? = null,
-    val corners: CornerRadii? = null,
+data class ImageRemote(val url: String) : ImageSource()
+class ImageRaw(val data: ByteArray) : ImageSource()
+expect class ImageResource : ImageSource
+
+
+data class Insets(
+    val left: Dimension? = null,
+    val top: Dimension? = null,
+    val right: Dimension? = null,
+    val bottom: Dimension? = null
 ) {
+    constructor(all: Dimension) : this(all, all, all, all)
+
     companion object {
-        fun capsule(
-            fill: Paint,
-            stroke: Color,
-            strokeWidth: Dimension,
-        ) = Background(fill, stroke, strokeWidth, corners = null)
-        fun rectangle(
-            fill: Paint,
-            stroke: Color,
-            strokeWidth: Dimension,
-        ) = Background(fill, stroke, strokeWidth, corners = CornerRadii(DimensionZero))
-        fun roundedRectangle(
-            fill: Paint,
-            stroke: Color,
-            strokeWidth: Dimension,
-            corners: CornerRadii
-        ) = Background(fill, stroke, strokeWidth, corners = corners)
-        fun roundedRectangle(
-            fill: Paint,
-            stroke: Color,
-            strokeWidth: Dimension,
-            cornerRadius: Dimension
-        ) = Background(fill, stroke, strokeWidth, corners = CornerRadii(cornerRadius))
+        fun zero() = Insets(0.px)
     }
-}
-
-data class CornerRadii(
-    val topLeft: Dimension,
-    val topRight: Dimension,
-    val bottomLeft: Dimension,
-    val bottomRight: Dimension
-) {
-    constructor(all: Dimension) : this(all, all, all, all)
-}
-
-data class Insets(val left: Dimension, val top: Dimension, val right: Dimension, val bottom: Dimension) {
-    constructor(all: Dimension) : this(all, all, all, all)
 }
 
 data class TextStyle(
@@ -105,3 +71,10 @@ data class Tab(
     val onSelect: () -> Unit,
     val onReselect: () -> Unit = onSelect,
 )
+
+expect class DimensionRaw
+value class Dimension(val value: DimensionRaw)
+
+expect val Int.px: Dimension
+expect val Int.rem: Dimension
+expect inline operator fun Dimension.plus(other: Dimension): Dimension

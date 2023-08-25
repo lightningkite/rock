@@ -13,44 +13,31 @@ fun ViewContext.myView(counter: Readable<Int>) {
     }
 
     column {
-//        background = Background(fill = Color(1f, 255f, 0f, 0f))
-        background = Background(
-            fill = LinearGradient(
-                angle = Angle(0.125f),
-                stops = listOf(
-                    GradientStop(ratio = 0.5f, color=Color(1f, 1f, 0f, 0f)),
-                    GradientStop(ratio = 0.5f, color=Color(1f, 0f, 1f, 0f)),
-                )
-            )
-        )
         row {
             simpleLabel {
                 ::text { "Lat: ${lat.current}" }
             }
-            simpleLabel {
-                ::text { "Lon: ${lon.current}" }
+            column {
+                simpleLabel {
+                    text = "Hello world"
+                }
+                simpleLabel {
+                    text = "Hello world 2"
+                } in withBackground(Background(fill = Color(1f, 1f, 1f, 1f)))
+                simpleLabel {
+                    ::text { "Lon: ${lon.current}" }
+                } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
-        }
+        } in withBackground(Background(
+            fill = RadialGradient(
 
-//        simpleLabel {
-//            text = "Hi!  Welcome! ${counter.once}"
-//        }
-//
-//
-//        simpleLabel {
-//            ::text {
-//                "Counter value: ${counter.current}"
-//            }
-//        } in padding() in padding()
-//
-//        padding()
-//        simpleLabel {
-//            ::text { "Counter value plus one: ${counter.current + prop.current}" }
-//        }
-//
-//        simpleLabel {
-//            reactiveScope { text = "Counter value plus one: ${counter.current + prop.current}" }
-//        }
+                stops = listOf(
+                    GradientStop(ratio = 0.5f, color=Color(1f, 1f, 0f, 0f)),
+                    GradientStop(ratio = 0.6f, color=Color(1f, 0f, 1f, 0f)),
+                    GradientStop(ratio = 0.7f, color=Color(1f, 0f, 0f, 1f)),
+                )
+            )
+        ))
     }
 }
 

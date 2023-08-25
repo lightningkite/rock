@@ -27,6 +27,7 @@ actual class ViewContext(
         onRemoveList.clear()
     }
 
+    val elementToDoList = ArrayList<HTMLElement.()->Unit>()
     var popCount = 0
     inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
         val element = (document.createElement(name) as T)
@@ -41,15 +42,20 @@ actual class ViewContext(
 
     inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) {
         (document.createElement(name) as T).apply {
+            elementToDoList.forEach { it(this) }
+            elementToDoList.clear()
+            var toPop = popCount
+            popCount = 0
             stackUse(this) {
                 setup()
             }
             stack.last().appendChild(this)
-            while (popCount > 0) {
+            while (toPop > 0) {
                 println("End containsNext")
                 val item = stack.removeLast()
+                println("${stack.size} left")
                 stack.last().appendChild(item)
-                popCount--
+                toPop--
             }
         }
     }
@@ -65,29 +71,6 @@ actual val NView.onRemove: OnRemoveHandler
         }
     }
 
-actual var NView.background: Background?
-    get() {
-        return null
-    }
-    set(value) {
-        if (value != null) {
-            this.style.removeProperty("background")
-            this.style.removeProperty("backgroundImage")
-            if (value.fill is Color)
-                this.style.background = value.fill.toWeb()
-            if (value.fill is LinearGradient) {
-                this.style.backgroundImage = "linear-gradient(${value.fill.angle.turns}turn, ${
-                    value.fill.stops.joinToString {
-                        it.color.toWeb()
-                    }
-                })"
-            }
-//                this.style.backgroundImage = "linear-gradient(${value.fill.angle.turns}turn, ${
-//                    value.fill.stops.map {
-//                        it.color.toWeb()
-//                    }})"
-        }
-    }
 
 private val HTMLElement.removeListeners: MutableList<() -> Unit>
     get() = removeListenersMaybe ?: run {
@@ -119,34 +102,3 @@ private object RemoveListeners {
         )
     }
 }
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias SimpleLabel = HTMLParagraphElement
-
-actual inline fun ViewContext.simpleLabel(setup: SimpleLabel.() -> Unit): Unit = element("p", setup)
-actual var SimpleLabel.text: String
-    get() = this.textContent ?: ""
-    set(value) {
-        this.textContent = value
-    }
-
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias Column = HTMLDivElement
-
-actual inline fun ViewContext.column(setup: Column.() -> Unit): Unit = element<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "column"
-    setup()
-}
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias Row = HTMLDivElement
-
-actual inline fun ViewContext.row(setup: Row.() -> Unit): Unit = element<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "row"
-    setup()
-}
-
-actual fun ViewContext.padding(): ViewWrapper = containsNext<HTMLDivElement>("div") { style.padding = "1rem" }

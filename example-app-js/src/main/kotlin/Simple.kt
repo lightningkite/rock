@@ -9,7 +9,7 @@ fun main() {
     val counter = Property(0)
     window.setInterval({
         counter modify { it + 1 }
-        println(counter.once)
+//        println(counter.once)
     }, 1000)
     val context = ViewContext(document.body!!)
     context.myView(counter)

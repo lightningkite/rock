@@ -7,6 +7,9 @@ fun ViewContext.myView(counter: Readable<Int>) {
     val lat = Property<Double?>(null)
     val lon = Property<Double?>(null)
 
+    val textProp = Property("")
+    val dropdownProp = Property<String?>(null)
+
     watchGeolocation { pos ->
         lat set pos.latitude
         lon set pos.longitude
@@ -52,6 +55,37 @@ fun ViewContext.myView(counter: Readable<Int>) {
                 )
             )
         )
+        editText {
+            bind(textProp)
+            hint = "test 123"
+        }
+
+        button {
+            onClick {
+                println("test button")
+            }
+            text = "click me"
+        }
+
+        text {
+            ::text { "You input: '${textProp.current}'" }
+        }
+
+        dropDown {
+            bind(
+                options = {
+                    listOf("Hello", "World")
+                },
+                getKey = { it.lowercase() },
+                getLabel = { it.uppercase() },
+                prop = dropdownProp
+            )
+        }
+
+        text {
+            ::text { "You selected: '${dropdownProp.current}'" }
+        }
+
         text {
             ::text { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
             ::visible { counter.current % 2 == 0 }
@@ -62,9 +96,11 @@ fun ViewContext.myView(counter: Readable<Int>) {
                 scaleType = ImageMode.Fit
                 source = ImageRemote("https://picsum.photos/200/300")
             }
-        } in sizedBox(SizeConstraints(
-            height = 400.px
-        ))
+        } in sizedBox(
+            SizeConstraints(
+                height = 400.px
+            )
+        )
     }
 }
 

@@ -1,21 +1,31 @@
 package com.lightningkite.mppexample
 
 
-@ViewModifierDsl3 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.padding(insets: String = "0"): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.margin(insets: String = "0"): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.withBackground(background: Background): ViewWrapper
+@ViewModifierDsl3
+expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
+@ViewModifierDsl3
+expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
+@ViewModifierDsl3
+expect fun ViewContext.padding(insets: String = "0"): ViewWrapper
+@ViewModifierDsl3
+expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
+@ViewModifierDsl3
+expect fun ViewContext.margin(insets: String = "0"): ViewWrapper
+@ViewModifierDsl3
+expect fun ViewContext.withBackground(background: Background): ViewWrapper
 
-@ViewDsl expect fun ViewContext.column(setup: Column.()->Unit = {}): Unit
-expect class Column: NView
+@ViewDsl
+expect fun ViewContext.column(setup: Column.() -> Unit = {}): Unit
+expect class Column : NView
 
-@ViewDsl expect fun ViewContext.row(setup: Row.()->Unit = {}): Unit
-expect class Row: NView
+@ViewDsl
+expect fun ViewContext.row(setup: Row.() -> Unit = {}): Unit
+expect class Row : NView
 
-@ViewDsl expect fun ViewContext.text(setup: Text.()->Unit = {}): Unit
-expect class Text: NView
+@ViewDsl
+expect fun ViewContext.text(setup: Text.() -> Unit = {}): Unit
+expect class Text : NView
+
 expect var Text.text: String
 expect var Text.textStyle: TextStyle
 expect var Text.gravity: TextGravity
@@ -27,6 +37,7 @@ expect var Text.gravity: TextGravity
 //expect var NView.elevation: Dimension
 //expect var NView.exists: Boolean
 expect var NView.visible: Boolean
+
 //
 //expect class ImageButton: NView
 //expect fun ViewContext.imageButton(setup: ImageButton.()->Unit = {}): ImageButton
@@ -34,18 +45,23 @@ expect var NView.visible: Boolean
 //expect var ImageButton.scaleType: String
 //expect var ImageButton.gravity: String
 //
-//expect class Button: NView
-//expect fun ViewContext.button(setup: Button.()->Unit = {}): Button
-//expect var Button.text: String
+expect class Button : NView
+
+expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
+expect var Button.text: String
+
 //expect var Button.textStyle: TextStyle
 //expect var Button.gravity: String
-//expect fun Button.onClick(action: ()->Unit)
+expect fun Button.onClick(action: () -> Unit)
+
 //
 //
-expect class Image: NView
-expect fun ViewContext.image(setup: Image.()->Unit = {}): Unit
+expect class Image : NView
+
+expect fun ViewContext.image(setup: Image.() -> Unit = {}): Unit
 expect var Image.source: ImageSource
 expect var Image.scaleType: ImageMode
+
 //
 //expect class Video: NView
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video
@@ -58,12 +74,16 @@ expect var Image.scaleType: ImageMode
 //expect class Space: NView
 //expect fun ViewContext.space(setup: Space.()->Unit = {}): Space
 //
-//expect class EditText: NView
-//expect fun ViewContext.editText(setup: EditText.()->Unit = {}): EditText
-//expect val EditText.text: Writable<String>
+expect class EditText : NView
+typealias TextInput = EditText
+
+expect fun ViewContext.editText(setup: EditText.() -> Unit = {}): Unit
+expect fun EditText.bind(text: Writable<String>): Unit
+
 //expect var EditText.textStyle: TextStyle
 //expect var EditText.keyboardHints: KeyboardHints
-//expect var EditText.hint: String
+expect var EditText.hint: String
+
 //
 //expect class AutoCompleteTextView: NView
 //expect fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.()->Unit = {}): AutoCompleteTextView
@@ -72,9 +92,26 @@ expect var Image.scaleType: ImageMode
 //expect var AutoCompleteTextView.keyboardHints: KeyboardHints
 //expect var AutoCompleteTextView.hint: String
 //
-//expect class DropDown: NView
-//typealias Spinner = DropDown
-//expect fun ViewContext.dropDown(setup: DropDown.()->Unit = {}): DropDown
+expect class DropDown : NView
+typealias Spinner = DropDown
+
+expect fun ViewContext.dropDown(setup: DropDown.() -> Unit = {}): Unit
+expect fun <T> DropDown.bind(
+    options: ReactiveScope.() -> List<T>,
+    getLabel: (T) -> String,
+    getKey: (T) -> String,
+    prop: Writable<T?>,
+): Unit
+
+expect var DropDown.values: List<DropDownOption>
+
+typealias SpinnerOption = DropDownOption
+
+data class DropDownOption(
+    val key: String,
+    val label: String
+)
+
 //
 //expect class SeekBar: NView
 //expect fun ViewContext.seekBar(setup: SeekBar.()->Unit = {}): SeekBar
@@ -115,8 +152,9 @@ expect var Image.scaleType: ImageMode
 //expect class HorizontalScrollView: NView
 //expect fun ViewContext.horizontalScrollView(setup: HorizontalScrollView.()->Unit = {}): HorizontalScrollView
 //
-expect class Box: NView
-expect fun ViewContext.box(setup: Box.()->Unit = {}): Unit
+expect class Box : NView
+
+expect fun ViewContext.box(setup: Box.() -> Unit = {}): Unit
 //expect var Box.children: List<NView>
 //
 //expect class RecyclerView: NView

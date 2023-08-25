@@ -22,7 +22,6 @@ actual fun <T> DropDown.bind(
     var lastListener: ((Event) -> Unit)? = null
     reactiveScope {
         innerHTML = ""
-        var idx = 0
         var foundSelected = false
         val optionValues = options()
         appendChild(document.createElement("option").apply {
@@ -39,7 +38,6 @@ actual fun <T> DropDown.bind(
                 if (key == prop.once)
                     foundSelected = true
             })
-            idx++
         }
         if (lastListener != null)
             removeEventListener("change", lastListener)

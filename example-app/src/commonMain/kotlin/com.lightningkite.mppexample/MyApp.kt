@@ -10,6 +10,7 @@ fun ViewContext.myView(counter: Readable<Int>) {
     val textProp = Property("")
     val dropdownProp = Property<String?>(null)
     val checkedProp = Property(false)
+    val radioProp = Property("one")
 
     val apiResponse = Property<String?>(null)
 
@@ -22,10 +23,16 @@ fun ViewContext.myView(counter: Readable<Int>) {
         text {
             ::text { "Counter: ${counter.current}" }
         }
-        text {
-            text = "This is outside the row"
-            gravity = TextGravity.Center
+
+        radioButton {
+            bind(
+                options = { listOf("one", "two") },
+                prop = radioProp,
+                getLabel = { it },
+                getKey = { it }
+            )
         }
+
         row {
             text {
                 textStyle = TextStyle(
@@ -108,15 +115,16 @@ fun ViewContext.myView(counter: Readable<Int>) {
 
         scrollView {
             text {
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque diam volutpat commodo sed egestas. Arcu odio ut sem nulla pharetra diam. Sit amet commodo nulla facilisi nullam vehicula ipsum a arcu. Tincidunt arcu non sodales neque. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Tempor id eu nisl nunc mi ipsum faucibus vitae. Scelerisque purus semper eget duis at tellus at urna. Sed euismod nisi porta lorem mollis aliquam. Gravida rutrum quisque non tellus orci ac. Eu sem integer vitae justo. Pretium nibh ipsum consequat nisl vel pretium lectus quam id. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.\n" +
-                        "\n" +
-                        "Urna duis convallis convallis tellus id interdum velit laoreet id. Tellus integer feugiat scelerisque varius morbi enim. Volutpat diam ut venenatis tellus in metus vulputate. Pharetra et ultrices neque ornare aenean euismod. Posuere ac ut consequat semper viverra nam. Tempor orci eu lobortis elementum nibh tellus molestie nunc. A scelerisque purus semper eget duis. Cras sed felis eget velit. Orci eu lobortis elementum nibh tellus. Sed blandit libero volutpat sed cras. Tempor commodo ullamcorper a lacus vestibulum sed. A pellentesque sit amet porttitor eget dolor. Viverra mauris in aliquam sem fringilla ut.\n" +
-                        "\n" +
-                        "Etiam tempor orci eu lobortis elementum nibh. Dolor sit amet consectetur adipiscing elit. Congue eu consequat ac felis donec et odio. Tincidunt vitae semper quis lectus nulla at volutpat diam. Eu tincidunt tortor aliquam nulla. Eget nunc scelerisque viverra mauris. Purus sit amet luctus venenatis lectus magna. Nunc mattis enim ut tellus elementum sagittis vitae et. Gravida neque convallis a cras. Accumsan tortor posuere ac ut consequat semper viverra. Amet consectetur adipiscing elit duis tristique sollicitudin nibh. At varius vel pharetra vel turpis nunc eget. Urna neque viverra justo nec ultrices dui sapien eget. Ut etiam sit amet nisl purus in mollis nunc. Quis risus sed vulputate odio ut enim blandit. Varius duis at consectetur lorem donec massa sapien faucibus. Sit amet mattis vulputate enim nulla aliquet porttitor.\n" +
-                        "\n" +
-                        "Cursus euismod quis viverra nibh cras pulvinar mattis nunc. Venenatis cras sed felis eget velit aliquet sagittis id consectetur. In hac habitasse platea dictumst quisque sagittis purus. Tellus rutrum tellus pellentesque eu tincidunt tortor aliquam nulla facilisi. Pellentesque adipiscing commodo elit at imperdiet. Dui id ornare arcu odio ut sem nulla. Habitant morbi tristique senectus et netus et malesuada. Mauris commodo quis imperdiet massa tincidunt. Ipsum a arcu cursus vitae congue mauris rhoncus aenean. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices gravida.\n" +
-                        "\n" +
-                        "Non curabitur gravida arcu ac tortor dignissim convallis aenean. Luctus venenatis lectus magna fringilla urna porttitor rhoncus dolor. Nisi quis eleifend quam adipiscing vitae proin sagittis nisl rhoncus. Habitant morbi tristique senectus et netus et malesuada fames ac. Iaculis urna id volutpat lacus laoreet non curabitur gravida. Habitant morbi tristique senectus et netus et malesuada. Facilisi nullam vehicula ipsum a arcu cursus. Orci a scelerisque purus semper eget duis. Urna cursus eget nunc scelerisque. Blandit volutpat maecenas volutpat blandit aliquam etiam erat. Id interdum velit laoreet id donec ultrices. Tristique nulla aliquet enim tortor at auctor urna nunc. Enim ut sem viverra aliquet eget. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Tempus imperdiet nulla malesuada pellentesque elit. Vulputate mi sit amet mauris commodo quis imperdiet."
+                text =
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque diam volutpat commodo sed egestas. Arcu odio ut sem nulla pharetra diam. Sit amet commodo nulla facilisi nullam vehicula ipsum a arcu. Tincidunt arcu non sodales neque. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Tempor id eu nisl nunc mi ipsum faucibus vitae. Scelerisque purus semper eget duis at tellus at urna. Sed euismod nisi porta lorem mollis aliquam. Gravida rutrum quisque non tellus orci ac. Eu sem integer vitae justo. Pretium nibh ipsum consequat nisl vel pretium lectus quam id. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.\n" +
+                            "\n" +
+                            "Urna duis convallis convallis tellus id interdum velit laoreet id. Tellus integer feugiat scelerisque varius morbi enim. Volutpat diam ut venenatis tellus in metus vulputate. Pharetra et ultrices neque ornare aenean euismod. Posuere ac ut consequat semper viverra nam. Tempor orci eu lobortis elementum nibh tellus molestie nunc. A scelerisque purus semper eget duis. Cras sed felis eget velit. Orci eu lobortis elementum nibh tellus. Sed blandit libero volutpat sed cras. Tempor commodo ullamcorper a lacus vestibulum sed. A pellentesque sit amet porttitor eget dolor. Viverra mauris in aliquam sem fringilla ut.\n" +
+                            "\n" +
+                            "Etiam tempor orci eu lobortis elementum nibh. Dolor sit amet consectetur adipiscing elit. Congue eu consequat ac felis donec et odio. Tincidunt vitae semper quis lectus nulla at volutpat diam. Eu tincidunt tortor aliquam nulla. Eget nunc scelerisque viverra mauris. Purus sit amet luctus venenatis lectus magna. Nunc mattis enim ut tellus elementum sagittis vitae et. Gravida neque convallis a cras. Accumsan tortor posuere ac ut consequat semper viverra. Amet consectetur adipiscing elit duis tristique sollicitudin nibh. At varius vel pharetra vel turpis nunc eget. Urna neque viverra justo nec ultrices dui sapien eget. Ut etiam sit amet nisl purus in mollis nunc. Quis risus sed vulputate odio ut enim blandit. Varius duis at consectetur lorem donec massa sapien faucibus. Sit amet mattis vulputate enim nulla aliquet porttitor.\n" +
+                            "\n" +
+                            "Cursus euismod quis viverra nibh cras pulvinar mattis nunc. Venenatis cras sed felis eget velit aliquet sagittis id consectetur. In hac habitasse platea dictumst quisque sagittis purus. Tellus rutrum tellus pellentesque eu tincidunt tortor aliquam nulla facilisi. Pellentesque adipiscing commodo elit at imperdiet. Dui id ornare arcu odio ut sem nulla. Habitant morbi tristique senectus et netus et malesuada. Mauris commodo quis imperdiet massa tincidunt. Ipsum a arcu cursus vitae congue mauris rhoncus aenean. Bibendum ut tristique et egestas quis ipsum suspendisse ultrices gravida.\n" +
+                            "\n" +
+                            "Non curabitur gravida arcu ac tortor dignissim convallis aenean. Luctus venenatis lectus magna fringilla urna porttitor rhoncus dolor. Nisi quis eleifend quam adipiscing vitae proin sagittis nisl rhoncus. Habitant morbi tristique senectus et netus et malesuada fames ac. Iaculis urna id volutpat lacus laoreet non curabitur gravida. Habitant morbi tristique senectus et netus et malesuada. Facilisi nullam vehicula ipsum a arcu cursus. Orci a scelerisque purus semper eget duis. Urna cursus eget nunc scelerisque. Blandit volutpat maecenas volutpat blandit aliquam etiam erat. Id interdum velit laoreet id donec ultrices. Tristique nulla aliquet enim tortor at auctor urna nunc. Enim ut sem viverra aliquet eget. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Tempus imperdiet nulla malesuada pellentesque elit. Vulputate mi sit amet mauris commodo quis imperdiet."
             }
         } in sizedBox(
             SizeConstraints(

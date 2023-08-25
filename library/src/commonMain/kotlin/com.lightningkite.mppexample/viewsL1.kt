@@ -137,13 +137,13 @@ expect fun <T> DropDown.bind(
 expect class CheckBox: NView
 expect fun ViewContext.checkBox(setup: CheckBox.()->Unit = {}): Unit
 expect fun CheckBox.bind(checked: Writable<Boolean>): Unit
-//
-//expect class ScrollView: NView
-//expect fun ViewContext.scrollView(setup: ScrollView.()->Unit = {}): ScrollView
-//
-//expect class HorizontalScrollView: NView
-//expect fun ViewContext.horizontalScrollView(setup: HorizontalScrollView.()->Unit = {}): HorizontalScrollView
-//
+
+expect class ScrollView: NView
+expect fun ViewContext.scrollView(setup: ScrollView.()->Unit = {}): Unit
+
+expect class HorizontalScrollView: NView
+expect fun ViewContext.horizontalScrollView(setup: HorizontalScrollView.()->Unit = {}): Unit
+
 expect class Box : NView
 
 expect fun ViewContext.box(setup: Box.() -> Unit = {}): Unit

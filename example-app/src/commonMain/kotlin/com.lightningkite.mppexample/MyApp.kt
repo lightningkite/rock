@@ -1,7 +1,6 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
-import kotlinx.serialization.json.Json
 
 fun ViewContext.myView(counter: Readable<Int>) {
     val prop = Property(1)
@@ -20,10 +19,6 @@ fun ViewContext.myView(counter: Readable<Int>) {
     }
 
     column {
-        text {
-            ::text { "Api Response: ${apiResponse.current}" }
-        }
-
         text {
             ::text { "Counter: ${counter.current}" }
         }
@@ -96,14 +91,13 @@ fun ViewContext.myView(counter: Readable<Int>) {
 
         checkBox {
             bind(checkedProp)
-        }
-
-        text {
-            ::text { "I am ${if (checkedProp.current) "" else " not "} checked" }
-            ::textStyle {
-                TextStyle(
-                    color = if (checkedProp.current) Color.red else Color.green
-                )
+            text {
+                ::text { "I am ${if (checkedProp.current) "" else " not "} checked" }
+                ::textStyle {
+                    TextStyle(
+                        color = if (checkedProp.current) Color.red else Color.green
+                    )
+                }
             }
         }
 

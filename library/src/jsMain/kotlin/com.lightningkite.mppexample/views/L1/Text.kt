@@ -1,12 +1,12 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.HTMLParagraphElement
+import org.w3c.dom.HTMLSpanElement
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias Text = HTMLParagraphElement
+actual typealias Text = HTMLSpanElement
 
-actual inline fun ViewContext.text(setup: Text.() -> Unit): Unit = element<HTMLParagraphElement>("p") {
+actual inline fun ViewContext.text(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("span") {
     textStyle = TextStyle()
     gravity = TextGravity.Left
     setup()

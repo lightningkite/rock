@@ -103,14 +103,6 @@ expect fun <T> DropDown.bind(
     prop: Writable<T?>,
 ): Unit
 
-expect var DropDown.values: List<DropDownOption>
-
-typealias SpinnerOption = DropDownOption
-
-data class DropDownOption(
-    val key: String,
-    val label: String
-)
 
 //
 //expect class SeekBar: NView
@@ -142,9 +134,9 @@ data class DropDownOption(
 //expect fun ViewContext.switch(setup: Switch.()->Unit = {}): Switch
 //expect val Switch.checked: Writable<Boolean>
 //
-//expect class CheckBox: NView
-//expect fun ViewContext.checkBox(setup: CheckBox.()->Unit = {}): CheckBox
-//expect val CheckBox.checked: Writable<Boolean>
+expect class CheckBox: NView
+expect fun ViewContext.checkBox(setup: CheckBox.()->Unit = {}): Unit
+expect fun CheckBox.bind(checked: Writable<Boolean>): Unit
 //
 //expect class ScrollView: NView
 //expect fun ViewContext.scrollView(setup: ScrollView.()->Unit = {}): ScrollView

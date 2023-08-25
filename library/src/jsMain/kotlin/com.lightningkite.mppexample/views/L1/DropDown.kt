@@ -66,9 +66,3 @@ actual fun <T> DropDown.bind(
 //        writable set it.currentTarget.asDynamic().value as String
 //    })
 //}
-
-actual var DropDown.values: List<DropDownOption>
-    get() = throw NotImplementedError()
-    set(values) {
-
-    }

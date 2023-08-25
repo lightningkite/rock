@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
+import kotlinx.serialization.json.Json
 
 fun ViewContext.myView(counter: Readable<Int>) {
     val prop = Property(1)
@@ -9,6 +10,9 @@ fun ViewContext.myView(counter: Readable<Int>) {
 
     val textProp = Property("")
     val dropdownProp = Property<String?>(null)
+    val checkedProp = Property(false)
+
+    val apiResponse = Property<String?>(null)
 
     watchGeolocation { pos ->
         lat set pos.latitude
@@ -16,6 +20,10 @@ fun ViewContext.myView(counter: Readable<Int>) {
     }
 
     column {
+        text {
+            ::text { "Api Response: ${apiResponse.current}" }
+        }
+
         text {
             ::text { "Counter: ${counter.current}" }
         }
@@ -84,6 +92,19 @@ fun ViewContext.myView(counter: Readable<Int>) {
 
         text {
             ::text { "You selected: '${dropdownProp.current}'" }
+        }
+
+        checkBox {
+            bind(checkedProp)
+        }
+
+        text {
+            ::text { "I am ${if (checkedProp.current) "" else " not "} checked" }
+            ::textStyle {
+                TextStyle(
+                    color = if (checkedProp.current) Color.red else Color.green
+                )
+            }
         }
 
         text {

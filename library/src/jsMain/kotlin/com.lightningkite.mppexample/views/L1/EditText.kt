@@ -8,6 +8,7 @@ import org.w3c.dom.HTMLParagraphElement
 actual typealias EditText = HTMLInputElement
 
 actual inline fun ViewContext.editText(setup: EditText.() -> Unit): Unit = element<HTMLInputElement>("input") {
+    type = "text"
     setup()
 }
 

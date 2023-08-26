@@ -2,8 +2,46 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-fun ViewContext.myView(counter: Readable<Int>) {
+fun ViewContext.asyncTest() {
+    val counter = Property(0)
     val prop = Property(1)
+    launch {
+        timeoutOrNull(5_000) {
+            while (true) {
+                delay(1000)
+                counter.modify { it + 1 }
+                async {
+                    for(i in 0 .. 5) {
+                        delay(500)
+                        prop.modify { it + 1 }
+                    }
+                }
+            }
+        }
+        println("WAIT STOP")
+    }
+    column {
+        row {
+            text { ::text { counter.current.toString() } }
+            text { text = " + " }
+            text { ::text { prop.current.toString() } }
+            text { text = " = " }
+            text { ::text { prop.current.plus(counter.current).toString() } }
+        }
+    }
+}
+
+fun ViewContext.myView() {
+    val counter = Property(0)
+    launch {
+        while (true) {
+            delay(1000)
+            counter.modify { it + 1 }
+            async {
+                delay(200)
+            }
+        }
+    }
     val lat = Property<Double?>(null)
     val lon = Property<Double?>(null)
 

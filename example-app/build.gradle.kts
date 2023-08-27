@@ -32,7 +32,14 @@ kotlin {
 //        }
 //    }
     js {
-        browser()
+        binaries.executable()
+        browser {
+            commonWebpackConfig {
+                cssSupport {
+                    enabled.set(true)
+                }
+            }
+        }
     }
 
     sourceSets {

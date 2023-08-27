@@ -33,7 +33,7 @@ kotlin {
 //            baseName = "library"
 //        }
 //    }
-    js {
+    js(IR) {
         browser()
     }
 

@@ -1,13 +1,11 @@
 package com.lightningkite.mppexample
 
-import kotlin.native.concurrent.ThreadLocal
 import kotlin.reflect.KMutableProperty0
 
 /**
  * Keeps track of the current builder's lifecycle to add listeners to.
  * TODO: Remove this in favor of context receivers when they are available
  */
-@ThreadLocal
 object ListeningLifecycleStack {
     val stack = ArrayList<OnRemoveHandler>()
     fun onRemove(action: () -> Unit) = stack.last()(action)
@@ -99,7 +97,7 @@ interface Writable<T> : Readable<T> {
 }
 
 class Property<T>(startValue: T) : Writable<T> {
-    val listeners = HashSet<() -> Unit>()
+    private val listeners = HashSet<() -> Unit>()
     override var once: T = startValue
         private set(value) {
             field = value

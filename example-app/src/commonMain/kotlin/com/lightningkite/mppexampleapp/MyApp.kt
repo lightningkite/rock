@@ -7,7 +7,10 @@ fun ViewContext.fetchTest() {
     launch {
         myOwnPage set fetch("/").text()
     }
-    text { ::text { myOwnPage.current } }
+    column {
+        text { ::text { myOwnPage.current } }
+        text { text = "You can enable hot reload via adding  --continuous to your run config" }
+    }
 }
 
 fun ViewContext.asyncTest() {

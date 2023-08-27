@@ -2,14 +2,40 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
+fun ViewContext.alignTest() {
+    column {
+        column {
+            text { text = "Test" } in alignLeft() in withBackground(Background(Color.teal))
+            text { text = "Test" } in alignCenter() in withBackground(Background(Color.teal))
+            text { text = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
+            text { text = "Test" } in alignRight() in withBackground(Background(Color.teal))
+        } in withBackground(Background(Color.yellow)) in weight(1f)
+        row {
+            text { text = "Test" } in alignTop() in withBackground(Background(Color.teal))
+            text { text = "Test" } in alignCenter() in withBackground(Background(Color.teal))
+            text { text = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
+            text { text = "Test" } in alignBottom() in withBackground(Background(Color.teal))
+        } in sizedBox(SizeConstraints(height = 100.px)) in withBackground(Background(Color.green))
+    }
+}
+
 fun ViewContext.fetchTest() {
     val myOwnPage = Property("")
     launch {
         myOwnPage set fetch("/").text()
     }
+    val barTextStyle = TextStyle(
+        color = Color.white,
+        size = 18.0,
+        bold = true,
+        font = Resources.titleFont
+    )
     column {
+        text {
+            text = "You can enable hot reload via adding  --continuous to your run config"
+            textStyle = barTextStyle
+        } in padding(1.rem) in withBackground(Background(Color.blue))
         text { ::text { myOwnPage.current } }
-        text { text = "You can enable hot reload via adding  --continuous to your run config" }
     }
 }
 

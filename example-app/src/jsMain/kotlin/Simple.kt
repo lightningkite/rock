@@ -7,5 +7,12 @@ import org.w3c.dom.HTMLAnchorElement
 
 fun main() {
     val context = ViewContext(document.body!!)
-    context.fetchTest()
+    context.elementToDoList.add {
+        style.position = "absolute"
+        style.left = "0px"
+        style.top = "0px"
+        style.right = "0px"
+        style.bottom = "0px"
+    }
+    context.alignTest()
 }

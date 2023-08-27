@@ -14,21 +14,25 @@ actual fun ViewContext.withBackground(background: Background): ViewWrapper {
         style.removeProperty("background")
         style.removeProperty("backgroundImage")
         style.removeProperty("backgroundAttachment")
-        if (background.fill is Color)
-            style.background = background.fill.toWeb()
-        if (background.fill is LinearGradient) {
-            if (background.fill.screenStatic)
-                this.style.backgroundAttachment = "fixed"
-            this.style.backgroundImage = "linear-gradient(${background.fill.angle.turns}turn, ${
-                joinGradientStops(background.fill.stops)
-            })"
-        }
-        if (background.fill is RadialGradient) {
-            if (background.fill.screenStatic)
-                this.style.backgroundAttachment = "fixed"
-            this.style.backgroundImage = "radial-gradient(circle at center, ${
-                joinGradientStops(background.fill.stops)
-            })"
+        when (background.fill) {
+            is Color -> style.background = background.fill.toWeb()
+            is LinearGradient -> {
+                if (background.fill.screenStatic)
+                    this.style.backgroundAttachment = "fixed"
+                this.style.backgroundImage = "linear-gradient(${background.fill.angle.turns}turn, ${
+                    joinGradientStops(background.fill.stops)
+                })"
+            }
+
+            is RadialGradient -> {
+                if (background.fill.screenStatic)
+                    this.style.backgroundAttachment = "fixed"
+                this.style.backgroundImage = "radial-gradient(circle at center, ${
+                    joinGradientStops(background.fill.stops)
+                })"
+            }
+
+            else -> { TODO() }
         }
     }
     return ViewWrapper
@@ -46,25 +50,29 @@ actual fun ViewContext.withBackground(background: Background): ViewWrapper {
 //    }
 //}
 
-actual fun ViewContext.padding(insets: Insets): ViewWrapper =
-    containsNext<HTMLDivElement>("div") {
+actual fun ViewContext.padding(insets: Insets): ViewWrapper {
+    elementToDoList.add {
         style.paddingLeft = insets.left?.value ?: "0"
         style.paddingRight = insets.right?.value ?: "0"
         style.paddingTop = insets.top?.value ?: "0"
         style.paddingBottom = insets.bottom?.value ?: "0"
     }
+    return ViewWrapper
+}
 
-actual fun ViewContext.padding(insets: String): ViewWrapper = padding(Insets(Dimension(insets)))
+actual fun ViewContext.padding(insets: Dimension): ViewWrapper = padding(Insets(insets))
 
-actual fun ViewContext.margin(insets: Insets): ViewWrapper =
-    containsNext<HTMLDivElement>("div") {
+actual fun ViewContext.margin(insets: Insets): ViewWrapper  {
+    elementToDoList.add {
         style.marginLeft = insets.left?.value ?: "0"
         style.marginRight = insets.right?.value ?: "0"
         style.marginTop = insets.top?.value ?: "0"
         style.marginBottom = insets.bottom?.value ?: "0"
     }
+    return ViewWrapper
+}
 
-actual fun ViewContext.margin(insets: String): ViewWrapper = margin(Insets(Dimension(insets)))
+actual fun ViewContext.margin(insets: Dimension): ViewWrapper = margin(Insets(insets))
 
 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
     elementToDoList.add {
@@ -98,6 +106,57 @@ actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
         else
             style.height = constraints.height.value
 
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.alignLeft(): ViewWrapper {
+    val parent = this.stack.last()
+    when (parent.style.flexDirection) {
+        "column" -> elementToDoList.add {
+            style.alignSelf = "start"
+        }
+    }
+    return ViewWrapper
+}
+actual fun ViewContext.alignRight(): ViewWrapper {
+    val parent = this.stack.last()
+    when (parent.style.flexDirection) {
+        "column" -> elementToDoList.add {
+            style.alignSelf = "end"
+        }
+    }
+    return ViewWrapper
+}
+actual fun ViewContext.alignCenter(): ViewWrapper {
+    elementToDoList.add {
+        style.alignSelf = "center"
+    }
+    return ViewWrapper
+}
+actual fun ViewContext.alignTop(): ViewWrapper {
+    val parent = this.stack.last()
+    when (parent.style.flexDirection) {
+        "row" -> elementToDoList.add {
+            style.alignSelf = "start"
+        }
+    }
+    return ViewWrapper
+}
+actual fun ViewContext.alignBottom(): ViewWrapper {
+    val parent = this.stack.last()
+    when (parent.style.flexDirection) {
+        "row" -> elementToDoList.add {
+            style.alignSelf = "end"
+        }
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.weight(amount: Float): ViewWrapper {
+    elementToDoList.add {
+        style.flexGrow = "$amount"
+        style.flexShrink = "$amount"
     }
     return ViewWrapper
 }

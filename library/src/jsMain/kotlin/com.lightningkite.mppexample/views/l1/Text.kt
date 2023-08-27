@@ -7,7 +7,6 @@ import org.w3c.dom.HTMLSpanElement
 actual typealias Text = HTMLSpanElement
 
 actual inline fun ViewContext.text(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("span") {
-    textStyle = TextStyle()
     gravity = TextGravity.Left
     setup()
 }
@@ -22,7 +21,7 @@ actual var Text.textStyle: TextStyle
     set(value) {
         style.color = value.color.toWeb()
         style.fontSize = value.size.toString()
-        style.font = value.font
+        style.fontFamily = value.font
         style.fontWeight = if (value.bold) "bold" else "normal"
         style.fontStyle = if (value.italic) "italic" else "normal"
         style.textTransform = if (value.allCaps) "capitalize" else "none"

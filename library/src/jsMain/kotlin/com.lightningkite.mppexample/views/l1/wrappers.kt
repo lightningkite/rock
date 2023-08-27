@@ -161,3 +161,20 @@ actual fun ViewContext.weight(amount: Float): ViewWrapper {
     return ViewWrapper
 }
 
+actual fun ViewContext.scrolls(): ViewWrapper {
+    elementToDoList.add {
+        style.display = "flex"
+        style.flexDirection = "column"
+        style.overflowY = "scroll"
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.scrollsHorizontally(): ViewWrapper {
+    elementToDoList.add {
+        style.display = "flex"
+        style.flexDirection = "row"
+        style.overflowX = "scroll"
+    }
+    return ViewWrapper
+}

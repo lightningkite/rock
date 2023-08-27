@@ -9,7 +9,7 @@ actual typealias WebView = HTMLIFrameElement
 actual inline fun ViewContext.webView(setup: WebView.() -> Unit): Unit = element<HTMLIFrameElement>("iframe", setup)
 
 actual var WebView.url: String
-    get() = throw NotImplementedError()
+    get() = src
     set(value) {
         src = value
     }

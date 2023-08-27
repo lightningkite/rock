@@ -37,6 +37,12 @@ expect fun ViewContext.margin(insets: Dimension): ViewWrapper
 @ViewModifierDsl3
 expect fun ViewContext.withBackground(background: Background): ViewWrapper
 
+@ViewModifierDsl3
+expect fun ViewContext.scrolls(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.scrollsHorizontally(): ViewWrapper
+
 @ViewDsl
 expect fun ViewContext.column(setup: Column.() -> Unit = {}): Unit
 expect class Column : NView
@@ -97,15 +103,15 @@ expect var Image.scaleType: ImageMode
 //expect class Space: NView
 //expect fun ViewContext.space(setup: Space.()->Unit = {}): Space
 //
-expect class EditText : NView
-typealias TextInput = EditText
+expect class TextField : NView
+typealias TextInput = TextField
 
-expect fun ViewContext.editText(setup: EditText.() -> Unit = {}): Unit
-expect fun EditText.bind(text: Writable<String>): Unit
+expect fun ViewContext.textField(setup: TextField.() -> Unit = {}): Unit
+expect fun TextField.bind(text: Writable<String>): Unit
 
 //expect var EditText.textStyle: TextStyle
 //expect var EditText.keyboardHints: KeyboardHints
-expect var EditText.hint: String
+expect var TextField.hint: String
 
 //
 //expect class AutoCompleteTextView: NView
@@ -167,14 +173,6 @@ expect class CheckBox : NView
 
 expect fun ViewContext.checkBox(setup: CheckBox.() -> Unit = {}): Unit
 expect fun CheckBox.bind(checked: Writable<Boolean>): Unit
-
-expect class ScrollView : NView
-
-expect fun ViewContext.scrollView(setup: ScrollView.() -> Unit = {}): Unit
-
-expect class HorizontalScrollView : NView
-
-expect fun ViewContext.horizontalScrollView(setup: HorizontalScrollView.() -> Unit = {}): Unit
 
 expect class Box : NView
 

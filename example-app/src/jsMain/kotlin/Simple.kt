@@ -14,5 +14,5 @@ fun main() {
         style.right = "0px"
         style.bottom = "0px"
     }
-    context.alignTest()
+    context.elementTest()
 }

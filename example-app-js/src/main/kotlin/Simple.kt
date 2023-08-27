@@ -7,5 +7,5 @@ import org.w3c.dom.HTMLAnchorElement
 
 fun main() {
     val context = ViewContext(document.body!!)
-    context.asyncTest()
+    context.fetchTest()
 }

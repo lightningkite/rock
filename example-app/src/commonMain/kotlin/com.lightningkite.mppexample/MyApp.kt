@@ -2,6 +2,14 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
+fun ViewContext.fetchTest() {
+    val myOwnPage = Property("")
+    launch {
+        myOwnPage set fetch("/").text()
+    }
+    text { ::text { myOwnPage.current } }
+}
+
 fun ViewContext.asyncTest() {
     val counter = Property(0)
     val prop = Property(1)

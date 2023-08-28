@@ -115,6 +115,8 @@ fun ViewContext.elementTest() {
         }
 
         row {
+            alpha = 0.5
+            rotation = Angle(-0.15f)
             text {
                 textStyle = TextStyle(
                     color = Color.teal,
@@ -152,20 +154,25 @@ fun ViewContext.elementTest() {
                 corners = CornerRadii(20.px)
             )
         ) in margin(1.rem)
-        textField {
-            bind(textProp)
-            hint = "test 123"
-            keyboardHints = KeyboardHints(
-                autocomplete = AutoComplete.Password,
-                action = null,
-                case = KeyboardCase.None,
-                type = KeyboardType.Text
-            )
-            textStyle = TextStyle(
-                color = Color.green,
-                bold = true
-            )
-        }
+
+        box {
+            elevation = 7.px
+            textField {
+                bind(textProp)
+                hint = "test 123"
+                keyboardHints = KeyboardHints(
+                    autocomplete = AutoComplete.Password,
+                    action = null,
+                    case = KeyboardCase.None,
+                    type = KeyboardType.Text
+                )
+                textStyle = TextStyle(
+                    color = Color.green,
+                    bold = true
+                )
+            } in margin(8.px)
+        } in padding(4.px) in withBackground(Background(fill = Color.teal, corners = CornerRadii(24.px))) in margin(4.rem)
+
 
         button {
             onClick { println("test button") }

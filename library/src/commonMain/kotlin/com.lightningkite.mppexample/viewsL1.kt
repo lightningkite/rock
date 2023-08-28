@@ -80,9 +80,9 @@ expect var Text.gravity: TextGravity
 //expect var Text.maxLines: Double? // this isn't easy to do in CSS
 
 //
-//expect var NView.rotation: Double
-//expect var NView.alpha: Double
-//expect var NView.elevation: Dimension
+expect var NView.rotation: Angle
+expect var NView.alpha: Double
+expect var NView.elevation: Dimension
 //expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 
@@ -97,7 +97,6 @@ expect class Button : NView
 
 expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
 
-//expect var Button.textStyle: TextStyle
 //expect var Button.gravity: String
 expect fun Button.onClick(action: () -> Unit)
 

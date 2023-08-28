@@ -79,6 +79,29 @@ actual var NView.visible: Boolean
         style.display = if (value) "flex" else "none"
     }
 
+actual var NView.alpha: Double
+    get() = throw NotImplementedError()
+    set(value) {
+        style.opacity = value.toString()
+    }
+
+actual var NView.rotation: Angle
+    get() = throw NotImplementedError()
+    set(value) {
+        style.transform = "rotate(${value.turns}turn)"
+    }
+
+actual var NView.elevation: Dimension
+    get() = throw NotImplementedError()
+    set(value) {
+        println("setting box shadow")
+        val offsetX = 0.px.value
+        val offsetY = value.value
+        val blur = 4.px.value
+        val spread = 0.px.value
+        style.boxShadow = "$offsetX $offsetY $blur $spread #77777799"
+    }
+
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NViewWithTextStyle = HTMLElement
 

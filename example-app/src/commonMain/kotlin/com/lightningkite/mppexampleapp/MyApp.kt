@@ -87,8 +87,6 @@ fun ViewContext.elementTest() {
     val checkedProp = Property(false)
     val radioProp = Property("one")
 
-    val apiResponse = Property<String?>(null)
-
     watchGeolocation { pos ->
         lat set pos.latitude
         lon set pos.longitude
@@ -136,21 +134,37 @@ fun ViewContext.elementTest() {
                     ::text { "Lon: ${lon.current}" }
                 } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
+            text {
+                ::text { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
+                ::visible { counter.current % 2 == 0 }
+            }
         } in withBackground(
             Background(
                 fill = RadialGradient(
-
                     stops = listOf(
                         GradientStop(ratio = 0.5f, color = Color(1f, 1f, 0f, 0f)),
                         GradientStop(ratio = 0.6f, color = Color(1f, 0f, 1f, 0f)),
                         GradientStop(ratio = 0.7f, color = Color(1f, 0f, 0f, 1f)),
                     )
-                )
+                ),
+                stroke = Color.purple,
+                strokeWidth = 6.px,
+                corners = CornerRadii(20.px)
             )
-        )
+        ) in margin(1.rem)
         textField {
             bind(textProp)
             hint = "test 123"
+            keyboardHints = KeyboardHints(
+                autocomplete = AutoComplete.Password,
+                action = null,
+                case = KeyboardCase.None,
+                type = KeyboardType.Text
+            )
+            textStyle = TextStyle(
+                color = Color.green,
+                bold = true
+            )
         }
 
         button {
@@ -192,11 +206,6 @@ fun ViewContext.elementTest() {
         }
 
         text {
-            ::text { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
-            ::visible { counter.current % 2 == 0 }
-        }
-
-        text {
             text =
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque diam volutpat commodo sed egestas. Arcu odio ut sem nulla pharetra diam. Sit amet commodo nulla facilisi nullam vehicula ipsum a arcu. Tincidunt arcu non sodales neque. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Tempor id eu nisl nunc mi ipsum faucibus vitae. Scelerisque purus semper eget duis at tellus at urna. Sed euismod nisi porta lorem mollis aliquam. Gravida rutrum quisque non tellus orci ac. Eu sem integer vitae justo. Pretium nibh ipsum consequat nisl vel pretium lectus quam id. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.\n" +
                         "\n" +
@@ -209,7 +218,7 @@ fun ViewContext.elementTest() {
                         "Non curabitur gravida arcu ac tortor dignissim convallis aenean. Luctus venenatis lectus magna fringilla urna porttitor rhoncus dolor. Nisi quis eleifend quam adipiscing vitae proin sagittis nisl rhoncus. Habitant morbi tristique senectus et netus et malesuada fames ac. Iaculis urna id volutpat lacus laoreet non curabitur gravida. Habitant morbi tristique senectus et netus et malesuada. Facilisi nullam vehicula ipsum a arcu cursus. Orci a scelerisque purus semper eget duis. Urna cursus eget nunc scelerisque. Blandit volutpat maecenas volutpat blandit aliquam etiam erat. Id interdum velit laoreet id donec ultrices. Tristique nulla aliquet enim tortor at auctor urna nunc. Enim ut sem viverra aliquet eget. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Tempus imperdiet nulla malesuada pellentesque elit. Vulputate mi sit amet mauris commodo quis imperdiet."
         } in scrolls() in sizedBox(
             SizeConstraints(
-                height = 64.px
+                minHeight = 64.px
             )
         ) in withBackground(
             Background(
@@ -232,8 +241,9 @@ fun ViewContext.elementTest() {
             text { text = "Hello" }
         } in scrollsHorizontally() in sizedBox(
             SizeConstraints(
-                height = 64.px,
-                width = 128.px,
+                minWidth = 128.px,
+                maxWidth = 128.px,
+                minHeight = 64.px
             )
         ) in withBackground(
             Background(
@@ -252,14 +262,36 @@ fun ViewContext.elementTest() {
             )
         )
 
-        webView {
-            url = "http://localhost:8080"
+        box {
+            image {
+                scaleType = ImageMode.Fit
+                source = ImageRemote("https://picsum.photos/200/300")
+            }
         } in sizedBox(
             SizeConstraints(
-                width = 512.px,
-                height = 512.px
+                height = 400.px
             )
         )
+
+        box {
+            image {
+                scaleType = ImageMode.Fit
+                source = ImageRemote("https://picsum.photos/200/300")
+            }
+        } in sizedBox(
+            SizeConstraints(
+                height = 400.px
+            )
+        )
+
+//        webView {
+//            url = "http://localhost:8080"
+//        } in sizedBox(
+//            SizeConstraints(
+//                width = 512.px,
+//                height = 512.px
+//            )
+//        )
     }
 }
 

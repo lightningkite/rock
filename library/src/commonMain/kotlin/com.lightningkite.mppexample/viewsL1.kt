@@ -109,8 +109,8 @@ typealias TextInput = TextField
 expect fun ViewContext.textField(setup: TextField.() -> Unit = {}): Unit
 expect fun TextField.bind(text: Writable<String>): Unit
 
-//expect var EditText.textStyle: TextStyle
-//expect var EditText.keyboardHints: KeyboardHints
+expect var TextField.textStyle: TextStyle
+expect var TextField.keyboardHints: KeyboardHints
 expect var TextField.hint: String
 
 //

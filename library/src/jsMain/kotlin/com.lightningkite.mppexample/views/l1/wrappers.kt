@@ -32,8 +32,33 @@ actual fun ViewContext.withBackground(background: Background): ViewWrapper {
                 })"
             }
 
-            else -> { TODO() }
+            null -> {}
         }
+
+        if (background.stroke == null)
+            style.removeProperty("borderColor")
+        else
+            style.borderColor = background.stroke.toWeb()
+
+        if (background.strokeWidth == null)
+            style.removeProperty("borderWidth")
+        else {
+            style.borderStyle = "solid"
+            style.borderWidth = background.strokeWidth.value
+        }
+
+        if (background.corners == null) {
+            style.removeProperty("borderTopLeftRadius")
+            style.removeProperty("borderTopRightRadius")
+            style.removeProperty("borderBottomLeftRadius")
+            style.removeProperty("borderBottomRightRadius")
+        } else {
+            style.borderTopLeftRadius = background.corners.topLeft.value
+            style.borderTopRightRadius = background.corners.topRight.value
+            style.borderBottomLeftRadius = background.corners.bottomLeft.value
+            style.borderBottomRightRadius = background.corners.bottomRight.value
+        }
+
     }
     return ViewWrapper
 }
@@ -62,7 +87,7 @@ actual fun ViewContext.padding(insets: Insets): ViewWrapper {
 
 actual fun ViewContext.padding(insets: Dimension): ViewWrapper = padding(Insets(insets))
 
-actual fun ViewContext.margin(insets: Insets): ViewWrapper  {
+actual fun ViewContext.margin(insets: Insets): ViewWrapper {
     elementToDoList.add {
         style.marginLeft = insets.left?.value ?: "0"
         style.marginRight = insets.right?.value ?: "0"
@@ -119,6 +144,7 @@ actual fun ViewContext.alignLeft(): ViewWrapper {
     }
     return ViewWrapper
 }
+
 actual fun ViewContext.alignRight(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {
@@ -128,12 +154,14 @@ actual fun ViewContext.alignRight(): ViewWrapper {
     }
     return ViewWrapper
 }
+
 actual fun ViewContext.alignCenter(): ViewWrapper {
     elementToDoList.add {
         style.alignSelf = "center"
     }
     return ViewWrapper
 }
+
 actual fun ViewContext.alignTop(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {
@@ -143,6 +171,7 @@ actual fun ViewContext.alignTop(): ViewWrapper {
     }
     return ViewWrapper
 }
+
 actual fun ViewContext.alignBottom(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {

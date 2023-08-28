@@ -88,12 +88,9 @@ expect var NView.visible: Boolean
 expect class Button : NView
 
 expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
-
 //expect var Button.gravity: String
 expect fun Button.onClick(action: () -> Unit)
 
-//
-//
 expect class Image : NView
 
 expect fun ViewContext.image(setup: Image.() -> Unit = {}): Unit
@@ -106,7 +103,7 @@ expect var Image.scaleType: ImageMode
 //
 //expect class ActivityIndicator: NView
 //typealias ProgressBar = ActivityIndicator
-//expect fun ViewContext.activityIndicator(setup: ActivityIndicator.()->Unit = {}): ActivityIndicator
+//expect fun ViewContext.activityIndicator(setup: ActivityIndicator.()->Unit = {}): Unit
 //expect var ActivityIndicator.indeterminateTint: Color
 //
 //expect class Space: NView
@@ -124,7 +121,7 @@ expect var TextField.hint: String
 
 //
 //expect class AutoCompleteTextView: NView
-//expect fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.()->Unit = {}): AutoCompleteTextView
+//expect fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.()->Unit = {}): Unit
 //expect val AutoCompleteTextView.text: Writable<String>
 //expect var AutoCompleteTextView.textStyle: TextStyle
 //expect var AutoCompleteTextView.keyboardHints: KeyboardHints
@@ -153,7 +150,7 @@ expect fun <T> RadioButton.bind(
 
 //
 //expect class SeekBar: NView
-//expect fun ViewContext.seekBar(setup: SeekBar.()->Unit = {}): SeekBar
+//expect fun ViewContext.seekBar(setup: SeekBar.()->Unit = {}): Unit
 //expect var SeekBar.thumbTint: Color
 //expect var SeekBar.progressTint: Color
 //expect var SeekBar.max: Double
@@ -162,12 +159,12 @@ expect fun <T> RadioButton.bind(
 //expect val SeekBar.value: Writable<Double>
 //
 //expect class TabLayout: NView
-//expect fun ViewContext.tabLayout(setup: TabLayout.()->Unit = {}): TabLayout
+//expect fun ViewContext.tabLayout(setup: TabLayout.()->Unit = {}): Unit
 //expect var TabLayout.scrolls: Boolean
 //expect var TabLayout.tabs: List<Tab>
 //
 //expect class ToggleButton: NView
-//expect fun ViewContext.toggleButton(setup: ToggleButton.()->Unit = {}): ToggleButton
+//expect fun ViewContext.toggleButton(setup: ToggleButton.()->Unit = {}): Unit
 //expect var ToggleButton.text: String
 //expect var ToggleButton.textStyle: TextStyle
 //expect var ToggleButton.gravity: String
@@ -175,7 +172,7 @@ expect fun <T> RadioButton.bind(
 //
 //
 //expect class Switch: NView
-//expect fun ViewContext.switch(setup: Switch.()->Unit = {}): Switch
+//expect fun ViewContext.switch(setup: Switch.()->Unit = {}): Unit
 //expect val Switch.checked: Writable<Boolean>
 //
 expect class CheckBox : NView
@@ -188,10 +185,10 @@ expect class Box : NView
 expect fun ViewContext.box(setup: Box.() -> Unit = {}): Unit
 
 //expect class RecyclerView: NView
-//expect fun ViewContext.recyclerView(setup: RecyclerView.()->Unit = {}): RecyclerView
+//expect fun ViewContext.recyclerView(setup: RecyclerView.()->Unit = {}): Unit
 //
 //expect class Pager: NView
-//expect fun ViewContext.pager(setup: Pager.()->Unit = {}): Pager
+//expect fun ViewContext.pager(setup: Pager.()->Unit = {}): Unit
 //
 expect class WebView : NView
 

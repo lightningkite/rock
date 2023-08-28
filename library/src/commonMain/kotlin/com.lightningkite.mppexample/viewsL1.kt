@@ -77,22 +77,14 @@ expect class Text : NViewWithTextStyle
 expect var Text.content: String
 expect var Text.textStyle: TextStyle
 expect var Text.gravity: TextGravity
-//expect var Text.maxLines: Double? // this isn't easy to do in CSS
 
 //
 expect var NView.rotation: Angle
 expect var NView.alpha: Double
 expect var NView.elevation: Dimension
-//expect var NView.exists: Boolean
+expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 
-//
-//expect class ImageButton: NView
-//expect fun ViewContext.imageButton(setup: ImageButton.()->Unit = {}): ImageButton
-//expect var ImageButton.src: ImageSource
-//expect var ImageButton.scaleType: String
-//expect var ImageButton.gravity: String
-//
 expect class Button : NView
 
 expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
@@ -195,8 +187,6 @@ expect class Box : NView
 
 expect fun ViewContext.box(setup: Box.() -> Unit = {}): Unit
 
-//expect var Box.children: List<NView>
-//
 //expect class RecyclerView: NView
 //expect fun ViewContext.recyclerView(setup: RecyclerView.()->Unit = {}): RecyclerView
 //

@@ -73,10 +73,16 @@ actual val NView.onRemove: OnRemoveHandler
         }
     }
 
-actual var NView.visible: Boolean
+actual var NView.exists: Boolean
     get() = throw NotImplementedError()
     set(value) {
         style.display = if (value) "flex" else "none"
+    }
+
+actual var NView.visible: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        style.visibility = if (value) "visible" else "hidden"
     }
 
 actual var NView.alpha: Double

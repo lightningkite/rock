@@ -48,7 +48,7 @@ fun ViewContext.asyncTest() {
                 delay(1000)
                 counter.modify { it + 1 }
                 async {
-                    for(i in 0 .. 5) {
+                    for (i in 0..5) {
                         delay(500)
                         prop.modify { it + 1 }
                     }
@@ -104,6 +104,10 @@ fun ViewContext.elementTest() {
         h1 {
             ::content { "Counter: ${counter.current}" }
         }
+        text {
+            ::content { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
+            ::visible { counter.current % 2 == 0 }
+        }
 
         radioButton {
             bind(
@@ -115,8 +119,8 @@ fun ViewContext.elementTest() {
         }
 
         row {
-            alpha = 0.5
-            rotation = Angle(-0.15f)
+            alpha = 0.8
+            rotation = Angle(-0.05f)
             text {
                 textStyle = TextStyle(
                     color = Color.teal,
@@ -137,9 +141,10 @@ fun ViewContext.elementTest() {
                 } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
             text {
-                ::content { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
-                ::visible { counter.current % 2 == 0 }
+                ::content { "This ${if (counter.current % 2 == 0) "exists" else "does not exist"}" }
+                ::exists { counter.current % 2 == 0 }
             }
+            text { content = "More text" }
         } in withBackground(
             Background(
                 fill = RadialGradient(
@@ -171,7 +176,12 @@ fun ViewContext.elementTest() {
                     bold = true
                 )
             } in margin(8.px)
-        } in padding(4.px) in withBackground(Background(fill = Color.teal, corners = CornerRadii(24.px))) in margin(4.rem)
+        } in padding(4.px) in withBackground(
+            Background(
+                fill = Color.teal,
+                corners = CornerRadii(24.px)
+            )
+        ) in margin(4.rem)
 
 
         button {

@@ -14,3 +14,6 @@ expect open class NView
 typealias OnRemoveHandler = (onRemove: ()->Unit)->Unit
 expect val NView.onRemove: OnRemoveHandler
 
+expect open class NViewWithTextStyle : NView
+expect fun NViewWithTextStyle.setStyles(styles: TextStyle)
+

@@ -53,7 +53,7 @@ expect class Row : NView
 
 @ViewDsl
 expect fun ViewContext.text(setup: Text.() -> Unit = {}): Unit
-expect class Text : NView
+expect class Text : NViewWithTextStyle
 
 expect var Text.text: String
 expect var Text.textStyle: TextStyle
@@ -103,7 +103,7 @@ expect var Image.scaleType: ImageMode
 //expect class Space: NView
 //expect fun ViewContext.space(setup: Space.()->Unit = {}): Space
 //
-expect class TextField : NView
+expect class TextField : NViewWithTextStyle
 typealias TextInput = TextField
 
 expect fun ViewContext.textField(setup: TextField.() -> Unit = {}): Unit

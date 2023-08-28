@@ -79,6 +79,19 @@ actual var NView.visible: Boolean
         style.display = if (value) "flex" else "none"
     }
 
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NViewWithTextStyle = HTMLElement
+
+actual fun NViewWithTextStyle.setStyles(styles: TextStyle) {
+    style.color = styles.color.toWeb()
+    style.fontSize = styles.size.toString()
+    style.fontFamily = styles.font
+    style.fontWeight = if (styles.bold) "bold" else "normal"
+    style.fontStyle = if (styles.italic) "italic" else "normal"
+    style.textTransform = if (styles.allCaps) "capitalize" else "none"
+    style.lineHeight = styles.lineSpacingMultiplier.toString()
+    style.letterSpacing = styles.letterSpacing.toString()
+}
 
 private val HTMLElement.removeListeners: MutableList<() -> Unit>
     get() = removeListenersMaybe ?: run {

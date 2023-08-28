@@ -32,14 +32,7 @@ actual var TextField.hint: String
 actual var TextField.textStyle: TextStyle
     get() = throw NotImplementedError()
     set(value) {
-        style.color = value.color.toWeb()
-        style.fontSize = value.size.toString()
-        style.fontFamily = value.font
-        style.fontWeight = if (value.bold) "bold" else "normal"
-        style.fontStyle = if (value.italic) "italic" else "normal"
-        style.textTransform = if (value.allCaps) "capitalize" else "none"
-        style.lineHeight = value.lineSpacingMultiplier.toString()
-        style.letterSpacing = value.letterSpacing.toString()
+        setStyles(value)
     }
 
 actual var TextField.keyboardHints: KeyboardHints

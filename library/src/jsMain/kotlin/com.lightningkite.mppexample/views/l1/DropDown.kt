@@ -20,6 +20,16 @@ actual fun <T> DropDown.bind(
     prop: Writable<T?>
 ) {
     var lastListener: ((Event) -> Unit)? = null
+
+    reactiveScope {
+        val current = prop.current ?: return@reactiveScope
+        val selected = getKey(current)
+        querySelectorAll("option").asList().forEach {
+            it as HTMLOptionElement
+            it.selected = selected == it.value
+        }
+    }
+
     reactiveScope {
         innerHTML = ""
         var foundSelected = false

@@ -13,6 +13,11 @@ actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = ele
 
 actual fun TextField.bind(text: Writable<String>) {
     value = text.once
+
+    reactiveScope {
+        value = text.current
+    }
+
     addEventListener("input", {
         text set it.currentTarget.asDynamic().value as String
     })

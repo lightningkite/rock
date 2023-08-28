@@ -95,6 +95,14 @@ fun ViewContext.elementTest() {
     }
 
     column {
+        reactiveScope {
+            if (counter.current == 5) {
+                textProp set "FIVE"
+                dropdownProp set "World"
+                radioProp set "two"
+                checkedProp set true
+            }
+        }
         text {
             ::text { "Counter: ${counter.current}" }
         }

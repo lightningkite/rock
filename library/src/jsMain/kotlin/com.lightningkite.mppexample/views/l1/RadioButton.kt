@@ -21,6 +21,14 @@ actual fun <T> RadioButton.bind(
     prop: Writable<T>,
 ) {
     reactiveScope {
+        val currentKey = getKey(prop.current)
+        querySelectorAll("input").asList().forEach {
+            it as HTMLInputElement
+            it.checked = it.value == currentKey
+        }
+    }
+
+    reactiveScope {
         innerHTML = ""
         var foundSelected = false
         val optionValues = options()

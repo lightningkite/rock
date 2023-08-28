@@ -5,16 +5,16 @@ import com.lightningkite.mppexample.*
 fun ViewContext.alignTest() {
     column {
         column {
-            text { text = "Test" } in alignLeft() in withBackground(Background(Color.teal))
-            text { text = "Test" } in alignCenter() in withBackground(Background(Color.teal))
-            text { text = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
-            text { text = "Test" } in alignRight() in withBackground(Background(Color.teal))
+            text { content = "Test" } in alignLeft() in withBackground(Background(Color.teal))
+            text { content = "Test" } in alignCenter() in withBackground(Background(Color.teal))
+            text { content = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
+            text { content = "Test" } in alignRight() in withBackground(Background(Color.teal))
         } in withBackground(Background(Color.yellow)) in weight(1f)
         row {
-            text { text = "Test" } in alignTop() in withBackground(Background(Color.teal))
-            text { text = "Test" } in alignCenter() in withBackground(Background(Color.teal))
-            text { text = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
-            text { text = "Test" } in alignBottom() in withBackground(Background(Color.teal))
+            text { content = "Test" } in alignTop() in withBackground(Background(Color.teal))
+            text { content = "Test" } in alignCenter() in withBackground(Background(Color.teal))
+            text { content = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
+            text { content = "Test" } in alignBottom() in withBackground(Background(Color.teal))
         } in sizedBox(SizeConstraints(height = 100.px)) in withBackground(Background(Color.green))
     }
 }
@@ -32,10 +32,10 @@ fun ViewContext.fetchTest() {
     )
     column {
         text {
-            text = "You can enable hot reload via adding  --continuous to your run config"
+            content = "You can enable hot reload via adding  --continuous to your run config"
             textStyle = barTextStyle
         } in padding(1.rem) in withBackground(Background(Color.blue))
-        text { ::text { myOwnPage.current } }
+        text { ::content { myOwnPage.current } }
     }
 }
 
@@ -59,11 +59,11 @@ fun ViewContext.asyncTest() {
     }
     column {
         row {
-            text { ::text { counter.current.toString() } }
-            text { text = " + " }
-            text { ::text { prop.current.toString() } }
-            text { text = " = " }
-            text { ::text { prop.current.plus(counter.current).toString() } }
+            text { ::content { counter.current.toString() } }
+            text { content = " + " }
+            text { ::content { prop.current.toString() } }
+            text { content = " = " }
+            text { ::content { prop.current.plus(counter.current).toString() } }
         }
     }
 }
@@ -101,8 +101,8 @@ fun ViewContext.elementTest() {
                 checkedProp set true
             }
         }
-        text {
-            ::text { "Counter: ${counter.current}" }
+        h1 {
+            ::content { "Counter: ${counter.current}" }
         }
 
         radioButton {
@@ -121,21 +121,21 @@ fun ViewContext.elementTest() {
                     bold = true,
                     italic = true
                 )
-                ::text { "Lat: ${lat.current}" }
+                ::content { "Lat: ${lat.current}" }
             } in padding(Insets(right = 36.px))
             column {
                 text {
-                    text = "Hello world"
+                    content = "Hello world"
                 }
                 text {
-                    text = "Hello world 2"
+                    content = "Hello world 2"
                 } in withBackground(Background(fill = Color(1f, 1f, 1f, 1f)))
                 text {
-                    ::text { "Lon: ${lon.current}" }
+                    ::content { "Lon: ${lon.current}" }
                 } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
             text {
-                ::text { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
+                ::content { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
                 ::visible { counter.current % 2 == 0 }
             }
         } in withBackground(
@@ -168,14 +168,12 @@ fun ViewContext.elementTest() {
         }
 
         button {
-            onClick {
-                println("test button")
-            }
-            text = "click me"
+            onClick { println("test button") }
+            text { content = "Click me" }
         }
 
         text {
-            ::text { "You input: '${textProp.current}'" }
+            ::content { "You input: '${textProp.current}'" }
         }
 
         dropDown {
@@ -190,13 +188,13 @@ fun ViewContext.elementTest() {
         }
 
         text {
-            ::text { "You selected: '${dropdownProp.current}'" }
+            ::content { "You selected: '${dropdownProp.current}'" }
         }
 
         checkBox {
             bind(checkedProp)
             text {
-                ::text { "I am ${if (checkedProp.current) "" else " not "} checked" }
+                ::content { "I am ${if (checkedProp.current) "" else " not "} checked" }
                 ::textStyle {
                     TextStyle(
                         color = if (checkedProp.current) Color.red else Color.green
@@ -206,7 +204,7 @@ fun ViewContext.elementTest() {
         }
 
         text {
-            text =
+            content =
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque diam volutpat commodo sed egestas. Arcu odio ut sem nulla pharetra diam. Sit amet commodo nulla facilisi nullam vehicula ipsum a arcu. Tincidunt arcu non sodales neque. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Tempor id eu nisl nunc mi ipsum faucibus vitae. Scelerisque purus semper eget duis at tellus at urna. Sed euismod nisi porta lorem mollis aliquam. Gravida rutrum quisque non tellus orci ac. Eu sem integer vitae justo. Pretium nibh ipsum consequat nisl vel pretium lectus quam id. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.\n" +
                         "\n" +
                         "Urna duis convallis convallis tellus id interdum velit laoreet id. Tellus integer feugiat scelerisque varius morbi enim. Volutpat diam ut venenatis tellus in metus vulputate. Pharetra et ultrices neque ornare aenean euismod. Posuere ac ut consequat semper viverra nam. Tempor orci eu lobortis elementum nibh tellus molestie nunc. A scelerisque purus semper eget duis. Cras sed felis eget velit. Orci eu lobortis elementum nibh tellus. Sed blandit libero volutpat sed cras. Tempor commodo ullamcorper a lacus vestibulum sed. A pellentesque sit amet porttitor eget dolor. Viverra mauris in aliquam sem fringilla ut.\n" +
@@ -227,18 +225,18 @@ fun ViewContext.elementTest() {
         )
 
         row {
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
-            text { text = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
+            text { content = "Hello" }
         } in scrollsHorizontally() in sizedBox(
             SizeConstraints(
                 minWidth = 128.px,

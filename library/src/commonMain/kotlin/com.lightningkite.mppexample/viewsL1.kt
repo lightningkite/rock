@@ -53,9 +53,28 @@ expect class Row : NView
 
 @ViewDsl
 expect fun ViewContext.text(setup: Text.() -> Unit = {}): Unit
+
+@ViewDsl
+expect fun ViewContext.h1(setup: Text.() -> Unit = {}): Unit
+
+@ViewDsl
+expect fun ViewContext.h2(setup: Text.() -> Unit = {}): Unit
+
+@ViewDsl
+expect fun ViewContext.h3(setup: Text.() -> Unit = {}): Unit
+
+@ViewDsl
+expect fun ViewContext.h4(setup: Text.() -> Unit = {}): Unit
+
+@ViewDsl
+expect fun ViewContext.h5(setup: Text.() -> Unit = {}): Unit
+
+@ViewDsl
+expect fun ViewContext.h6(setup: Text.() -> Unit = {}): Unit
+
 expect class Text : NViewWithTextStyle
 
-expect var Text.text: String
+expect var Text.content: String
 expect var Text.textStyle: TextStyle
 expect var Text.gravity: TextGravity
 //expect var Text.maxLines: Double? // this isn't easy to do in CSS
@@ -77,7 +96,6 @@ expect var NView.visible: Boolean
 expect class Button : NView
 
 expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
-expect var Button.text: String
 
 //expect var Button.textStyle: TextStyle
 //expect var Button.gravity: String

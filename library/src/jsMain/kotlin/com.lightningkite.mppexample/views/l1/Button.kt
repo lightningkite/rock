@@ -17,10 +17,3 @@ actual fun Button.onClick(action: ()->Unit) {
         action()
     })
 }
-
-actual var Button.text: String
-    get() = throw NotImplementedError()
-    set(value) {
-        innerText = value
-    }
-

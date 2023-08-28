@@ -6,11 +6,46 @@ import org.w3c.dom.HTMLSpanElement
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Text = HTMLSpanElement
 
-actual inline fun ViewContext.text(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("span") {
+fun Text.sharedSetup() {
     gravity = TextGravity.Left
+}
+
+actual inline fun ViewContext.text(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("span") {
+    sharedSetup()
     setup()
 }
-actual var Text.text: String
+
+actual inline fun ViewContext.h1(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h1") {
+    sharedSetup()
+    setup()
+}
+
+actual inline fun ViewContext.h2(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h2") {
+    sharedSetup()
+    setup()
+}
+
+actual inline fun ViewContext.h3(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h3") {
+    sharedSetup()
+    setup()
+}
+
+actual inline fun ViewContext.h4(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h4") {
+    sharedSetup()
+    setup()
+}
+
+actual inline fun ViewContext.h5(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h5") {
+    sharedSetup()
+    setup()
+}
+
+actual inline fun ViewContext.h6(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h6") {
+    sharedSetup()
+    setup()
+}
+
+actual var Text.content: String
     get() = this.textContent ?: ""
     set(value) {
         this.textContent = value

@@ -101,7 +101,8 @@ expect var Image.scaleType: ImageMode
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video
 //
 expect class ActivityIndicator: NView
-typealias ProgressBar = ActivityIndicator
+typealias LoadingSpinner = ActivityIndicator
+//typealias ProgressBar = ActivityIndicator
 expect fun ViewContext.activityIndicator(setup: ActivityIndicator.()->Unit = {}): Unit
 expect var ActivityIndicator.color: Color
 

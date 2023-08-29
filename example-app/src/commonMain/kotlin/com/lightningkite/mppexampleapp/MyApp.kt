@@ -101,9 +101,13 @@ fun ViewContext.elementTest() {
                 checkedProp set true
             }
         }
-
-        activityIndicator {
-
+        row {
+            activityIndicator {
+                ::color { Color.gray(counter.current / 20f) }
+            }
+            activityIndicator {
+                ::color { Color.gray(1f - counter.current / 20f ) }
+            }
         }
 
         h1 {
@@ -125,7 +129,7 @@ fun ViewContext.elementTest() {
 
         row {
             alpha = 0.8
-            rotation = Angle(-0.05f)
+            rotation = Angle(-0.015f)
             text {
                 textStyle = TextStyle(
                     color = Color.teal,
@@ -190,7 +194,7 @@ fun ViewContext.elementTest() {
 
 
         button {
-            onClick { println("test button") }
+            onClick { counter modify {it + 1} }
             text { content = "Click me" }
         }
 

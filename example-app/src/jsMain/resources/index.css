@@ -115,3 +115,56 @@
 .rock-mui-button-text:focus {
     background-color: rgba(var(--rock-mui-button-focus), 0.15);
 }
+
+.rock-mui-switch {
+    user-select: none;
+    cursor: pointer;
+    display: inline-flex;
+    alignItems: center;
+    position: relative;
+    height: 36px;
+}
+
+.rock-mui-switch > input[type="checkbox"] {
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.rock-mui-switch .rock-mui-switch-check {
+    width: 48px;
+    height: 16px;
+    background-color: #929292;
+    overflow-x: visible;
+    overflow-y: visible;
+    position: relative;
+    border-radius: 8px;
+    transition: linear all 0.2s;
+}
+
+.rock-mui-switch input[type="checkbox"]:checked ~ .rock-mui-switch-check {
+    background-color: #a2a2a2;
+}
+
+.rock-mui-switch .rock-mui-switch-check::after {
+    content: "";
+    transition: linear all 0.2s;
+    position: absolute;
+    display: block;
+    width: 22px;
+    height: 22px;
+    z-index: 2;
+    margin-top: -3px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background-color: #555;
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+
+.rock-mui-switch input:checked ~ .rock-mui-switch-check::after {
+    background-color: #00aba9;
+    transform: translateX(30px);
+}

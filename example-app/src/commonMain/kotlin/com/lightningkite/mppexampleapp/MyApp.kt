@@ -87,6 +87,7 @@ fun ViewContext.elementTest() {
     val checkedProp = Property(false)
     val radioProp = Property("one")
     val formProp = Property(mutableMapOf<String, Any>())
+    val switchProp = Property(true)
 
     watchGeolocation { pos ->
         lat set pos.latitude
@@ -102,6 +103,12 @@ fun ViewContext.elementTest() {
                 checkedProp set true
             }
         }
+
+        switch {
+            bind(switchProp)
+
+            text { content = "Switch Label" }
+        } in padding(2.rem)
 
         form {
             bind(formProp) { map ->
@@ -121,7 +128,7 @@ fun ViewContext.elementTest() {
                     box {
                         image {
                             scaleType = ImageMode.Fit
-                            source = ImageRemote("https://picsum.photos/200/300")
+                            source = ImageRemote("https://picsum.photos/64/64")
                         }
                     } in sizedBox(
                         SizeConstraints(

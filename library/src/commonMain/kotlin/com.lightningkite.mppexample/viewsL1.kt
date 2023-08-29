@@ -170,11 +170,11 @@ expect fun <T> RadioButton.bind(
 //expect var ToggleButton.gravity: String
 //expect val ToggleButton.checked: Writable<Boolean>
 //
-//
-//expect class Switch: NView
-//expect fun ViewContext.switch(setup: Switch.()->Unit = {}): Unit
-//expect val Switch.checked: Writable<Boolean>
-//
+
+expect class Switch: NView
+expect fun ViewContext.switch(setup: Switch.()->Unit = {}): Unit
+expect fun Switch.bind(checked: Writable<Boolean>): Unit
+
 expect class CheckBox : NView
 
 expect fun ViewContext.checkBox(setup: CheckBox.() -> Unit = {}): Unit

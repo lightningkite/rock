@@ -101,6 +101,14 @@ fun ViewContext.elementTest() {
                 checkedProp set true
             }
         }
+
+        box {
+            muiTextField {
+                bind(textProp)
+                label = "Some Input Label"
+            }
+        } in padding(2.rem)
+
         row {
             activityIndicator {
                 ::color { Color.gray(counter.current / 20f) }

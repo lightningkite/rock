@@ -68,6 +68,66 @@
             transform: rotate(360deg);
           }
         }
+
+// BEGIN CUSTOM STYLESHEET
+        .rock-text-field-container {
+            position: relative;
+            font-size: 16px;
+        }
+
+
+
+.rock-mui-text-field {
+  position: relative;
+  --text-field-color: indigo;
+}
+
+.rock-mui-text-field input::placeholder {
+  opacity: 0;
+}
+
+.rock-mui-text-field input {
+  width: 100%;
+  height: 60px;
+  font-size: 1.2rem;
+  padding: 10px 16px 10px 16px;
+  outline: none;
+  border: 1px solid gray;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.rock-mui-text-field label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: gray;
+  letter-spacing: 1px;
+  transition: .3s;
+  font-weight: 600;
+}
+
+.rock-mui-text-field input:focus + label,
+.rock-mui-text-field input:not(:placeholder-shown) + label
+{
+  top: 2px;
+  font-size: .8rem;
+  color: indigo;
+  background: #fff;
+  padding: 7px;
+}
+
+.rock-mui-text-field input:focus {
+  border: 2px solid var(--text-field-color);
+}
+
+
+
+
+        // END CUSTOM STYLESHEET
+
     </style>
 </head>
 <body>

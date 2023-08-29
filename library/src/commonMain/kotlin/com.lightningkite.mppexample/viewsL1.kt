@@ -99,7 +99,7 @@ expect var Image.scaleType: ImageMode
 
 //expect class Video: NView
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video
-//
+
 expect class ActivityIndicator: NView
 typealias LoadingSpinner = ActivityIndicator
 //typealias ProgressBar = ActivityIndicator

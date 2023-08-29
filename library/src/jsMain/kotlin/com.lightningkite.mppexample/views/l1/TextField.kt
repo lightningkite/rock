@@ -8,6 +8,7 @@ actual typealias TextField = HTMLInputElement
 
 actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = element<HTMLInputElement>("input") {
     type = "text"
+    style.width = "100%"
     setup()
 }
 

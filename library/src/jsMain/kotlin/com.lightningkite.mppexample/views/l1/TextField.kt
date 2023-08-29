@@ -1,6 +1,7 @@
 package com.lightningkite.mppexample
 
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.get
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -9,8 +10,15 @@ actual typealias TextField = HTMLInputElement
 actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = element<HTMLInputElement>("input") {
     type = "text"
     style.width = "100%"
+    name = "UNNAMED-INPUT"
     setup()
 }
+
+actual var TextField.key: String
+    get() = throw NotImplementedError()
+    set(value) {
+        name = value
+    }
 
 actual fun TextField.bind(text: Writable<String>) {
     value = text.once
@@ -77,4 +85,17 @@ actual var TextField.keyboardHints: KeyboardHints
 //            KeyboardCase.Words -> TODO()
 //            KeyboardCase.Sentences -> TODO()
 //        }
+    }
+actual var TextField.validation: InputValidation
+    get() = throw NotImplementedError()
+    set(value) {
+        required = value.required
+        if (value.minLength == null)
+            removeAttribute("minLength")
+        else
+            minLength = value.minLength
+        if (value.maxLength == null)
+            removeAttribute("maxLength")
+        else
+            maxLength = value.maxLength
     }

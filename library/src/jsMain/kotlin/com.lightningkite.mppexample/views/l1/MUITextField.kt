@@ -52,3 +52,17 @@ actual var MUITextField.keyboardHints: KeyboardHints
         val input = getElementsByTagName("input")[0] as TextField
         input.keyboardHints = value
     }
+
+actual var MUITextField.validation: InputValidation
+    get() = throw NotImplementedError()
+    set(value) {
+        val input = getElementsByTagName("input")[0] as TextField
+        input.validation = value
+    }
+
+actual var MUITextField.key: String
+    get() = throw NotImplementedError()
+    set(value) {
+        val input = getElementsByTagName("input")[0] as TextField
+        input.key = value
+    }

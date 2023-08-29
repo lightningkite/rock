@@ -86,6 +86,7 @@ fun ViewContext.elementTest() {
     val dropdownProp = Property<String?>(null)
     val checkedProp = Property(false)
     val radioProp = Property("one")
+    val formProp = Property(mutableMapOf<String, Any>())
 
     watchGeolocation { pos ->
         lat set pos.latitude
@@ -101,6 +102,22 @@ fun ViewContext.elementTest() {
                 checkedProp set true
             }
         }
+
+        form {
+            bind(formProp) { map ->
+                println(map)
+            }
+            muiTextField {
+                validation = InputValidation(required = true)
+                key = "required-field"
+                label = "Required Field"
+            }
+            button {
+                text {
+                    content = "Submit Form"
+                }
+            }
+        } in padding(1.rem)
 
         box {
             muiTextField {

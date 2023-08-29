@@ -9,6 +9,7 @@ import org.w3c.dom.HTMLParagraphElement
 actual typealias Button = HTMLButtonElement
 
 actual inline fun ViewContext.button(setup: Button.() -> Unit): Unit = element<HTMLButtonElement>("button") {
+    type = "submit" // may need to remove this and make it a variable
     setup()
 }
 

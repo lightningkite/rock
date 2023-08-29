@@ -28,6 +28,10 @@
           border-radius: 5px;
         }
 
+        .rock-mui-text-field input:invalid {
+          border: 1px solid red;
+        }
+
         .rock-mui-text-field label {
           position: absolute;
           left: 16px;

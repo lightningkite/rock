@@ -100,14 +100,16 @@ expect var Image.scaleType: ImageMode
 //expect class Video: NView
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video
 
-expect class ActivityIndicator: NView
+expect class ActivityIndicator : NView
 typealias LoadingSpinner = ActivityIndicator
+
 //typealias ProgressBar = ActivityIndicator
-expect fun ViewContext.activityIndicator(setup: ActivityIndicator.()->Unit = {}): Unit
+expect fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit = {}): Unit
 expect var ActivityIndicator.color: Color
 
-expect class Space: NView
-expect fun ViewContext.space(setup: Space.()->Unit = {}): Unit
+expect class Space : NView
+
+expect fun ViewContext.space(setup: Space.() -> Unit = {}): Unit
 expect var Space.size: SizeConstraints
 
 expect class TextField : NViewWithTextStyle
@@ -119,6 +121,8 @@ expect fun TextField.bind(text: Writable<String>): Unit
 expect var TextField.textStyle: TextStyle
 expect var TextField.keyboardHints: KeyboardHints
 expect var TextField.hint: String
+expect var TextField.validation: InputValidation
+expect var TextField.key: String
 
 expect class DropDown : NView
 typealias Spinner = DropDown
@@ -197,9 +201,12 @@ expect var MUITextField.textStyle: TextStyle
 expect var MUITextField.labelStyle: TextStyle
 expect var MUITextField.keyboardHints: KeyboardHints
 expect var MUITextField.label: String
+expect var MUITextField.validation: InputValidation
+expect var MUITextField.key: String
 
-expect class AutoCompleteTextView: NView
-expect fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.()->Unit = {}): Unit
+expect class AutoCompleteTextView : NView
+
+expect fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.() -> Unit = {}): Unit
 
 expect fun <T> AutoCompleteTextView.bind(
     options: ReactiveScope.() -> List<T>,
@@ -207,6 +214,14 @@ expect fun <T> AutoCompleteTextView.bind(
     getKey: (T) -> String,
     prop: Writable<T?>,
 ): Unit
+
 expect var AutoCompleteTextView.label: String
 expect var AutoCompleteTextView.textStyle: TextStyle
 expect var AutoCompleteTextView.labelStyle: TextStyle
+
+expect class Form : NView
+
+expect fun ViewContext.form(setup: Form.() -> Unit = {}): Unit
+expect fun <T : MutableMap<String, Any>> Form.bind(
+    prop: Writable<T>, onSubmit: (T) -> Unit
+): Unit

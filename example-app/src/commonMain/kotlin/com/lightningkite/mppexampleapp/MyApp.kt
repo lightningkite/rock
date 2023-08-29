@@ -221,6 +221,24 @@ fun ViewContext.elementTest() {
             )
         }
 
+        autoCompleteTextView {
+            label = "Autocomplete"
+            bind(
+                options = {
+                    listOf("Hello", "World")
+                },
+                getKey = { if (it == "Hello") "HeLlO" else "wOrLd" },
+                getLabel = { it.uppercase() },
+                prop = dropdownProp
+            )
+            textStyle = TextStyle(
+                color = Color.red
+            )
+            labelStyle = TextStyle(
+                color = Color.blue
+            )
+        } in padding(2.rem)
+
         text {
             ::content { "You selected: '${dropdownProp.current}'" }
         }

@@ -1,9 +1,7 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLLabelElement
-import org.w3c.dom.get
+import com.lightningkite.mppexample.*
+import org.w3c.dom.*
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -46,6 +44,11 @@ actual var MUITextField.labelStyle: TextStyle
     get() = throw NotImplementedError()
     set(value) {
         style.setProperty("--text-field-color", value.color.toWeb()) // set the outline color to match the label color
-        val label = getElementsByTagName("label")[0] as NViewWithTextStyle
-        label.setStyles(value)
+    }
+
+actual var MUITextField.keyboardHints: KeyboardHints
+    get() = throw NotImplementedError()
+    set(value) {
+        val input = getElementsByTagName("input")[0] as TextField
+        input.keyboardHints = value
     }

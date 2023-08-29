@@ -101,6 +101,11 @@ fun ViewContext.elementTest() {
                 checkedProp set true
             }
         }
+
+        activityIndicator {
+
+        }
+
         h1 {
             ::content { "Counter: ${counter.current}" }
         }

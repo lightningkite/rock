@@ -78,7 +78,7 @@ expect var Text.content: String
 expect var Text.textStyle: TextStyle
 expect var Text.gravity: TextGravity
 
-//
+
 expect var NView.rotation: Angle
 expect var NView.alpha: Double
 expect var NView.elevation: Dimension
@@ -88,7 +88,6 @@ expect var NView.visible: Boolean
 expect class Button : NView
 
 expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
-//expect var Button.gravity: String
 expect fun Button.onClick(action: () -> Unit)
 
 expect class Image : NView
@@ -97,18 +96,19 @@ expect fun ViewContext.image(setup: Image.() -> Unit = {}): Unit
 expect var Image.source: ImageSource
 expect var Image.scaleType: ImageMode
 
-//
+
 //expect class Video: NView
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video
 //
-//expect class ActivityIndicator: NView
-//typealias ProgressBar = ActivityIndicator
-//expect fun ViewContext.activityIndicator(setup: ActivityIndicator.()->Unit = {}): Unit
-//expect var ActivityIndicator.indeterminateTint: Color
-//
-//expect class Space: NView
-//expect fun ViewContext.space(setup: Space.()->Unit = {}): Space
-//
+expect class ActivityIndicator: NView
+typealias ProgressBar = ActivityIndicator
+expect fun ViewContext.activityIndicator(setup: ActivityIndicator.()->Unit = {}): Unit
+expect var ActivityIndicator.color: Color
+
+expect class Space: NView
+expect fun ViewContext.space(setup: Space.()->Unit = {}): Unit
+expect var Space.size: SizeConstraints
+
 expect class TextField : NViewWithTextStyle
 typealias TextInput = TextField
 

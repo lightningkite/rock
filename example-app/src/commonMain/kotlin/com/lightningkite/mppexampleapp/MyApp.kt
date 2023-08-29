@@ -112,9 +112,53 @@ fun ViewContext.elementTest() {
                 key = "required-field"
                 label = "Required Field"
             }
-            button {
-                text {
-                    content = "Submit Form"
+            row {
+                text { content = "Primary" }
+                button {
+                    variant = ButtonVariant.Contained
+                    size = ButtonSize.Large
+                    text { content = "Submit Form (contained)" }
+                    box {
+                        image {
+                            scaleType = ImageMode.Fit
+                            source = ImageRemote("https://picsum.photos/200/300")
+                        }
+                    } in sizedBox(
+                        SizeConstraints(
+                            height = 32.px
+                        )
+                    )
+                }
+                button {
+                    variant = ButtonVariant.Outlined
+                    size = ButtonSize.Medium
+                    text { content = "Submit Form (outlined)" }
+                }
+                button {
+                    variant = ButtonVariant.Text
+                    size = ButtonSize.Small
+                    text { content = "Submit Form (text)" }
+                }
+            }
+            row {
+                text { content = "Danger" }
+                button {
+                    variant = ButtonVariant.Contained
+                    size = ButtonSize.Small
+                    palette = ButtonPalette.Danger
+                    text { content = "Submit Form (contained)" }
+                }
+                button {
+                    variant = ButtonVariant.Outlined
+                    size = ButtonSize.Medium
+                    palette = ButtonPalette.Danger
+                    text { content = "Submit Form (outlined)" }
+                }
+                button {
+                    variant = ButtonVariant.Text
+                    size = ButtonSize.Large
+                    palette = ButtonPalette.Danger
+                    text { content = "Submit Form (text)" }
                 }
             }
         } in padding(1.rem)
@@ -131,7 +175,7 @@ fun ViewContext.elementTest() {
                 ::color { Color.gray(counter.current / 20f) }
             }
             activityIndicator {
-                ::color { Color.gray(1f - counter.current / 20f ) }
+                ::color { Color.gray(1f - counter.current / 20f) }
             }
         }
 
@@ -219,7 +263,7 @@ fun ViewContext.elementTest() {
 
 
         button {
-            onClick { counter modify {it + 1} }
+            onClick { counter modify { it + 1 } }
             text { content = "Click me" }
         }
 
@@ -329,16 +373,7 @@ fun ViewContext.elementTest() {
             )
         )
 
-        box {
-            image {
-                scaleType = ImageMode.Fit
-                source = ImageRemote("https://picsum.photos/200/300")
-            }
-        } in sizedBox(
-            SizeConstraints(
-                height = 400.px
-            )
-        )
+
 
         box {
             image {

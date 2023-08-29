@@ -86,6 +86,9 @@ expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 
 expect class Button : NView
+expect var Button.variant: ButtonVariant
+expect var Button.palette: ButtonPalette
+expect var Button.size: ButtonSize
 
 expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
 expect fun Button.onClick(action: () -> Unit)

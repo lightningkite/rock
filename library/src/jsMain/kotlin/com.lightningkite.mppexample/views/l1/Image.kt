@@ -9,6 +9,8 @@ actual typealias Image = HTMLImageElement
 
 actual inline fun ViewContext.image(setup: Image.() -> Unit): Unit = element<HTMLImageElement>("img") {
     scaleType = ImageMode.Fit
+    style.width = "inherit"
+    style.height = "inherit"
     setup()
 }
 

@@ -62,25 +62,56 @@
           border: 2px solid var(--text-field-color);
         }
 
+.rock-mui-button {
+  transition: background 200ms, box-shadow 200ms;
+  text-transform: uppercase;
+  outline: 0;
+  border: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  background-color: transparent;
+  padding: calc(12px * var(--rock-mui-button-size)) calc(20px * var(--rock-mui-button-size));
+  font-size: calc(18px * var(--rock-mui-button-size));
 
-
-datalist {
-  position: absolute;
-  background-color: white;
-  border: 1px solid blue;
-  border-radius: 0 0 5px 5px;
-  border-top: none;
-  font-family: sans-serif;
-  width: 350px;
-  padding: 5px;
-
+  --rock-mui-button: black;
+  --rock-mui-button-hover: black;
+  --rock-mui-button-focus: black;
+  --rock-mui-button-size: 1;
 }
 
-option {
-  background-color: white;
-  padding: 4px;
-  color: blue;
-  margin-bottom: 1px;
-   font-size: 18px;
-  cursor: pointer;
+.rock-mui-button-contained {
+  color: #fff;
+  background-color: rgb(var(--rock-mui-button));
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.rock-mui-button-contained:hover {
+    background-color: rgb(var(--rock-mui-button-hover));
+    box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.4);
+}
+
+.rock-mui-button-contained:focus {
+    background-color: rgb(var(--rock-mui-button-focus));
+}
+
+.rock-mui-button-outlined {
+  color: rgb(var(--rock-mui-button));
+  border: 1px solid rgb(var(--rock-mui-button));
+}
+
+.rock-mui-button-outlined:hover {
+  border: 1px solid rgb(var(--rock-mui-button-hover));
+}
+
+.rock-mui-button-outlined:focus {
+    background-color: rgba(var(--rock-mui-button-focus), 0.15);
+  border: 1px solid rgb(var(--rock-mui-button-focus));
+}
+
+.rock-mui-button-text span {
+  color: rgb(var(--rock-mui-button));
+}
+
+.rock-mui-button-text:focus {
+    background-color: rgba(var(--rock-mui-button-focus), 0.15);
 }

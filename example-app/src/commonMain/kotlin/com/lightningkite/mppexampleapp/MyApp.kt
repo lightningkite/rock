@@ -192,7 +192,7 @@ fun ViewContext.elementTest() {
         forEach(
             data = { listItems.current },
             render = {
-                text { content = it.toString() }
+                text { content = it.toString() } in padding(1.rem)
             }
         )
 

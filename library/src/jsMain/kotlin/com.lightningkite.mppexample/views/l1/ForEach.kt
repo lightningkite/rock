@@ -1,8 +1,7 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.asList
+import kotlinx.browser.document
+import org.w3c.dom.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias ForEach = HTMLFormElement
@@ -11,12 +10,17 @@ actual inline fun <T> ViewContext.forEach(
     crossinline data: ReactiveScope.() -> List<T>,
     crossinline render: NView.(T) -> Unit
 ): Unit = element<HTMLFormElement>("div") {
+    var container = this as HTMLElement
     reactiveScope {
         val items = data()
-        innerHTML = ""
-        items.forEach {
-            render(it)
+        val newContainer = document.createElement("div") as HTMLDivElement
+        element(newContainer) {
+            items.forEach {
+                render(it)
+            }
         }
+        container.replaceWith(newContainer)
+        container = newContainer
     }
 }
 

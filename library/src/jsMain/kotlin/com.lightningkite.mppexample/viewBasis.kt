@@ -36,14 +36,16 @@ actual class ViewContext(
         ListeningLifecycleStack.useIn(element.onRemove) {
             setup(element)
         }
-        println("Start containsNext")
         stack.add(element)
         popCount++
         return ViewWrapper
     }
 
-    inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) {
-        (document.createElement(name) as T).apply {
+    inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) =
+        element(document.createElement(name) as T, setup)
+
+    inline fun <T : HTMLElement> element(initialElement: T, setup: T.() -> Unit) {
+        initialElement.apply {
             elementToDoList.forEach { it(this) }
             elementToDoList.clear()
             var toPop = popCount
@@ -53,7 +55,6 @@ actual class ViewContext(
             }
             stack.last().appendChild(this)
             while (toPop > 0) {
-                println("End containsNext")
                 val item = stack.removeLast()
                 println("${stack.size} left")
                 stack.last().appendChild(item)

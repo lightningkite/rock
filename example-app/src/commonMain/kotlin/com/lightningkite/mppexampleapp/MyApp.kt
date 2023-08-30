@@ -104,16 +104,9 @@ fun ViewContext.elementTest() {
                 radioProp set "two"
                 checkedProp set true
 
-                listItems set listOf(1, 2, 3, 4, 5)
             }
+            listItems set listOf(counter.current, 2, 3, 4, 5)
         }
-
-        forEach(
-            data = { listItems.current },
-            render = {
-                text { content = it.toString() }
-            }
-        )
 
         switch {
             bind(switchProp)
@@ -195,6 +188,13 @@ fun ViewContext.elementTest() {
                 }
             }
         } in padding(1.rem)
+
+        forEach(
+            data = { listItems.current },
+            render = {
+                text { content = it.toString() }
+            }
+        )
 
         box {
             textField {

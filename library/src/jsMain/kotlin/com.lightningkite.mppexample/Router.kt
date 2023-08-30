@@ -19,18 +19,17 @@ actual object RockNavigator {
 
     actual var currentPath: String
         get() = window.location.pathname
-        set(value) {}
+        set(value) = throw NotImplementedError()
 
     actual fun navigate(path: String, pushState: Boolean) {
         if (router == null) throw Error("Uninitialized RockNavigator")
         println("Navigating to $path")
         document.body?.innerHTML = ""
-        if (pushState)
-            window.history.pushState(
-                mapOf(
-                    "path" to path
-                ), "", path
-            )
+        if (pushState) window.history.pushState(
+            mapOf(
+                "path" to path
+            ), "", path
+        )
         router!!.render(path)
     }
 }

@@ -45,7 +45,7 @@ class Router(
                 map.children[routeKey]!!.render = route.render
             } else {
                 println("is not leaf")
-                map = map.children[key]!!
+                map = map.children[routeKey]!!
             }
         }
     }

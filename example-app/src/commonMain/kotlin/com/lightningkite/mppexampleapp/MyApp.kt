@@ -68,6 +68,13 @@ fun ViewContext.asyncTest() {
     }
 }
 
+fun ViewContext.simpleElementTest() {
+    button {
+        onClick { println("TEST") }
+        text { content = "PRINT TEST" }
+    }
+}
+
 fun ViewContext.elementTest() {
     val counter = Property(0)
     launch {

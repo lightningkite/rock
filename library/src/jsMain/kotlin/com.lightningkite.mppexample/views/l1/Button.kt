@@ -23,8 +23,7 @@ actual inline fun ViewContext.button(setup: Button.() -> Unit): Unit = element<H
 }
 
 actual fun Button.onClick(action: () -> Unit) {
-    val button = getElementsByTagName("button")[0] as HTMLElement?
-    button?.addEventListener("click", {
+    addEventListener("click", {
         action()
     })
 }

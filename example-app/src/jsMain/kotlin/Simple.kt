@@ -14,5 +14,25 @@ fun main() {
         style.right = "0px"
         style.bottom = "0px"
     }
-    context.elementTest()
+    RockNavigator.router = Router(
+        context,
+        routes = listOf(
+            Route("/") {
+                column {
+                    text { content = "Home" }
+                    button {
+                        onClick {
+                            println("button click")
+                            RockNavigator.navigate("/test")
+                        }
+                        text {content = "Navigate"}
+                    }
+                }
+            },
+            Route("/test") {
+                text { content = "Test" }
+            }
+        )
+    )
+//    context.simpleElementTest()
 }

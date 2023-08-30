@@ -89,6 +89,8 @@ fun ViewContext.elementTest() {
     val formProp = Property(mutableMapOf<String, Any>())
     val switchProp = Property(true)
 
+    val listItems = Property(listOf(1, 2, 3))
+
     watchGeolocation { pos ->
         lat set pos.latitude
         lon set pos.longitude
@@ -101,8 +103,17 @@ fun ViewContext.elementTest() {
                 dropdownProp set "World"
                 radioProp set "two"
                 checkedProp set true
+
+                listItems set listOf(1, 2, 3, 4, 5)
             }
         }
+
+        forEach(
+            data = { listItems.current },
+            render = {
+                text { content = it.toString() }
+            }
+        )
 
         switch {
             bind(switchProp)

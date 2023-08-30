@@ -46,11 +46,13 @@ expect fun ViewContext.scrollsHorizontally(): ViewWrapper
 @ViewDsl
 expect fun ViewContext.column(setup: Column.() -> Unit = {}): Unit
 expect class Column : NView
+
 expect var Column.gravity: StackGravity
 
 @ViewDsl
 expect fun ViewContext.row(setup: Row.() -> Unit = {}): Unit
 expect class Row : NView
+
 expect var Row.gravity: StackGravity
 
 @ViewDsl
@@ -81,6 +83,7 @@ expect var Text.textStyle: TextStyle
 expect var Text.gravity: TextGravity
 
 expect class Button : NView
+
 expect var Button.variant: ButtonVariant
 expect var Button.palette: ButtonPalette
 expect var Button.size: ButtonSize
@@ -94,7 +97,6 @@ expect class Image : NView
 expect fun ViewContext.image(setup: Image.() -> Unit = {}): Unit
 expect var Image.source: ImageSource
 expect var Image.scaleType: ImageMode
-
 
 
 expect class ActivityIndicator : NView
@@ -143,8 +145,9 @@ expect fun <T> RadioGroup.bind(
 ): Unit
 
 
-expect class Switch: NView
-expect fun ViewContext.switch(setup: Switch.()->Unit = {}): Unit
+expect class Switch : NView
+
+expect fun ViewContext.switch(setup: Switch.() -> Unit = {}): Unit
 expect fun Switch.bind(checked: Writable<Boolean>): Unit
 
 expect class CheckBox : NView
@@ -181,6 +184,13 @@ expect class Form : NView
 expect fun ViewContext.form(setup: Form.() -> Unit = {}): Unit
 expect fun <T : MutableMap<String, Any>> Form.bind(
     prop: Writable<T>, onSubmit: (T) -> Unit
+): Unit
+
+expect class ForEach : NView
+
+expect fun <T> ViewContext.forEach(
+    data: ReactiveScope.() -> List<T>,
+    render: NView.(T) -> Unit
 ): Unit
 
 //expect class RecyclerView: NView

@@ -18,10 +18,18 @@ fun main() {
             Route("/") { homeComponent(it) },
             Route("/test") { testComponent(it) },
             Route("/users") { testComponent(it) },
-            Route("/users/{userId}") { userComponent(it) },
+            Route("/users/{userId}") {
+                userComponent(
+                    UserProps(
+                        userId = it["userId"]!!.toInt()
+                    )
+                )
+            },
             Route("/users/{userId}/settings") { userSettings(it) },
-        )
-    ) {
-        text { content = "Not found" }
-    }
+        ),
+        fallback = {
+            text { content = "Not found" }
+        }
+    )
 }
+

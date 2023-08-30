@@ -38,6 +38,7 @@ kotlin {
                 cssSupport {
                     enabled.set(true)
                 }
+//                devServer?.open = false
             }
         }
     }

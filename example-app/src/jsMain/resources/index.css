@@ -120,7 +120,7 @@
     user-select: none;
     cursor: pointer;
     display: inline-flex;
-    alignItems: center;
+    align-items: center;
     position: relative;
     height: 36px;
 }

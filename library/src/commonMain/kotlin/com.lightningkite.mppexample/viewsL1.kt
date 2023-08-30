@@ -126,6 +126,7 @@ expect var TextField.keyboardHints: KeyboardHints
 expect var TextField.hint: String
 expect var TextField.validation: InputValidation
 expect var TextField.key: String
+expect var TextField.variant: TextFieldVariant
 
 expect class DropDown : NView
 typealias Spinner = DropDown
@@ -194,18 +195,6 @@ expect class WebView : NView
 
 expect fun ViewContext.webView(setup: WebView.() -> Unit = {}): Unit
 expect var WebView.url: String
-
-expect class MUITextField : NViewWithTextStyle
-
-expect fun ViewContext.muiTextField(setup: MUITextField.() -> Unit): Unit
-expect fun MUITextField.bind(text: Writable<String>): Unit
-
-expect var MUITextField.textStyle: TextStyle
-expect var MUITextField.labelStyle: TextStyle
-expect var MUITextField.keyboardHints: KeyboardHints
-expect var MUITextField.label: String
-expect var MUITextField.validation: InputValidation
-expect var MUITextField.key: String
 
 expect class AutoCompleteTextView : NView
 

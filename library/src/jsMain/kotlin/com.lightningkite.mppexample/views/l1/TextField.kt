@@ -1,33 +1,43 @@
 package com.lightningkite.mppexample
 
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.HTMLLabelElement
 import org.w3c.dom.get
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias TextField = HTMLInputElement
+actual typealias TextField = HTMLDivElement
 
-actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = element<HTMLInputElement>("input") {
-    type = "text"
-    style.width = "100%"
-    name = "UNNAMED-INPUT"
+actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = element<HTMLDivElement>("div") {
+    element<HTMLInputElement>("input") {
+        type = "text"
+        style.width = "100%"
+        name = "UNNAMED-INPUT"
+    }
+
+    element<HTMLLabelElement>("label") {}
+
+    variant = TextFieldVariant.Outlined
     setup()
 }
 
 actual var TextField.key: String
     get() = throw NotImplementedError()
     set(value) {
-        name = value
+        val input = getElementsByTagName("input")[0] as HTMLInputElement
+        input.name = value
     }
 
 actual fun TextField.bind(text: Writable<String>) {
-    value = text.once
+    val input = getElementsByTagName("input")[0] as HTMLInputElement
+    input.value = text.once
 
     reactiveScope {
-        value = text.current
+        input.value = text.current
     }
 
-    addEventListener("input", {
+    input.addEventListener("input", {
         text set it.currentTarget.asDynamic().value as String
     })
 }
@@ -35,7 +45,11 @@ actual fun TextField.bind(text: Writable<String>) {
 actual var TextField.hint: String
     get() = throw NotImplementedError()
     set(value) {
-        placeholder = value
+        val input = getElementsByTagName("input")[0] as HTMLInputElement
+        input.placeholder = value
+
+        val label = getElementsByTagName("label")[0] as HTMLLabelElement
+        label.innerText = value
     }
 
 actual var TextField.textStyle: TextStyle
@@ -47,11 +61,12 @@ actual var TextField.textStyle: TextStyle
 actual var TextField.keyboardHints: KeyboardHints
     get() = throw NotImplementedError()
     set(value) {
-//        if (value.action != null) {
-//            TODO()
-//        }
+        if (value.action != null) {
+            TODO()
+        }
+        val input = getElementsByTagName("input")[0] as HTMLInputElement
 
-        type = when (value.type) {
+        input.type = when (value.type) {
             KeyboardType.Text -> "text"
             KeyboardType.Decimal -> "number"
             KeyboardType.Integer -> "number"
@@ -60,22 +75,22 @@ actual var TextField.keyboardHints: KeyboardHints
 
         when (value.autocomplete) {
             AutoComplete.Email -> {
-                type = "email"
-                autocomplete = "email"
+                input.type = "email"
+                input.autocomplete = "email"
             }
             AutoComplete.Password -> {
-                type = "password"
-                autocomplete = "current-password"
+                input.type = "password"
+                input.autocomplete = "current-password"
             }
             AutoComplete.NewPassword -> {
-                type = "password"
-                autocomplete = "new-password"
+                input.type = "password"
+                input.autocomplete = "new-password"
             }
             AutoComplete.Phone -> {
-                autocomplete = "tel"
+                input.autocomplete = "tel"
             }
             null -> {
-                autocomplete = "off"
+                input.autocomplete = "off"
             }
         }
 
@@ -89,13 +104,23 @@ actual var TextField.keyboardHints: KeyboardHints
 actual var TextField.validation: InputValidation
     get() = throw NotImplementedError()
     set(value) {
-        required = value.required
+        val input = getElementsByTagName("input")[0] as HTMLInputElement
+        input.required = value.required
         if (value.minLength == null)
-            removeAttribute("minLength")
+            input.removeAttribute("minLength")
         else
-            minLength = value.minLength
+            input.minLength = value.minLength
         if (value.maxLength == null)
-            removeAttribute("maxLength")
+            input.removeAttribute("maxLength")
         else
-            maxLength = value.maxLength
+            input.maxLength = value.maxLength
+    }
+
+actual var TextField.variant: TextFieldVariant
+    get() = throw NotImplementedError()
+    set(value) {
+        className = when(value) {
+            TextFieldVariant.Unstyled -> ""
+            TextFieldVariant.Outlined -> "rock-mui-text-field"
+        }
     }

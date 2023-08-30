@@ -114,10 +114,11 @@ fun ViewContext.elementTest() {
             bind(formProp) { map ->
                 println(map)
             }
-            muiTextField {
+            textField {
+                variant = TextFieldVariant.Outlined
                 validation = InputValidation(required = true)
                 key = "required-field"
-                label = "Required Field"
+                hint = "Required Field"
             }
             row {
                 text { content = "Primary" }
@@ -171,9 +172,9 @@ fun ViewContext.elementTest() {
         } in padding(1.rem)
 
         box {
-            muiTextField {
+            textField {
                 bind(textProp)
-                label = "Some Input Label"
+                hint = "Some Input Label"
             }
         } in padding(2.rem)
 

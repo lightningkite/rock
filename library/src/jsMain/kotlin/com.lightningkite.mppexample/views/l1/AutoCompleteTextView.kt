@@ -9,7 +9,7 @@ actual typealias AutoCompleteTextView = HTMLDataListElement
 
 actual inline fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.() -> Unit): Unit =
     element<HTMLDataListElement>("div") {
-        muiTextField {}
+        textField {}
         setup()
     }
 
@@ -64,14 +64,15 @@ actual fun <T> AutoCompleteTextView.bind(
 actual var AutoCompleteTextView.label: String
     get() = throw NotImplementedError()
     set(value) {
-        val label = getElementsByTagName("div")[0] as MUITextField
-        label.label = value
+        val label = getElementsByTagName("div")[0] as TextField
+        label.hint = value
     }
 
 actual var AutoCompleteTextView.textStyle: TextStyle
     get() = throw NotImplementedError()
     set(value) {
-        val input = getElementsByTagName("input")[0] as TextField
+        println(getElementsByTagName("input")[0])
+        val input = getElementsByTagName("input")[0] as HTMLInputElement
         input.setStyles(value)
     }
 

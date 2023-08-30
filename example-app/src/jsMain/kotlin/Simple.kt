@@ -2,8 +2,6 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 import kotlinx.browser.document
-import kotlinx.browser.window
-import org.w3c.dom.HTMLAnchorElement
 
 fun main() {
     val context = ViewContext(document.body!!)
@@ -17,22 +15,12 @@ fun main() {
     RockNavigator.router = Router(
         context,
         routes = listOf(
-            Route("/") {
-                column {
-                    text { content = "Home" }
-                    button {
-                        onClick {
-                            println("button click")
-                            RockNavigator.navigate("/test")
-                        }
-                        text {content = "Navigate"}
-                    }
-                }
-            },
-            Route("/test") {
-                text { content = "Test" }
-            }
+            Route("/") { homeComponent(it) },
+            Route("/test") { testComponent(it) },
+            Route("/users") { testComponent(it) },
+            Route("/users/{userId}") { userComponent(it) },
         )
-    )
-//    context.simpleElementTest()
+    ) {
+        text { content = "Not found" }
+    }
 }

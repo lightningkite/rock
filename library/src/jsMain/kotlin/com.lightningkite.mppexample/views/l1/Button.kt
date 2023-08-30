@@ -14,6 +14,7 @@ actual inline fun ViewContext.button(setup: Button.() -> Unit): Unit = element<H
     style.alignItems = "center"
     style.height = "min-content"
     palette = ButtonPalette.Primary
+    variant = ButtonVariant.Contained
 
 //    text {
 //        gravity = TextGravity.Center

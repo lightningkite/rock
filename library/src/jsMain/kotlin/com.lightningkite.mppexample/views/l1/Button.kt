@@ -1,9 +1,6 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.HTMLButtonElement
-import org.w3c.dom.HTMLDivElement
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.get
+import org.w3c.dom.*
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -13,8 +10,15 @@ actual inline fun ViewContext.button(setup: Button.() -> Unit): Unit = element<H
     type = "submit" // may need to remove this and make it a variable
     style.display = "flex"
     style.flexDirection = "row"
+    style.justifyContent = "center"
+    style.alignItems = "center"
     style.height = "min-content"
     palette = ButtonPalette.Primary
+
+//    text {
+//        gravity = TextGravity.Center
+//    }
+
     setup()
 }
 
@@ -24,6 +28,13 @@ actual fun Button.onClick(action: () -> Unit) {
         action()
     })
 }
+
+//actual var Button.content: String
+//    get() = throw NotImplementedError()
+//    set(value) {
+//        val span = getElementsByTagName("span")[0] as HTMLSpanElement
+//        span.content = value
+//    }
 
 actual var Button.variant: ButtonVariant
     get() = throw NotImplementedError()

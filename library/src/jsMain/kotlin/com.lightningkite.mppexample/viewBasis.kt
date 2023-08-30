@@ -27,7 +27,7 @@ actual class ViewContext(
         onRemoveList.clear()
     }
 
-    val elementToDoList = ArrayList<HTMLElement.()->Unit>()
+    val elementToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
     inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
         val element = (document.createElement(name) as T)
@@ -100,12 +100,20 @@ actual var NView.rotation: Angle
 actual var NView.elevation: Dimension
     get() = throw NotImplementedError()
     set(value) {
-        println("setting box shadow")
         val offsetX = 0.px.value
         val offsetY = value.value
         val blur = 4.px.value
         val spread = 0.px.value
         style.boxShadow = "$offsetX $offsetY $blur $spread #77777799"
+    }
+
+actual var NView.weight: Int
+    get() = throw NotImplementedError()
+    set(value) {
+        if (value == 0)
+            style.removeProperty("flex")
+        else
+            style.flex = value.toString()
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")

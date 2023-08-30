@@ -7,7 +7,7 @@ import org.w3c.dom.HTMLSpanElement
 actual typealias Text = HTMLSpanElement
 
 fun Text.sharedSetup() {
-    gravity = TextGravity.Left
+//    gravity = TextGravity.Left // adding this overrides the default button > span css that centers the text
 }
 
 actual inline fun ViewContext.text(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("span") {

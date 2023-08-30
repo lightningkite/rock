@@ -7,6 +7,7 @@ import org.w3c.dom.*
 actual typealias CheckBox = HTMLLabelElement
 
 actual inline fun ViewContext.checkBox(setup: CheckBox.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+    style.setProperty("user-select", "none")
     element<HTMLInputElement>("input") {
         type = "checkbox"
     }

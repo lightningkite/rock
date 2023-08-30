@@ -121,11 +121,15 @@ fun ViewContext.elementTest() {
                 hint = "Required Field"
             }
             row {
+                gravity = StackGravity.Center
+
                 text { content = "Primary" }
                 button {
                     variant = ButtonVariant.Contained
                     size = ButtonSize.Large
-                    text { content = "Submit Form (contained)" }
+                    text {
+                        content = "Submit Form (contained)"
+                    }
                     box {
                         image {
                             scaleType = ImageMode.Fit
@@ -140,7 +144,9 @@ fun ViewContext.elementTest() {
                 button {
                     variant = ButtonVariant.Outlined
                     size = ButtonSize.Medium
-                    text { content = "Submit Form (outlined)" }
+                    text {
+                        content = "Submit Form (outlined)"
+                    }
                 }
                 button {
                     variant = ButtonVariant.Text
@@ -149,6 +155,8 @@ fun ViewContext.elementTest() {
                 }
             }
             row {
+                gravity = StackGravity.End
+
                 text { content = "Danger" }
                 button {
                     variant = ButtonVariant.Contained
@@ -156,11 +164,17 @@ fun ViewContext.elementTest() {
                     palette = ButtonPalette.Danger
                     text { content = "Submit Form (contained)" }
                 }
-                button {
-                    variant = ButtonVariant.Outlined
-                    size = ButtonSize.Medium
-                    palette = ButtonPalette.Danger
-                    text { content = "Submit Form (outlined)" }
+                box {
+                    weight = 1
+                    column {
+                        gravity = StackGravity.Center
+                        button {
+                            variant = ButtonVariant.Outlined
+                            size = ButtonSize.Medium
+                            palette = ButtonPalette.Danger
+                            text { content = "Submit Form (outlined)" }
+                        }
+                    }
                 }
                 button {
                     variant = ButtonVariant.Text
@@ -195,7 +209,7 @@ fun ViewContext.elementTest() {
             ::visible { counter.current % 2 == 0 }
         }
 
-        radioButton {
+        radioGroup {
             bind(
                 options = { listOf("one", "two") },
                 prop = radioProp,
@@ -369,19 +383,6 @@ fun ViewContext.elementTest() {
                 fill = Color.blue
             )
         )
-
-        box {
-            image {
-                scaleType = ImageMode.Fit
-                source = ImageRemote("https://picsum.photos/200/300")
-            }
-        } in sizedBox(
-            SizeConstraints(
-                height = 400.px
-            )
-        )
-
-
 
         box {
             image {

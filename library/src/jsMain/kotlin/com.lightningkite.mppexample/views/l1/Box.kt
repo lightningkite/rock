@@ -6,7 +6,6 @@ import org.w3c.dom.HTMLDivElement
 actual typealias Box = HTMLDivElement
 
 actual inline fun ViewContext.box(setup: Box.() -> Unit): Unit = element<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "column"
+    style.display = "block"
     setup()
 }

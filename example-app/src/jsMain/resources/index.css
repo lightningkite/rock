@@ -109,6 +109,7 @@
 }
 
 .rock-mui-button-text span {
+  text-align: center;
   color: rgb(var(--rock-mui-button));
 }
 
@@ -167,4 +168,63 @@
 .rock-mui-switch input:checked ~ .rock-mui-switch-check::after {
     background-color: #00aba9;
     transform: translateX(30px);
+}
+
+
+.rock-mui-radio {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    margin: 0 0 10px;
+    padding: 0 0 0 24px;
+    min-height: 20px;
+
+    --mui-rock-radio-color: black;
+}
+
+.rock-mui-radio .rock-mui-radio-check::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+    border: 2px solid black;
+    border-radius: 14px;
+    z-index: 1;
+    transition: border-color 0.28s cubic-bezier(.4, 0, .2, 1);
+}
+
+.rock-mui-radio .rock-mui-radio-check::after {
+    content: '';
+    position: absolute;
+    top: 7px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(var(--rock-mui-radio-color));
+    border-radius: 50%;
+    z-index: 2;
+    transform: scale(0, 0);
+    transition: transform 0.28s cubic-bezier(.4, 0, .2, 1);
+}
+
+.rock-mui-radio input[type="radio"] {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 36px;
+    height: 20px;
+    opacity: 0;
+    z-index: 0;
+}
+
+.rock-mui-radio input[type="radio"]:checked ~ .rock-mui-radio-check::before {
+    border-color: rgb(var(--rock-mui-radio-color));
+}
+
+.rock-mui-radio input[type="radio"]:checked ~ .rock-mui-radio-check::after {
+    transform: scale(1, 1);
 }

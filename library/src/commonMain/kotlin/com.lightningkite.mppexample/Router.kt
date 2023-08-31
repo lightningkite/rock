@@ -72,21 +72,24 @@ class Router(
             }
         }
 
-        if (failed) {
+        if (failed || route.render == null) {
             println("NOT FOUND, USING FALLBACK")
             fallback(context)
-        } else if (route.render == null) {
-            throw Error("Expecting render method on route")
         } else {
             println("MATCHED ROUTE")
-            route.render!!(context, props)
+            context.run {
+                box {
+                    id = "rock-screen-animate-in"
+                    route.render!!(props)
+                }
+            }
         }
     }
 }
 
 expect object RockNavigator {
     var currentPath: String
-    fun navigate(path: String, pushState: Boolean = true)
+    fun navigate(path: String, pushState: Boolean = true, transition: ScreenTransition = ScreenTransition.Push)
     var router: Router?
 }
 

@@ -120,6 +120,13 @@ actual var NView.weight: Int
             style.flex = value.toString()
     }
 
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+actual var NView.id: String
+    get() = throw NotImplementedError()
+    set(value) {
+        id = value
+    }
+
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NViewWithTextStyle = HTMLElement
 

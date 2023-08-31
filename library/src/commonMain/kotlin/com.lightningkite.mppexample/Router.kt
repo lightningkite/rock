@@ -117,7 +117,7 @@ data class RouteNode(
 )
 
 data class NavigationOptions(
+    val transitions: ScreenTransitions? = null,
     val pushState: Boolean = true,
     val reverse: Boolean = false,
-    val transitions: ScreenTransitions? = null
 )

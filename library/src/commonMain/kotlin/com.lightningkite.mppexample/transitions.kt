@@ -20,10 +20,21 @@ data class ScreenTransitions(
             forward = ScreenTransition.None,
             reverse = ScreenTransition.None
         )
-
-        val PushPop = ScreenTransitions(
+        val HorizontalSlide = ScreenTransitions(
             forward = ScreenTransition.Push,
             reverse = ScreenTransition.Pop
+        )
+        val Fade = ScreenTransitions(
+            forward = ScreenTransition.Fade,
+            reverse = ScreenTransition.Fade
+        )
+        val FadeResize = ScreenTransitions(
+            forward = ScreenTransition.ShrinkFade,
+            reverse = ScreenTransition.GrowFade,
+        )
+        val VerticalSlide = ScreenTransitions(
+            forward = ScreenTransition.PullUp,
+            reverse = ScreenTransition.PullDown,
         )
     }
 }

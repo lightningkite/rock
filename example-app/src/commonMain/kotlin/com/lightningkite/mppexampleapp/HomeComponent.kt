@@ -19,8 +19,7 @@ fun ViewContext.homeComponent(route: RouteProps) {
             bind(userIdProp)
         } in margin(
             Insets(
-                top = 2.rem,
-                bottom = 2.rem
+                top = 2.rem, bottom = 2.rem
             )
         )
 

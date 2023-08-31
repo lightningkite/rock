@@ -44,4 +44,4 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
 //var ViewContext.defaultSpacing by viewContextAddon(2)
 //val ViewContext.defaultSpacing2 by viewContextAddon(Property(1))
 var ViewContext.navigator by viewContextAddon<IRockNavigator>(DummyRockNavigator())
-var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.PushPop)
+var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)

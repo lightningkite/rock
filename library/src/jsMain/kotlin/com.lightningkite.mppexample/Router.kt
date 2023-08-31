@@ -20,7 +20,6 @@ actual class RockNavigator actual constructor(
             event as PopStateEvent
             context.run {
                 val index = event.state as Int?
-                println("INDEX: $index")
                 val reverse = index == null || index < currentIndex
                 currentIndex = index ?: 0
                 navigate(currentPath, NavigationOptions(pushState = false, reverse = reverse))
@@ -52,7 +51,6 @@ actual class RockNavigator actual constructor(
 
         if (options.pushState) {
             currentIndex = nextIndex
-            println("CURRENTIDX: $currentIndex")
             window.history.pushState(
                 nextIndex++, "", path
             )

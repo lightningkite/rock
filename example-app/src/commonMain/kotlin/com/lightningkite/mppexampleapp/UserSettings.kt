@@ -2,6 +2,15 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-fun ViewContext.userSettings(props: RouteProps) {
-    text { content = "The user id is: ${ props["userId"] ?: "" } and this is the settings page" }
+class UserSettings(val userId: Int) : RockScreen {
+    override fun ViewContext.render() {
+        text { content = "The user id is: $userId and this is the settings page" }
+    }
+
+    override fun createPath(): String = "/users/$userId/settings"
+
+    companion object {
+        const val PATH = "/users/{userId}/settings"
+        fun create(props: RouteProps) = UserSettings(userId = props["userId"]!!.toInt())
+    }
 }

@@ -5,10 +5,10 @@ import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.PopStateEvent
 
-actual class RockNavigator actual constructor(
+actual class PlatformNavigator actual constructor(
     private val router: Router,
     private val context: ViewContext
-) : IRockNavigator {
+) : RockNavigator {
     private var nextIndex: Int = 0
     private var currentIndex: Int = 0
 
@@ -31,9 +31,10 @@ actual class RockNavigator actual constructor(
         get() = window.location.pathname
         set(value) = throw NotImplementedError()
 
-    override fun navigate(path: String, options: NavigationOptions) {
+    private fun navigate(path: String, options: NavigationOptions) {
         val transitions = options.transitions ?: context.screenTransitions
         val transition = if (options.reverse) transitions.reverse else transitions.forward
+
         val current = document.body?.querySelector("#rock-screen-animate-in") as HTMLElement?
 
         if (current != null) {
@@ -73,6 +74,8 @@ actual class RockNavigator actual constructor(
             }
         }
     }
+
+    override fun navigate(screen: RockScreen, options: NavigationOptions) = navigate(screen.createPath(), options)
 
     private fun getEnterTransitionClass(transition: ScreenTransition): String? {
         return when (transition) {

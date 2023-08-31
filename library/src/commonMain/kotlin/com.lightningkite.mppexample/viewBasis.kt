@@ -1,6 +1,5 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.Navigator
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -43,5 +42,5 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
 
 //var ViewContext.defaultSpacing by viewContextAddon(2)
 //val ViewContext.defaultSpacing2 by viewContextAddon(Property(1))
-var ViewContext.navigator by viewContextAddon<IRockNavigator>(DummyRockNavigator())
-var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
+var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
+var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.FadeResize)

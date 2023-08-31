@@ -2,6 +2,7 @@ package com.lightningkite.mppexample
 
 typealias RouteProps = Map<String, String>
 typealias RouteMap = MutableMap<String, RouteNode>
+typealias ScreenCreator = (props: RouteProps) -> RockScreen
 typealias RouteRenderer = ViewContext.(props: RouteProps) -> Unit
 
 class Router(
@@ -17,9 +18,8 @@ class Router(
 
     init {
         routes.forEach { setupRoute(it) }
-        println(routeMap)
         context.run {
-            navigator = RockNavigator(
+            navigator = PlatformNavigator(
                 router = this@Router,
                 context = this,
             )
@@ -43,7 +43,10 @@ class Router(
             }
             map.children[routeKey]!!.dynamicParam = paramName
             if (isLeaf) {
-                map.children[routeKey]!!.render = route.render
+                map.children[routeKey]!!.render = {
+                    val screen = route.render(it)
+                    screen.run { render() }
+                }
             } else {
                 map = map.children[routeKey]!!
             }
@@ -73,41 +76,43 @@ class Router(
         context.run {
             box {
                 id = "rock-screen-animate-in"
-                if (!failed && route.render != null)
+                if (!failed && route.render != null) {
+                    println("ROUTE FOUND")
                     route.render!!(props)
-                else
+                } else {
                     fallback()
+                }
             }
         }
     }
 }
 
-interface IRockNavigator {
+interface RockNavigator {
     var currentPath: String
     fun navigate(
-        path: String,
+        screen: RockScreen,
         options: NavigationOptions = NavigationOptions()
     )
 }
 
-expect class RockNavigator(
+expect class PlatformNavigator(
     router: Router,
     context: ViewContext
-) : IRockNavigator
+) : RockNavigator
 
-class DummyRockNavigator : IRockNavigator {
+class DummyRockNavigator : RockNavigator {
     override var currentPath: String
         get() = throw NotImplementedError()
         set(value) = throw NotImplementedError()
 
-    override fun navigate(path: String, options: NavigationOptions) {
+    override fun navigate(screen: RockScreen, options: NavigationOptions) {
         throw NotImplementedError()
     }
 }
 
 data class Route(
     val path: String,
-    val render: RouteRenderer,
+    val render: ScreenCreator,
 )
 
 data class RouteNode(
@@ -121,3 +126,12 @@ data class NavigationOptions(
     val pushState: Boolean = true,
     val reverse: Boolean = false,
 )
+
+interface RockScreen {
+    fun ViewContext.render()
+    fun createPath(): String
+}
+
+interface RockApp {
+    fun ViewContext.render()
+}

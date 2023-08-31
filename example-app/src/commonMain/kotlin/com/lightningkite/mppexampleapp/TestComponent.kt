@@ -2,6 +2,14 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-fun ViewContext.testComponent(props: RouteProps) {
-    text { content = "TEST COMPONENT" }
+class TestComponent() : RockScreen {
+    override fun ViewContext.render() {
+        text { content = "TEST COMPONENT" }
+    }
+
+    override fun createPath(): String = "/test"
+
+    companion object {
+        const val PATH = "/test"
+    }
 }

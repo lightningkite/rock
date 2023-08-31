@@ -235,3 +235,70 @@ body {
 .rock-mui-radio input[type="radio"]:checked ~ .rock-mui-radio-check::after {
 	transform: scale(1, 1);
 }
+
+
+
+
+
+.box-shadow {
+    box-shadow: var(--hover-box-shadow);
+    --box-shadow: unset;
+}
+
+.background {
+    background: var(--hover-background);
+    --background: unset;
+}
+
+.background-image {
+    background-image: var(--hover-background-image);
+    --background-image: unset;
+}
+
+.background-attachment {
+    background-attachment: var(--hover-background-attachment);
+    --background-attachment: unset;
+}
+
+.border-color {
+    border-color: var(--hover-border-color);
+    --border-color: unset;
+}
+
+.border-width {
+    border-width: var(--hover-border-width);
+    --border-width: unset;
+}
+
+
+
+
+.hover-box-shadow:hover {
+    box-shadow: var(--hover-box-shadow) !important;
+    --hover-box-shadow: none;
+}
+
+.hover-background:hover {
+    background: var(--hover-background) !important;
+    --hover-background: unset;
+}
+
+.hover-background-image:hover {
+    background-image: var(--hover-background-image) !important;
+    --hover-background-image: unset;
+}
+
+.hover-background-attachment:hover {
+    background-attachment: var(--hover-background-attachment) !important;
+    --hover-background-attachment: unset;
+}
+
+.hover-border-color:hover {
+    border-color: var(--hover-border-color) !important;
+    --hover-border-color: unset;
+}
+
+.hover-border-width:hover {
+    border-width: var(--hover-border-width) !important;
+    --hover-border-width: unset;
+}

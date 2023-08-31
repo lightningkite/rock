@@ -92,12 +92,16 @@ actual var NView.rotation: Angle
 actual var NView.elevation: Dimension
     get() = throw NotImplementedError()
     set(value) {
-        val offsetX = 0.px.value
-        val offsetY = value.value
-        val blur = 4.px.value
-        val spread = 0.px.value
-        style.boxShadow = "$offsetX $offsetY $blur $spread #77777799"
+        style.boxShadow = value.toBoxShadow()
     }
+
+fun Dimension.toBoxShadow(): String {
+    val offsetX = 0.px.value
+    val offsetY = value
+    val blur = 4.px.value
+    val spread = 0.px.value
+    return "$offsetX $offsetY $blur $spread #77777799"
+}
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 actual var NView.id: String

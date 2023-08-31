@@ -4,10 +4,23 @@ import com.lightningkite.mppexample.*
 
 class HomeScreen : RockScreen {
     override fun ViewContext.render() {
+        val counter = Property(0)
+        launch {
+            while (true) {
+                delay(1000)
+                counter.modify { it + 1 }
+                async {
+                    delay(200)
+                }
+            }
+        }
+
         column {
             val userIdProp = Property("1")
 
-            text { content = "HOME COMPONENT" }
+            text {
+                content = "HOME COMPONENT"
+            } in changingBackground { Background(fill = Color.gray(1 - counter.current / 20f)) }
             button {
                 onClick {
                     navigator.navigate(TestComponent())
@@ -36,7 +49,24 @@ class HomeScreen : RockScreen {
                     navigator.navigate(NonexistentScreen())
                 }
                 text { content = "404" }
-            }
+            } in margin(Insets(bottom = 2.rem))
+
+            text {
+                content = "hover me"
+            } in hoverable(
+                elevation = 8.px,
+                background = Background(
+                    fill = LinearGradient(
+                        angle = Angle(0.15f),
+                        stops = listOf(
+                            GradientStop(ratio = 0.5f, color = Color.yellow),
+                            GradientStop(ratio = 1f, color = Color.red)
+                        )
+                    ),
+                    stroke = Color.green,
+                    strokeWidth = 4.px
+                )
+            )
         }
     }
 

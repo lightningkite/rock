@@ -9,7 +9,6 @@ fun ViewContext.homeComponent(route: RouteProps) {
         text { content = "HOME COMPONENT" }
         button {
             onClick {
-                println("button click")
                 navigator.navigate("/test")
             }
             text { content = "Navigate" }
@@ -27,7 +26,6 @@ fun ViewContext.homeComponent(route: RouteProps) {
 
         button {
             onClick {
-                println("button click")
                 navigator.navigate("/users/${userIdProp.once}")
             }
             text { content = "Users" }

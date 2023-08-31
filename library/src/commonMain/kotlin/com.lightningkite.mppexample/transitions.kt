@@ -12,6 +12,18 @@ enum class ScreenTransition {
 }
 
 data class ScreenTransitions(
-    val forward: ScreenTransition = ScreenTransition.Push,
-    val reverse: ScreenTransition = ScreenTransition.Pop
-)
+    val forward: ScreenTransition,
+    val reverse: ScreenTransition
+) {
+    companion object {
+        val None = ScreenTransitions(
+            forward = ScreenTransition.None,
+            reverse = ScreenTransition.None
+        )
+
+        val PushPop = ScreenTransitions(
+            forward = ScreenTransition.Push,
+            reverse = ScreenTransition.Pop
+        )
+    }
+}

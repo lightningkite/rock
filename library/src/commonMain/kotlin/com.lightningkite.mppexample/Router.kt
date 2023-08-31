@@ -19,7 +19,6 @@ class Router(
         routes.forEach { setupRoute(it) }
         println(routeMap)
         context.run {
-            println("SETTING NAVIGATOR")
             navigator = RockNavigator(
                 router = this@Router,
                 context = this,
@@ -71,14 +70,13 @@ class Router(
             }
         }
 
-        if (failed || route.render == null) {
-            fallback(context)
-        } else {
-            context.run {
-                box {
-                    id = "rock-screen-animate-in"
+        context.run {
+            box {
+                id = "rock-screen-animate-in"
+                if (!failed && route.render != null)
                     route.render!!(props)
-                }
+                else
+                    fallback()
             }
         }
     }
@@ -88,8 +86,7 @@ interface IRockNavigator {
     var currentPath: String
     fun navigate(
         path: String,
-        pushState: Boolean = true,
-        transition: ScreenTransition = ScreenTransition.Push
+        options: NavigationOptions = NavigationOptions()
     )
 }
 
@@ -103,7 +100,7 @@ class DummyRockNavigator : IRockNavigator {
         get() = throw NotImplementedError()
         set(value) = throw NotImplementedError()
 
-    override fun navigate(path: String, pushState: Boolean, transition: ScreenTransition) {
+    override fun navigate(path: String, options: NavigationOptions) {
         throw NotImplementedError()
     }
 }
@@ -117,4 +114,10 @@ data class RouteNode(
     var render: RouteRenderer?,
     val children: RouteMap,
     var dynamicParam: String?
+)
+
+data class NavigationOptions(
+    val pushState: Boolean = true,
+    val reverse: Boolean = false,
+    val transitions: ScreenTransitions? = null
 )

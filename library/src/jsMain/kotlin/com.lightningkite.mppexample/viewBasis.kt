@@ -2,10 +2,13 @@ package com.lightningkite.mppexample
 
 import kotlinx.browser.document
 import org.w3c.dom.*
+import kotlin.reflect.KProperty
 
 actual class ViewContext(
     parent: HTMLElement
 ) {
+    actual val addons: MutableMap<KProperty<*>, Any?> = mutableMapOf()
+
     val stack = arrayListOf(parent)
     inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
         ListeningLifecycleStack.useIn(this.onRemove) {
@@ -29,17 +32,17 @@ actual class ViewContext(
 
     val elementToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
-    inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
-        val element = (document.createElement(name) as T)
-        elementToDoList.forEach { it(element) }
-        elementToDoList.clear()
-        ListeningLifecycleStack.useIn(element.onRemove) {
-            setup(element)
-        }
-        stack.add(element)
-        popCount++
-        return ViewWrapper
-    }
+//    inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
+//        val element = (document.createElement(name) as T)
+//        elementToDoList.forEach { it(element) }
+//        elementToDoList.clear()
+//        ListeningLifecycleStack.useIn(element.onRemove) {
+//            setup(element)
+//        }
+//        stack.add(element)
+//        popCount++
+//        return ViewWrapper
+//    }
 
     inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) =
         element(document.createElement(name) as T, setup)

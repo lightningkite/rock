@@ -19,11 +19,9 @@ fun main() {
             Route("/test") { testComponent(it) },
             Route("/users") { testComponent(it) },
             Route("/users/{userId}") {
-                userComponent(
-                    UserProps(
-                        userId = it["userId"]!!.toInt()
-                    )
-                )
+                UserScreen(
+                    userId = it["userId"]!!.toInt()
+                ).run { render() }
             },
             Route("/users/{userId}/settings") { userSettings(it) },
         ),

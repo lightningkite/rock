@@ -2,12 +2,16 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-fun ViewContext.userComponent(props: UserProps) {
-    column {
-        text { content = "The user id is: ${props.userId}" }
+interface Screen {
+    fun ViewContext.render()
+}
+
+class UserScreen(val userId: Int): Screen {
+    override fun ViewContext.render() = column {
+        text { content = "The user id is: ${userId}" }
         button {
             onClick {
-                RockNavigator.navigate("/users/${props.userId}/settings")
+                RockNavigator.navigate("/users/${userId}/settings")
             }
             text { content = "Settings" }
         }

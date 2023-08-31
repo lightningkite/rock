@@ -5,25 +5,30 @@ import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.PopStateEvent
 
-actual object RockNavigator {
-    actual var router: Router? = null
-        set(value) {
-            if (field != null) throw Error("Attempted reinitialization of RockNavigator")
-            field = value
-            navigate(currentPath, pushState = false, transition = ScreenTransition.None)
-            window.addEventListener("popstate", { event ->
-                event as PopStateEvent
-                println("Intercepted navigation to $currentPath")
-                navigate(currentPath, pushState = false, transition = ScreenTransition.Pop)
-            })
-        }
+actual class RockNavigator actual constructor(
+    private val router: Router,
+    private val context: ViewContext
+) : IRockNavigator {
+    private var nextIndex: Int = 0
 
-    actual var currentPath: String
+    init {
+        context.run {
+            navigate(currentPath, pushState = false, transition = ScreenTransition.None)
+        }
+        window.addEventListener("popstate", { event ->
+            event as PopStateEvent
+            println("Intercepted navigation to $currentPath")
+            context.run {
+                navigate(currentPath, pushState = false, transition = ScreenTransition.Pop)
+            }
+        })
+    }
+
+    override var currentPath: String
         get() = window.location.pathname
         set(value) = throw NotImplementedError()
 
-    actual fun navigate(path: String, pushState: Boolean, transition: ScreenTransition) {
-        if (router == null) throw Error("Uninitialized RockNavigator")
+    override fun navigate(path: String, pushState: Boolean, transition: ScreenTransition) {
         println("Navigating to $path")
         val current = document.body?.querySelector("#rock-screen-animate-in") as HTMLElement?
 

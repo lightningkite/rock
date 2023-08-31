@@ -6,7 +6,7 @@ typealias RouteRenderer = ViewContext.(props: RouteProps) -> Unit
 
 class Router(
     private val context: ViewContext,
-    private val routes: List<Route>,
+    routes: List<Route>,
     private val fallback: ViewContext.() -> Unit
 ) {
     private val routeMap: RouteNode = RouteNode(
@@ -18,21 +18,24 @@ class Router(
     init {
         routes.forEach { setupRoute(it) }
         println(routeMap)
+        context.run {
+            println("SETTING NAVIGATOR")
+            navigator = RockNavigator(
+                router = this@Router,
+                context = this,
+            )
+        }
     }
 
     private fun setupRoute(route: Route) {
         val path = segmentPath(route.path)
         var map = routeMap
-        println("PROCESSING ROUTE ${route.path}")
         path.forEachIndexed { idx, key ->
             val isLeaf = idx == path.lastIndex
             val isDynamic = key.startsWith("{") && key.endsWith("}")
             val routeKey = if (isDynamic) "*" else key
             val paramName = if (isDynamic) key.substring(1, key.lastIndex) else null
-            println("segment $idx: $key (leaf: $isLeaf, isDynamic: $isDynamic, routeKey: $routeKey)")
             if (!map.children.containsKey(routeKey)) {
-                println("Adding child")
-                println("dynamic param: ${key.substring(1, key.lastIndex)}")
                 map.children[routeKey] = RouteNode(
                     render = null,
                     children = mutableMapOf(),
@@ -41,10 +44,8 @@ class Router(
             }
             map.children[routeKey]!!.dynamicParam = paramName
             if (isLeaf) {
-                println("is leaf")
                 map.children[routeKey]!!.render = route.render
             } else {
-                println("is not leaf")
                 map = map.children[routeKey]!!
             }
         }
@@ -54,8 +55,6 @@ class Router(
         if (path == "/") listOf("/") else path.split("/").filter { it.isNotEmpty() }.toList()
 
     fun render(location: String) {
-        println("Location: $location")
-
         val segments = segmentPath(location)
         val props = mutableMapOf<String, String>()
         var route = routeMap
@@ -73,10 +72,8 @@ class Router(
         }
 
         if (failed || route.render == null) {
-            println("NOT FOUND, USING FALLBACK")
             fallback(context)
         } else {
-            println("MATCHED ROUTE")
             context.run {
                 box {
                     id = "rock-screen-animate-in"
@@ -87,10 +84,28 @@ class Router(
     }
 }
 
-expect object RockNavigator {
+interface IRockNavigator {
     var currentPath: String
-    fun navigate(path: String, pushState: Boolean = true, transition: ScreenTransition = ScreenTransition.Push)
-    var router: Router?
+    fun navigate(
+        path: String,
+        pushState: Boolean = true,
+        transition: ScreenTransition = ScreenTransition.Push
+    )
+}
+
+expect class RockNavigator(
+    router: Router,
+    context: ViewContext
+) : IRockNavigator
+
+class DummyRockNavigator : IRockNavigator {
+    override var currentPath: String
+        get() = throw NotImplementedError()
+        set(value) = throw NotImplementedError()
+
+    override fun navigate(path: String, pushState: Boolean, transition: ScreenTransition) {
+        throw NotImplementedError()
+    }
 }
 
 data class Route(

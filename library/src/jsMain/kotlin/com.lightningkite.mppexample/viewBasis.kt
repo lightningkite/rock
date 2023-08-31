@@ -7,7 +7,7 @@ import kotlin.reflect.KProperty
 actual class ViewContext(
     parent: HTMLElement
 ) {
-    actual val addons: MutableMap<KProperty<*>, Any?> = mutableMapOf()
+    actual val addons: MutableMap<String, Any?> = mutableMapOf()
 
     val stack = arrayListOf(parent)
     inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
@@ -109,15 +109,6 @@ actual var NView.elevation: Dimension
         val blur = 4.px.value
         val spread = 0.px.value
         style.boxShadow = "$offsetX $offsetY $blur $spread #77777799"
-    }
-
-actual var NView.weight: Int
-    get() = throw NotImplementedError()
-    set(value) {
-        if (value == 0)
-            style.removeProperty("flex")
-        else
-            style.flex = value.toString()
     }
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")

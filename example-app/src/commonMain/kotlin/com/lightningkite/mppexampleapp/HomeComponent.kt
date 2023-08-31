@@ -10,7 +10,7 @@ fun ViewContext.homeComponent(route: RouteProps) {
         button {
             onClick {
                 println("button click")
-                RockNavigator.navigate("/test")
+                navigator.navigate("/test")
             }
             text { content = "Navigate" }
         }
@@ -28,14 +28,14 @@ fun ViewContext.homeComponent(route: RouteProps) {
         button {
             onClick {
                 println("button click")
-                RockNavigator.navigate("/users/${userIdProp.once}")
+                navigator.navigate("/users/${userIdProp.once}")
             }
             text { content = "Users" }
         } in margin(Insets(bottom = 2.rem))
 
         button {
             onClick {
-                RockNavigator.navigate("/404")
+                navigator.navigate("/404")
             }
             text { content = "404" }
         }

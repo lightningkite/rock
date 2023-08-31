@@ -11,7 +11,7 @@ class UserScreen(val userId: Int): Screen {
         text { content = "The user id is: ${userId}" }
         button {
             onClick {
-                RockNavigator.navigate("/users/${userId}/settings")
+                navigator?.navigate("/users/${userId}/settings")
             }
             text { content = "Settings" }
         }

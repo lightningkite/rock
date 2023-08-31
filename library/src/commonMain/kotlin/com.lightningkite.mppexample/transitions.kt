@@ -10,3 +10,8 @@ enum class ScreenTransition {
     GrowFade,
     ShrinkFade,
 }
+
+data class ScreenTransitions(
+    val forward: ScreenTransition = ScreenTransition.Push,
+    val reverse: ScreenTransition = ScreenTransition.Pop
+)

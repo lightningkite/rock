@@ -29,7 +29,7 @@ class HomeScreen : RockScreen {
             }
 
             button {
-                themedText {
+                text {
                     content = "Nice Button"
                 }
             }

@@ -24,3 +24,5 @@ fun ViewContext.button(
         )
     ) in buttonLike(theme.primary.background.closestColor())
 }
+
+//TODO handle theming for disabled button. consider adding more to the PaintPair class to hold foreground/background for disabled state

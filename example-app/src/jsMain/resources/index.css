@@ -241,33 +241,44 @@ body {
 
 
 .box-shadow {
-    box-shadow: var(--hover-box-shadow);
+    box-shadow: var(--box-shadow);
     --box-shadow: unset;
 }
 
 .background {
-    background: var(--hover-background);
+    background: var(--background);
     --background: unset;
 }
 
 .background-image {
-    background-image: var(--hover-background-image);
+    background-image: var(--background-image);
     --background-image: unset;
 }
 
 .background-attachment {
-    background-attachment: var(--hover-background-attachment);
+    background-attachment: var(--background-attachment);
     --background-attachment: unset;
 }
 
 .border-color {
-    border-color: var(--hover-border-color);
+    border-color: var(--border-color);
     --border-color: unset;
 }
 
 .border-width {
-    border-width: var(--hover-border-width);
+    border-width: var(--border-width);
     --border-width: unset;
+}
+
+.border-radius {
+    border-top-left-radius: var(--border-top-left-radius);
+    border-top-right-radius: var(--border-top-right-radius);
+    border-bottom-left-radius: var(--border-bottom-left-radius);
+    border-bottom-right-radius: var(--border-bottom-right-radius);
+    --border-top-left-radius: unset;
+    --border-top-right-radius: unset;
+    --border-bottom-left-radius: unset;
+    --border-bottom-right-radius: unset;
 }
 
 
@@ -301,4 +312,14 @@ body {
 .hover-border-width:hover {
     border-width: var(--hover-border-width) !important;
     --hover-border-width: unset;
+}
+.hover-border-radius:hover {
+    border-top-left-radius: var(--hover-border-top-left-radius) !important;
+    border-top-right-radius: var(--hover-border-top-right-radius) !important;
+    border-bottom-left-radius: var(--hover-border-bottom-left-radius) !important;
+    border-bottom-right-radius: var(--hover-border-bottom-right-radius) !important;
+    --hover-border-top-left-radius: unset;
+    --hover-border-top-right-radius: unset;
+    --hover-border-bottom-left-radius: unset;
+    --hover-border-bottom-right-radius: unset;
 }

@@ -24,92 +24,42 @@ private fun joinGradientStops(stops: List<GradientStop>): String {
 fun LinearGradient.toCss() = "linear-gradient(${angle.turns}turn, ${joinGradientStops(stops)})"
 fun RadialGradient.toCss() = "radial-gradient(circle at center, ${joinGradientStops(stops)})"
 
-actual fun ViewContext.hoverable(background: Background?, elevation: Dimension?): ViewWrapper {
-    elementToDoList.add {
-        if (elevation != null) {
-            style.setProperty("--hover-box-shadow", elevation.toBoxShadow())
-            classList.add("hover-box-shadow")
-        }
-
-        if (background != null) {
-            when (background.fill) {
-                is Color -> {
-                    style.setProperty("--hover-background", background.fill.toWeb())
-                    classList.add("hover-background")
-                }
-                is LinearGradient -> {
-                    style.setProperty("--hover-background-image", background.fill.toCss())
-                    style.setProperty("--hover-background-attachment", if (background.fill.screenStatic) "fixed" else "unset")
-                    classList.add("hover-background-image", "hover-background-attachment")
-                }
-                is RadialGradient -> {
-                    style.setProperty("--hover-background-image", background.fill.toCss())
-                    style.setProperty("--hover-background-attachment", if (background.fill.screenStatic) "fixed" else "unset")
-                    classList.add("hover-background-image", "hover-background-attachment")
-                }
-                null -> {}
-            }
-
-            if (background.stroke != null) {
-                style.setProperty("--hover-border-color", background.stroke.toWeb())
-                classList.add("hover-border-color")
-            }
-
-            if (background.strokeWidth != null) {
-                style.borderStyle = "solid"
-                style.setProperty("--hover-border-width", background.strokeWidth.value)
-                classList.add("hover-border-width")
-            }
-
-            if (background.corners != null) {
-                throw NotImplementedError("Corners on hover not implemented")
-            }
-        }
-    }
-    return ViewWrapper
-}
-
-fun HTMLElement.applyBackground(background: Background) {
-    style.removeProperty("background")
-    style.removeProperty("backgroundImage")
-    style.removeProperty("backgroundAttachment")
+fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
     when (background.fill) {
-        is Color -> style.background = background.fill.toWeb()
+        is Color -> {
+            style.setProperty("--${prefix}background", background.fill.toWeb())
+            classList.add("${prefix}background")
+        }
         is LinearGradient -> {
-            if (background.fill.screenStatic)
-                this.style.backgroundAttachment = "fixed"
-            this.style.backgroundImage = background.fill.toCss()
+            style.setProperty("--${prefix}background-image", background.fill.toCss())
+            style.setProperty("--${prefix}background-attachment", if (background.fill.screenStatic) "fixed" else "unset")
+            classList.add("${prefix}background-image", "${prefix}background-attachment")
         }
         is RadialGradient -> {
-            if (background.fill.screenStatic)
-                this.style.backgroundAttachment = "fixed"
-            this.style.backgroundImage = background.fill.toCss()
+            style.setProperty("--${prefix}background-image", background.fill.toCss())
+            style.setProperty("--${prefix}background-attachment", if (background.fill.screenStatic) "fixed" else "unset")
+            classList.add("${prefix}background-image", "${prefix}background-attachment")
         }
         null -> {}
     }
 
-    if (background.stroke == null)
-        style.removeProperty("borderColor")
-    else
-        style.borderColor = background.stroke.toWeb()
-
-    if (background.strokeWidth == null)
-        style.removeProperty("borderWidth")
-    else {
-        style.borderStyle = "solid"
-        style.borderWidth = background.strokeWidth.value
+    if (background.stroke != null) {
+        style.setProperty("--${prefix}border-color", background.stroke.toWeb())
+        classList.add("${prefix}border-color")
     }
 
-    if (background.corners == null) {
-        style.removeProperty("borderTopLeftRadius")
-        style.removeProperty("borderTopRightRadius")
-        style.removeProperty("borderBottomLeftRadius")
-        style.removeProperty("borderBottomRightRadius")
-    } else {
-        style.borderTopLeftRadius = background.corners.topLeft.value
-        style.borderTopRightRadius = background.corners.topRight.value
-        style.borderBottomLeftRadius = background.corners.bottomLeft.value
-        style.borderBottomRightRadius = background.corners.bottomRight.value
+    if (background.strokeWidth != null) {
+        style.borderStyle = "solid"
+        style.setProperty("--${prefix}border-width", background.strokeWidth.value)
+        classList.add("${prefix}border-width")
+    }
+
+    if (background.corners != null) {
+        style.setProperty("--${prefix}border-top-left-radius", background.corners.topLeft.value)
+        style.setProperty("--${prefix}border-top-right-radius", background.corners.topRight.value)
+        style.setProperty("--${prefix}border-bottom-left-radius", background.corners.bottomLeft.value)
+        style.setProperty("--${prefix}border-bottom-right-radius", background.corners.bottomRight.value)
+        classList.add("${prefix}border-radius")
     }
 }
 
@@ -121,6 +71,18 @@ actual fun ViewContext.withBackground(background: Background): ViewWrapper {
 actual fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper {
     elementToDoList.add {
         reactiveScope { applyBackground(getBackground()) }
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.hoverable(background: Background?, elevation: Dimension?): ViewWrapper {
+    elementToDoList.add {
+        if (elevation != null) {
+            style.setProperty("--hover-box-shadow", elevation.toBoxShadow())
+            classList.add("hover-box-shadow")
+        }
+        if (background != null)
+            applyBackground(background, "hover-")
     }
     return ViewWrapper
 }

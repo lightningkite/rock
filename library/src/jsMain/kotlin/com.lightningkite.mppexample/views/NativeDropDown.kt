@@ -3,17 +3,16 @@ package com.lightningkite.mppexample
 import kotlinx.browser.document
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventListener
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias DropDown = HTMLSelectElement
+actual typealias NativeDropDown = HTMLSelectElement
 
-actual inline fun ViewContext.dropDown(setup: DropDown.() -> Unit): Unit = element<HTMLSelectElement>("select") {
+actual inline fun ViewContext.nativeDropDown(setup: NativeDropDown.() -> Unit): Unit = element<HTMLSelectElement>("select") {
     setup()
 }
 
-actual fun <T> DropDown.bind(
+actual fun <T> NativeDropDown.bind(
     options: ReactiveScope.() -> List<T>,
     getLabel: (T) -> String,
     getKey: (T) -> String,

@@ -104,8 +104,4 @@ data class InputValidation(
     val maxLength: Int? = null,
 )
 
-enum class ButtonVariant { Unstyled, Contained, Outlined, Text }
-enum class ButtonPalette { Primary, Danger }
-enum class ButtonSize { Small, Medium, Large }
-
 enum class TextFieldVariant { Unstyled, Outlined }

@@ -1,8 +1,11 @@
 package com.lightningkite.mppexample
 
 import kotlinx.browser.document
-import org.w3c.dom.*
-import kotlin.reflect.KProperty
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.MutationObserver
+import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.asList
+
 
 actual class ViewContext(
     parent: HTMLElement
@@ -95,43 +98,6 @@ actual var NView.elevation: Dimension
         style.boxShadow = value.toBoxShadow()
     }
 
-fun Dimension.toBoxShadow(): String {
-    val offsetX = 0.px.value
-    val offsetY = value
-    val blur = 4.px.value
-    val spread = 0.px.value
-    return "$offsetX $offsetY $blur $spread #77777799"
-}
-
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual var NView.id: String
-    get() = throw NotImplementedError()
-    set(value) {
-        id = value
-    }
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NViewWithTextStyle = HTMLElement
-
-actual fun NViewWithTextStyle.setStyles(styles: TextStyle) {
-    style.color = styles.color.toWeb()
-    style.fontSize = "${styles.size}px"
-    style.fontFamily = styles.font
-    style.fontWeight = if (styles.bold) "bold" else "normal"
-    style.fontStyle = if (styles.italic) "italic" else "normal"
-    style.textTransform = if (styles.allCaps) "uppercase" else "none"
-    style.lineHeight = styles.lineSpacingMultiplier.toString()
-    style.letterSpacing = styles.letterSpacing.toString()
-}
-
-private val HTMLElement.removeListeners: MutableList<() -> Unit>
-    get() = removeListenersMaybe ?: run {
-        val newList = ArrayList<() -> Unit>()
-        this.asDynamic()[RemoveListeners.symbol] = newList
-        newList
-    }
-private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
-    get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
 
 private object RemoveListeners {
     val symbol = js("Symbol('removeListeners')")
@@ -153,4 +119,34 @@ private object RemoveListeners {
             )
         )
     }
+}
+
+private val HTMLElement.removeListeners: MutableList<() -> Unit>
+    get() = removeListenersMaybe ?: run {
+        val newList = ArrayList<() -> Unit>()
+        this.asDynamic()[RemoveListeners.symbol] = newList
+        newList
+    }
+private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
+    get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
+
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+actual var NView.id: String
+    get() = throw NotImplementedError()
+    set(value) {
+        id = value
+    }
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NViewWithTextStyle = HTMLElement
+
+actual fun NViewWithTextStyle.setStyles(styles: TextStyle) {
+    style.color = styles.color.toWeb()
+    style.fontSize = "${styles.size}px"
+    style.fontFamily = styles.font
+    style.fontWeight = if (styles.bold) "bold" else "normal"
+    style.fontStyle = if (styles.italic) "italic" else "normal"
+    style.textTransform = if (styles.allCaps) "uppercase" else "none"
+    style.lineHeight = styles.lineSpacingMultiplier.toString()
+    style.letterSpacing = styles.letterSpacing.toString()
 }

@@ -4,7 +4,7 @@ import com.lightningkite.mppexample.*
 
 class TestComponent() : RockScreen {
     override fun ViewContext.render() {
-        text { content = "TEST COMPONENT" }
+        nativeText { content = "TEST COMPONENT" }
     }
 
     override fun createPath(): String = "/test"

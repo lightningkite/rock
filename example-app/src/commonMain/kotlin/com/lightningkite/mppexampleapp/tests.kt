@@ -5,16 +5,16 @@ import com.lightningkite.mppexample.*
 fun ViewContext.alignTest() {
     column {
         column {
-            text { content = "Test" } in alignLeft() in withBackground(Background(Color.teal))
-            text { content = "Test" } in alignCenter() in withBackground(Background(Color.teal))
-            text { content = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
-            text { content = "Test" } in alignRight() in withBackground(Background(Color.teal))
+            nativeText { content = "Test" } in alignLeft() in withBackground(Background(Color.teal))
+            nativeText { content = "Test" } in alignCenter() in withBackground(Background(Color.teal))
+            nativeText { content = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
+            nativeText { content = "Test" } in alignRight() in withBackground(Background(Color.teal))
         } in withBackground(Background(Color.yellow)) in weight(1f)
         row {
-            text { content = "Test" } in alignTop() in withBackground(Background(Color.teal))
-            text { content = "Test" } in alignCenter() in withBackground(Background(Color.teal))
-            text { content = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
-            text { content = "Test" } in alignBottom() in withBackground(Background(Color.teal))
+            nativeText { content = "Test" } in alignTop() in withBackground(Background(Color.teal))
+            nativeText { content = "Test" } in alignCenter() in withBackground(Background(Color.teal))
+            nativeText { content = "Test" } in withBackground(Background(Color.teal)) in weight(1f)
+            nativeText { content = "Test" } in alignBottom() in withBackground(Background(Color.teal))
         } in sizedBox(SizeConstraints(height = 100.px)) in withBackground(Background(Color.green))
     }
 }
@@ -31,11 +31,11 @@ fun ViewContext.fetchTest() {
         font = Resources.titleFont
     )
     column {
-        text {
+        nativeText {
             content = "You can enable hot reload via adding  --continuous to your run config"
             textStyle = barTextStyle
         } in padding(1.rem) in withBackground(Background(Color.blue))
-        text { ::content { myOwnPage.current } }
+        nativeText { ::content { myOwnPage.current } }
     }
 }
 
@@ -59,18 +59,18 @@ fun ViewContext.asyncTest() {
     }
     column {
         row {
-            text { ::content { counter.current.toString() } }
-            text { content = " + " }
-            text { ::content { prop.current.toString() } }
-            text { content = " = " }
-            text { ::content { prop.current.plus(counter.current).toString() } }
+            nativeText { ::content { counter.current.toString() } }
+            nativeText { content = " + " }
+            nativeText { ::content { prop.current.toString() } }
+            nativeText { content = " = " }
+            nativeText { ::content { prop.current.plus(counter.current).toString() } }
         }
     }
 }
 
 fun ViewContext.simpleElementTest() {
-    button {
+    nativeButton {
         onClick { println("TEST") }
-        text { content = "PRINT TEST" }
+        nativeText { content = "PRINT TEST" }
     }
 }

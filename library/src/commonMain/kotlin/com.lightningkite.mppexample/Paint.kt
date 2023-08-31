@@ -6,6 +6,7 @@ import kotlin.math.min
 sealed interface Paint {
     fun closestColor(): Color
 }
+data class PaintPair(val foreground: Paint, val background: Paint)
 
 data class GradientStop(val ratio: Float, val color: Color)
 data class LinearGradient(

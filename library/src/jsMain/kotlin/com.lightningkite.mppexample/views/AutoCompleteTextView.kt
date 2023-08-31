@@ -1,6 +1,5 @@
 package com.lightningkite.mppexample
 
-import com.lightningkite.mppexample.*
 import kotlinx.browser.document
 import org.w3c.dom.*
 
@@ -9,7 +8,7 @@ actual typealias AutoCompleteTextView = HTMLDataListElement
 
 actual inline fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.() -> Unit): Unit =
     element<HTMLDataListElement>("div") {
-        textField {}
+        nativeTextField {}
         setup()
     }
 
@@ -64,7 +63,7 @@ actual fun <T> AutoCompleteTextView.bind(
 actual var AutoCompleteTextView.label: String
     get() = throw NotImplementedError()
     set(value) {
-        val label = getElementsByTagName("div")[0] as TextField
+        val label = getElementsByTagName("div")[0] as NativeTextField
         label.hint = value
     }
 

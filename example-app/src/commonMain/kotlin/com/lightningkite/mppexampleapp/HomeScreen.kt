@@ -18,23 +18,23 @@ class HomeScreen : RockScreen {
         column {
             val userIdProp = Property("1")
 
-            text {
+            nativeText {
                 content = "HOME COMPONENT"
             } in changingBackground { Background(fill = Color.gray(1 - counter.current / 20f)) }
-            button {
+            nativeButton {
                 onClick {
                     navigator.navigate(TestComponent())
                 }
-                text { content = "Navigate" }
+                nativeText { content = "Navigate" }
             }
 
-            niceButton {
+            button {
                 themedText {
                     content = "Nice Button"
                 }
             }
 
-            textField {
+            nativeTextField {
                 hint = "User Id"
                 bind(userIdProp)
             } in margin(
@@ -43,21 +43,21 @@ class HomeScreen : RockScreen {
                 )
             )
 
-            button {
+            nativeButton {
                 onClick {
                     navigator.navigate(UserScreen(userId = userIdProp.once.toInt()))
                 }
-                text { content = "Users" }
+                nativeText { content = "Users" }
             } in margin(Insets(bottom = 2.rem))
 
-            button {
+            nativeButton {
                 onClick {
                     navigator.navigate(NonexistentScreen())
                 }
-                text { content = "404" }
+                nativeText { content = "404" }
             } in margin(Insets(bottom = 2.rem))
 
-            text {
+            nativeText {
                 content = "hover me"
             } in hoverable(
                 elevation = 8.px,

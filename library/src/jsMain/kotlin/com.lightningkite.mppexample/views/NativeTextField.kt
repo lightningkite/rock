@@ -7,9 +7,9 @@ import org.w3c.dom.get
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias TextField = HTMLDivElement
+actual typealias NativeTextField = HTMLDivElement
 
-actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = element<HTMLDivElement>("div") {
+actual inline fun ViewContext.nativeTextField(setup: NativeTextField.() -> Unit): Unit = element<HTMLDivElement>("div") {
     element<HTMLInputElement>("input") {
         type = "text"
         style.width = "100%"
@@ -22,14 +22,14 @@ actual inline fun ViewContext.textField(setup: TextField.() -> Unit): Unit = ele
     setup()
 }
 
-actual var TextField.key: String
+actual var NativeTextField.key: String
     get() = throw NotImplementedError()
     set(value) {
         val input = getElementsByTagName("input")[0] as HTMLInputElement
         input.name = value
     }
 
-actual fun TextField.bind(text: Writable<String>) {
+actual fun NativeTextField.bind(text: Writable<String>) {
     val input = getElementsByTagName("input")[0] as HTMLInputElement
     input.value = text.once
 
@@ -42,7 +42,7 @@ actual fun TextField.bind(text: Writable<String>) {
     })
 }
 
-actual var TextField.hint: String
+actual var NativeTextField.hint: String
     get() = throw NotImplementedError()
     set(value) {
         val input = getElementsByTagName("input")[0] as HTMLInputElement
@@ -52,13 +52,13 @@ actual var TextField.hint: String
         label.innerText = value
     }
 
-actual var TextField.textStyle: TextStyle
+actual var NativeTextField.textStyle: TextStyle
     get() = throw NotImplementedError()
     set(value) {
         setStyles(value)
     }
 
-actual var TextField.keyboardHints: KeyboardHints
+actual var NativeTextField.keyboardHints: KeyboardHints
     get() = throw NotImplementedError()
     set(value) {
         if (value.action != null) {
@@ -101,7 +101,7 @@ actual var TextField.keyboardHints: KeyboardHints
 //            KeyboardCase.Sentences -> TODO()
 //        }
     }
-actual var TextField.validation: InputValidation
+actual var NativeTextField.validation: InputValidation
     get() = throw NotImplementedError()
     set(value) {
         val input = getElementsByTagName("input")[0] as HTMLInputElement
@@ -116,7 +116,7 @@ actual var TextField.validation: InputValidation
             input.maxLength = value.maxLength
     }
 
-actual var TextField.variant: TextFieldVariant
+actual var NativeTextField.variant: TextFieldVariant
     get() = throw NotImplementedError()
     set(value) {
         className = when(value) {

@@ -4,9 +4,9 @@ import org.w3c.dom.*
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias Button = HTMLButtonElement
+actual typealias NativeButton = HTMLButtonElement
 
-actual inline fun ViewContext.button(setup: Button.() -> Unit): Unit = element<HTMLButtonElement>("button") {
+actual inline fun ViewContext.nativeButton(setup: NativeButton.() -> Unit): Unit = element<HTMLButtonElement>("button") {
     type = "submit" // may need to remove this and make it a variable
     style.display = "flex"
     style.flexDirection = "row"
@@ -17,23 +17,14 @@ actual inline fun ViewContext.button(setup: Button.() -> Unit): Unit = element<H
     setup()
 }
 
-actual fun Button.onClick(action: () -> Unit) {
+actual fun NativeButton.onClick(action: () -> Unit) {
     addEventListener("click", {
         action()
     })
 }
 
-actual var Button.variant: ButtonVariant
+actual var NativeButton.clickable: Boolean
     get() = throw NotImplementedError()
     set(value) {
-    }
-
-actual var Button.palette: ButtonPalette
-    get() = throw NotImplementedError()
-    set(value) {
-    }
-
-actual var Button.size: ButtonSize
-    get() = throw NotImplementedError()
-    set(value) {
+        disabled = !value
     }

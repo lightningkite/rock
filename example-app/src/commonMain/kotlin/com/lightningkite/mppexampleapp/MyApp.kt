@@ -14,7 +14,7 @@ class MyApp : RockApp {
                 Route(UserSettings.PATH) { UserSettings.create(it) },
             ),
             fallback = {
-                text { content = "Not found" }
+                nativeText { content = "Not found" }
             },
             theme = Theme(
                 titleFont = systemDefaultFont,

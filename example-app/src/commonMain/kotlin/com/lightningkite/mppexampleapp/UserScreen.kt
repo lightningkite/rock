@@ -4,12 +4,12 @@ import com.lightningkite.mppexample.*
 
 class UserScreen(val userId: Int) : RockScreen {
     override fun ViewContext.render() = column {
-        text { content = "The user id is: $userId" }
-        button {
+        nativeText { content = "The user id is: $userId" }
+        nativeButton {
             onClick {
                 navigator.navigate(UserSettings(userId))
             }
-            text { content = "Settings" }
+            nativeText { content = "Settings" }
         }
     }
 

@@ -46,14 +46,14 @@ fun ViewContext.allViewTest() {
         switch {
             bind(switchProp)
 
-            text { content = "Switch Label" }
+            nativeText { content = "Switch Label" }
         } in padding(2.rem)
 
         form {
             bind(formProp) { map ->
                 println(map)
             }
-            textField {
+            nativeTextField {
                 variant = TextFieldVariant.Outlined
                 validation = InputValidation(required = true)
                 key = "required-field"
@@ -62,11 +62,9 @@ fun ViewContext.allViewTest() {
             row {
                 gravity = StackGravity.Center
 
-                text { content = "Primary" }
-                button {
-                    variant = ButtonVariant.Contained
-                    size = ButtonSize.Large
-                    text {
+                nativeText { content = "Primary" }
+                nativeButton {
+                    nativeText {
                         content = "Submit Form (contained)"
                     }
                     box {
@@ -80,45 +78,32 @@ fun ViewContext.allViewTest() {
                         )
                     )
                 }
-                button {
-                    variant = ButtonVariant.Outlined
-                    size = ButtonSize.Medium
-                    text {
+                nativeButton {
+                    nativeText {
                         content = "Submit Form (outlined)"
                     }
                 }
-                button {
-                    variant = ButtonVariant.Text
-                    size = ButtonSize.Small
-                    text { content = "Submit Form (text)" }
+                nativeButton {
+                    nativeText { content = "Submit Form (text)" }
                 }
             }
             row {
                 gravity = StackGravity.End
 
-                text { content = "Danger" }
-                button {
-                    variant = ButtonVariant.Contained
-                    size = ButtonSize.Small
-                    palette = ButtonPalette.Danger
-                    text { content = "Submit Form (contained)" }
+                nativeText { content = "Danger" }
+                nativeButton {
+                    nativeText { content = "Submit Form (contained)" }
                 }
                 box {
                     column {
                         gravity = StackGravity.Center
-                        button {
-                            variant = ButtonVariant.Outlined
-                            size = ButtonSize.Medium
-                            palette = ButtonPalette.Danger
-                            text { content = "Submit Form (outlined)" }
+                        nativeButton {
+                            nativeText { content = "Submit Form (outlined)" }
                         }
                     }
                 } in weight(1f)
-                button {
-                    variant = ButtonVariant.Text
-                    size = ButtonSize.Large
-                    palette = ButtonPalette.Danger
-                    text { content = "Submit Form (text)" }
+                nativeButton {
+                    nativeText { content = "Submit Form (text)" }
                 }
             }
         } in padding(1.rem)
@@ -126,12 +111,12 @@ fun ViewContext.allViewTest() {
         forEach(
             data = { listItems.current },
             render = {
-                text { content = it.toString() } in padding(1.rem)
+                nativeText { content = it.toString() } in padding(1.rem)
             }
         )
 
         box {
-            textField {
+            nativeTextField {
                 bind(textProp)
                 hint = "Some Input Label"
             }
@@ -146,10 +131,10 @@ fun ViewContext.allViewTest() {
             }
         }
 
-        h1 {
+        nativeH1 {
             ::content { "Counter: ${counter.current}" }
         }
-        text {
+        nativeText {
             ::content { "This is ${if (counter.current % 2 == 0) "visible" else "invisible"}" }
             ::visible { counter.current % 2 == 0 }
         }
@@ -166,7 +151,7 @@ fun ViewContext.allViewTest() {
         row {
             alpha = 0.8
             rotation = Angle(-0.015f)
-            text {
+            nativeText {
                 textStyle = TextStyle(
                     color = Color.teal,
                     bold = true,
@@ -175,21 +160,21 @@ fun ViewContext.allViewTest() {
                 ::content { "Lat: ${lat.current}" }
             } in padding(Insets(right = 36.px))
             column {
-                text {
+                nativeText {
                     content = "Hello world"
                 }
-                text {
+                nativeText {
                     content = "Hello world 2"
                 } in withBackground(Background(fill = Color(1f, 1f, 1f, 1f)))
-                text {
+                nativeText {
                     ::content { "Lon: ${lon.current}" }
                 } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
-            text {
+            nativeText {
                 ::content { "This ${if (counter.current % 2 == 0) "exists" else "does not exist"}" }
                 ::exists { counter.current % 2 == 0 }
             }
-            text { content = "More text" }
+            nativeText { content = "More text" }
         } in withBackground(
             Background(
                 fill = RadialGradient(
@@ -207,7 +192,7 @@ fun ViewContext.allViewTest() {
 
         box {
             elevation = 7.px
-            textField {
+            nativeTextField {
                 bind(textProp)
                 hint = "test 123"
                 keyboardHints = KeyboardHints(
@@ -229,16 +214,16 @@ fun ViewContext.allViewTest() {
         ) in margin(4.rem)
 
 
-        button {
+        nativeButton {
             onClick { counter modify { it + 1 } }
-            text { content = "Click me" }
+            nativeText { content = "Click me" }
         }
 
-        text {
+        nativeText {
             ::content { "You input: '${textProp.current}'" }
         }
 
-        dropDown {
+        nativeDropDown {
             bind(
                 options = {
                     listOf("Hello", "World")
@@ -267,13 +252,13 @@ fun ViewContext.allViewTest() {
             )
         } in padding(2.rem)
 
-        text {
+        nativeText {
             ::content { "You selected: '${dropdownProp.current}'" }
         }
 
         checkBox {
             bind(checkedProp)
-            text {
+            nativeText {
                 ::content { "I am ${if (checkedProp.current) "" else " not "} checked" }
                 ::textStyle {
                     TextStyle(
@@ -283,7 +268,7 @@ fun ViewContext.allViewTest() {
             }
         }
 
-        text {
+        nativeText {
             content =
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pellentesque diam volutpat commodo sed egestas. Arcu odio ut sem nulla pharetra diam. Sit amet commodo nulla facilisi nullam vehicula ipsum a arcu. Tincidunt arcu non sodales neque. Nunc lobortis mattis aliquam faucibus purus in massa tempor nec. Tempor id eu nisl nunc mi ipsum faucibus vitae. Scelerisque purus semper eget duis at tellus at urna. Sed euismod nisi porta lorem mollis aliquam. Gravida rutrum quisque non tellus orci ac. Eu sem integer vitae justo. Pretium nibh ipsum consequat nisl vel pretium lectus quam id. Elit sed vulputate mi sit amet mauris commodo quis imperdiet.\n" +
                         "\n" +
@@ -305,18 +290,18 @@ fun ViewContext.allViewTest() {
         )
 
         row {
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
-            text { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
+            nativeText { content = "Hello" }
         } in scrollsHorizontally() in sizedBox(
             SizeConstraints(
                 minWidth = 128.px,

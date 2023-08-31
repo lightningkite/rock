@@ -15,3 +15,11 @@ actual val systemDefaultFont: Font get() = "Helvetica"
 
 actual sealed class ImageSource actual constructor()
 actual class ImageResource(val relativeUrl: String) : ImageSource()
+
+fun Dimension.toBoxShadow(): String {
+    val offsetX = 0.px.value
+    val offsetY = value
+    val blur = 4.px.value
+    val spread = 0.px.value
+    return "$offsetX $offsetY $blur $spread #77777799"
+}

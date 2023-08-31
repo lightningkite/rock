@@ -7,6 +7,7 @@ typealias RouteRenderer = ViewContext.(props: RouteProps) -> Unit
 
 class Router(
     private val context: ViewContext,
+    private val theme: Theme,
     routes: List<Route>,
     private val fallback: ViewContext.() -> Unit
 ) {
@@ -45,7 +46,11 @@ class Router(
             if (isLeaf) {
                 map.children[routeKey]!!.render = {
                     val screen = route.render(it)
-                    screen.run { render() }
+                    screen.run {
+                        withTheme(this@Router.theme) {
+                            render()
+                        }
+                    }
                 }
             } else {
                 map = map.children[routeKey]!!

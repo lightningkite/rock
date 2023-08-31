@@ -4,8 +4,19 @@ import com.lightningkite.mppexample.*
 
 class MyApp : RockApp {
     override fun ViewContext.render() {
-        withTheme(
-            Theme(
+        Router(
+            context = this,
+            routes = listOf(
+                Route(HomeScreen.PATH) { HomeScreen() },
+                Route(TestComponent.PATH) { TestComponent() },
+                Route(TestComponent.PATH) { TestComponent() },
+                Route(UserScreen.PATH) { UserScreen.create(it) },
+                Route(UserSettings.PATH) { UserSettings.create(it) },
+            ),
+            fallback = {
+                text { content = "Not found" }
+            },
+            theme = Theme(
                 titleFont = systemDefaultFont,
                 bodyFont = systemDefaultFont,
                 baseSize = 18.0,
@@ -22,21 +33,7 @@ class MyApp : RockApp {
                     background = Color.green
                 )
             )
-        ) {
-            Router(
-                context = this,
-                routes = listOf(
-                    Route(HomeScreen.PATH) { HomeScreen() },
-                    Route(TestComponent.PATH) { TestComponent() },
-                    Route(TestComponent.PATH) { TestComponent() },
-                    Route(UserScreen.PATH) { UserScreen.create(it) },
-                    Route(UserSettings.PATH) { UserSettings.create(it) },
-                ),
-                fallback = {
-                    text { content = "Not found" }
-                }
-            )
-        }
+        )
     }
 }
 

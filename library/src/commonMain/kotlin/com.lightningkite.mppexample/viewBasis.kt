@@ -35,12 +35,9 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
         thisRef.addons.getOrPut(property.name) { init } as T
 
     override fun setValue(thisRef: ViewContext, property: KProperty<*>, value: T) {
-        println("CHANGING ADDON")
         thisRef.addons[property.name] = value
     }
 }
 
-//var ViewContext.defaultSpacing by viewContextAddon(2)
-//val ViewContext.defaultSpacing2 by viewContextAddon(Property(1))
 var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
 var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.FadeResize)

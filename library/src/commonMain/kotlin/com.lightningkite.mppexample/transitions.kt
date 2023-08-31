@@ -29,8 +29,8 @@ data class ScreenTransitions(
             reverse = ScreenTransition.Fade
         )
         val FadeResize = ScreenTransitions(
-            forward = ScreenTransition.ShrinkFade,
-            reverse = ScreenTransition.GrowFade,
+            forward = ScreenTransition.GrowFade,
+            reverse = ScreenTransition.ShrinkFade,
         )
         val VerticalSlide = ScreenTransitions(
             forward = ScreenTransition.PullUp,

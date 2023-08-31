@@ -77,7 +77,6 @@ class Router(
             box {
                 id = "rock-screen-animate-in"
                 if (!failed && route.render != null) {
-                    println("ROUTE FOUND")
                     route.render!!(props)
                 } else {
                     fallback()

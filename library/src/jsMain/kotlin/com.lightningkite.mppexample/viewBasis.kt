@@ -48,7 +48,6 @@ actual class ViewContext(
             stack.last().appendChild(this)
             while (toPop > 0) {
                 val item = stack.removeLast()
-                println("${stack.size} left")
                 stack.last().appendChild(item)
                 toPop--
             }

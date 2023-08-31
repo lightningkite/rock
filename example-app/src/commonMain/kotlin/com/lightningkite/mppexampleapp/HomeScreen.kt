@@ -4,7 +4,6 @@ import com.lightningkite.mppexample.*
 
 class HomeScreen : RockScreen {
     override fun ViewContext.render() {
-        println("RENDER HOME")
         column {
             val userIdProp = Property("1")
 

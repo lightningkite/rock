@@ -71,7 +71,6 @@ actual var AutoCompleteTextView.label: String
 actual var AutoCompleteTextView.textStyle: TextStyle
     get() = throw NotImplementedError()
     set(value) {
-        println(getElementsByTagName("input")[0])
         val input = getElementsByTagName("input")[0] as HTMLInputElement
         input.setStyles(value)
     }

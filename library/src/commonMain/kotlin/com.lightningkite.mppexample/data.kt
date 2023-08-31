@@ -32,6 +32,9 @@ data class Insets(
 
     companion object {
         fun zero() = Insets(0.px)
+
+        fun symmetric(horizontal: Dimension = 0.px, vertical: Dimension = 0.px) =
+            Insets(horizontal, vertical, horizontal, vertical)
     }
 }
 

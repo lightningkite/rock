@@ -25,21 +25,38 @@ fun LinearGradient.toCss() = "linear-gradient(${angle.turns}turn, ${joinGradient
 fun RadialGradient.toCss() = "radial-gradient(circle at center, ${joinGradientStops(stops)})"
 
 fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
+    classList.remove(
+        "${prefix}background",
+        "${prefix}background-image",
+        "${prefix}background-attachment",
+        "${prefix}border-color",
+        "${prefix}border-width",
+        "${prefix}border-radius"
+    )
     when (background.fill) {
         is Color -> {
             style.setProperty("--${prefix}background", background.fill.toWeb())
             classList.add("${prefix}background")
         }
+
         is LinearGradient -> {
             style.setProperty("--${prefix}background-image", background.fill.toCss())
-            style.setProperty("--${prefix}background-attachment", if (background.fill.screenStatic) "fixed" else "unset")
+            style.setProperty(
+                "--${prefix}background-attachment",
+                if (background.fill.screenStatic) "fixed" else "unset"
+            )
             classList.add("${prefix}background-image", "${prefix}background-attachment")
         }
+
         is RadialGradient -> {
             style.setProperty("--${prefix}background-image", background.fill.toCss())
-            style.setProperty("--${prefix}background-attachment", if (background.fill.screenStatic) "fixed" else "unset")
+            style.setProperty(
+                "--${prefix}background-attachment",
+                if (background.fill.screenStatic) "fixed" else "unset"
+            )
             classList.add("${prefix}background-image", "${prefix}background-attachment")
         }
+
         null -> {}
     }
 
@@ -83,6 +100,18 @@ actual fun ViewContext.hoverable(background: Background?, elevation: Dimension?)
         }
         if (background != null)
             applyBackground(background, "hover-")
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.focusable(background: Background?, elevation: Dimension?): ViewWrapper {
+    elementToDoList.add {
+        if (elevation != null) {
+            style.setProperty("--focus-box-shadow", elevation.toBoxShadow())
+            classList.add("focus-box-shadow")
+        }
+        if (background != null)
+            applyBackground(background, "focus-")
     }
     return ViewWrapper
 }

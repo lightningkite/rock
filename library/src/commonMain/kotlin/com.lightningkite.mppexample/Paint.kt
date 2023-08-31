@@ -3,29 +3,61 @@ package com.lightningkite.mppexample
 import kotlin.math.max
 import kotlin.math.min
 
-sealed interface Paint
+sealed interface Paint {
+    fun closestColor(): Color
+}
 
 data class GradientStop(val ratio: Float, val color: Color)
 data class LinearGradient(
     val stops: List<GradientStop>,
     val angle: Angle = Angle.zero,
     val screenStatic: Boolean = false,
-): Paint
+) : Paint {
+    override fun closestColor(): Color {
+        return stops.maxByOrNull { it.ratio }?.color ?: Color.transparent
+    }
+}
+
 data class RadialGradient(
     val stops: List<GradientStop>,
     val screenStatic: Boolean = false,
-): Paint
+) : Paint {
+    override fun closestColor(): Color {
+        return stops.maxByOrNull { it.ratio }?.color ?: Color.transparent
+    }
+}
 
 data class Color(
     val alpha: Float = 0f,
     val red: Float = 0f,
     val green: Float = 0f,
     val blue: Float = 0f
-): Paint {
+) : Paint {
+
+    override fun closestColor(): Color = this
 
     fun toInt(): Int {
         return (alpha.byteize() shl 24) or (red.byteize() shl 16) or (green.byteize() shl 8) or (blue.byteize())
     }
+
+    fun toGradient(ratio: Float = 0.2f): LinearGradient = LinearGradient(
+        stops = listOf(
+            GradientStop(1f, this),
+            GradientStop(0f, darken(ratio))
+        )
+    )
+
+    fun darken(ratio: Float): Color = copy(
+        red = red * (1f - ratio),
+        green = green * (1f - ratio),
+        blue = blue * (1f - ratio)
+    )
+
+    fun lighten(ratio: Float): Color = copy(
+        red = red + (1f - red) * ratio,
+        green = green + (1f - green) * ratio,
+        blue = blue + (1f - blue) * ratio
+    )
 
     companion object {
 
@@ -48,6 +80,13 @@ data class Color(
 
         fun fromInt(value: Int): Color = Color(
             alpha = value.ushr(24).and(0xFF).floatize(),
+            red = value.shr(16).and(0xFF).floatize(),
+            green = value.shr(8).and(0xFF).floatize(),
+            blue = value.and(0xFF).floatize()
+        )
+
+        fun fromHex(value: Int): Color = Color(
+            alpha = 1f,
             red = value.shr(16).and(0xFF).floatize(),
             green = value.shr(8).and(0xFF).floatize(),
             blue = value.and(0xFF).floatize()
@@ -110,12 +149,14 @@ data class Color(
                     blue
                 )
             ).plus(2)
+
             (blue > green && blue > red) -> (red - green).div(
                 max(max(red, green), blue) - min(
                     min(red, green),
                     blue
                 )
             ).plus(4)
+
             else -> 0f
         }.let { Angle(it.plus(6f).rem(6f).div(6f)) },
         saturation = run {

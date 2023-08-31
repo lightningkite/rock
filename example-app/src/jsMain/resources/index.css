@@ -70,61 +70,6 @@ body {
 	border: 2px solid var(--text-field-color);
 }
 
-.rock-mui-button {
-	transition: background 200ms, box-shadow 200ms;
-	text-transform: uppercase;
-	outline: 0;
-	border: 0;
-	border-radius: 0.25rem;
-	cursor: pointer;
-	background-color: transparent;
-	padding: calc(12px * var(--rock-mui-button-size)) calc(20px * var(--rock-mui-button-size));
-	font-size: calc(18px * var(--rock-mui-button-size));
-
-	--rock-mui-button: black;
-	--rock-mui-button-hover: black;
-	--rock-mui-button-focus: black;
-	--rock-mui-button-size: 1;
-}
-
-.rock-mui-button-contained {
-	color: #fff;
-	background-color: rgb(var(--rock-mui-button));
-	box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.3);
-}
-
-.rock-mui-button-contained:hover {
-	background-color: rgb(var(--rock-mui-button-hover));
-	box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.4);
-}
-
-.rock-mui-button-contained:focus {
-	background-color: rgb(var(--rock-mui-button-focus));
-}
-
-.rock-mui-button-outlined {
-	color: rgb(var(--rock-mui-button));
-	border: 1px solid rgb(var(--rock-mui-button));
-}
-
-.rock-mui-button-outlined:hover {
-	border: 1px solid rgb(var(--rock-mui-button-hover));
-}
-
-.rock-mui-button-outlined:focus {
-	background-color: rgba(var(--rock-mui-button-focus), 0.15);
-	border: 1px solid rgb(var(--rock-mui-button-focus));
-}
-
-.rock-mui-button-text span {
-	text-align: center;
-	color: rgb(var(--rock-mui-button));
-}
-
-.rock-mui-button-text:focus {
-	background-color: rgba(var(--rock-mui-button-focus), 0.15);
-}
-
 .rock-mui-switch {
 	user-select: none;
 	cursor: pointer;
@@ -243,16 +188,19 @@ body {
 .box-shadow {
     box-shadow: var(--box-shadow);
     --box-shadow: unset;
+    transition: all 0.15s linear;
 }
 
 .background {
     background: var(--background);
     --background: unset;
+    transition: all 0.15s linear;
 }
 
 .background-image {
     background-image: var(--background-image);
     --background-image: unset;
+    transition: all 0.15s linear;
 }
 
 .background-attachment {
@@ -263,6 +211,7 @@ body {
 .border-color {
     border-color: var(--border-color);
     --border-color: unset;
+    transition: all 0.15s linear;
 }
 
 .border-width {
@@ -285,41 +234,76 @@ body {
 
 
 .hover-box-shadow:hover {
-    box-shadow: var(--hover-box-shadow) !important;
+    box-shadow: var(--hover-box-shadow);
     --hover-box-shadow: none;
 }
 
 .hover-background:hover {
-    background: var(--hover-background) !important;
+    background: var(--hover-background);
     --hover-background: unset;
 }
 
 .hover-background-image:hover {
-    background-image: var(--hover-background-image) !important;
+    background-image: var(--hover-background-image);
     --hover-background-image: unset;
 }
 
 .hover-background-attachment:hover {
-    background-attachment: var(--hover-background-attachment) !important;
+    background-attachment: var(--hover-background-attachment);
     --hover-background-attachment: unset;
 }
 
 .hover-border-color:hover {
-    border-color: var(--hover-border-color) !important;
+    border-color: var(--hover-border-color);
     --hover-border-color: unset;
 }
 
 .hover-border-width:hover {
-    border-width: var(--hover-border-width) !important;
+    border-width: var(--hover-border-width);
     --hover-border-width: unset;
 }
 .hover-border-radius:hover {
-    border-top-left-radius: var(--hover-border-top-left-radius) !important;
-    border-top-right-radius: var(--hover-border-top-right-radius) !important;
-    border-bottom-left-radius: var(--hover-border-bottom-left-radius) !important;
-    border-bottom-right-radius: var(--hover-border-bottom-right-radius) !important;
+    border-top-left-radius: var(--hover-border-top-left-radius);
+    border-top-right-radius: var(--hover-border-top-right-radius);
+    border-bottom-left-radius: var(--hover-border-bottom-left-radius);
+    border-bottom-right-radius: var(--hover-border-bottom-right-radius);
     --hover-border-top-left-radius: unset;
     --hover-border-top-right-radius: unset;
     --hover-border-bottom-left-radius: unset;
     --hover-border-bottom-right-radius: unset;
+}
+
+.focus-box-shadow:active {
+    box-shadow: var(--focus-box-shadow);
+    --focus-box-shadow: none;
+}
+.focus-background:active {
+    background: var(--focus-background);
+    --focus-background: unset;
+}
+.focus-background-image:active {
+    background-image: var(--focus-background-image);
+    --focus-background-image: unset;
+}
+.focus-background-attachment:active {
+    background-attachment: var(--focus-background-attachment);
+    --focus-background-attachment: unset;
+}
+.focus-border-color:active {
+    border-color: var(--focus-border-color);
+    --focus-border-color: unset;
+}
+.focus-border-width:active {
+    border-width: var(--focus-border-width);
+    --focus-border-width: unset;
+}
+.focus-border-radius:active {
+    border-top-left-radius: var(--focus-border-top-left-radius);
+    border-top-right-radius: var(--focus-border-top-right-radius);
+    border-bottom-left-radius: var(--focus-border-bottom-left-radius);
+    border-bottom-right-radius: var(--focus-border-bottom-right-radius);
+    --focus-border-top-left-radius: unset;
+    --focus-border-top-right-radius: unset;
+    --focus-border-bottom-left-radius: unset;
+    --focus-border-bottom-right-radius: unset;
 }

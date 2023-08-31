@@ -28,6 +28,12 @@ class HomeScreen : RockScreen {
                 text { content = "Navigate" }
             }
 
+            niceButton {
+                themedText {
+                    content = "Nice Button"
+                }
+            }
+
             textField {
                 hint = "User Id"
                 bind(userIdProp)

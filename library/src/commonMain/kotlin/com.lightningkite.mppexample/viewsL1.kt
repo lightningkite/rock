@@ -44,6 +44,9 @@ expect fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Bac
 expect fun ViewContext.hoverable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
 
 @ViewModifierDsl3
+expect fun ViewContext.focusable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+
+@ViewModifierDsl3
 expect fun ViewContext.scrolls(): ViewWrapper
 
 @ViewModifierDsl3

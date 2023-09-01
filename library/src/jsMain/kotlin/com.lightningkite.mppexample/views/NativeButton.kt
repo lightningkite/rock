@@ -28,6 +28,6 @@ actual fun NativeButton.onClick(action: () -> Unit) {
 actual var NativeButton.clickable: Boolean
     get() = throw NotImplementedError()
     set(value) {
-        println("NativeButton.clickable: $value")
+//        println("NativeButton.clickable: $value")
         disabled = !value
     }

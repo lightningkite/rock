@@ -17,26 +17,26 @@ class HomeScreen : RockScreen {
 
         column {
             val userIdProp = Property("1")
-
-            nativeText {
-                content = "HOME COMPONENT"
-            } in changingBackground { Background(fill = Color.gray(1 - counter.current / 20f)) }
-            nativeButton {
-                onClick {
-                    navigator.navigate(TestComponent())
-                }
-                nativeText { content = "Navigate" }
-            }
-
-            text {
-                ::content { "Counter: ${counter.current}" }
-            }
+//
+//            nativeText {
+//                content = "HOME COMPONENT"
+//            } in changingBackground { Background(fill = Color.gray(1 - counter.current / 20f)) }
+//            nativeButton {
+//                onClick {
+//                    navigator.navigate(TestComponent())
+//                }
+//                nativeText { content = "Navigate" }
+//            }
+//
+//            text {
+//                ::content { "Counter: ${counter.current}" }
+//            }
 
             button(
                 options = ButtonOptions(
                     palette = ButtonPalette.Primary,
                     size = ButtonSize.Large,
-                    variant = ButtonVariant.Contained
+                    variant = ButtonVariant.Text
                 ),
                 disabled = { counter.current % 5 == 1 },
                 onClick = {
@@ -145,46 +145,46 @@ class HomeScreen : RockScreen {
 //                text { content = "Nice Button" }
 //            }
 
-            nativeTextField {
-                hint = "User Id"
-                bind(userIdProp)
-            } in margin(
-                Insets(
-                    top = 2.rem, bottom = 2.rem
-                )
-            )
-
-            nativeButton {
-                onClick {
-                    navigator.navigate(UserScreen(userId = userIdProp.once.toInt()))
-                }
-                nativeText { content = "Users" }
-            } in margin(Insets(bottom = 2.rem))
-
-            nativeButton {
-                onClick {
-                    navigator.navigate(NonexistentScreen())
-                }
-                nativeText { content = "404" }
-            } in margin(Insets(bottom = 2.rem))
-
-            nativeText {
-                content = "hover me"
-            } in interactive(
-                transitions = false,
-                hoverElevation = 8.px,
-                hoverBackground = Background(
-                    fill = LinearGradient(
-                        angle = Angle(0.15f),
-                        stops = listOf(
-                            GradientStop(ratio = 0.5f, color = Color.yellow),
-                            GradientStop(ratio = 1f, color = Color.red)
-                        )
-                    ),
-                    stroke = Color.green,
-                    strokeWidth = 4.px
-                )
-            )
+//            nativeTextField {
+//                hint = "User Id"
+//                bind(userIdProp)
+//            } in margin(
+//                Insets(
+//                    top = 2.rem, bottom = 2.rem
+//                )
+//            )
+//
+//            nativeButton {
+//                onClick {
+//                    navigator.navigate(UserScreen(userId = userIdProp.once.toInt()))
+//                }
+//                nativeText { content = "Users" }
+//            } in margin(Insets(bottom = 2.rem))
+//
+//            nativeButton {
+//                onClick {
+//                    navigator.navigate(NonexistentScreen())
+//                }
+//                nativeText { content = "404" }
+//            } in margin(Insets(bottom = 2.rem))
+//
+//            nativeText {
+//                content = "hover me"
+//            } in interactive(
+//                transitions = false,
+//                hoverElevation = 8.px,
+//                hoverBackground = Background(
+//                    fill = LinearGradient(
+//                        angle = Angle(0.15f),
+//                        stops = listOf(
+//                            GradientStop(ratio = 0.5f, color = Color.yellow),
+//                            GradientStop(ratio = 1f, color = Color.red)
+//                        )
+//                    ),
+//                    stroke = Color.green,
+//                    strokeWidth = 4.px
+//                )
+//            )
         }
     }
 

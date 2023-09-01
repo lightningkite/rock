@@ -55,6 +55,7 @@ class ReactiveScope(val action: ReactiveScope.() -> Unit) {
             for (entry in removers.entries.toList()) {
                 if (entry.key !in latestPass) {
                     entry.value()
+                    removers.remove(entry.key)
                 }
             }
             // Add listeners that are new
@@ -84,19 +85,26 @@ class ReactiveScope(val action: ReactiveScope.() -> Unit) {
 }
 
 interface Listenable {
+    val debugName: String get() = "Unknown"
     fun addListener(listener: () -> Unit): () -> Unit
 }
 
 interface Readable<T> : Listenable {
+    override val debugName: String
+        get() = "Readable whose value is $once"
     val once: T
 }
 
 interface Writable<T> : Readable<T> {
+    override val debugName: String
+        get() = "Writable whose value is $once"
     infix fun set(value: T)
     infix fun modify(update: (T)->T) = set(update(once))
 }
 
 class Property<T>(startValue: T) : Writable<T> {
+    override val debugName: String
+        get() = "Property whose value is $once"
     private val listeners = HashSet<() -> Unit>()
     override var once: T = startValue
         private set(value) {

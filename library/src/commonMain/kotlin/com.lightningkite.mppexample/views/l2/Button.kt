@@ -14,6 +14,7 @@ data class ButtonOptions(
 fun ViewContext.button(
     options: ButtonOptions,
     onClick: suspend () -> Unit,
+    disabled: ReactiveScope.() -> Boolean,
     setup: NView.() -> Unit,
 ) {
     var buttonTheme = when (options.palette) {
@@ -79,11 +80,18 @@ fun ViewContext.button(
                     }
                 }
             }
+            ::clickable { !loading.current && !disabled() }
+
             cursor = "pointer"
-            withRenderContext(RenderContext.Button) {
+            withRenderContext(ButtonRenderContext(size = options.size)) {
                 withTheme(buttonTheme) {
-                    activityIndicator(exists = loading)
-                    setup()
+                    stack {
+                        activityIndicator(visible = loading) in stackCenter()
+                        box {
+                            ::visible { !loading.current }
+                            setup()
+                        } in stackCenter()
+                    }
                 }
             }
         } in padding(
@@ -116,8 +124,10 @@ fun ViewContext.button(
     }
 }
 
-fun ViewContext.button(onClick: suspend () -> Unit, setup: NView.() -> Unit) = button(
-    options = ButtonOptions(),
-    onClick = onClick,
-    setup = setup,
-)
+fun ViewContext.button(onClick: suspend () -> Unit, disabled: ReactiveScope.() -> Boolean, setup: NView.() -> Unit) =
+    button(
+        options = ButtonOptions(),
+        disabled = disabled,
+        onClick = onClick,
+        setup = setup,
+    )

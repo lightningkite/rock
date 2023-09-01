@@ -38,6 +38,7 @@ class HomeScreen : RockScreen {
                     size = ButtonSize.Large,
                     variant = ButtonVariant.Contained
                 ),
+                disabled = { counter.current % 5 == 1 },
                 onClick = {
                     val content = fetch("https://swapi.dev/api/people/1").text()
                     println(content)

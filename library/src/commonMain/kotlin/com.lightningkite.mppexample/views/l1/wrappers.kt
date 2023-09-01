@@ -11,6 +11,9 @@ expect fun ViewContext.alignRight(): ViewWrapper
 expect fun ViewContext.alignCenter(): ViewWrapper
 
 @ViewModifierDsl3
+expect fun ViewContext.stackCenter(): ViewWrapper
+
+@ViewModifierDsl3
 expect fun ViewContext.alignTop(): ViewWrapper
 
 @ViewModifierDsl3

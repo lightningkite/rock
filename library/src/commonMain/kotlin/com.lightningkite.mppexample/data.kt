@@ -54,9 +54,6 @@ enum class TextGravity {
     Left, Center, Right
 }
 
-enum class StackGravity {
-    Start, Center, End
-}
 
 data class KeyboardHints(
     val case: KeyboardCase,

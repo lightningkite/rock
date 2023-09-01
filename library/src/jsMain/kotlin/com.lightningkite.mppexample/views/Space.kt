@@ -5,7 +5,7 @@ import org.w3c.dom.HTMLDivElement
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Space = HTMLDivElement
 
-actual inline fun ViewContext.space(setup: Column.() -> Unit): Unit = element<HTMLDivElement>("div") {
+actual inline fun ViewContext.space(setup: Space.() -> Unit): Unit = element<HTMLDivElement>("div") {
     setup()
 }
 

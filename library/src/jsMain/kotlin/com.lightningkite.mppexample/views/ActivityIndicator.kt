@@ -9,9 +9,8 @@ fun ActivityIndicator.setupSharedIndicator(color: Color) {
     style.boxSizing = "border-box"
     style.display = "block"
     style.position = "absolute"
-    style.width = "55%"
-    style.height = "55%"
-    style.margin = 8.px.value
+    style.width = "100%"
+    style.height = "100%"
     style.border = "4px solid #fff"
     style.borderRadius = "50%"
     style.animation = "rock-activity-indicator 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite"

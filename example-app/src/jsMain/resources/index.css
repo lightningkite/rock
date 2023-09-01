@@ -344,3 +344,16 @@ button:disabled span, button[disabled] span {
     --disabled-border-bottom-left-radius: unset;
     --disabled-border-bottom-right-radius: unset;
 }
+
+.rock-stack {
+  display: grid;
+  grid-template-columns: auto;
+  z-index: 0;
+}
+
+.rock-stack > * {
+  grid-column-start: 1;
+  grid-column-end: 1;
+  grid-row-start: 1;
+  grid-row-end: 1;
+}

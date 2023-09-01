@@ -1,5 +1,6 @@
 package com.lightningkite.mppexample
 
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 
 
@@ -164,6 +165,21 @@ actual fun ViewContext.interactive(
 //    }
 //    return ViewWrapper
 //}
+
+//actual fun ViewContext.stackCenter(): ViewWrapper {
+//    elementToDoList.add {
+//        style.display = "flex"
+//        style.alignItems = "center"
+//        style.justifyContent = "center"
+//    }
+//    return ViewWrapper
+//}
+
+actual fun ViewContext.stackCenter() : ViewWrapper = containsNext<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.alignItems = "center"
+    style.justifyContent = "center"
+}
 
 //actual fun ViewContext.background(background: Background): ViewWrapper = containsNext<HTMLDivElement>("div") {
 //    style.removeProperty("background")

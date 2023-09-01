@@ -36,6 +36,17 @@ actual class ViewContext(
     val elementToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
 
+    inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
+        val element = (document.createElement(name) as T)
+        ListeningLifecycleStack.useIn(element.onRemove) {
+            setup(element)
+        }
+        println("Start containsNext")
+        stack.add(element)
+        popCount++
+        return ViewWrapper
+    }
+
     inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) =
         element(document.createElement(name) as T, setup)
 

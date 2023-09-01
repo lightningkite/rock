@@ -137,6 +137,12 @@ actual var NView.id: String
         id = value
     }
 
+actual var NView.cursor: String
+    get() = throw NotImplementedError()
+    set(value) {
+        style.cursor = value
+    }
+
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NViewWithTextStyle = HTMLElement
 

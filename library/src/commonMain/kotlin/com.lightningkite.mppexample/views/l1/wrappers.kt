@@ -48,6 +48,7 @@ expect fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Bac
 
 @ViewModifierDsl3
 expect fun ViewContext.interactive(
+    transitions: Boolean = true,
     background: Background? = null,
     hoverBackground: Background? = null,
     downBackground: Background? = null,

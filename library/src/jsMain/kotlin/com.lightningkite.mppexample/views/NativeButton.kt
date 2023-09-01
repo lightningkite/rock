@@ -13,7 +13,6 @@ actual inline fun ViewContext.nativeButton(setup: NativeButton.() -> Unit): Unit
     style.justifyContent = "center"
     style.alignItems = "center"
     style.height = "min-content"
-    style.cursor = "pointer"
 
     clickable = true
 

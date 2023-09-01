@@ -14,6 +14,7 @@ fun ViewContext.button(
     buttonSetup: NativeButton.() -> Unit,
 ) {
     nativeButton {
+        cursor = "pointer"
         withTheme(theme.primaryTheme()) {
             buttonSetup()
         }
@@ -27,5 +28,3 @@ fun ViewContext.button(
         disabledColor = theme.primaryDisabled.background.closestColor(),
     )
 }
-
-//TODO handle theming for disabled button. consider adding more to the PaintPair class to hold foreground/background for disabled state

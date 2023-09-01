@@ -106,6 +106,7 @@ actual fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Bac
 }
 
 actual fun ViewContext.interactive(
+    transitions: Boolean,
     background: Background?,
     hoverBackground: Background?,
     downBackground: Background?,
@@ -116,6 +117,10 @@ actual fun ViewContext.interactive(
     disabledElevation: Dimension?
 ): ViewWrapper {
     elementToDoList.add {
+        if (transitions)
+            style.transition = "all 0.15s linear"
+        else
+            style.removeProperty("transition")
         if (elevation != null)
             applyBoxShadow(elevation)
         if (hoverElevation != null)

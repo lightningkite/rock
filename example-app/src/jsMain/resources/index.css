@@ -188,19 +188,16 @@ body {
 .box-shadow {
     box-shadow: var(--box-shadow);
     --box-shadow: unset;
-    transition: all 0.15s linear;
 }
 
 .background {
     background: var(--background);
     --background: unset;
-    transition: all 0.15s linear;
 }
 
 .background-image {
     background-image: var(--background-image);
     --background-image: unset;
-    transition: all 0.15s linear;
 }
 
 .background-attachment {
@@ -211,7 +208,6 @@ body {
 .border-color {
     border-color: var(--border-color);
     --border-color: unset;
-    transition: all 0.15s linear;
 }
 
 .border-width {

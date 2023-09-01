@@ -22,4 +22,3 @@ fun ViewContext.buttonLike(color: Color, disabledColor: Color): ViewWrapper {
     )
     return ViewWrapper
 }
-

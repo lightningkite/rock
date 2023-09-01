@@ -33,7 +33,7 @@ class HomeScreen : RockScreen {
             }
 
             button {
-                ::disabled { (counter.current / 10) % 2 == 0 }
+                ::disabled { (counter.current / 5) % 2 == 0 }
                 onClick {
                     println("Nice button clicked")
                 }
@@ -68,7 +68,8 @@ class HomeScreen : RockScreen {
             nativeText {
                 content = "hover me"
             } in interactive(
-                elevation = 8.px,
+                transitions = false,
+                hoverElevation = 8.px,
                 hoverBackground = Background(
                     fill = LinearGradient(
                         angle = Angle(0.15f),

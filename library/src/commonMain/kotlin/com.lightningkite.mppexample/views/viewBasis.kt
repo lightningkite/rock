@@ -24,6 +24,7 @@ expect var NView.elevation: Dimension
 expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 expect var NView.id: String
+expect var NView.cursor: String
 
 expect open class NViewWithTextStyle : NView
 

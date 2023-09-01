@@ -47,6 +47,16 @@ data class Color(
         )
     )
 
+    fun toGrayscale(): Color {
+        val average = 0.299f * red + 0.587f * green + 0.114f * blue
+        return Color(
+            alpha = alpha,
+            red = average,
+            green = average,
+            blue = average
+        )
+    }
+
     fun darken(ratio: Float): Color = copy(
         red = red * (1f - ratio),
         green = green * (1f - ratio),

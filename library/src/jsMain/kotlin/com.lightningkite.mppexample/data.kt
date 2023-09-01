@@ -17,6 +17,8 @@ actual sealed class ImageSource actual constructor()
 actual class ImageResource(val relativeUrl: String) : ImageSource()
 
 fun Dimension.toBoxShadow(): String {
+    if (value == "0px")
+        return "none"
     val offsetX = 0.px.value
     val offsetY = value
     val blur = 4.px.value

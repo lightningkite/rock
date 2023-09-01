@@ -54,7 +54,6 @@ fun ViewContext.allViewTest() {
                 println(map)
             }
             nativeTextField {
-                variant = TextFieldVariant.Outlined
                 validation = InputValidation(required = true)
                 key = "required-field"
                 hint = "Required Field"

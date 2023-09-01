@@ -30,7 +30,7 @@ class MyApp : RockApp {
                 ),
                 accent = PaintPair(
                     foreground = Color.white,
-                    background = Color.green
+                    background = Color.fromHex(0x9C27B0),
                 ),
                 normalDisabled = PaintPair(
                     foreground = Color.fromHex(0x999999),

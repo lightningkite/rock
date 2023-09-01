@@ -18,7 +18,12 @@ data class Theme(
         normal = primary,
         normalDisabled = primaryDisabled,
         primary = accent,
-        accent = accent,
+        allCaps = true,
+    )
+
+    fun accentTheme() = copy(
+        normal = accent,
+        normalDisabled = accentDisabled,
         allCaps = true,
     )
 }

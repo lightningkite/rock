@@ -32,14 +32,110 @@ class HomeScreen : RockScreen {
                 ::content { "Counter: ${counter.current}" }
             }
 
-            button {
-                ::disabled { (counter.current / 5) % 2 == 0 }
-                onClick {
-                    println("Nice button clicked")
-                }
-                text {
-                    content = "Nice Button"
-                }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Primary,
+                    size = ButtonSize.Large,
+                    variant = ButtonVariant.Contained
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Primary,
+                    size = ButtonSize.Medium,
+                    variant = ButtonVariant.Outlined,
+                    fullWidth = true
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Primary,
+                    size = ButtonSize.Small,
+                    variant = ButtonVariant.Text
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+
+
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Accent,
+                    size = ButtonSize.Large,
+                    variant = ButtonVariant.Contained
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Accent,
+                    size = ButtonSize.Medium,
+                    variant = ButtonVariant.Outlined,
+                    fullWidth = true
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Accent,
+                    size = ButtonSize.Small,
+                    variant = ButtonVariant.Text
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Danger,
+                    size = ButtonSize.Large,
+                    variant = ButtonVariant.Contained
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Danger,
+                    size = ButtonSize.Medium,
+                    variant = ButtonVariant.Outlined,
+                    fullWidth = true
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
+            }
+            button(
+                options = ButtonOptions(
+                    palette = ButtonPalette.Danger,
+                    size = ButtonSize.Small,
+                    variant = ButtonVariant.Text
+                )
+            ) {
+                ::disabled { (counter.current / 5) % 2 == 1 }
+                onClick { println("Nice button clicked") }
+                text { content = "Nice Button" }
             }
 
             nativeTextField {

@@ -18,7 +18,6 @@ actual inline fun ViewContext.nativeTextField(setup: NativeTextField.() -> Unit)
 
     element<HTMLLabelElement>("label") {}
 
-    variant = TextFieldVariant.Outlined
     setup()
 }
 
@@ -116,11 +115,11 @@ actual var NativeTextField.validation: InputValidation
             input.maxLength = value.maxLength
     }
 
-actual var NativeTextField.variant: TextFieldVariant
-    get() = throw NotImplementedError()
-    set(value) {
-        className = when(value) {
-            TextFieldVariant.Unstyled -> ""
-            TextFieldVariant.Outlined -> "rock-mui-text-field"
-        }
-    }
+//actual var NativeTextField.variant: TextFieldVariant
+//    get() = throw NotImplementedError()
+//    set(value) {
+//        className = when(value) {
+//            TextFieldVariant.Unstyled -> ""
+//            TextFieldVariant.Outlined -> "rock-mui-text-field"
+//        }
+//    }

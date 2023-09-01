@@ -10,4 +10,3 @@ expect var NativeTextField.keyboardHints: KeyboardHints
 expect var NativeTextField.hint: String
 expect var NativeTextField.validation: InputValidation
 expect var NativeTextField.key: String
-expect var NativeTextField.variant: TextFieldVariant

@@ -23,6 +23,8 @@ expect var NView.alpha: Double
 expect var NView.elevation: Dimension
 expect var NView.exists: Boolean
 expect var NView.visible: Boolean
+
+// the following NView properties will probably be no-ops in non-web platforms
 expect var NView.id: String
 expect var NView.cursor: String
 

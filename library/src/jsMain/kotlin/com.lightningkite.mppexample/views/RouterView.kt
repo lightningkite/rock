@@ -3,42 +3,40 @@ package com.lightningkite.mppexample
 
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-import com.lightningkite.mppexample.RockScreen
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias RouterView = HTMLDivElement
 
-actual fun ViewContext.routerView(setup: ViewContext.() -> Router): Unit = element<HTMLDivElement>("div") {
-    println("creating routerview")
-    id = "rock-router"
-//    val screen = Property<RockScreen>(HomeScreen())
-//    setup()
-}
-
-fun ViewContext.swapView(screen: Readable<RockScreen>) {
+actual fun ViewContext.routerView(setup: ViewContext.() -> Router): Unit {
     box {
+        val router = setup()
+        val screen = Property<RockScreen?>(null)
+        val reverse = Property(false)
+
+        navigator = PlatformNavigator(router = router, onScreenChanged = { newScreen, reverseTransition ->
+            reverse set reverseTransition
+            screen set newScreen
+        })
+
         className = "rock-stack"
         style.position = "relative"
 
         val derivedContext = derive(this)
         var oldView: HTMLElement? = null
+
         reactiveScope {
             with(derivedContext) {
                 with(screen.current) {
-                    render()
+                    if (this != null) render()
                 }
             }
-            val transition = derivedContext.screenTransitions.forward
-            val newView = lastChild as HTMLElement
-            newView.id = "rock-screen-animate-in"
+            val transition =
+                if (reverse.once) derivedContext.screenTransitions.reverse else derivedContext.screenTransitions.forward
+            val newView = lastChild as HTMLElement? ?: return@reactiveScope
             newView.classList.add("rock-screen")
-
-            val enterClass = getEnterTransitionClass(transition)
-            newView.style.animation = "$enterClass 0.25s"
+            newView.style.animation = "${transition.enterClass()} 0.25s"
             oldView?.let { view ->
-                view.id = "rock-screen-animate-out"
-                val exitClass = getExitTransitionClass(transition)
-                view.style.animation = "$exitClass 0.25s"
+                view.style.animation = "${transition.exitClass()} 0.25s"
                 view.addEventListener("animationend", {
                     removeChild(view)
                 })
@@ -48,8 +46,8 @@ fun ViewContext.swapView(screen: Readable<RockScreen>) {
     }
 }
 
-private fun getEnterTransitionClass(transition: ScreenTransition): String? {
-    return when (transition) {
+private fun ScreenTransition.enterClass(): String? {
+    return when (this) {
         ScreenTransition.None -> null
         ScreenTransition.Push -> "stack-push-in"
         ScreenTransition.Pop -> "stack-pop-in"
@@ -61,8 +59,8 @@ private fun getEnterTransitionClass(transition: ScreenTransition): String? {
     }
 }
 
-private fun getExitTransitionClass(transition: ScreenTransition): String? {
-    return when (transition) {
+private fun ScreenTransition.exitClass(): String? {
+    return when (this) {
         ScreenTransition.None -> null
         ScreenTransition.Push -> "stack-push-out"
         ScreenTransition.Pop -> "stack-pop-out"

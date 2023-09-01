@@ -2,15 +2,13 @@ package com.lightningkite.mppexample
 
 interface RockNavigator {
     var currentPath: String
-    fun navigate(
-        screen: RockScreen,
-        options: NavigationOptions = NavigationOptions()
-    )
+    fun navigate(screen: RockScreen)
+    fun replace(screen: RockScreen)
 }
 
 expect class PlatformNavigator(
     router: Router,
-    context: ViewContext
+    onScreenChanged: (RockScreen, Boolean) -> Unit
 ) : RockNavigator
 
 class DummyRockNavigator : RockNavigator {
@@ -18,7 +16,11 @@ class DummyRockNavigator : RockNavigator {
         get() = throw NotImplementedError()
         set(value) = throw NotImplementedError()
 
-    override fun navigate(screen: RockScreen, options: NavigationOptions) {
+    override fun navigate(screen: RockScreen) {
+        throw NotImplementedError()
+    }
+
+    override fun replace(screen: RockScreen) {
         throw NotImplementedError()
     }
 }

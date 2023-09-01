@@ -3,13 +3,11 @@ package com.lightningkite.mppexample
 typealias RouteProps = Map<String, String>
 typealias RouteMap = MutableMap<String, RouteNode>
 typealias ScreenCreator = (props: RouteProps) -> RockScreen
-typealias RouteRenderer = ViewContext.(props: RouteProps) -> Unit
+typealias RouteRenderer = (props: RouteProps) -> RockScreen
 
 class Router(
-    private val context: ViewContext,
-    private val theme: Theme,
     routes: List<Route>,
-    private val fallback: ViewContext.() -> Unit
+    private val fallback: RockScreen
 ) {
     private val routeMap: RouteNode = RouteNode(
         render = null,
@@ -19,12 +17,6 @@ class Router(
 
     init {
         routes.forEach { setupRoute(it) }
-        context.run {
-            navigator = PlatformNavigator(
-                router = this@Router,
-                context = this,
-            )
-        }
     }
 
     private fun setupRoute(route: Route) {
@@ -45,12 +37,7 @@ class Router(
             map.children[routeKey]!!.dynamicParam = paramName
             if (isLeaf) {
                 map.children[routeKey]!!.render = {
-                    val screen = route.render(it)
-                    screen.run {
-                        withTheme(this@Router.theme) {
-                            render()
-                        }
-                    }
+                    route.render(it)
                 }
             } else {
                 map = map.children[routeKey]!!
@@ -61,7 +48,7 @@ class Router(
     private fun segmentPath(path: String) =
         if (path == "/") listOf("/") else path.split("/").filter { it.isNotEmpty() }.toList()
 
-    fun render(location: String): ViewContext.() -> Unit {
+    fun findRoute(location: String): RockScreen {
         val segments = segmentPath(location)
         val props = mutableMapOf<String, String>()
         var route = routeMap
@@ -78,20 +65,9 @@ class Router(
             }
         }
 
-        return {
-            if (!failed && route.render != null) {
-                route.render!!(props)
-            } else {
-                fallback()
-            }
-        }
-
-//        context.run {
-//            box {
-//                id = "rock-screen-animate-in"
-//
-//            }
-//        }
+        if (failed || route.render == null)
+            return fallback
+        return route.render!!(props)
     }
 }
 

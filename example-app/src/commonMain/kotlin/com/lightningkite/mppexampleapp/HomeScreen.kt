@@ -23,9 +23,9 @@ class HomeScreen : RockScreen {
 //            } in changingBackground { Background(fill = Color.gray(1 - counter.current / 20f)) }
             nativeButton {
                 onClick {
-                    navigator.navigate(TestComponent())
+                    navigator.replace(TestComponent())
                 }
-                nativeText { content = "Navigate To Test" }
+                nativeText { content = "Navigate+Replace To Test" }
             }
 //
 //            text {

@@ -1,29 +1,24 @@
 package com.lightningkite.mppexample
 
 
-fun ViewContext.buttonLike(color: Color): ViewWrapper {
+fun ViewContext.buttonLike(color: Color, disabledColor: Color): ViewWrapper {
     val hover = color.darken(0.15f)
     val focus = color.darken(0.3f)
-    withBackground(
-        Background(
+
+    interactive(
+        background = Background(
             fill = color,
-//            fill = color.toGradient(),
             stroke = hover,
             strokeWidth = 2.px,
             corners = CornerRadii(12.px),
-        )
-    )
-    hoverable(
+        ),
         elevation = 2.px,
-        background = Background(
-            fill = hover//.toGradient()
-        )
-    )
-    focusable(
-        elevation = 4.px,
-        background = Background(
-            fill = focus//.toGradient()
-        )
+        hoverBackground = Background(fill = hover.toGradient()),
+        hoverElevation = 4.px,
+        downBackground = Background(fill = focus),
+        downElevation = 8.px,
+        disabledBackground = Background(fill = disabledColor, stroke = disabledColor.darken(0.15f)),
+        disabledElevation = 0.px
     )
     return ViewWrapper
 }

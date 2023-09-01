@@ -142,6 +142,7 @@ actual typealias NViewWithTextStyle = HTMLElement
 
 actual fun NViewWithTextStyle.setStyles(styles: TextStyle) {
     style.color = styles.color.toWeb()
+    style.setProperty("--disabled-color", styles.disabledColor.toWeb())
     style.fontSize = "${styles.size}px"
     style.fontFamily = styles.font
     style.fontWeight = if (styles.bold) "bold" else "normal"

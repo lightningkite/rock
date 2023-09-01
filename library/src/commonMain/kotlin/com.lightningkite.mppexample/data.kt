@@ -40,6 +40,7 @@ data class Insets(
 
 data class TextStyle(
     val color: Color = Color.black,
+    val disabledColor: Color = Color.gray,
     val size: Double = 14.0,
     val font: Font = systemDefaultFont,
     val bold: Boolean = false,

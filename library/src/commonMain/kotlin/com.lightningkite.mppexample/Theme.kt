@@ -1,5 +1,7 @@
 package com.lightningkite.mppexample
 
+data class PaintPair(val foreground: Paint, val background: Paint)
+
 data class Theme(
     val titleFont: Font,
     val bodyFont: Font,
@@ -7,10 +9,17 @@ data class Theme(
     val normal: PaintPair,
     val primary: PaintPair,
     val accent: PaintPair,
+    val normalDisabled: PaintPair,
+    val primaryDisabled: PaintPair,
+    val accentDisabled: PaintPair,
     val allCaps: Boolean = false
 ) {
     fun primaryTheme() = copy(
-        normal = primary, primary = accent, accent = accent, allCaps = true
+        normal = primary,
+        normalDisabled = primaryDisabled,
+        primary = accent,
+        accent = accent,
+        allCaps = true,
     )
 }
 

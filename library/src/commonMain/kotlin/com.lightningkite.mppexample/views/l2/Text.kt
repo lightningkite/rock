@@ -17,9 +17,11 @@ inline fun ViewContext.text(level: HeadingLevel, crossinline setup: Text.() -> U
         textStyle = TextStyle(
             size = theme.baseSize * level.toMultiplier(),
             color = theme.normal.foreground.closestColor(),
+            disabledColor = theme.normalDisabled.foreground.closestColor(),
             font = theme.bodyFont,
             allCaps = theme.allCaps
         )
+
         setup()
     }
     when (level) {

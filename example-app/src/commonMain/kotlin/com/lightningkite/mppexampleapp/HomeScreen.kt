@@ -28,7 +28,15 @@ class HomeScreen : RockScreen {
                 nativeText { content = "Navigate" }
             }
 
+            text {
+                ::content { "Counter: ${counter.current}" }
+            }
+
             button {
+                ::disabled { (counter.current / 10) % 2 == 0 }
+                onClick {
+                    println("Nice button clicked")
+                }
                 text {
                     content = "Nice Button"
                 }
@@ -59,9 +67,9 @@ class HomeScreen : RockScreen {
 
             nativeText {
                 content = "hover me"
-            } in hoverable(
+            } in interactive(
                 elevation = 8.px,
-                background = Background(
+                hoverBackground = Background(
                     fill = LinearGradient(
                         angle = Angle(0.15f),
                         stops = listOf(

@@ -31,7 +31,19 @@ class MyApp : RockApp {
                 accent = PaintPair(
                     foreground = Color.white,
                     background = Color.green
-                )
+                ),
+                normalDisabled = PaintPair(
+                    foreground = Color.fromHex(0x999999),
+                    background = Color.white
+                ),
+                primaryDisabled = PaintPair(
+                    foreground = Color.fromHex(0xededed),
+                    background = Color.fromHex(0x666666)
+                ),
+                accentDisabled = PaintPair(
+                    foreground = Color.fromHex(0x999999),
+                    background = Color.green
+                ),
             )
         )
     }

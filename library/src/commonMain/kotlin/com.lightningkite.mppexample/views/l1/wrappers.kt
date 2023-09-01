@@ -35,16 +35,28 @@ expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
 expect fun ViewContext.margin(insets: Dimension): ViewWrapper
 
 @ViewModifierDsl3
-expect fun ViewContext.withBackground(background: Background): ViewWrapper
+expect fun ViewContext.withBackground(background: Background? = null, elevation: Dimension? = null): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper
 
-@ViewModifierDsl3
-expect fun ViewContext.hoverable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+//@ViewModifierDsl3
+//expect fun ViewContext.hoverable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+//
+//@ViewModifierDsl3
+//expect fun ViewContext.focusable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
 
 @ViewModifierDsl3
-expect fun ViewContext.focusable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+expect fun ViewContext.interactive(
+    background: Background? = null,
+    hoverBackground: Background? = null,
+    downBackground: Background? = null,
+    disabledBackground: Background? = null,
+    elevation: Dimension? = null,
+    hoverElevation: Dimension? = null,
+    downElevation: Dimension? = null,
+    disabledElevation: Dimension? = null
+): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.scrolls(): ViewWrapper

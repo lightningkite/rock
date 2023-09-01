@@ -1,4 +1,5 @@
 package com.lightningkite.mppexample
+
 import org.w3c.dom.HTMLElement
 
 
@@ -19,6 +20,15 @@ private fun joinGradientStops(stops: List<GradientStop>): String {
 
 fun LinearGradient.toCss() = "linear-gradient(${angle.turns}turn, ${joinGradientStops(stops)})"
 fun RadialGradient.toCss() = "radial-gradient(circle at center, ${joinGradientStops(stops)})"
+
+fun HTMLElement.applyBoxShadow(elevation: Dimension?, prefix: String = "") {
+    if (elevation != null) {
+        style.setProperty("--${prefix}box-shadow", elevation.toBoxShadow())
+        classList.add("${prefix}box-shadow")
+    } else {
+        classList.remove("${prefix}box-shadow")
+    }
+}
 
 fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
     classList.remove(
@@ -76,8 +86,15 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
     }
 }
 
-actual fun ViewContext.withBackground(background: Background): ViewWrapper {
-    elementToDoList.add { applyBackground(background) }
+actual fun ViewContext.withBackground(background: Background?, elevation: Dimension?): ViewWrapper {
+    elementToDoList.add {
+        if (background != null)
+            applyBackground(background)
+        if (elevation != null) {
+            style.setProperty("--box-shadow", elevation.toBoxShadow())
+            classList.add("box-shadow")
+        }
+    }
     return ViewWrapper
 }
 
@@ -88,29 +105,60 @@ actual fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Bac
     return ViewWrapper
 }
 
-actual fun ViewContext.hoverable(background: Background?, elevation: Dimension?): ViewWrapper {
+actual fun ViewContext.interactive(
+    background: Background?,
+    hoverBackground: Background?,
+    downBackground: Background?,
+    disabledBackground: Background?,
+    elevation: Dimension?,
+    hoverElevation: Dimension?,
+    downElevation: Dimension?,
+    disabledElevation: Dimension?
+): ViewWrapper {
     elementToDoList.add {
-        if (elevation != null) {
-            style.setProperty("--hover-box-shadow", elevation.toBoxShadow())
-            classList.add("hover-box-shadow")
-        }
+        if (elevation != null)
+            applyBoxShadow(elevation)
+        if (hoverElevation != null)
+            applyBoxShadow(hoverElevation, "hover-")
+        if (downElevation != null)
+            applyBoxShadow(downElevation, "focus-")
+        if (disabledElevation != null)
+            applyBoxShadow(disabledElevation, "disabled-")
         if (background != null)
-            applyBackground(background, "hover-")
+            applyBackground(background)
+        if (hoverBackground != null)
+            applyBackground(hoverBackground, "hover-")
+        if (downBackground != null)
+            applyBackground(downBackground, "focus-")
+        if (disabledBackground != null)
+            applyBackground(disabledBackground, "disabled-")
     }
     return ViewWrapper
 }
 
-actual fun ViewContext.focusable(background: Background?, elevation: Dimension?): ViewWrapper {
-    elementToDoList.add {
-        if (elevation != null) {
-            style.setProperty("--focus-box-shadow", elevation.toBoxShadow())
-            classList.add("focus-box-shadow")
-        }
-        if (background != null)
-            applyBackground(background, "focus-")
-    }
-    return ViewWrapper
-}
+//actual fun ViewContext.hoverable(background: Background?, elevation: Dimension?): ViewWrapper {
+//    elementToDoList.add {
+//        if (elevation != null) {
+//            style.setProperty("--hover-box-shadow", elevation.toBoxShadow())
+//            classList.add("hover-box-shadow")
+//        }
+//        if (background != null)
+//            applyBackground(background, "hover-")
+//    }
+//    return ViewWrapper
+//}
+//
+//actual fun ViewContext.focusable(background: Background?, elevation: Dimension?): ViewWrapper {
+//    elementToDoList.add {
+//        if (elevation != null) {
+//            style.setProperty("--focus-box-shadow", elevation.toBoxShadow())
+//            classList.add("focus-box-shadow")
+//        }
+//        if (background != null)
+//            applyBackground(background, "focus-")
+//    }
+//    return ViewWrapper
+//}
 
 //actual fun ViewContext.background(background: Background): ViewWrapper = containsNext<HTMLDivElement>("div") {
 //    style.removeProperty("background")

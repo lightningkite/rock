@@ -27,3 +27,4 @@ expect class Text : NViewWithTextStyle
 expect var Text.content: String
 expect var Text.textStyle: TextStyle
 expect var Text.gravity: TextGravity
+expect var Text.selectable: Boolean

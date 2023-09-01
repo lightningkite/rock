@@ -73,10 +73,13 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
     }
 
     if (background.strokeWidth != null) {
-        style.borderStyle = "solid"
+        style.setProperty("--${prefix}border-style", "solid")
         style.setProperty("--${prefix}border-width", background.strokeWidth.value)
         classList.add("${prefix}border-width")
+    } else {
+        style.setProperty("--${prefix}border-style", "none")
     }
+    classList.add("${prefix}border-style")
 
     if (background.corners != null) {
         style.setProperty("--${prefix}border-top-left-radius", background.corners.topLeft.value)
@@ -101,7 +104,7 @@ actual fun ViewContext.nativeBackground(background: Background?, elevation: Dime
 
 actual fun ViewContext.nativeBackground(paint: Paint) = nativeBackground(Background(fill = paint))
 
-actual fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper {
+actual fun ViewContext.nativeChangingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper {
     elementToDoList.add {
         reactiveScope { applyBackground(getBackground()) }
     }
@@ -113,10 +116,12 @@ actual fun ViewContext.interactive(
     background: Background?,
     hoverBackground: Background?,
     downBackground: Background?,
+    focusedBackground: Background?,
     disabledBackground: Background?,
     elevation: Dimension?,
     hoverElevation: Dimension?,
     downElevation: Dimension?,
+    focusedElevation: Dimension?,
     disabledElevation: Dimension?
 ): ViewWrapper {
     elementToDoList.add {
@@ -129,7 +134,9 @@ actual fun ViewContext.interactive(
         if (hoverElevation != null)
             applyBoxShadow(hoverElevation, "hover-")
         if (downElevation != null)
-            applyBoxShadow(downElevation, "focus-")
+            applyBoxShadow(downElevation, "down-")
+        if (focusedElevation != null)
+            applyBoxShadow(focusedElevation, "focused-")
         if (disabledElevation != null)
             applyBoxShadow(disabledElevation, "disabled-")
         if (background != null)
@@ -137,45 +144,14 @@ actual fun ViewContext.interactive(
         if (hoverBackground != null)
             applyBackground(hoverBackground, "hover-")
         if (downBackground != null)
-            applyBackground(downBackground, "focus-")
+            applyBackground(downBackground, "down-")
+        if (focusedBackground != null)
+            applyBackground(focusedBackground, "focused-")
         if (disabledBackground != null)
             applyBackground(disabledBackground, "disabled-")
     }
     return ViewWrapper
 }
-
-//actual fun ViewContext.hoverable(background: Background?, elevation: Dimension?): ViewWrapper {
-//    elementToDoList.add {
-//        if (elevation != null) {
-//            style.setProperty("--hover-box-shadow", elevation.toBoxShadow())
-//            classList.add("hover-box-shadow")
-//        }
-//        if (background != null)
-//            applyBackground(background, "hover-")
-//    }
-//    return ViewWrapper
-//}
-//
-//actual fun ViewContext.focusable(background: Background?, elevation: Dimension?): ViewWrapper {
-//    elementToDoList.add {
-//        if (elevation != null) {
-//            style.setProperty("--focus-box-shadow", elevation.toBoxShadow())
-//            classList.add("focus-box-shadow")
-//        }
-//        if (background != null)
-//            applyBackground(background, "focus-")
-//    }
-//    return ViewWrapper
-//}
-
-//actual fun ViewContext.stackCenter(): ViewWrapper {
-//    elementToDoList.add {
-//        style.display = "flex"
-//        style.alignItems = "center"
-//        style.justifyContent = "center"
-//    }
-//    return ViewWrapper
-//}
 
 actual fun ViewContext.stackCenter(): ViewWrapper = containsNext<HTMLDivElement>("div") {
     style.display = "flex"

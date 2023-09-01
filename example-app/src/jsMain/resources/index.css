@@ -1,5 +1,6 @@
 * {
 	font-family: 'Roboto', 'Helvetica', sans-serif !important;
+	box-sizing: border-box;
 }
 
 body {
@@ -201,38 +202,42 @@ body > div {
 
 
 
+button:disabled {
+    cursor: not-allowed !important;
+}
+button:disabled span, button[disabled] span {
+    color: var(--disabled-color) !important;
+}
 
 
 .box-shadow {
     box-shadow: var(--box-shadow);
     --box-shadow: unset;
 }
-
 .background {
     background: var(--background);
     --background: unset;
 }
-
 .background-image {
     background-image: var(--background-image);
     --background-image: unset;
 }
-
 .background-attachment {
     background-attachment: var(--background-attachment);
     --background-attachment: unset;
 }
-
 .border-color {
     border-color: var(--border-color);
     --border-color: unset;
 }
-
 .border-width {
     border-width: var(--border-width);
     --border-width: unset;
 }
-
+.border-style {
+    border-style: var(--border-style);
+    --border-style: unset;
+}
 .border-radius {
     border-top-left-radius: var(--border-top-left-radius);
     border-top-right-radius: var(--border-top-right-radius);
@@ -244,43 +249,33 @@ body > div {
     --border-bottom-right-radius: unset;
 }
 
-button:disabled {
-    cursor: not-allowed !important;
-}
-
-button:disabled span, button[disabled] span {
-    color: var(--disabled-color) !important;
-}
-
-
 .hover-box-shadow:hover {
     box-shadow: var(--hover-box-shadow);
     --hover-box-shadow: none;
 }
-
 .hover-background:hover {
     background: var(--hover-background);
     --hover-background: unset;
 }
-
 .hover-background-image:hover {
     background-image: var(--hover-background-image);
     --hover-background-image: unset;
 }
-
 .hover-background-attachment:hover {
     background-attachment: var(--hover-background-attachment);
     --hover-background-attachment: unset;
 }
-
 .hover-border-color:hover {
     border-color: var(--hover-border-color);
     --hover-border-color: unset;
 }
-
 .hover-border-width:hover {
     border-width: var(--hover-border-width);
     --hover-border-width: unset;
+}
+.hover-border-style:hover {
+    border-style: var(--hover-border-style);
+    --hover-border-style: unset;
 }
 .hover-border-radius:hover {
     border-top-left-radius: var(--hover-border-top-left-radius);
@@ -293,31 +288,35 @@ button:disabled span, button[disabled] span {
     --hover-border-bottom-right-radius: unset;
 }
 
-.focus-box-shadow:active {
+.down-box-shadow:active {
     box-shadow: var(--focus-box-shadow);
     --focus-box-shadow: none;
 }
-.focus-background:active {
+.down-background:active {
     background: var(--focus-background);
     --focus-background: unset;
 }
-.focus-background-image:active {
+.down-background-image:active {
     background-image: var(--focus-background-image);
     --focus-background-image: unset;
 }
-.focus-background-attachment:active {
+.down-background-attachment:active {
     background-attachment: var(--focus-background-attachment);
     --focus-background-attachment: unset;
 }
-.focus-border-color:active {
+.down-border-color:active {
     border-color: var(--focus-border-color);
     --focus-border-color: unset;
 }
-.focus-border-width:active {
+.down-border-width:active {
     border-width: var(--focus-border-width);
     --focus-border-width: unset;
 }
-.focus-border-radius:active {
+.down-border-style:active {
+    border-style: var(--focus-border-style);
+    --focus-border-style: unset;
+}
+.down-border-radius:active {
     border-top-left-radius: var(--focus-border-top-left-radius);
     border-top-right-radius: var(--focus-border-top-right-radius);
     border-bottom-left-radius: var(--focus-border-bottom-left-radius);
@@ -326,6 +325,45 @@ button:disabled span, button[disabled] span {
     --focus-border-top-right-radius: unset;
     --focus-border-bottom-left-radius: unset;
     --focus-border-bottom-right-radius: unset;
+}
+
+.focused-box-shadow:focus {
+    box-shadow: var(--focused-box-shadow);
+    --focused-box-shadow: none;
+}
+.focused-background:focus {
+    background: var(--focused-background);
+    --focused-background: unset;
+}
+.focused-background-image:focus {
+    background-image: var(--focused-background-image);
+    --focused-background-image: unset;
+}
+.focused-background-attachment:focus {
+    background-attachment: var(--focused-background-attachment);
+    --focused-background-attachment: unset;
+}
+.focused-border-color:focus {
+    border-color: var(--focused-border-color);
+    --focused-border-color: unset;
+}
+.focused-border-width:focus {
+    border-width: var(--focused-border-width);
+    --focused-border-width: unset;
+}
+.focused-border-style:focus {
+    border-style: var(--focused-border-style);
+    --focused-border-style: unset;
+}
+.focused-border-radius:focus {
+    border-top-left-radius: var(--focused-border-top-left-radius);
+    border-top-right-radius: var(--focused-border-top-right-radius);
+    border-bottom-left-radius: var(--focused-border-bottom-left-radius);
+    border-bottom-right-radius: var(--focused-border-bottom-right-radius);
+    --focused-border-top-left-radius: unset;
+    --focused-border-top-right-radius: unset;
+    --focused-border-bottom-left-radius: unset;
+    --focused-border-bottom-right-radius: unset;
 }
 
 .disabled-box-shadow:disabled {
@@ -351,6 +389,10 @@ button:disabled span, button[disabled] span {
 .disabled-border-width:disabled {
     border-width: var(--disabled-border-width);
     --disabled-border-width: unset;
+}
+.disabled-border-style:disabled {
+    border-style: var(--disabled-border-style);
+    --disabled-border-style: unset;
 }
 .disabled-border-radius:disabled {
     border-top-left-radius: var(--disabled-border-top-left-radius);

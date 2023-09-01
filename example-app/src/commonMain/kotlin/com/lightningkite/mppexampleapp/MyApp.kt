@@ -45,23 +45,25 @@ class MyApp : RockApp {
 
         withTheme(theme) {
             column {
-                text(level = HeadingLevel.H1) {
+                h1 {
                     content = "Hello, world!"
-                } in nativeBackground(Color.fromHex(0xeeeeee)) in padding(1.rem)
+                } in background(Color.fromHex(0xeeeeee))
 
-                routerView {
-                    Router(
-                        routes = listOf(
-                            Route(HomeScreen.PATH) { HomeScreen() },
-                            Route(TestComponent.PATH) { TestComponent() },
-                            Route(UserScreen.PATH) { UserScreen.create(it) },
-                            Route(UserSettings.PATH) { UserSettings.create(it) },
-                            Route(ScreenA.PATH) { ScreenA() },
-                            Route(ScreenB.PATH) { ScreenB() },
-                        ),
-                        fallback = TestComponent()
+                box {
+                    routerView(
+                        Router(
+                            routes = listOf(
+                                Route(HomeScreen.PATH) { HomeScreen() },
+                                Route(TestComponent.PATH) { TestComponent() },
+                                Route(UserScreen.PATH) { UserScreen.create(it) },
+                                Route(UserSettings.PATH) { UserSettings.create(it) },
+                                Route(ScreenA.PATH) { ScreenA() },
+                                Route(ScreenB.PATH) { ScreenB() },
+                            ),
+                            fallback = TestComponent()
+                        )
                     )
-                } in weight(1f)
+                } in background(Color.fromHex(0xfafafa)) in weight(1f)
 
                 row {
                     gravity = StackGravity.Center
@@ -89,8 +91,7 @@ class MyApp : RockApp {
                     text {
                         content = "Goodbye, world!"
                     }
-                } in nativeBackground(Color.fromHex(0xeeeeee)) in padding(1.rem)
-
+                } in background(Color.fromHex(0xeeeeee))
             }
         }
     }

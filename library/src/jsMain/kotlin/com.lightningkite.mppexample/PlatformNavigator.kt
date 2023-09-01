@@ -10,7 +10,7 @@ actual class PlatformNavigator actual constructor(
     val router: Router,
     val onScreenChanged: (RockScreen, Boolean) -> Unit
 ) : RockNavigator {
-    private var nextIndex: Int = 0
+    private var nextIndex: Int = 1
     private var currentIndex: Int = 0
 
     init {
@@ -19,7 +19,6 @@ actual class PlatformNavigator actual constructor(
             event as PopStateEvent
             val index = event.state as Int?
             val reverse = index == null || index < currentIndex
-//            println("index: $index, currentIndex: $currentIndex, reverse: $reverse")
             currentIndex = index ?: 0
             navigate(currentPath, reverse = reverse, pushState = false)
         })

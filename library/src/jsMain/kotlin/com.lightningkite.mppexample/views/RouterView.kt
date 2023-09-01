@@ -7,9 +7,8 @@ import org.w3c.dom.HTMLElement
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias RouterView = HTMLDivElement
 
-actual fun ViewContext.routerView(setup: ViewContext.() -> Router): Unit {
+actual fun ViewContext.routerView(router: Router): Unit {
     box {
-        val router = setup()
         val screen = Property<RockScreen?>(null)
         val reverse = Property(false)
 

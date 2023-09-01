@@ -6,7 +6,6 @@ import org.w3c.dom.*
 actual typealias ActivityIndicator = HTMLDivElement
 
 fun ActivityIndicator.setupSharedIndicator(color: Color) {
-    style.boxSizing = "border-box"
     style.display = "block"
     style.position = "absolute"
     style.width = "100%"

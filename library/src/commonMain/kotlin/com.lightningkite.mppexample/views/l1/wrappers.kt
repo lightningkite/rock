@@ -44,13 +44,7 @@ expect fun ViewContext.nativeBackground(background: Background? = null, elevatio
 expect fun ViewContext.nativeBackground(paint: Paint): ViewWrapper
 
 @ViewModifierDsl3
-expect fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper
-
-//@ViewModifierDsl3
-//expect fun ViewContext.hoverable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
-//
-//@ViewModifierDsl3
-//expect fun ViewContext.focusable(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+expect fun ViewContext.nativeChangingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.interactive(
@@ -58,10 +52,12 @@ expect fun ViewContext.interactive(
     background: Background? = null,
     hoverBackground: Background? = null,
     downBackground: Background? = null,
+    focusedBackground: Background? = null,
     disabledBackground: Background? = null,
     elevation: Dimension? = null,
     hoverElevation: Dimension? = null,
     downElevation: Dimension? = null,
+    focusedElevation: Dimension? = null,
     disabledElevation: Dimension? = null
 ): ViewWrapper
 

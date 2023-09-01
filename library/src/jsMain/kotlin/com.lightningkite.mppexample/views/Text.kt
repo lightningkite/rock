@@ -66,3 +66,9 @@ actual var Text.gravity: TextGravity
             TextGravity.Right -> "right"
         }
     }
+
+actual var Text.selectable: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        style.setProperty("user-select", if(value) "text" else "none")
+    }

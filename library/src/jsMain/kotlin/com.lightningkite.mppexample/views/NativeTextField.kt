@@ -7,36 +7,32 @@ import org.w3c.dom.get
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NativeTextField = HTMLDivElement
+actual typealias NativeTextField = HTMLInputElement
 
-actual inline fun ViewContext.nativeTextField(setup: NativeTextField.() -> Unit): Unit = element<HTMLDivElement>("div") {
+actual inline fun ViewContext.nativeTextField(setup: NativeTextField.() -> Unit): Unit =
     element<HTMLInputElement>("input") {
         type = "text"
         style.width = "100%"
         name = "UNNAMED-INPUT"
+        style.outline = "none"
+
+        setup()
     }
-
-    element<HTMLLabelElement>("label") {}
-
-    setup()
-}
 
 actual var NativeTextField.key: String
     get() = throw NotImplementedError()
     set(value) {
-        val input = getElementsByTagName("input")[0] as HTMLInputElement
-        input.name = value
+        name = value
     }
 
 actual fun NativeTextField.bind(text: Writable<String>) {
-    val input = getElementsByTagName("input")[0] as HTMLInputElement
-    input.value = text.once
+    value = text.once
 
     reactiveScope {
-        input.value = text.current
+        value = text.current
     }
 
-    input.addEventListener("input", {
+    addEventListener("input", {
         text set it.currentTarget.asDynamic().value as String
     })
 }
@@ -44,11 +40,7 @@ actual fun NativeTextField.bind(text: Writable<String>) {
 actual var NativeTextField.hint: String
     get() = throw NotImplementedError()
     set(value) {
-        val input = getElementsByTagName("input")[0] as HTMLInputElement
-        input.placeholder = value
-
-        val label = getElementsByTagName("label")[0] as HTMLLabelElement
-        label.innerText = value
+        placeholder = value
     }
 
 actual var NativeTextField.textStyle: TextStyle
@@ -63,9 +55,8 @@ actual var NativeTextField.keyboardHints: KeyboardHints
         if (value.action != null) {
             TODO()
         }
-        val input = getElementsByTagName("input")[0] as HTMLInputElement
 
-        input.type = when (value.type) {
+        type = when (value.type) {
             KeyboardType.Text -> "text"
             KeyboardType.Decimal -> "number"
             KeyboardType.Integer -> "number"
@@ -74,22 +65,26 @@ actual var NativeTextField.keyboardHints: KeyboardHints
 
         when (value.autocomplete) {
             AutoComplete.Email -> {
-                input.type = "email"
-                input.autocomplete = "email"
+                type = "email"
+                autocomplete = "email"
             }
+
             AutoComplete.Password -> {
-                input.type = "password"
-                input.autocomplete = "current-password"
+                type = "password"
+                autocomplete = "current-password"
             }
+
             AutoComplete.NewPassword -> {
-                input.type = "password"
-                input.autocomplete = "new-password"
+                type = "password"
+                autocomplete = "new-password"
             }
+
             AutoComplete.Phone -> {
-                input.autocomplete = "tel"
+                autocomplete = "tel"
             }
+
             null -> {
-                input.autocomplete = "off"
+                autocomplete = "off"
             }
         }
 
@@ -103,16 +98,15 @@ actual var NativeTextField.keyboardHints: KeyboardHints
 actual var NativeTextField.validation: InputValidation
     get() = throw NotImplementedError()
     set(value) {
-        val input = getElementsByTagName("input")[0] as HTMLInputElement
-        input.required = value.required
+        required = value.required
         if (value.minLength == null)
-            input.removeAttribute("minLength")
+            removeAttribute("minLength")
         else
-            input.minLength = value.minLength
+            minLength = value.minLength
         if (value.maxLength == null)
-            input.removeAttribute("maxLength")
+            removeAttribute("maxLength")
         else
-            input.maxLength = value.maxLength
+            maxLength = value.maxLength
     }
 
 //actual var NativeTextField.variant: TextFieldVariant

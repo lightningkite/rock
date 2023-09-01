@@ -13,7 +13,8 @@ data class ButtonOptions(
 
 fun ViewContext.button(
     options: ButtonOptions,
-    buttonSetup: NativeButton.() -> Unit,
+    onClick: suspend () -> Unit,
+    setup: NView.() -> Unit,
 ) {
     var buttonTheme = when (options.palette) {
         ButtonPalette.Primary -> theme.primaryTheme()
@@ -64,12 +65,25 @@ fun ViewContext.button(
         )
     )
 
-    val setup = {
+    val loading = Property(false)
+
+    val setupAll = {
         nativeButton {
+            onClick {
+                launch {
+                    loading set true
+                    try {
+                        onClick()
+                    } finally {
+                        loading set false
+                    }
+                }
+            }
             cursor = "pointer"
             withRenderContext(RenderContext.Button) {
                 withTheme(buttonTheme) {
-                    buttonSetup()
+                    activityIndicator(exists = loading)
+                    setup()
                 }
             }
         } in padding(
@@ -97,10 +111,13 @@ fun ViewContext.button(
         )
     }
 
-    if (options.fullWidth) setup() else box {
-        setup()
+    if (options.fullWidth) setupAll() else box {
+        setupAll()
     }
 }
 
-fun ViewContext.button(buttonSetup: NativeButton.() -> Unit) =
-    button(options = ButtonOptions(), buttonSetup = buttonSetup)
+fun ViewContext.button(onClick: suspend () -> Unit, setup: NView.() -> Unit) = button(
+    options = ButtonOptions(),
+    onClick = onClick,
+    setup = setup,
+)

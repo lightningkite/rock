@@ -37,109 +37,112 @@ class HomeScreen : RockScreen {
                     palette = ButtonPalette.Primary,
                     size = ButtonSize.Large,
                     variant = ButtonVariant.Contained
-                )
+                ),
+                onClick = {
+                    val content = fetch("https://swapi.dev/api/people/1").text()
+                    println(content)
+                }
             ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
                 text { content = "Nice Button" }
             }
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Primary,
-                    size = ButtonSize.Medium,
-                    variant = ButtonVariant.Outlined,
-                    fullWidth = true
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Primary,
-                    size = ButtonSize.Small,
-                    variant = ButtonVariant.Text
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Primary,
+//                    size = ButtonSize.Medium,
+//                    variant = ButtonVariant.Outlined,
+//                    fullWidth = true
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//                text { content = "Nice Button" }
+//            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Primary,
+//                    size = ButtonSize.Small,
+//                    variant = ButtonVariant.Text
+//                ),
+//                onClick = {
+//                    afterTimeout(1000) {
+//                        println("Nice button clicked")
+//                    }
+//                }
+//            ) {
+//                text { content = "Nice Button" }
+//            }
 
-            activityIndicator()
-
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Accent,
-                    size = ButtonSize.Large,
-                    variant = ButtonVariant.Contained
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-
-                activityIndicator()
-                text { content = "Nice Button" }
-            }
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Accent,
-                    size = ButtonSize.Medium,
-                    variant = ButtonVariant.Outlined,
-                    fullWidth = true
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Accent,
-                    size = ButtonSize.Small,
-                    variant = ButtonVariant.Text
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
-
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Danger,
-                    size = ButtonSize.Large,
-                    variant = ButtonVariant.Contained
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Danger,
-                    size = ButtonSize.Medium,
-                    variant = ButtonVariant.Outlined,
-                    fullWidth = true
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
-            button(
-                options = ButtonOptions(
-                    palette = ButtonPalette.Danger,
-                    size = ButtonSize.Small,
-                    variant = ButtonVariant.Text
-                )
-            ) {
-                ::disabled { (counter.current / 5) % 2 == 1 }
-                onClick { println("Nice button clicked") }
-                text { content = "Nice Button" }
-            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Accent,
+//                    size = ButtonSize.Large,
+//                    variant = ButtonVariant.Contained
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//
+//                activityIndicator()
+//                text { content = "Nice Button" }
+//            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Accent,
+//                    size = ButtonSize.Medium,
+//                    variant = ButtonVariant.Outlined,
+//                    fullWidth = true
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//                text { content = "Nice Button" }
+//            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Accent,
+//                    size = ButtonSize.Small,
+//                    variant = ButtonVariant.Text
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//                text { content = "Nice Button" }
+//            }
+//
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Danger,
+//                    size = ButtonSize.Large,
+//                    variant = ButtonVariant.Contained
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//                text { content = "Nice Button" }
+//            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Danger,
+//                    size = ButtonSize.Medium,
+//                    variant = ButtonVariant.Outlined,
+//                    fullWidth = true
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//                text { content = "Nice Button" }
+//            }
+//            button(
+//                options = ButtonOptions(
+//                    palette = ButtonPalette.Danger,
+//                    size = ButtonSize.Small,
+//                    variant = ButtonVariant.Text
+//                )
+//            ) {
+//                ::disabled { (counter.current / 5) % 2 == 1 }
+//                onClick { println("Nice button clicked") }
+//                text { content = "Nice Button" }
+//            }
 
             nativeTextField {
                 hint = "User Id"

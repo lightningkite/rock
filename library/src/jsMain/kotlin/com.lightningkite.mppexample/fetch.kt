@@ -8,13 +8,14 @@ import org.w3c.files.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE", "UnsafeCastFromDynamic")
 actual suspend fun fetch(
     url: String,
     method: HttpMethod,
     headers: HttpHeaders,
     body: RequestBody?
 ): RequestResponse {
-    val a = js("new AbortController()")
+    val a: dynamic = js("new AbortController()")
     val o = js("({})")
     o.method = method.name
     o.headers = headers
@@ -26,7 +27,7 @@ actual suspend fun fetch(
         else -> throw NotImplementedError()
     }
     o.signal = a.signal
-    val promise = window.fetch(url, o)
+    val promise = window.fetch(url, o as RequestInit)
     return suspendCoroutineCancellable { cont ->
         promise.then(
             onFulfilled = {
@@ -36,12 +37,20 @@ actual suspend fun fetch(
                 cont.resumeWithException(it)
             }
         )
-        return@suspendCoroutineCancellable { a.abort() }
+        return@suspendCoroutineCancellable { a.abort(); Unit }
     }
 }
-actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders = HttpHeaders(init = map)
+actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders = HttpHeaders().apply {
+    for(entry in map) {
+        append(entry.key, entry.value)
+    }
+}
 actual inline fun httpHeaders(headers: HttpHeaders): HttpHeaders = HttpHeaders(init = headers)
-actual inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders = HttpHeaders(init = list)
+actual inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders = HttpHeaders().apply {
+    for(entry in list) {
+        append(entry.first, entry.second)
+    }
+}
 actual typealias HttpHeaders = Headers
 actual class RequestResponse(val wraps: Response) {
     actual val status: Short get() = wraps.status

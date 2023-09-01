@@ -1,11 +1,13 @@
 package com.lightningkite.mppexample
 
-fun ViewContext.activityIndicator() {
+fun ViewContext.activityIndicator(exists: Property<Boolean>?) {
     nativeActivityIndicator {
+        if (exists != null)
+            ::exists { exists.current }
         if (renderContext == RenderContext.Button) {
             color = theme.normal.foreground.closestColor()
-            width = 36.px
-            height = 36.px
+            width = 32.px
+            height = 32.px
             lineWidth = 4.px
         } else {
             color = theme.primary.background.closestColor()
@@ -13,3 +15,4 @@ fun ViewContext.activityIndicator() {
         }
     }
 }
+

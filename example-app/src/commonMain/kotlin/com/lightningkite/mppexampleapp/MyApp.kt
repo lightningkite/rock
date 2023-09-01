@@ -56,6 +56,8 @@ class MyApp : RockApp {
                             Route(TestComponent.PATH) { TestComponent() },
                             Route(UserScreen.PATH) { UserScreen.create(it) },
                             Route(UserSettings.PATH) { UserSettings.create(it) },
+                            Route(ScreenA.PATH) { ScreenA() },
+                            Route(ScreenB.PATH) { ScreenB() },
                         ),
                         fallback = TestComponent()
                     )
@@ -65,15 +67,21 @@ class MyApp : RockApp {
                     gravity = StackGravity.Center
 
                     button(
-                        onClick = {
-                            navigator.navigate(TestComponent())
-                        }
+                        onClick = { navigator.replace(HomeScreen()) }
                     ) {
-                        text { content = "Test" }
+                        text { content = "Home" }
                     }
 
-                    text {
-                        content = "Demo footer"
+                    button(
+                        onClick = { navigator.replace(ScreenA()) }
+                    ) {
+                        text { content = "Screen A" }
+                    }
+
+                    button(
+                        onClick = { navigator.replace(ScreenB()) }
+                    ) {
+                        text { content = "Screen B" }
                     }
 
                     space() in weight(1f)

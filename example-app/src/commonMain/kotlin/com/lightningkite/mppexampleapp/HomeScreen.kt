@@ -67,6 +67,7 @@ class HomeScreen : RockScreen {
                 text { content = "Nice Button" }
             }
 
+            activityIndicator()
 
             button(
                 options = ButtonOptions(
@@ -77,6 +78,8 @@ class HomeScreen : RockScreen {
             ) {
                 ::disabled { (counter.current / 5) % 2 == 1 }
                 onClick { println("Nice button clicked") }
+
+                activityIndicator()
                 text { content = "Nice Button" }
             }
             button(

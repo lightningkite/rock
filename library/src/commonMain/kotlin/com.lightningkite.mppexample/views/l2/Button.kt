@@ -67,8 +67,10 @@ fun ViewContext.button(
     val setup = {
         nativeButton {
             cursor = "pointer"
-            withTheme(buttonTheme) {
-                buttonSetup()
+            withRenderContext(RenderContext.Button) {
+                withTheme(buttonTheme) {
+                    buttonSetup()
+                }
             }
         } in padding(
             Insets.symmetric(

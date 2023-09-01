@@ -122,10 +122,10 @@ fun ViewContext.allViewTest() {
         } in padding(2.rem)
 
         row {
-            activityIndicator {
+            nativeActivityIndicator {
                 ::color { Color.gray(counter.current / 20f) }
             }
-            activityIndicator {
+            nativeActivityIndicator {
                 ::color { Color.gray(1f - counter.current / 20f) }
             }
         }

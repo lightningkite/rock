@@ -7,6 +7,9 @@ actual val Int.px: Dimension
 actual val Int.rem: Dimension
     get() = Dimension("${this}rem")
 
+actual val Double.rem: Dimension
+    get() = Dimension("${this}rem")
+
 actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension("calc(${this.value} + ${other.value})")
 
 actual typealias Font = String

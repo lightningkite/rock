@@ -11,6 +11,9 @@ actual class ViewContext(
     parent: HTMLElement
 ) {
     actual val addons: MutableMap<String, Any?> = mutableMapOf()
+    fun derive(parent: HTMLElement): ViewContext = ViewContext(parent).also {
+        it.addons.putAll(this.addons)
+    }
 
     val stack = arrayListOf(parent)
     inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
@@ -41,7 +44,6 @@ actual class ViewContext(
         ListeningLifecycleStack.useIn(element.onRemove) {
             setup(element)
         }
-        println("Start containsNext")
         stack.add(element)
         popCount++
         return ViewWrapper

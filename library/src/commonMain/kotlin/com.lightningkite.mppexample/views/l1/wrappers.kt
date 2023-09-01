@@ -38,7 +38,10 @@ expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
 expect fun ViewContext.margin(insets: Dimension): ViewWrapper
 
 @ViewModifierDsl3
-expect fun ViewContext.withBackground(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+expect fun ViewContext.nativeBackground(background: Background? = null, elevation: Dimension? = null): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.nativeBackground(paint: Paint): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper

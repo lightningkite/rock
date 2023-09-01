@@ -94,6 +94,7 @@ value class Dimension(val value: DimensionRaw)
 
 expect val Int.px: Dimension
 expect val Int.rem: Dimension
+expect val Double.rem: Dimension
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 
 data class InputValidation(

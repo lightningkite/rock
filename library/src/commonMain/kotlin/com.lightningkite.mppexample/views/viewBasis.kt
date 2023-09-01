@@ -43,4 +43,4 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
 }
 
 var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
-var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.FadeResize)
+var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)

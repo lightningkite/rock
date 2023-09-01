@@ -28,13 +28,14 @@ data class Theme(
     )
 }
 
-val ViewContext.themeStack by viewContextAddon(arrayListOf<Theme>())
+var ViewContext.themeStack by viewContextAddon(listOf<Theme>())
 val ViewContext.theme get() = themeStack.lastOrNull() ?: throw IllegalStateException("No theme set")
 inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
-    themeStack.add(theme)
+    val old = themeStack
+    themeStack += theme
     try {
         action()
     } finally {
-        themeStack.removeLast()
+        themeStack = old
     }
 }

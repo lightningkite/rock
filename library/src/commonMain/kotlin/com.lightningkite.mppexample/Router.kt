@@ -61,7 +61,7 @@ class Router(
     private fun segmentPath(path: String) =
         if (path == "/") listOf("/") else path.split("/").filter { it.isNotEmpty() }.toList()
 
-    fun render(location: String) {
+    fun render(location: String): ViewContext.() -> Unit {
         val segments = segmentPath(location)
         val props = mutableMapOf<String, String>()
         var route = routeMap
@@ -78,16 +78,20 @@ class Router(
             }
         }
 
-        context.run {
-            box {
-                id = "rock-screen-animate-in"
-                if (!failed && route.render != null) {
-                    route.render!!(props)
-                } else {
-                    fallback()
-                }
+        return {
+            if (!failed && route.render != null) {
+                route.render!!(props)
+            } else {
+                fallback()
             }
         }
+
+//        context.run {
+//            box {
+//                id = "rock-screen-animate-in"
+//
+//            }
+//        }
     }
 }
 

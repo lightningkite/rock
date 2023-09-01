@@ -21,12 +21,12 @@ class HomeScreen : RockScreen {
 //            nativeText {
 //                content = "HOME COMPONENT"
 //            } in changingBackground { Background(fill = Color.gray(1 - counter.current / 20f)) }
-//            nativeButton {
-//                onClick {
-//                    navigator.navigate(TestComponent())
-//                }
-//                nativeText { content = "Navigate" }
-//            }
+            nativeButton {
+                onClick {
+                    navigator.navigate(TestComponent())
+                }
+                nativeText { content = "Navigate To Test" }
+            }
 //
 //            text {
 //                ::content { "Counter: ${counter.current}" }
@@ -154,19 +154,19 @@ class HomeScreen : RockScreen {
 //                )
 //            )
 //
-//            nativeButton {
-//                onClick {
-//                    navigator.navigate(UserScreen(userId = userIdProp.once.toInt()))
-//                }
-//                nativeText { content = "Users" }
-//            } in margin(Insets(bottom = 2.rem))
+            nativeButton {
+                onClick {
+                    navigator.navigate(UserScreen(userId = userIdProp.once.toInt()))
+                }
+                nativeText { content = "Users" }
+            } in margin(Insets(bottom = 2.rem))
 //
-//            nativeButton {
-//                onClick {
-//                    navigator.navigate(NonexistentScreen())
-//                }
-//                nativeText { content = "404" }
-//            } in margin(Insets(bottom = 2.rem))
+            nativeButton {
+                onClick {
+                    navigator.navigate(NonexistentScreen())
+                }
+                nativeText { content = "404" }
+            } in margin(Insets(bottom = 2.rem))
 //
 //            nativeText {
 //                content = "hover me"

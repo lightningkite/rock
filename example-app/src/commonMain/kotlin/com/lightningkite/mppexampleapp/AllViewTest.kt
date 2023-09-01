@@ -164,17 +164,17 @@ fun ViewContext.allViewTest() {
                 }
                 nativeText {
                     content = "Hello world 2"
-                } in withBackground(Background(fill = Color(1f, 1f, 1f, 1f)))
+                } in nativeBackground(Background(fill = Color(1f, 1f, 1f, 1f)))
                 nativeText {
                     ::content { "Lon: ${lon.current}" }
-                } in withBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
+                } in nativeBackground(Background(fill = Color(1f, 1f, 0f, 0f)))
             }
             nativeText {
                 ::content { "This ${if (counter.current % 2 == 0) "exists" else "does not exist"}" }
                 ::exists { counter.current % 2 == 0 }
             }
             nativeText { content = "More text" }
-        } in withBackground(
+        } in nativeBackground(
             Background(
                 fill = RadialGradient(
                     stops = listOf(
@@ -205,7 +205,7 @@ fun ViewContext.allViewTest() {
                     bold = true
                 )
             } in margin(8.px)
-        } in padding(4.px) in withBackground(
+        } in padding(4.px) in nativeBackground(
             Background(
                 fill = Color.teal,
                 corners = CornerRadii(24.px)
@@ -282,7 +282,7 @@ fun ViewContext.allViewTest() {
             SizeConstraints(
                 minHeight = 64.px
             )
-        ) in withBackground(
+        ) in nativeBackground(
             Background(
                 fill = Color.teal
             )
@@ -307,7 +307,7 @@ fun ViewContext.allViewTest() {
                 maxWidth = 128.px,
                 minHeight = 64.px
             )
-        ) in withBackground(
+        ) in nativeBackground(
             Background(
                 fill = Color.blue
             )

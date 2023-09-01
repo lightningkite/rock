@@ -131,3 +131,11 @@ fun ViewContext.button(onClick: suspend () -> Unit, disabled: ReactiveScope.() -
         onClick = onClick,
         setup = setup,
     )
+
+fun ViewContext.button(onClick: suspend () -> Unit, setup: NView.() -> Unit) =
+    button(
+        options = ButtonOptions(),
+        disabled = { false },
+        onClick = onClick,
+        setup = setup,
+    )

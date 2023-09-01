@@ -87,7 +87,7 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
     }
 }
 
-actual fun ViewContext.withBackground(background: Background?, elevation: Dimension?): ViewWrapper {
+actual fun ViewContext.nativeBackground(background: Background?, elevation: Dimension?): ViewWrapper {
     elementToDoList.add {
         if (background != null)
             applyBackground(background)
@@ -98,6 +98,8 @@ actual fun ViewContext.withBackground(background: Background?, elevation: Dimens
     }
     return ViewWrapper
 }
+
+actual fun ViewContext.nativeBackground(paint: Paint) = nativeBackground(Background(fill = paint))
 
 actual fun ViewContext.changingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper {
     elementToDoList.add {
@@ -175,7 +177,7 @@ actual fun ViewContext.interactive(
 //    return ViewWrapper
 //}
 
-actual fun ViewContext.stackCenter() : ViewWrapper = containsNext<HTMLDivElement>("div") {
+actual fun ViewContext.stackCenter(): ViewWrapper = containsNext<HTMLDivElement>("div") {
     style.display = "flex"
     style.alignItems = "center"
     style.justifyContent = "center"

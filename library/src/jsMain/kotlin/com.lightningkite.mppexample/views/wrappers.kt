@@ -1,9 +1,5 @@
 package com.lightningkite.mppexample
-
-import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLStyleElement
-import org.w3c.dom.asList
 
 
 private fun joinGradientStops(stops: List<GradientStop>): String {

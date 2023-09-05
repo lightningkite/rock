@@ -2,9 +2,9 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-class TestComponent() : RockScreen {
+class NotFound() : RockScreen {
     override fun ViewContext.render() {
-        nativeText { content = "TEST COMPONENT" }
+        nativeText { content = "404 NOT FOUND" }
     }
 
     override fun createPath(): String = "/test"

@@ -1,6 +1,6 @@
 package com.lightningkite.mppexample
 
-fun ViewContext.activityIndicator(visible: Property<Boolean>? = null, exists: Property<Boolean>? = null) {
+fun ViewContext.activityIndicator(visible: Readable<Boolean>? = null, exists: Property<Boolean>? = null) {
     nativeActivityIndicator {
         if (exists != null)
             ::exists { exists.current }

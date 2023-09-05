@@ -4,6 +4,7 @@ interface RockNavigator {
     var currentPath: String
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
+    fun goBack()
 }
 
 expect class PlatformNavigator(
@@ -14,14 +15,18 @@ expect class PlatformNavigator(
 class DummyRockNavigator : RockNavigator {
     override var currentPath: String
         get() = throw NotImplementedError()
-        set(value) = throw NotImplementedError()
+        set(value) = throw IllegalStateException("Cannot navigate without a navigator.")
 
     override fun navigate(screen: RockScreen) {
-        throw NotImplementedError()
+        throw IllegalStateException("Cannot navigate without a navigator.")
     }
 
     override fun replace(screen: RockScreen) {
-        throw NotImplementedError()
+        throw IllegalStateException("Cannot navigate without a navigator.")
+    }
+
+    override fun goBack() {
+        throw IllegalStateException("Cannot navigate without a navigator.")
     }
 }
 

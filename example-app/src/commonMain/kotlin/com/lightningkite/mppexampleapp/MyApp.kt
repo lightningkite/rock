@@ -35,11 +35,11 @@ class MyApp : RockApp {
             ),
         )
 
-        val screen = Property<RockScreen>(HomeScreen())
+        val screen = Property<RockScreen>(PasswordRecovery())
 
         launch {
             window.setTimeout({
-                screen set TestComponent()
+                screen set NotFound()
             }, 1000)
         }
 
@@ -53,14 +53,13 @@ class MyApp : RockApp {
                     routerView(
                         Router(
                             routes = listOf(
-                                Route(HomeScreen.PATH) { HomeScreen() },
-                                Route(TestComponent.PATH) { TestComponent() },
-                                Route(UserScreen.PATH) { UserScreen.create(it) },
-                                Route(UserSettings.PATH) { UserSettings.create(it) },
-                                Route(Login.PATH) { Login() },
-                                Route(ScreenB.PATH) { ScreenB() },
+                                Route(Login.PATH) { _, params -> Login(email = params["email"]) },
+                                Route(NotFound.PATH) { _, _ -> NotFound() },
+                                Route(Register.PATH) { _, _ -> Register() },
+                                Route(PasswordRecovery.PATH) { _, _ -> PasswordRecovery() },
+                                Route(Dashboard.PATH) { _, _ -> Dashboard() }
                             ),
-                            fallback = TestComponent()
+                            fallback = NotFound()
                         )
                     )
                 } in background(Color.fromHex(0xfafafa)) in weight(1f)
@@ -69,21 +68,9 @@ class MyApp : RockApp {
                     gravity = StackGravity.Center
 
                     button(
-                        onClick = { navigator.replace(HomeScreen()) }
+                        onClick = { navigator.replace(PasswordRecovery()) }
                     ) {
                         text { content = "Home" }
-                    }
-
-                    button(
-                        onClick = { navigator.replace(Login()) }
-                    ) {
-                        text { content = "Screen A" }
-                    }
-
-                    button(
-                        onClick = { navigator.replace(ScreenB()) }
-                    ) {
-                        text { content = "Screen B" }
                     }
 
                     space() in weight(1f)

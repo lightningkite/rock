@@ -14,17 +14,28 @@ data class Theme(
     val accentDisabled: PaintPair,
     val allCaps: Boolean = false
 ) {
-    fun primaryTheme() = copy(
+    fun primaryTheme(allCaps: Boolean = false) = copy(
         normal = primary,
         normalDisabled = primaryDisabled,
         primary = accent,
-        allCaps = true,
+        allCaps = allCaps,
     )
 
     fun accentTheme() = copy(
         normal = accent,
         normalDisabled = accentDisabled,
         allCaps = true,
+    )
+
+    fun dangerTheme() = copy(
+        normal = PaintPair(
+            foreground = Color(1f, 1f, 1f, 1f),
+            background = Color.fromHex(0xD32F2F),
+        ),
+        normalDisabled = PaintPair(
+            foreground = Color.fromHex(0xededed),
+            background = Color.fromHex(0x666666)
+        ),
     )
 }
 

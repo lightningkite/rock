@@ -2,13 +2,17 @@ package com.lightningkite.mppexample
 
 data class ButtonGroupItem(
     val text: String,
-    val onClick: suspend () -> Unit
+    val onClick: suspend () -> Unit,
+    val dangerous: Boolean = false
 )
 
 fun ViewContext.buttonGroup(
     disabled: ReactiveScope.() -> Boolean,
+    disableAllWhenLoading: Boolean = true,
     buttons: List<ButtonGroupItem>,
 ) = run {
+    val loading = if (disableAllWhenLoading) Property(false) else null
+
     forEach(
         direction = ForEachDirection.Horizontal,
         data = { buttons.reversed() },
@@ -22,12 +26,13 @@ fun ViewContext.buttonGroup(
             button(
                 options = ButtonOptions(
                     variant = variant,
-                    palette = ButtonPalette.Primary,
+                    palette = if (item.dangerous) ButtonPalette.Danger else ButtonPalette.Primary,
                     size = ButtonSize.Medium,
                     fullWidth = false
                 ),
                 onClick = item.onClick,
                 disabled = disabled,
+                loading = loading,
             ) {
                 text { content = item.text }
             } in padding(
@@ -37,5 +42,13 @@ fun ViewContext.buttonGroup(
                 ),
             )
         }
-    ) in padding(Insets.symmetric(vertical = 8.px))
+    ) in padding(Insets.symmetric(vertical = 8.px)) in alignRight()
 }
+
+
+fun ViewContext.buttonGroup(
+    buttons: List<ButtonGroupItem>,
+) = buttonGroup(
+    disabled = { false },
+    buttons = buttons
+)

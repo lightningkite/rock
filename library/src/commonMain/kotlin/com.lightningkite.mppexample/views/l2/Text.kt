@@ -15,8 +15,6 @@ fun TextLevel.toMultiplier(): Float = when (this) {
 
 inline fun ViewContext.text(level: TextLevel, crossinline setup: Text.() -> Unit) {
     val textSetup: Text.() -> Unit = {
-        if (theme.allCaps)
-            println("ALL CAPS")
         textStyle = TextStyle(
             size = theme.baseSize * level.toMultiplier(),
             color = if (level == TextLevel.Caption) theme.normal.foreground.closestColor()

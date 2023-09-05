@@ -1,9 +1,9 @@
 package com.lightningkite.mppexample
 
 typealias RouteProps = Map<String, String>
+typealias RouteParams = Map<String, String>
 typealias RouteMap = MutableMap<String, RouteNode>
-typealias ScreenCreator = (props: RouteProps) -> RockScreen
-typealias RouteRenderer = (props: RouteProps) -> RockScreen
+typealias ScreenCreator = (props: RouteProps, params: RouteParams) -> RockScreen
 
 class Router(
     routes: List<Route>,
@@ -36,9 +36,7 @@ class Router(
             }
             map.children[routeKey]!!.dynamicParam = paramName
             if (isLeaf) {
-                map.children[routeKey]!!.render = {
-                    route.render(it)
-                }
+                map.children[routeKey]!!.render = route.render
             } else {
                 map = map.children[routeKey]!!
             }
@@ -48,11 +46,12 @@ class Router(
     private fun segmentPath(path: String) =
         if (path == "/") listOf("/") else path.split("/").filter { it.isNotEmpty() }.toList()
 
-    fun findRoute(location: String): RockScreen {
+    fun findRoute(location: String, params: Map<String, String>): RockScreen {
         val segments = segmentPath(location)
         val props = mutableMapOf<String, String>()
         var route = routeMap
         var failed = false
+
         segments.forEach { segment ->
             if (!failed) {
                 if (route.children.containsKey(segment))
@@ -67,7 +66,8 @@ class Router(
 
         if (failed || route.render == null)
             return fallback
-        return route.render!!(props)
+
+        return route.render!!(props, params)
     }
 }
 
@@ -77,7 +77,7 @@ data class Route(
 )
 
 data class RouteNode(
-    var render: RouteRenderer?,
+    var render: ScreenCreator?,
     val children: RouteMap,
     var dynamicParam: String?
 )

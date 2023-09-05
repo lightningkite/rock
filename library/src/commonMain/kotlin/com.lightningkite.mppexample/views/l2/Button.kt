@@ -15,10 +15,11 @@ fun ViewContext.button(
     options: ButtonOptions,
     onClick: suspend () -> Unit,
     disabled: ReactiveScope.() -> Boolean,
+    loading: Writable<Boolean>? = null,
     setup: NView.() -> Unit,
 ) {
     var buttonTheme = when (options.palette) {
-        ButtonPalette.Primary -> theme.primaryTheme()
+        ButtonPalette.Primary -> theme.primaryTheme(allCaps = true)
         ButtonPalette.Accent -> theme.accentTheme()
         ButtonPalette.Danger -> theme.copy(
             normal = PaintPair(
@@ -68,29 +69,29 @@ fun ViewContext.button(
         )
     )
 
-    val loading = Property(false)
+    val loadingProp = loading ?: Property(false)
 
     val setupAll = {
         nativeButton {
             onClick {
                 launch {
-                    loading set true
+                    loadingProp set true
                     try {
                         onClick()
                     } finally {
-                        loading set false
+                        loadingProp set false
                     }
                 }
             }
-            ::clickable { !loading.current && !disabled() }
+            ::clickable { !loadingProp.current && !disabled() }
 
             cursor = "pointer"
             withRenderContext(ButtonRenderContext(size = options.size)) {
                 withTheme(buttonTheme) {
                     stack {
-                        activityIndicator(visible = loading) in stackCenter()
+                        activityIndicator(visible = loadingProp) in stackCenter()
                         box {
-                            ::visible { !loading.current }
+                            ::visible { !loadingProp.current }
                             setup()
                         } in stackCenter()
                     }
@@ -123,6 +124,7 @@ fun ViewContext.button(
             disabledBackground = Background(
                 fill = buttonTheme.normalDisabled.background,
                 stroke = outline?.toGrayscale(),
+                strokeWidth = if (outline != null) 1.px else 0.px
             ),
             disabledElevation = 0.px
         )
@@ -133,7 +135,11 @@ fun ViewContext.button(
     }
 }
 
-fun ViewContext.button(onClick: suspend () -> Unit, disabled: ReactiveScope.() -> Boolean, setup: NView.() -> Unit) =
+fun ViewContext.button(
+    onClick: suspend () -> Unit, disabled: ReactiveScope.() -> Boolean,
+    loading: Writable<Boolean>? = null,
+    setup: NView.() -> Unit
+) =
     button(
         options = ButtonOptions(),
         disabled = disabled,
@@ -141,7 +147,7 @@ fun ViewContext.button(onClick: suspend () -> Unit, disabled: ReactiveScope.() -
         setup = setup,
     )
 
-fun ViewContext.button(onClick: suspend () -> Unit, setup: NView.() -> Unit) =
+fun ViewContext.button(onClick: suspend () -> Unit, loading: Writable<Boolean>? = null, setup: NView.() -> Unit) =
     button(
         options = ButtonOptions(),
         disabled = { false },

@@ -2,7 +2,7 @@ package com.lightningkite.mppexample
 
 fun ViewContext.background(
     background: Background?,
-    elevation: Dimension?,
+    elevation: Dimension? = null,
     padding: Insets = Insets(16.px)
 ): ViewWrapper {
     nativeBackground(background, elevation)

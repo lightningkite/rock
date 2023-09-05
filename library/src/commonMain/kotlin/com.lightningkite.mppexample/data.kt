@@ -56,8 +56,8 @@ enum class TextGravity {
 
 
 data class KeyboardHints(
-    val case: KeyboardCase,
-    val type: KeyboardType,
+    val case: KeyboardCase = KeyboardCase.None,
+    val type: KeyboardType = KeyboardType.Text,
     val autocomplete: AutoComplete? = null,
     val action: Action? = null
 ) {

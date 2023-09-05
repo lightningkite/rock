@@ -3,7 +3,7 @@ package com.lightningkite.mppexample
 enum class TextLevel { H1, H2, H3, H4, H5, H6, Body, Caption }
 
 fun TextLevel.toMultiplier(): Float = when (this) {
-    TextLevel.Caption -> 0.8f
+    TextLevel.Caption -> 0.9f
     TextLevel.Body -> 1f
     TextLevel.H6 -> 1.2f
     TextLevel.H5 -> 1.4f

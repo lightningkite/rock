@@ -109,8 +109,8 @@ fun ViewContext.allViewTest() {
 
         forEach(
             data = { listItems.current },
-            render = {
-                nativeText { content = it.toString() } in padding(1.rem)
+            render = { item ->
+                nativeText { content = item.toString() } in padding(1.rem)
             }
         )
 

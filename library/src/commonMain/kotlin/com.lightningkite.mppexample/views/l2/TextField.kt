@@ -4,6 +4,7 @@ fun ViewContext.textField(
     label: ReactiveScope.() -> String,
     hint: ReactiveScope.() -> String = { "" },
     text: Writable<String>,
+    keyboardHints: KeyboardHints? = null
 ) {
     column {
         caption {
@@ -13,6 +14,8 @@ fun ViewContext.textField(
         nativeTextField {
             bind(text)
             ::hint { hint() }
+            if (keyboardHints != null)
+                this.keyboardHints = keyboardHints
         } in padding(8.px) in interactive(
             background = Background(
                 corners = CornerRadii(8.px),
@@ -24,5 +27,5 @@ fun ViewContext.textField(
                 strokeWidth = 1.px,
             )
         )
-    }
+    } in padding(Insets.symmetric(vertical = 8.px))
 }

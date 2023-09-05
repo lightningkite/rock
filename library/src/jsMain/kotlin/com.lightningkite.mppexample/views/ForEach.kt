@@ -8,15 +8,32 @@ actual typealias ForEach = HTMLFormElement
 
 actual inline fun <T> ViewContext.forEach(
     crossinline data: ReactiveScope.() -> List<T>,
-    crossinline render: NView.(T) -> Unit
-): Unit = element<HTMLFormElement>("div") {
+    crossinline render: NView.(T) -> Unit,
+    direction: ForEachDirection
+): Unit = forEach(
+    data = data,
+    render = { _, item -> render(item) },
+    direction = direction
+)
+
+actual inline fun <T> ViewContext.forEach(
+    crossinline data: ReactiveScope.() -> List<T>,
+    crossinline render: NView.(Int, T) -> Unit,
+    direction: ForEachDirection
+) = box {
     var container = this as HTMLElement
+
     reactiveScope {
         val items = data()
         val newContainer = document.createElement("div") as HTMLDivElement
+        newContainer.style.display = "flex"
+        newContainer.style.flexDirection = when (direction) {
+            ForEachDirection.Horizontal -> "row"
+            ForEachDirection.Vertical -> "column"
+        }
         element(newContainer) {
-            items.forEach {
-                render(it)
+            items.forEachIndexed { index, item ->
+                render(index, item)
             }
         }
         container.replaceWith(newContainer)

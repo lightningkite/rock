@@ -43,6 +43,8 @@ fun ViewContext.button(
         if (options.variant == ButtonVariant.Contained) buttonTheme.normal.background.closestColor() else Color.transparent
     val outline: Color? =
         if (options.variant == ButtonVariant.Outlined) buttonTheme.normal.background.closestColor() else null
+    val hoverOutline: Color? = outline?.darken(0.15f)
+    val downOutline: Color? = outline?.darken(0.3f)
     val foreground = when (options.variant) {
         ButtonVariant.Text -> buttonTheme.normal.background.closestColor()
         ButtonVariant.Outlined -> outline!!
@@ -50,7 +52,7 @@ fun ViewContext.button(
     }
     val elevation = if (options.variant == ButtonVariant.Contained) 2.px else 0.px
     val hoverElevation = if (options.variant == ButtonVariant.Contained) 4.px else 0.px
-    val downElevation = if (options.variant == ButtonVariant.Contained) 8.px else 0.px
+    val downElevation = if (options.variant == ButtonVariant.Contained) 6.px else 0.px
     val hoverBackground = background.darken(0.15f)
     val downBackground = if (options.variant == ButtonVariant.Contained)
         background.darken(0.3f)
@@ -107,9 +109,16 @@ fun ViewContext.button(
                 corners = CornerRadii(8.px),
             ),
             elevation = elevation,
-            hoverBackground = Background(fill = hoverBackground),
+            hoverBackground = Background(
+                fill = hoverBackground,
+                stroke = hoverOutline,
+                strokeWidth = if (hoverOutline != null) 1.px else 0.px
+            ),
             hoverElevation = hoverElevation,
-            downBackground = Background(fill = downBackground),
+            downBackground = Background(
+                fill = downBackground, stroke = downOutline,
+                strokeWidth = if (downOutline != null) 1.px else 0.px
+            ),
             downElevation = downElevation,
             disabledBackground = Background(
                 fill = buttonTheme.normalDisabled.background,

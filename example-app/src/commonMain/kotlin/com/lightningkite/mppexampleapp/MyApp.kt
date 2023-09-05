@@ -57,7 +57,7 @@ class MyApp : RockApp {
                                 Route(TestComponent.PATH) { TestComponent() },
                                 Route(UserScreen.PATH) { UserScreen.create(it) },
                                 Route(UserSettings.PATH) { UserSettings.create(it) },
-                                Route(ScreenA.PATH) { ScreenA() },
+                                Route(Login.PATH) { Login() },
                                 Route(ScreenB.PATH) { ScreenB() },
                             ),
                             fallback = TestComponent()
@@ -75,7 +75,7 @@ class MyApp : RockApp {
                     }
 
                     button(
-                        onClick = { navigator.replace(ScreenA()) }
+                        onClick = { navigator.replace(Login()) }
                     ) {
                         text { content = "Screen A" }
                     }

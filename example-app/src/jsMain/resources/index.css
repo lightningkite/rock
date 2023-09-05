@@ -289,42 +289,42 @@ button:disabled span, button[disabled] span {
 }
 
 .down-box-shadow:active {
-    box-shadow: var(--focus-box-shadow);
-    --focus-box-shadow: none;
+    box-shadow: var(--down-box-shadow);
+    --down-box-shadow: none;
 }
 .down-background:active {
-    background: var(--focus-background);
-    --focus-background: unset;
+    background: var(--down-background);
+    --down-background: unset;
 }
 .down-background-image:active {
-    background-image: var(--focus-background-image);
-    --focus-background-image: unset;
+    background-image: var(--down-background-image);
+    --down-background-image: unset;
 }
 .down-background-attachment:active {
-    background-attachment: var(--focus-background-attachment);
-    --focus-background-attachment: unset;
+    background-attachment: var(--down-background-attachment);
+    --down-background-attachment: unset;
 }
 .down-border-color:active {
-    border-color: var(--focus-border-color);
-    --focus-border-color: unset;
+    border-color: var(--down-border-color);
+    --down-border-color: unset;
 }
 .down-border-width:active {
-    border-width: var(--focus-border-width);
-    --focus-border-width: unset;
+    border-width: var(--down-border-width);
+    --down-border-width: unset;
 }
 .down-border-style:active {
-    border-style: var(--focus-border-style);
-    --focus-border-style: unset;
+    border-style: var(--down-border-style);
+    --down-border-style: unset;
 }
 .down-border-radius:active {
-    border-top-left-radius: var(--focus-border-top-left-radius);
-    border-top-right-radius: var(--focus-border-top-right-radius);
-    border-bottom-left-radius: var(--focus-border-bottom-left-radius);
-    border-bottom-right-radius: var(--focus-border-bottom-right-radius);
-    --focus-border-top-left-radius: unset;
-    --focus-border-top-right-radius: unset;
-    --focus-border-bottom-left-radius: unset;
-    --focus-border-bottom-right-radius: unset;
+    border-top-left-radius: var(--down-border-top-left-radius);
+    border-top-right-radius: var(--down-border-top-right-radius);
+    border-bottom-left-radius: var(--down-border-bottom-left-radius);
+    border-bottom-right-radius: var(--down-border-bottom-right-radius);
+    --down-border-top-left-radius: unset;
+    --down-border-top-right-radius: unset;
+    --down-border-bottom-left-radius: unset;
+    --down-border-bottom-right-radius: unset;
 }
 
 .focused-box-shadow:focus {

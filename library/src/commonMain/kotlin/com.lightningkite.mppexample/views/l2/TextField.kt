@@ -8,6 +8,7 @@ fun ViewContext.textField(
     column {
         caption {
             ::content{ label() }
+            selectable = false
         } in padding(Insets(bottom = 4.px))
         nativeTextField {
             bind(text)
@@ -15,7 +16,7 @@ fun ViewContext.textField(
         } in padding(8.px) in interactive(
             background = Background(
                 corners = CornerRadii(8.px),
-                stroke = Color.transparent,
+                stroke = Color.gray(0.7f),
                 strokeWidth = 1.px,
             ),
             focusedBackground = Background(

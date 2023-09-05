@@ -8,7 +8,9 @@ import kotlin.reflect.KMutableProperty0
  */
 object ListeningLifecycleStack {
     val stack = ArrayList<OnRemoveHandler>()
-    fun onRemove(action: () -> Unit) = stack.last()(action)
+    fun onRemove(action: () -> Unit) =
+        if (stack.isNotEmpty()) stack.last()(action) else throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
+
     inline fun useIn(noinline handler: OnRemoveHandler, action: () -> Unit) {
         stack.add(handler)
         try {
@@ -46,23 +48,27 @@ class ReactiveScope(val action: ReactiveScope.() -> Unit) {
         latestPass.add(listenable)
     }
 
-    private operator fun invoke() {
+    operator fun invoke() {
         latestPass.clear()
         try {
             action()
         } finally {
-            // Remove listeners we no longer depend on
-            for (entry in removers.entries.toList()) {
-                if (entry.key !in latestPass) {
-                    entry.value()
-                    removers.remove(entry.key)
-                }
+            postRun()
+        }
+    }
+
+    private fun postRun() {
+        // Remove listeners we no longer depend on
+        for (entry in removers.entries.toList()) {
+            if (entry.key !in latestPass) {
+                entry.value()
+                removers.remove(entry.key)
             }
-            // Add listeners that are new
-            for (new in latestPass) {
-                if (!removers.containsKey(new)) {
-                    removers[new] = new.addListener { this() }
-                }
+        }
+        // Add listeners that are new
+        for (new in latestPass) {
+            if (!removers.containsKey(new)) {
+                removers[new] = new.addListener { this() }
             }
         }
     }
@@ -98,8 +104,9 @@ interface Readable<T> : Listenable {
 interface Writable<T> : Readable<T> {
     override val debugName: String
         get() = "Writable whose value is $once"
+
     infix fun set(value: T)
-    infix fun modify(update: (T)->T) = set(update(once))
+    infix fun modify(update: (T) -> T) = set(update(once))
 }
 
 class Property<T>(startValue: T) : Writable<T> {
@@ -112,7 +119,10 @@ class Property<T>(startValue: T) : Writable<T> {
             listeners.toList().forEach { it() }
         }
 
-    override infix fun set(value: T) { this.once = value }
+    override infix fun set(value: T) {
+        this.once = value
+    }
+
     override fun addListener(listener: () -> Unit): () -> Unit {
         listeners.add(listener)
         return {
@@ -120,3 +130,41 @@ class Property<T>(startValue: T) : Writable<T> {
         }
     }
 }
+
+class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
+    private val listeners = HashSet<()->Unit>()
+    @Suppress("UNCHECKED_CAST")
+    override val once: T
+        get() = if(!ready) throw IllegalStateException() else currentValue as T
+    private var ready: Boolean = false
+    private var currentValue: T? = null
+        set(value) {
+            if (!ready || value != field) {
+                ready = true
+                field = value
+                listeners.forEach { it() }
+            }
+        }
+    val rs = ReactiveScope { currentValue = computer() }
+    init {
+        rs.clear()
+    }
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        if(listeners.isEmpty()) {
+            // startup
+            rs()
+        }
+        listeners.add(listener)
+        return { removeListener(listener) }
+    }
+
+    private fun removeListener(listener: ()->Unit) {
+        listeners.remove(listener)
+        if(listeners.isEmpty()) {
+            // shutdown
+            rs.clear()
+        }
+    }
+}
+

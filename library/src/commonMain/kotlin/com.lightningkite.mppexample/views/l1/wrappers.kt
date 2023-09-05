@@ -14,6 +14,18 @@ expect fun ViewContext.alignCenter(): ViewWrapper
 expect fun ViewContext.stackCenter(): ViewWrapper
 
 @ViewModifierDsl3
+expect fun ViewContext.stackRight(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.stackLeft(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.stackTop(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.stackBottom(): ViewWrapper
+
+@ViewModifierDsl3
 expect fun ViewContext.alignTop(): ViewWrapper
 
 @ViewModifierDsl3
@@ -24,6 +36,12 @@ expect fun ViewContext.weight(amount: Float): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.fullWidth(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.fullHeight(): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
@@ -66,3 +84,14 @@ expect fun ViewContext.scrolls(): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.scrollsHorizontally(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.clickable(
+    enabled: Readable<Boolean>,
+    onClick: suspend () -> Unit,
+): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.clickable(
+    onClick: suspend () -> Unit,
+): ViewWrapper

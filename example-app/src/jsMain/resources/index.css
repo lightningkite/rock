@@ -406,7 +406,7 @@ button:disabled span, button[disabled] span {
 }
 
 .rock-stack {
-  display: grid;
+  display: grid !important;
   grid-template-columns: auto;
   z-index: 0;
 }

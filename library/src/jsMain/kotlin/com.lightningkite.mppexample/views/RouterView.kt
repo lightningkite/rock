@@ -42,7 +42,7 @@ actual fun ViewContext.routerView(router: Router): Unit {
             }
             oldView = newView
         }
-    }
+    } in fullWidth() in fullHeight()
 }
 
 private fun ScreenTransition.enterClass(): String? {

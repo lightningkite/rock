@@ -49,8 +49,7 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
         is LinearGradient -> {
             style.setProperty("--${prefix}background-image", background.fill.toCss())
             style.setProperty(
-                "--${prefix}background-attachment",
-                if (background.fill.screenStatic) "fixed" else "unset"
+                "--${prefix}background-attachment", if (background.fill.screenStatic) "fixed" else "unset"
             )
             classList.add("${prefix}background-image", "${prefix}background-attachment")
         }
@@ -58,8 +57,7 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
         is RadialGradient -> {
             style.setProperty("--${prefix}background-image", background.fill.toCss())
             style.setProperty(
-                "--${prefix}background-attachment",
-                if (background.fill.screenStatic) "fixed" else "unset"
+                "--${prefix}background-attachment", if (background.fill.screenStatic) "fixed" else "unset"
             )
             classList.add("${prefix}background-image", "${prefix}background-attachment")
         }
@@ -92,8 +90,7 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
 
 actual fun ViewContext.nativeBackground(background: Background?, elevation: Dimension?): ViewWrapper {
     elementToDoList.add {
-        if (background != null)
-            applyBackground(background)
+        if (background != null) applyBackground(background)
         if (elevation != null) {
             style.setProperty("--box-shadow", elevation.toBoxShadow())
             classList.add("box-shadow")
@@ -125,30 +122,18 @@ actual fun ViewContext.interactive(
     disabledElevation: Dimension?
 ): ViewWrapper {
     elementToDoList.add {
-        if (transitions)
-            style.transition = "all 0.15s linear"
-        else
-            style.removeProperty("transition")
-        if (elevation != null)
-            applyBoxShadow(elevation)
-        if (hoverElevation != null)
-            applyBoxShadow(hoverElevation, "hover-")
-        if (downElevation != null)
-            applyBoxShadow(downElevation, "down-")
-        if (focusedElevation != null)
-            applyBoxShadow(focusedElevation, "focused-")
-        if (disabledElevation != null)
-            applyBoxShadow(disabledElevation, "disabled-")
-        if (background != null)
-            applyBackground(background)
-        if (hoverBackground != null)
-            applyBackground(hoverBackground, "hover-")
-        if (downBackground != null)
-            applyBackground(downBackground, "down-")
-        if (focusedBackground != null)
-            applyBackground(focusedBackground, "focused-")
-        if (disabledBackground != null)
-            applyBackground(disabledBackground, "disabled-")
+        if (transitions) style.transition = "all 0.15s linear"
+        else style.removeProperty("transition")
+        if (elevation != null) applyBoxShadow(elevation)
+        if (hoverElevation != null) applyBoxShadow(hoverElevation, "hover-")
+        if (downElevation != null) applyBoxShadow(downElevation, "down-")
+        if (focusedElevation != null) applyBoxShadow(focusedElevation, "focused-")
+        if (disabledElevation != null) applyBoxShadow(disabledElevation, "disabled-")
+        if (background != null) applyBackground(background)
+        if (hoverBackground != null) applyBackground(hoverBackground, "hover-")
+        if (downBackground != null) applyBackground(downBackground, "down-")
+        if (focusedBackground != null) applyBackground(focusedBackground, "focused-")
+        if (disabledBackground != null) applyBackground(disabledBackground, "disabled-")
     }
     return ViewWrapper
 }
@@ -157,6 +142,26 @@ actual fun ViewContext.stackCenter(): ViewWrapper = containsNext<HTMLDivElement>
     style.display = "flex"
     style.alignItems = "center"
     style.justifyContent = "center"
+}
+
+actual fun ViewContext.stackRight(): ViewWrapper = containsNext<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.justifyContent = "flex-end"
+}
+
+actual fun ViewContext.stackLeft(): ViewWrapper = containsNext<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.justifyContent = "flex-start"
+}
+
+actual fun ViewContext.stackTop(): ViewWrapper = containsNext<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.alignItems = "flex-start"
+}
+
+actual fun ViewContext.stackBottom(): ViewWrapper = containsNext<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.alignItems = "flex-end"
 }
 
 //actual fun ViewContext.background(background: Background): ViewWrapper = containsNext<HTMLDivElement>("div") {
@@ -197,36 +202,41 @@ actual fun ViewContext.margin(insets: Dimension): ViewWrapper = margin(Insets(in
 
 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
     elementToDoList.add {
-        if (constraints.minHeight == null)
-            style.removeProperty("minHeight")
-        else
-            style.minHeight = constraints.minHeight.value
+        if (constraints.minHeight == null) style.removeProperty("minHeight")
+        else style.minHeight = constraints.minHeight.value
 
-        if (constraints.maxHeight == null)
-            style.removeProperty("maxHeight")
-        else
-            style.maxHeight = constraints.maxHeight.value
+        if (constraints.maxHeight == null) style.removeProperty("maxHeight")
+        else style.maxHeight = constraints.maxHeight.value
 
-        if (constraints.minWidth == null)
-            style.removeProperty("minWidth")
-        else
-            style.minWidth = constraints.minWidth.value
+        if (constraints.minWidth == null) style.removeProperty("minWidth")
+        else style.minWidth = constraints.minWidth.value
 
-        if (constraints.maxWidth == null)
-            style.removeProperty("maxWidth")
-        else
-            style.maxWidth = constraints.maxWidth.value
+        if (constraints.maxWidth == null) style.removeProperty("maxWidth")
+        else style.maxWidth = constraints.maxWidth.value
 
-        if (constraints.width == null)
-            style.removeProperty("width")
-        else
-            style.width = constraints.width.value
+        if (constraints.width == null) style.removeProperty("width")
+        else style.width = constraints.width.value
 
-        if (constraints.height == null)
-            style.removeProperty("height")
-        else
-            style.height = constraints.height.value
+        if (constraints.height == null) style.removeProperty("height")
+        else style.height = constraints.height.value
 
+        style.overflowX = "hidden"
+        style.overflowY = "hidden"
+
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.fullWidth(): ViewWrapper {
+    elementToDoList.add {
+        style.width = "100%"
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.fullHeight(): ViewWrapper {
+    elementToDoList.add {
+        style.height = "100%"
     }
     return ViewWrapper
 }
@@ -288,8 +298,6 @@ actual fun ViewContext.weight(amount: Float): ViewWrapper {
 
 actual fun ViewContext.scrolls(): ViewWrapper {
     elementToDoList.add {
-        style.display = "flex"
-        style.flexDirection = "column"
         style.overflowY = "scroll"
     }
     return ViewWrapper
@@ -300,6 +308,29 @@ actual fun ViewContext.scrollsHorizontally(): ViewWrapper {
         style.display = "flex"
         style.flexDirection = "row"
         style.overflowX = "scroll"
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.clickable(
+    enabled: Readable<Boolean>,
+    onClick: suspend () -> Unit,
+): ViewWrapper {
+    elementToDoList.add {
+        addEventListener("click", {
+            if (enabled.once) launch(onClick)
+        })
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.clickable(
+    onClick: suspend () -> Unit,
+): ViewWrapper {
+    elementToDoList.add {
+        addEventListener("click", {
+            launch(onClick)
+        })
     }
     return ViewWrapper
 }

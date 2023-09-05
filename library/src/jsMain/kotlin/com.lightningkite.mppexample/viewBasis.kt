@@ -17,7 +17,7 @@ actual class ViewContext(
 
     val stack = arrayListOf(parent)
     inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
-        ListeningLifecycleStack.useIn(this.onRemove) {
+        ListeningLifecycleStack.useIn(item.onRemove) {
             stack.add(item)
             try {
                 action(item)
@@ -118,11 +118,8 @@ private object RemoveListeners {
     init {
         MutationObserver { list, ob ->
             list.forEach {
-                it.removedNodes.asList().forEach {
-                    (it as? HTMLElement)?.removeListenersMaybe?.let {
-                        it.forEach { it() }
-                        it.clear()
-                    }
+                it.removedNodes.asList().forEach { node ->
+                    if(node is HTMLElement) shutdown(node)
                 }
             }
         }.observe(
@@ -131,6 +128,16 @@ private object RemoveListeners {
                 subtree = true,
             )
         )
+    }
+
+    private fun shutdown(element: HTMLElement) {
+        element.removeListenersMaybe?.let {
+            it.forEach { it() }
+            it.clear()
+        }
+        for(child in element.childNodes.asList()) {
+            if(child is HTMLElement) shutdown(child)
+        }
     }
 }
 

@@ -102,6 +102,8 @@ fun ViewContext.button(
                 horizontal = (16 * sizeMultiplier).toInt().px,
                 vertical = (8 * sizeMultiplier).toInt().px
             )
+        ) in margin(
+            Insets.symmetric(vertical = 8.px)
         ) in interactive(
             background = Background(
                 fill = background,
@@ -127,7 +129,7 @@ fun ViewContext.button(
                 strokeWidth = if (outline != null) 1.px else 0.px
             ),
             disabledElevation = 0.px
-        )
+        ) in fullWidth()
     }
 
     if (options.fullWidth) setupAll() else box {
@@ -151,6 +153,18 @@ fun ViewContext.button(onClick: suspend () -> Unit, loading: Writable<Boolean>? 
     button(
         options = ButtonOptions(),
         disabled = { false },
+        onClick = onClick,
+        setup = setup,
+    )
+
+fun ViewContext.textButton(
+    onClick: suspend () -> Unit,
+    disabled: ReactiveScope.() -> Boolean = { false },
+    setup: NView.() -> Unit
+) =
+    button(
+        options = ButtonOptions(variant = ButtonVariant.Text),
+        disabled = disabled,
         onClick = onClick,
         setup = setup,
     )

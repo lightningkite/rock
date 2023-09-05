@@ -1,10 +1,12 @@
 package com.lightningkite.mppexample
 
-fun ViewContext.textField(
+private fun ViewContext.textField(
     label: ReactiveScope.() -> String,
     hint: ReactiveScope.() -> String = { "" },
     text: Writable<String>,
-    keyboardHints: KeyboardHints? = null
+    keyboardHints: KeyboardHints? = null,
+    minValue: Double?,
+    maxValue: Double?,
 ) {
     column {
         caption {
@@ -16,6 +18,10 @@ fun ViewContext.textField(
             ::hint { hint() }
             if (keyboardHints != null)
                 this.keyboardHints = keyboardHints
+            if (minValue != null)
+                this.minValue = minValue
+            if (maxValue != null)
+                this.maxValue = maxValue
         } in padding(8.px) in interactive(
             background = Background(
                 corners = CornerRadii(8.px),
@@ -30,20 +36,40 @@ fun ViewContext.textField(
     } in padding(Insets.symmetric(vertical = 8.px))
 }
 
+fun ViewContext.textField(
+    label: ReactiveScope.() -> String,
+    hint: ReactiveScope.() -> String = { "" },
+    text: Writable<String>,
+    keyboardHints: KeyboardHints? = null,
+) = textField(
+    label = label,
+    hint = hint,
+    text = text,
+    keyboardHints = keyboardHints,
+    minValue = null,
+    maxValue = null,
+)
+
 fun ViewContext.integerInput(
     label: String,
     hint: String = "",
     value: Writable<Int>,
+    min: Int? = null,
+    max: Int? = null
 ) = integerInput(
     label = { label },
     hint = { hint },
-    value = value
+    value = value,
+    min = min,
+    max = max,
 )
 
 fun ViewContext.integerInput(
     label: ReactiveScope.() -> String,
     hint: ReactiveScope.() -> String = { "" },
     value: Writable<Int>,
+    min: Int? = null,
+    max: Int? = null
 ) {
     val text = Property(value.once.toString())
 
@@ -71,6 +97,8 @@ fun ViewContext.integerInput(
         label = label,
         hint = hint,
         text = text,
-        keyboardHints = KeyboardHints.integer
+        keyboardHints = KeyboardHints.integer,
+        minValue = min?.toDouble(),
+        maxValue = max?.toDouble(),
     )
 }

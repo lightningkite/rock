@@ -49,6 +49,24 @@ actual var NativeTextField.textStyle: TextStyle
         setStyles(value)
     }
 
+actual var NativeTextField.minValue: Double?
+    get() = throw NotImplementedError()
+    set(value) {
+        if (value == null)
+            removeAttribute("min")
+        else
+            min = value.toString()
+    }
+
+actual var NativeTextField.maxValue: Double?
+    get() = throw NotImplementedError()
+    set(value) {
+        if (value == null)
+            removeAttribute("max")
+        else
+            max = value.toString()
+    }
+
 actual var NativeTextField.keyboardHints: KeyboardHints
     get() = throw NotImplementedError()
     set(value) {

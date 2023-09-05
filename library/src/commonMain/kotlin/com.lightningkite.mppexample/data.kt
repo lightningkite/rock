@@ -5,8 +5,12 @@ expect class Font
 expect val systemDefaultFont: Font
 
 expect sealed class ImageSource()
-data class ImageVector(val paths: List<Path>) : ImageSource() {
-    data class Path(val fillColor: Paint, val strokeColor: Color, val strokeWidth: Dimension, val path: String)
+
+data class ImageVector(
+    val paths: List<Path>, val width: Dimension, val height: Dimension,
+    val viewBoxMinX: Int = 0, val viewBoxMinY: Int = 0, val viewBoxWidth: Int = 24, val viewBoxHeight: Int = 24
+) : ImageSource() {
+    data class Path(val fillColor: Paint? = null, val strokeColor: Color? = null, val strokeWidth: Int? = null, val path: String)
 }
 
 data class ImageRemote(val url: String) : ImageSource()

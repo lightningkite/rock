@@ -103,6 +103,7 @@ fun ViewContext.cartCard(
                 integerInput(
                     label = "Quantity",
                     value = quantityInput,
+                    min = 1
                 )
                 button(onClick = {
                     cartItems set cartItems.once.filter { it.product.key != product.key }

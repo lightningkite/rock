@@ -2,10 +2,9 @@ package com.lightningkite.mppexample
 
 import kotlinx.browser.window
 import org.w3c.dom.PopStateEvent
-import org.w3c.dom.url.URLSearchParams
 
 actual class PlatformNavigator actual constructor(
-    val router: Router, val onScreenChanged: (RockScreen, Boolean) -> Unit
+    override val router: Router, val onScreenChanged: (RockScreen, Boolean) -> Unit
 ) : RockNavigator {
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0
@@ -41,18 +40,7 @@ actual class PlatformNavigator actual constructor(
         } else {
             window.history.replaceState(currentIndex, "", path)
         }
-
-        val pathParts = path.split("?")
-        val query = pathParts.getOrNull(1) ?: ""
-        val searchParamMap = mutableMapOf<String, String>()
-        val urlSearchParams = URLSearchParams(query)
-        val keys = urlSearchParams.asDynamic().keys()
-        while (true) {
-            val key = keys.next()
-            if (key.done == true) break
-            searchParamMap[key.value as String] = urlSearchParams.get(key.value as String) ?: ""
-        }
-        val screen = router.findRoute(pathParts[0], searchParamMap)
+        val screen = router.findScreen(path)
         if (router.isNavigating)
             throw RedirectException(screen)
         onScreenChanged(screen, reverse)

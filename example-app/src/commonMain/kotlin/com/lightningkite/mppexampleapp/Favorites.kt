@@ -2,8 +2,8 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-class Favorites : RockScreen {
-    override fun ViewContext.render() {
+class Favorites : AuthenticatedScreen() {
+    override fun ViewContext.renderAuthenticated() {
         column {
             appBar(title = "Favorites")
 

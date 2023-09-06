@@ -4,6 +4,7 @@ import com.lightningkite.mppexample.*
 
 class Login(
     private val email: String? = null,
+    private val redirect: String? = null,
 ) : RockScreen {
     override fun ViewContext.render() {
         val email = Property(email ?: "")
@@ -89,7 +90,10 @@ class Login(
                                     currentUser set AuthenticatedUser(
                                         email = email.once,
                                     )
-                                    navigator.replace(Dashboard())
+                                    if (redirect != null)
+                                        navigator.replace(navigator.router.findScreen(redirect))
+                                    else
+                                        navigator.replace(Dashboard())
                                 } else {
                                     error set "Invalid email or password"
                                 }
@@ -114,11 +118,23 @@ class Login(
     }
 
     override fun createPath(): String {
-        return if (email == null) PATH else "$PATH?email=$email"
+        println("CREATING PATH")
+        val path = "$PATH${
+            mapOf(
+                "email" to email,
+                "redirect" to redirect
+            ).toURLParams()
+        }"
+        println(path)
+        return path
     }
 
     companion object {
         const val PATH = "/"
-    }
 
+        fun create(props: RouteProps) = Login(
+            email = props["email"],
+            redirect = props["redirect"]
+        )
+    }
 }

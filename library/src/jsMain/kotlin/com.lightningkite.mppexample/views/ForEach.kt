@@ -49,7 +49,7 @@ actual inline fun <T> ViewContext.forEach(
             container.replaceWith(newContainer)
             container = newContainer
         }
-    } in alignRight()
+    }
 }
 
 //

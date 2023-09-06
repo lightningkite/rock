@@ -2,8 +2,8 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-class Search : RockScreen {
-    override fun ViewContext.render() {
+class Search : AuthenticatedScreen() {
+    override fun ViewContext.renderAuthenticated() {
         val search = Property("")
 
         column {

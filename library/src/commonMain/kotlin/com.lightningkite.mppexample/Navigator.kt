@@ -2,6 +2,7 @@ package com.lightningkite.mppexample
 
 interface RockNavigator {
     var currentPath: String
+    val router: Router
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
     fun goBack()
@@ -16,6 +17,9 @@ class DummyRockNavigator : RockNavigator {
     override var currentPath: String
         get() = throw NotImplementedError()
         set(value) = throw IllegalStateException("Cannot get current path without a navigator.")
+
+    override val router: Router
+        get() = throw NotImplementedError()
 
     override fun navigate(screen: RockScreen) {
         throw IllegalStateException("Cannot navigate without a navigator.")

@@ -2,8 +2,8 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-class Cart : RockScreen {
-    override fun ViewContext.render() {
+class Cart : AuthenticatedScreen() {
+    override fun ViewContext.renderAuthenticated() {
         column {
             appBar(title = "Cart")
             val cartProducts = SharedReadable {

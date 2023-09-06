@@ -5,7 +5,7 @@ import com.lightningkite.mppexample.*
 abstract class AuthenticatedScreen : RockScreen {
     override fun ViewContext.render() {
         if (currentUser.once == null)
-            navigator.replace(Login())
+            navigator.replace(Login(redirect = navigator.currentPath))
 
         renderAuthenticated()
     }
@@ -21,7 +21,7 @@ class MyApp : RockApp {
                     routerView(
                         Router(
                             routes = listOf(
-                                Route(Login.PATH) { _, params -> Login(email = params["email"]) },
+                                Route(Login.PATH) { _, params -> Login.create(params) },
                                 Route(NotFound.PATH) { _, _ -> NotFound() },
                                 Route(Register.PATH) { _, _ -> Register() },
                                 Route(PasswordRecovery.PATH) { _, _ -> PasswordRecovery() },

@@ -11,6 +11,7 @@ const val MAX_REDIRECTS = 3
 
 @ViewDsl
 actual fun ViewContext.routerView(router: Router): Unit {
+    val theme = this.theme
     box {
         val screen = Property<RockScreen?>(null, overrideDebugName = "Router.screen")
         val reverse = Property(false, overrideDebugName = "Router.reverse")
@@ -35,11 +36,13 @@ actual fun ViewContext.routerView(router: Router): Unit {
             try {
                 with(derivedContext) {
                     with(screen.current) {
-                        if (this != null) {
-                            router.isNavigating = true
-                            println("RENDERING ${this::class.simpleName}")
-                            render()
-                            router.isNavigating = false
+                        withTheme(theme) {
+                            if (this != null) {
+                                router.isNavigating = true
+                                println("RENDERING ${this::class.simpleName}")
+                                render()
+                                router.isNavigating = false
+                            }
                         }
                     }
                 }

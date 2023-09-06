@@ -44,31 +44,38 @@ fun reactiveScope(action: ReactiveScope.() -> Unit) {
 class ReactiveScope(val action: ReactiveScope.() -> Unit) {
     private val removers: HashMap<Listenable, () -> Unit> = HashMap()
     private val latestPass: HashSet<Listenable> = HashSet()
+
     fun rerunOn(listenable: Listenable) {
+        if (!removers.containsKey(listenable)) {
+            removers[listenable] = listenable.addListener { this() }
+        }
         latestPass.add(listenable)
     }
 
+    var queueRerun: Boolean = false
+    var isRunning: Boolean = false
     operator fun invoke() {
+        if(isRunning) {
+            queueRerun = true
+            return
+        }
+        isRunning = true
         latestPass.clear()
         try {
             action()
         } finally {
-            postRun()
-        }
-    }
-
-    private fun postRun() {
-        // Remove listeners we no longer depend on
-        for (entry in removers.entries.toList()) {
-            if (entry.key !in latestPass) {
-                entry.value()
-                removers.remove(entry.key)
+            // Remove listeners we no longer depend on
+            for (entry in removers.entries.toList()) {
+                if (entry.key !in latestPass) {
+                    entry.value()
+                    removers.remove(entry.key)
+                }
             }
-        }
-        // Add listeners that are new
-        for (new in latestPass) {
-            if (!removers.containsKey(new)) {
-                removers[new] = new.addListener { this() }
+            isRunning = false
+
+            if(queueRerun) {
+                queueRerun = false
+                this()
             }
         }
     }
@@ -109,9 +116,9 @@ interface Writable<T> : Readable<T> {
     infix fun modify(update: (T) -> T) = set(update(once))
 }
 
-class Property<T>(startValue: T) : Writable<T> {
+class Property<T>(startValue: T, private val overrideDebugName: String? = null) : Writable<T> {
     override val debugName: String
-        get() = "Property whose value is $once"
+        get() = overrideDebugName ?: "Property whose value is $once"
     private val listeners = HashSet<() -> Unit>()
     override var once: T = startValue
         private set(value) {
@@ -124,6 +131,7 @@ class Property<T>(startValue: T) : Writable<T> {
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
+        println("Adding listener to $debugName")
         listeners.add(listener)
         return {
             listeners.remove(listener)
@@ -132,10 +140,11 @@ class Property<T>(startValue: T) : Writable<T> {
 }
 
 class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
-    private val listeners = HashSet<()->Unit>()
+    private val listeners = HashSet<() -> Unit>()
+
     @Suppress("UNCHECKED_CAST")
     override val once: T
-        get() = if(!ready) throw IllegalStateException() else currentValue as T
+        get() = if (!ready) throw IllegalStateException() else currentValue as T
     private var ready: Boolean = false
     private var currentValue: T? = null
         set(value) {
@@ -146,12 +155,13 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
             }
         }
     val rs = ReactiveScope { currentValue = computer() }
+
     init {
         rs.clear()
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
-        if(listeners.isEmpty()) {
+        if (listeners.isEmpty()) {
             // startup
             rs()
         }
@@ -159,9 +169,9 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
         return { removeListener(listener) }
     }
 
-    private fun removeListener(listener: ()->Unit) {
+    private fun removeListener(listener: () -> Unit) {
         listeners.remove(listener)
-        if(listeners.isEmpty()) {
+        if (listeners.isEmpty()) {
             // shutdown
             rs.clear()
         }

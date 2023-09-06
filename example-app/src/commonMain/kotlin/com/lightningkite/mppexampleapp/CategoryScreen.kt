@@ -13,8 +13,8 @@ data class Category(
 open class CategoryScreen(
     private val category: Category,
     private val showBackButton: Boolean = true
-) : RockScreen {
-    override fun ViewContext.render() {
+) : AuthenticatedScreen() {
+    override fun ViewContext.renderAuthenticated() {
         box {
             appBar(title = category.name, showBackButton = showBackButton)
 

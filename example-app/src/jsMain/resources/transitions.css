@@ -1,6 +1,6 @@
 @keyframes stack-pull-up-in {
   from {
-    transform: translateY(100%);
+    transform: translateY(100vh);
   }
 
   to {
@@ -14,17 +14,17 @@
   }
 
   to {
-    transform: translateY(-100%);
+    transform: translateY(-100vh);
   }
 }
 
 @keyframes stack-pull-down-in {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-100vh);
   }
 
   to {
-    transform: translateY(0%);
+    transform: translateY(0);
   }
 }
 
@@ -34,13 +34,13 @@
   }
 
   to {
-    transform: translateY(100%);
+    transform: translateY(100vh);
   }
 }
 
 @keyframes stack-push-in {
   from {
-    transform: translateX(100%);
+    transform: translateX(100vw);
   }
 
   to {
@@ -54,13 +54,13 @@
   }
 
   to {
-    transform: translateX(-100%);
+    transform: translateX(-100vw);
   }
 }
 
 @keyframes stack-pop-in {
   from {
-    transform: translateX(-100%);
+    transform: translateX(-100vw);
   }
 
   to {
@@ -74,7 +74,7 @@
   }
 
   to {
-    transform: translateX(100%);
+    transform: translateX(100vw);
   }
 }
 
@@ -101,47 +101,47 @@
 @keyframes stack-grow-fade-in {
   from {
     opacity: 0;
-    transform: scale(0.75) translateY(7%);
+    transform: scale(0.75) translateY(7vh);
   }
 
   to {
     opacity: 1;
-    transform: scale(1.0) translateY(0%);
+    transform: scale(1.0) translateY(0);
   }
 }
 
 @keyframes stack-grow-fade-out {
   from {
     opacity: 1;
-    transform: scale(1.00) translateY(0%);
+    transform: scale(1.00) translateY(0);
   }
 
   to {
     opacity: 0;
-    transform: scale(1.33) translateY(-7%);
+    transform: scale(1.33) translateY(-7vh);
   }
 }
 
 @keyframes stack-shrink-fade-in {
   from {
     opacity: 0;
-    transform: scale(1.33) translateY(-7%);
+    transform: scale(1.33) translateY(-7vh);
   }
 
   to {
     opacity: 1;
-    transform: scale(1.0) translateY(0%);
+    transform: scale(1.0) translateY(0);
   }
 }
 
 @keyframes stack-shrink-fade-out {
   from {
     opacity: 1;
-    transform: scale(1.0) translateY(0%);
+    transform: scale(1.0) translateY(0vh);
   }
 
   to {
     opacity: 0;
-    transform: scale(0.75) translateY(7%);
+    transform: scale(0.75) translateY(7vh);
   }
 }

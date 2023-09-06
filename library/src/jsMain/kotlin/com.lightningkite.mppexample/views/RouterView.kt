@@ -9,10 +9,11 @@ actual typealias RouterView = HTMLDivElement
 
 actual fun ViewContext.routerView(router: Router): Unit {
     box {
-        val screen = Property<RockScreen?>(null)
-        val reverse = Property(false)
+        val screen = Property<RockScreen?>(null, overrideDebugName = "Router.screen")
+        val reverse = Property(false, overrideDebugName = "Router.reverse")
 
         navigator = PlatformNavigator(router = router, onScreenChanged = { newScreen, reverseTransition ->
+            println("Screen changed to ${newScreen::class.simpleName}")
             reverse set reverseTransition
             screen set newScreen
         })
@@ -24,11 +25,16 @@ actual fun ViewContext.routerView(router: Router): Unit {
         var oldView: HTMLElement? = null
 
         reactiveScope {
+            println("IN ROUTER -> REACTIVE SCOPE")
             with(derivedContext) {
                 with(screen.current) {
-                    if (this != null) render()
+                    if (this != null) {
+                        println("RENDERING ${this::class.simpleName}")
+                        render()
+                    }
                 }
             }
+
             val transition =
                 if (reverse.once) derivedContext.screenTransitions.reverse else derivedContext.screenTransitions.forward
             val newView = lastChild as HTMLElement? ?: return@reactiveScope
@@ -43,6 +49,7 @@ actual fun ViewContext.routerView(router: Router): Unit {
                 })
             }
             oldView = newView
+            println("OUT ROUTER -> REACTIVE SCOPE")
         }
     } in fullWidth() in fullHeight()
 }

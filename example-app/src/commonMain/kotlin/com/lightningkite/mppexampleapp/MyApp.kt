@@ -2,6 +2,17 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
+abstract class AuthenticatedScreen : RockScreen {
+    override fun ViewContext.render() {
+        if (currentUser.once == null)
+            navigator.replace(Login())
+
+        renderAuthenticated()
+    }
+
+    abstract fun ViewContext.renderAuthenticated()
+}
+
 class MyApp : RockApp {
     override fun ViewContext.render() {
         withTheme(appTheme) {
@@ -34,6 +45,8 @@ class MyApp : RockApp {
                 } in background(paint = Color.fromHex(0xfafafa), padding = Insets.none) in weight(1f)
 
                 row {
+                    ::exists { currentUser.current != null }
+
                     gravity = StackGravity.Center
                     navButton(text = { "Home" }, icon = ImageVector(
                         width = 24.px, height = 24.px, paths = listOf(
@@ -146,7 +159,8 @@ fun searchProducts(query: String, category: Category): List<Product> {
     for (sub in category.subcategories) {
         result.addAll(searchProducts(query, sub))
     }
-    return result.map { it.key to it }.toMap().values.toList() // filter out duplicates, not necessary if products are unique to a single category
+    return result.map { it.key to it }
+        .toMap().values.toList() // filter out duplicates, not necessary if products are unique to a single category
 }
 
 data class CartItem(
@@ -167,4 +181,12 @@ val ViewContext.favorites by viewContextAddon(
             findProduct("ic-surge-device", rootCategory)!!,
         )
     )
+)
+
+data class AuthenticatedUser(
+    val email: String,
+)
+
+val ViewContext.currentUser by viewContextAddon(
+    Property<AuthenticatedUser?>(null)
 )

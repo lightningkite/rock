@@ -11,7 +11,6 @@ class Login(
         val error = Property<String?>(null)
 
         column {
-
             column {
                 image {
                     source =
@@ -85,10 +84,12 @@ class Login(
                                 error set "Please enter your password"
                             } else {
                                 error set null
-                                // delay 1000 ms
                                 val response = fetch("https://swapi.dev/api/people/1")
                                 if (response.ok) {
-                                    navigator.navigate(Dashboard())
+                                    currentUser set AuthenticatedUser(
+                                        email = email.once,
+                                    )
+                                    navigator.replace(Dashboard())
                                 } else {
                                     error set "Invalid email or password"
                                 }

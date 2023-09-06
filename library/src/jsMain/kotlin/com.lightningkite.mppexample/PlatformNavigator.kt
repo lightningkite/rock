@@ -9,6 +9,7 @@ actual class PlatformNavigator actual constructor(
 ) : RockNavigator {
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0
+    private var redirect: RockScreen? = null
 
     init {
         navigate("${currentPath}${currentSearch}", reverse = false, pushState = false)
@@ -42,7 +43,7 @@ actual class PlatformNavigator actual constructor(
         }
 
         val pathParts = path.split("?")
-        val query = pathParts.getOrNull(1) ?: "test=idk"
+        val query = pathParts.getOrNull(1) ?: ""
         val searchParamMap = mutableMapOf<String, String>()
         val urlSearchParams = URLSearchParams(query)
         val keys = urlSearchParams.asDynamic().keys()
@@ -58,5 +59,6 @@ actual class PlatformNavigator actual constructor(
     override fun navigate(screen: RockScreen) = navigate(screen.createPath(), reverse = false, pushState = true)
 
     override fun replace(screen: RockScreen) = navigate(screen.createPath(), reverse = false, pushState = false)
+
     override fun goBack() = window.history.go(-1)
 }

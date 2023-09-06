@@ -59,6 +59,5 @@ fun ImageVector.toWeb(): String {
             )
         }
         append("</svg>")
-        println(toString())
     }
 }

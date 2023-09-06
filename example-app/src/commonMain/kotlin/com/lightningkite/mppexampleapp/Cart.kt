@@ -24,6 +24,9 @@ class Cart : AuthenticatedScreen() {
     }
 
     override fun createPath(): String = PATH
+    override val icon = null
+    override val title = "Cart"
+    override val showInNavigation = true
 
     companion object {
         const val PATH = "/cart"

@@ -36,6 +36,9 @@ class PasswordRecovery : RockScreen {
     }
 
     override fun createPath(): String = PATH
+    override val icon = null
+    override val title = "Password Recovery"
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/password-recovery"

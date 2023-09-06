@@ -8,6 +8,9 @@ class NotFound() : RockScreen {
     }
 
     override fun createPath(): String = "/test"
+    override val icon = null
+    override val title = "Not Found"
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/test"

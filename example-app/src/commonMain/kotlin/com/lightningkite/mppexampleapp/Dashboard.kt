@@ -177,6 +177,9 @@ class Dashboard : CategoryScreen(
 ) {
 
     override fun createPath(): String = PATH
+    override val icon = null
+    override val title = "Home"
+    override val showInNavigation = true
 
     companion object {
         const val PATH = "/dashboard"

@@ -6,7 +6,7 @@ typealias RouteMap = MutableMap<String, RouteNode>
 typealias ScreenCreator = (props: RouteProps, params: RouteParams) -> RockScreen
 
 class Router(
-    routes: List<Route>, private val fallback: RockScreen
+    val routes: List<Route>, private val fallback: RockScreen
 ) {
     var isNavigating = false
 
@@ -85,6 +85,9 @@ data class RouteNode(
 interface RockScreen {
     fun ViewContext.render()
     fun createPath(): String
+    val title: String
+    val icon: ImageVector?
+    val showInNavigation: Boolean
 }
 
 interface RockApp {

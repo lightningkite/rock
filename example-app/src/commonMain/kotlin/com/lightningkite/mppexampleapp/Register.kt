@@ -102,6 +102,9 @@ class Register : RockScreen {
     override fun createPath(): String {
         return PATH
     }
+    override val icon = null
+    override val title = "Register"
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/register"

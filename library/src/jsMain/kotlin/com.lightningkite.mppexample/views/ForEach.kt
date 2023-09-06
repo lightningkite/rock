@@ -11,11 +11,13 @@ actual inline fun <T> ViewContext.forEach(
     crossinline data: ReactiveScope.() -> List<T>,
     crossinline render: NView.(T) -> Unit,
     crossinline fallback: NView.() -> Unit,
+    noinline separator: (NView.() -> Unit)?,
     direction: ForEachDirection
 ): Unit = forEach(
     data = data,
     render = { _, item -> render(item) },
     fallback = fallback,
+    separator = separator,
     direction = direction
 )
 
@@ -24,6 +26,7 @@ actual inline fun <T> ViewContext.forEach(
     crossinline data: ReactiveScope.() -> List<T>,
     crossinline render: NView.(Int, T) -> Unit,
     crossinline fallback: NView.() -> Unit,
+    noinline separator: (NView.() -> Unit)?,
     direction: ForEachDirection
 ) {
     val theme = this.theme
@@ -45,6 +48,8 @@ actual inline fun <T> ViewContext.forEach(
                     } else
                         items.forEachIndexed { index, item ->
                             render(index, item)
+                            if (index != items.lastIndex && separator != null)
+                                separator()
                         }
                 }
             }

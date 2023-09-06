@@ -32,6 +32,9 @@ open class CategoryScreen(
     }
 
     override fun createPath(): String = "/categories/${category.key}"
+    override val icon = null
+    override val title = category.name
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/categories/{categoryKey}"

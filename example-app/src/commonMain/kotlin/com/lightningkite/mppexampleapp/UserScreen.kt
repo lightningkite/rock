@@ -14,6 +14,9 @@ class UserScreen(val userId: Int) : RockScreen {
     }
 
     override fun createPath(): String = "/users/$userId"
+    override val icon = null
+    override val title = "Account"
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/users/{userId}"

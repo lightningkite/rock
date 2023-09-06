@@ -128,6 +128,9 @@ class Login(
         println(path)
         return path
     }
+    override val icon = null
+    override val title = "Login"
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/"

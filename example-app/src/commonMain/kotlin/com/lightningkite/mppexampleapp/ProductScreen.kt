@@ -112,6 +112,9 @@ class ProductScreen(
     }
 
     override fun createPath(): String = "/product/${product.key}"
+    override val icon = null
+    override val title = "Product Screen"
+    override val showInNavigation = false
 
     companion object {
         const val PATH = "/product/{productKey}"

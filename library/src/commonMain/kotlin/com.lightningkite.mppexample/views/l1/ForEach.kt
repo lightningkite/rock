@@ -12,6 +12,7 @@ expect fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
     render: NView.(T) -> Unit,
     fallback: NView.() -> Unit = {},
+    separator: (NView.() -> Unit)? = null,
     direction: ForEachDirection = ForEachDirection.Vertical,
 ): Unit
 
@@ -20,5 +21,6 @@ expect fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
     render: NView.(Int, T) -> Unit,
     fallback: NView.() -> Unit = {},
+    separator: (NView.() -> Unit)? = null,
     direction: ForEachDirection = ForEachDirection.Vertical,
 ): Unit

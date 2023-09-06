@@ -31,7 +31,6 @@ actual class PlatformNavigator actual constructor(
         set(value) = throw NotImplementedError()
 
     private fun navigate(path: String, reverse: Boolean, pushState: Boolean) {
-
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(

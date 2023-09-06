@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
+import kotlinx.serialization.Serializable
 
 abstract class AuthenticatedScreen : RockScreen {
     override fun ViewContext.render() {
@@ -39,6 +40,7 @@ class MyApp : RockApp {
                                 Route(Cart.PATH) { _, _ -> Cart() },
                                 Route(Favorites.PATH) { _, _ -> Favorites() },
                                 Route(Search.PATH) { _, _ -> Search() },
+                                Route(Account.PATH) { _, _ -> Account() },
                             ), fallback = NotFound()
                         )
                     )
@@ -74,6 +76,16 @@ class MyApp : RockApp {
                             )
                         )
                     ), onClick = { navigator.replace(Search()) })
+                    navButton(text = { "Account" }, icon = ImageVector(
+                        viewBoxMinX = -16, viewBoxMinY = -16,
+                        viewBoxWidth = 128, viewBoxHeight = 128,
+                        width = 24.px, height = 24.px, paths = listOf(
+                            ImageVector.Path(
+                                fillColor = Color.black,
+                                path = "M69.3677,51.0059a30,30,0,1,0-42.7354,0A41.9971,41.9971,0,0,0,0,90a5.9966,5.9966,0,0,0,6,6H90a5.9966,5.9966,0,0,0,6-6A41.9971,41.9971,0,0,0,69.3677,51.0059ZM48,12A18,18,0,1,1,30,30,18.02,18.02,0,0,1,48,12ZM12.5977,84A30.0624,30.0624,0,0,1,42,60H54A30.0624,30.0624,0,0,1,83.4023,84Z",
+                            )
+                        )
+                    ), onClick = { navigator.replace(Account()) })
                     navButton(text = {
                         val size = cartItems.current.size
                         if (size == 0) "Cart" else "Cart ($size)"
@@ -183,10 +195,11 @@ val ViewContext.favorites by viewContextAddon(
     )
 )
 
+@Serializable
 data class AuthenticatedUser(
     val email: String,
 )
 
 val ViewContext.currentUser by viewContextAddon(
-    Property<AuthenticatedUser?>(null)
+    PersistentProperty<AuthenticatedUser?>("rock.demo.auth", defaultValue = null)
 )

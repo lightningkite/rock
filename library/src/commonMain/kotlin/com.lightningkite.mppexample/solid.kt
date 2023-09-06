@@ -1,5 +1,9 @@
 package com.lightningkite.mppexample
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import kotlin.reflect.KMutableProperty0
 
 /**
@@ -55,7 +59,7 @@ class ReactiveScope(val action: ReactiveScope.() -> Unit) {
     var queueRerun: Boolean = false
     var isRunning: Boolean = false
     operator fun invoke() {
-        if(isRunning) {
+        if (isRunning) {
             queueRerun = true
             return
         }
@@ -73,7 +77,7 @@ class ReactiveScope(val action: ReactiveScope.() -> Unit) {
             }
             isRunning = false
 
-            if(queueRerun) {
+            if (queueRerun) {
                 queueRerun = false
                 this()
             }
@@ -114,6 +118,59 @@ interface Writable<T> : Readable<T> {
 
     infix fun set(value: T)
     infix fun modify(update: (T) -> T) = set(update(once))
+}
+
+class PersistentProperty<T>(
+    private val key: String,
+    defaultValue: T,
+    private val serializer: KSerializer<T>,
+    private val overrideDebugName: String? = null
+) : Writable<T> {
+    override val debugName: String
+        get() = overrideDebugName ?: "PersistentProperty whose value is $once"
+    private val listeners = HashSet<() -> Unit>()
+
+    var initialized = false
+        private set
+
+    override var once: T = defaultValue
+        private set(value) {
+            field = value
+            listeners.toList().forEach { it() }
+            PlatformStorage.set(key, Json.encodeToString(serializer, value))
+        }
+
+    override infix fun set(value: T) {
+        this.once = value
+    }
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return {
+            listeners.remove(listener)
+        }
+    }
+
+    init {
+        val stored = PlatformStorage.get(key)
+        println("PersistentProperty $key stored as $stored")
+        initialized = true
+        if (stored != null)
+            once = Json.decodeFromString(serializer, stored)
+    }
+}
+
+inline fun <reified T> PersistentProperty(
+    key: String,
+    defaultValue: T,
+    overrideDebugName: String? = null
+) =
+    PersistentProperty(key, defaultValue, serializer(), overrideDebugName)
+
+expect object PlatformStorage {
+    fun get(key: String): String?
+    fun set(key: String, value: String)
+    fun remove(key: String)
 }
 
 class Property<T>(startValue: T, private val overrideDebugName: String? = null) : Writable<T> {

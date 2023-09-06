@@ -1,5 +1,7 @@
 package com.lightningkite.mppexample
 
+// TODO replace this with a proper implementation of URL encoding
+
 val reverseCharMap by lazy {
     val charMap = mutableMapOf<String, Char>()
     "0123456789ABCDEF".forEachIndexed { index, c ->

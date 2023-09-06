@@ -15,7 +15,7 @@ data class ButtonOptions(
 fun ViewContext.button(
     options: ButtonOptions,
     onClick: suspend () -> Unit,
-    disabled: ReactiveScope.() -> Boolean,
+    disabled: ReactiveScope.() -> Boolean = { false },
     loading: Writable<Boolean>? = null,
     setup: NView.() -> Unit,
 ) {
@@ -130,7 +130,7 @@ fun ViewContext.button(
                 strokeWidth = if (outline != null) 1.px else 0.px
             ),
             disabledElevation = 0.px
-        ) in fullWidth()
+        )
     }
 
     if (options.fullWidth) setupAll() else box {

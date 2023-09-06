@@ -44,3 +44,13 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
 
 var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
 var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
+
+inline fun <reified T> ViewContext.persistentProperty(
+    key: String,
+    defaultValue: T,
+    overrideDebugName: String? = null
+) = PersistentProperty<T>(
+    key = key,
+    defaultValue = defaultValue,
+    overrideDebugName = overrideDebugName
+)

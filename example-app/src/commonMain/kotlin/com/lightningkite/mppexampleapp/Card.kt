@@ -44,37 +44,32 @@ fun ViewContext.cartCard(
         }
     }
 
-    box {
-        row {
-            image {
-                source = ImageRemote(product.image)
-                scaleType = ImageMode.Fit
-            } in sizedBox(
-                SizeConstraints(
-                    maxWidth = 64.px,
-                    maxHeight = 64.px,
-                    minWidth = 64.px,
-                    minHeight = 64.px,
-                )
-            ) in alignCenter() in padding(Insets(right = 16.px))
-            h5 { content = product.name } in padding(Insets(bottom = 4.px)) in alignCenter()
-            space() in weight(1f)
-            column {
-                integerInput(
-                    label = "Quantity",
-                    value = quantityInput,
-                    min = 1
-                )
-                button(onClick = {
-                    cartItems set cartItems.once.filter { it.product.key != product.key }
-                }) {
-                    text { content = "Remove" }
-                } in alignRight()
-            } in alignCenter()
-        } in padding(Insets.symmetric(horizontal = 12.px))
-    } in background(
-        background = Background(
-            fill = Color.white, stroke = Color.gray, strokeWidth = 1.px, corners = CornerRadii(8.px)
-        ),
-    ) in margin(8.px)
+    listTile {
+        image {
+            source = ImageRemote(product.image)
+            scaleType = ImageMode.Fit
+        } in sizedBox(
+            SizeConstraints(
+                maxWidth = 96.px,
+                maxHeight = 96.px,
+                minWidth = 96.px,
+                minHeight = 96.px,
+            )
+        ) in alignCenter() in padding(Insets(right = 16.px))
+        h5 { content = product.name } in padding(Insets(bottom = 4.px)) in alignCenter()
+        space() in weight(1f)
+        column {
+            integerInput(
+                label = "Quantity",
+                value = quantityInput,
+                min = 1
+            )
+            button(onClick = {
+                cartItems set cartItems.once.filter { it.product.key != product.key }
+            }) {
+                text { content = "Remove" }
+            } in alignRight()
+        } in alignCenter()
+    }
+
 }

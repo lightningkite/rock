@@ -17,14 +17,12 @@ open class CategoryScreen(
         box {
             appBar(title = category.name, showBackButton = showBackButton)
 
-            forEach(data = { category.subcategories }, render = { it ->
-                listTile(
-                    image = ImageRemote(it.image),
+            listTileGroup(data = { category.subcategories }, render = {
+                listTile(image = ImageRemote(it.image),
                     imageConstraints = SizeConstraints(maxHeight = 64.px),
                     onClick = {
                         navigator.navigate(CategoryScreen(it))
-                    }
-                ) {
+                    }) {
                     text { content = it.name }
                 }
             })

@@ -7,7 +7,7 @@ class Favorites : AuthenticatedScreen() {
         column {
             appBar(title = "Favorites")
 
-            forEach(
+            listTileGroup(
                 data = { favorites.current },
                 render = { product -> productCard(product) },
                 fallback = {

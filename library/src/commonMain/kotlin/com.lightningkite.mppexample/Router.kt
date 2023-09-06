@@ -9,6 +9,8 @@ class Router(
     routes: List<Route>,
     private val fallback: RockScreen
 ) {
+    var isNavigating = false
+
     private val routeMap: RouteNode = RouteNode(
         render = null,
         children = mutableMapOf(),
@@ -91,3 +93,5 @@ interface RockScreen {
 interface RockApp {
     fun ViewContext.render()
 }
+
+class RedirectException(val screen: RockScreen) : Exception()

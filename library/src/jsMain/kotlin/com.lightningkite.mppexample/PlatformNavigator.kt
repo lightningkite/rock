@@ -9,7 +9,6 @@ actual class PlatformNavigator actual constructor(
 ) : RockNavigator {
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0
-    private var redirect: RockScreen? = null
 
     init {
         navigate("${currentPath}${currentSearch}", reverse = false, pushState = false)
@@ -33,6 +32,7 @@ actual class PlatformNavigator actual constructor(
         set(value) = throw NotImplementedError()
 
     private fun navigate(path: String, reverse: Boolean, pushState: Boolean) {
+
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(
@@ -53,6 +53,8 @@ actual class PlatformNavigator actual constructor(
             searchParamMap[key.value as String] = urlSearchParams.get(key.value as String) ?: ""
         }
         val screen = router.findRoute(pathParts[0], searchParamMap)
+        if (router.isNavigating)
+            throw RedirectException(screen)
         onScreenChanged(screen, reverse)
     }
 

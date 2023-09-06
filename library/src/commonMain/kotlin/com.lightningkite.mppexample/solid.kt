@@ -131,7 +131,6 @@ class Property<T>(startValue: T, private val overrideDebugName: String? = null) 
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
-        println("Adding listener to $debugName")
         listeners.add(listener)
         return {
             listeners.remove(listener)

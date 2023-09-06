@@ -26,9 +26,10 @@ actual inline fun <T> ViewContext.forEach(
     crossinline fallback: NView.() -> Unit,
     direction: ForEachDirection
 ) {
+    val theme = this.theme
+
     box {
         var container = this as HTMLElement
-
         reactiveScope {
             val items = data()
             val newContainer = document.createElement("div") as HTMLDivElement
@@ -37,14 +38,15 @@ actual inline fun <T> ViewContext.forEach(
                 ForEachDirection.Horizontal -> "row"
                 ForEachDirection.Vertical -> "column"
             }
-            element(newContainer) {
-                if (items.isEmpty()) {
-                    println("EMPTY")
-                    fallback()
-                } else
-                    items.forEachIndexed { index, item ->
-                        render(index, item)
-                    }
+            withTheme(theme) {
+                element(newContainer) {
+                    if (items.isEmpty()) {
+                        fallback()
+                    } else
+                        items.forEachIndexed { index, item ->
+                            render(index, item)
+                        }
+                }
             }
             container.replaceWith(newContainer)
             container = newContainer

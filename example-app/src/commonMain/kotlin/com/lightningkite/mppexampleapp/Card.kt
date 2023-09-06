@@ -2,72 +2,29 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
 
-fun ViewContext.card(
-    header: String,
-    description: String? = null,
-    background: ImageSource? = null,
-    image: ImageSource? = null,
-    sizeConstraints: SizeConstraints = SizeConstraints(),
-    onClick: (() -> Unit)? = null,
-) {
-    box {
-        stack {
-            row {
-                if (image != null) image {
-                    source = image
-                    scaleType = ImageMode.Fit
-                } in sizedBox(
-                    SizeConstraints(
-                        maxWidth = 64.px,
-                        maxHeight = 64.px,
-                        minWidth = 64.px,
-                        minHeight = 64.px,
-                    )
-                ) in alignCenter() in padding(Insets(right = 16.px))
-                column {
-                    h5 { content = header } in padding(Insets(bottom = 4.px))
-                    text { content = description ?: "" }
-                } in alignCenter()
-                if (onClick != null) {
-                    space() in weight(1f)
-                    text { content = "->" } in stackCenter() in stackRight()
-                }
-            } in padding(Insets.symmetric(horizontal = 12.px)) in sizedBox(
-                SizeConstraints(
-                    minHeight = 62.px
-                )
-            )
-            if (background != null) image {
-                alpha = 0.25
-                source = background
-                scaleType = ImageMode.Crop
-            } in fullWidth() in sizedBox(
-                SizeConstraints(
-                    maxHeight = 62.px,
-                )
-            ) in stackRight()
-        }
-    } in interactive(
-        background = Background(
-            fill = Color.white, stroke = Color.gray, strokeWidth = 1.px, corners = CornerRadii(8.px)
-        ),
-        hoverBackground = if (onClick == null) null else Background(
-            fill = Color.gray(0.9f),
-            stroke = Color.gray,
-            strokeWidth = 1.px,
-        ),
-        downBackground = if (onClick == null) null else Background(
-            fill = Color.gray(0.8f),
-            stroke = Color.gray,
-            strokeWidth = 1.px,
-        ),
-    ) in sizedBox(
-        sizeConstraints
-    ) in margin(8.px) in (if (onClick == null) ViewWrapper else clickable(onClick = onClick)) in padding(
-        if (background != null) Insets.zero() else Insets(12.px)
-    )
-}
 
+fun ViewContext.productCard(
+    product: Product
+) {
+    listTile(onClick = {
+        navigator.navigate(ProductScreen(product))
+    }) {
+        row {
+            image {
+                source = ImageRemote(product.image)
+            } in sizedBox(
+                SizeConstraints(
+                    minWidth = 64.px,
+                    maxWidth = 64.px,
+                )
+            ) in nativeBackground(Background(corners = CornerRadii(4.px)))
+            column {
+                h6 { content = product.name } in padding(bottom = 4.px)
+                caption { content = product.description }
+            } in alignCenter() in padding(left = 16.px)
+        }
+    }
+}
 
 fun ViewContext.cartCard(
     product: Product

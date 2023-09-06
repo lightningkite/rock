@@ -9,16 +9,7 @@ class Favorites : AuthenticatedScreen() {
 
             forEach(
                 data = { favorites.current },
-                render = { product ->
-                    card(
-                        header = product.name,
-                        description = product.description,
-                        image = ImageRemote(product.image),
-                        onClick = {
-                            navigator.navigate(ProductScreen(product))
-                        }
-                    )
-                },
+                render = { product -> productCard(product) },
                 fallback = {
                     text {
                         content = "You have no favorites."

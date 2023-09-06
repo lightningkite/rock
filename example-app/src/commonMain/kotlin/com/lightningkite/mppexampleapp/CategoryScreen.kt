@@ -11,42 +11,25 @@ data class Category(
 )
 
 open class CategoryScreen(
-    private val category: Category,
-    private val showBackButton: Boolean = true
+    private val category: Category, private val showBackButton: Boolean = true
 ) : AuthenticatedScreen() {
     override fun ViewContext.renderAuthenticated() {
         box {
             appBar(title = category.name, showBackButton = showBackButton)
 
-            forEach(
-                data = { category.subcategories },
-                render = { it ->
-                    card(
-                        header = it.name,
-                        background = ImageRemote(it.image),
-                        onClick = {
-                            navigator.navigate(CategoryScreen(it))
-                        },
-                        sizeConstraints = SizeConstraints(
-                            maxHeight = 64.px,
-                            minHeight = 64.px,
-                        )
-                    )
-                })
-
-            forEach(
-                data = { category.products },
-                render = { it ->
-                    card(
-                        header = it.name,
-                        description = it.description,
-                        image = ImageRemote(it.image),
-                        onClick = {
-                            navigator.navigate(ProductScreen(it))
-                        }
-                    )
+            forEach(data = { category.subcategories }, render = { it ->
+                listTile(
+                    image = ImageRemote(it.image),
+                    imageConstraints = SizeConstraints(maxHeight = 64.px),
+                    onClick = {
+                        navigator.navigate(CategoryScreen(it))
+                    }
+                ) {
+                    text { content = it.name }
                 }
-            )
+            })
+
+            forEach(data = { category.products }, render = { it -> productCard(it) })
         } in fullHeight() in scrolls()
     }
 

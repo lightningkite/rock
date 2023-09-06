@@ -24,17 +24,12 @@ class Search : AuthenticatedScreen() {
                 )
             } in padding(Insets.symmetric(horizontal = 8.px))
 
-            forEach(
-                data = { searchProducts(search.current, rootCategory) },
-                render = { product ->
-                    card(
-                        header = product.name,
-                        description = product.description,
-                        image = ImageRemote(product.image),
-                        onClick = { navigator.navigate(ProductScreen(product)) }
-                    )
-                }
-            )
+            listTileGroup {
+                forEach(
+                    data = { searchProducts(search.current, rootCategory) },
+                    render = { product -> productCard(product) }
+                )
+            }
         } in scrolls()
     }
 

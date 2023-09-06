@@ -416,4 +416,5 @@ button:disabled span, button[disabled] span {
   grid-column-end: 1;
   grid-row-start: 1;
   grid-row-end: 1;
+  z-index: 1;
 }

@@ -27,7 +27,12 @@ class PasswordRecovery : RockScreen {
                     ),
                 )
             )
-        }
+        } in padding(16.px) in sizedBox(
+            SizeConstraints(
+                maxWidth = 640.px,
+                minWidth = 640.px
+            )
+        )
     }
 
     override fun createPath(): String = PATH

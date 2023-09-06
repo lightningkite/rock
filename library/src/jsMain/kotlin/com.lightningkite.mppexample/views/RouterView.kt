@@ -34,6 +34,8 @@ actual fun ViewContext.routerView(router: Router): Unit {
             val newView = lastChild as HTMLElement? ?: return@reactiveScope
             newView.classList.add("rock-screen")
             newView.style.animation = "${transition.enterClass()} 0.25s"
+            newView.style.marginLeft = "auto"
+            newView.style.marginRight = "auto"
             oldView?.let { view ->
                 view.style.animation = "${transition.exitClass()} 0.25s"
                 view.addEventListener("animationend", {

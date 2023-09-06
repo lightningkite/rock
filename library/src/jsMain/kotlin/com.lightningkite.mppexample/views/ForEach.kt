@@ -25,31 +25,29 @@ actual inline fun <T> ViewContext.forEach(
     direction: ForEachDirection
 ) {
     box {
-        box {
-            var container = this as HTMLElement
+        var container = this as HTMLElement
 
-            reactiveScope {
-                val items = data()
-                val newContainer = document.createElement("div") as HTMLDivElement
-                newContainer.style.display = "flex"
-                newContainer.style.flexDirection = when (direction) {
-                    ForEachDirection.Horizontal -> "row"
-                    ForEachDirection.Vertical -> "column"
-                }
-                element(newContainer) {
-                    if (items.isEmpty()) {
-                        println("EMPTY")
-                        fallback()
-                    } else
-                        items.forEachIndexed { index, item ->
-                            render(index, item)
-                        }
-                }
-                container.replaceWith(newContainer)
-                container = newContainer
+        reactiveScope {
+            val items = data()
+            val newContainer = document.createElement("div") as HTMLDivElement
+            newContainer.style.display = "flex"
+            newContainer.style.flexDirection = when (direction) {
+                ForEachDirection.Horizontal -> "row"
+                ForEachDirection.Vertical -> "column"
             }
+            element(newContainer) {
+                if (items.isEmpty()) {
+                    println("EMPTY")
+                    fallback()
+                } else
+                    items.forEachIndexed { index, item ->
+                        render(index, item)
+                    }
+            }
+            container.replaceWith(newContainer)
+            container = newContainer
         }
-    } in fullWidth()
+    } in alignRight()
 }
 
 //

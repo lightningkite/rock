@@ -10,7 +10,7 @@ data class ImageVector(
     val paths: List<Path>, val width: Dimension, val height: Dimension,
     val viewBoxMinX: Int = 0, val viewBoxMinY: Int = 0, val viewBoxWidth: Int = 24, val viewBoxHeight: Int = 24
 ) : ImageSource() {
-    data class Path(val fillColor: Paint? = null, val strokeColor: Color? = null, val strokeWidth: Int? = null, val path: String)
+    data class Path(val fillColor: Paint? = null, val strokeColor: Color? = null, val strokeWidth: Double? = null, val path: String)
 }
 
 data class ImageRemote(val url: String) : ImageSource()

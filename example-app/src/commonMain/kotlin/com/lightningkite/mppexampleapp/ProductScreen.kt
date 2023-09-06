@@ -96,8 +96,15 @@ class ProductScreen(
                         }
                     }
                 ) {
-                    text {
-                        ::content { if (favorited.current) "Remove from Favorites" else "Add to Favorites" }
+                    stack {
+                        text {
+                            ::visible { favorited.current }
+                            content = "Remove from Favorites"
+                        }
+                        text {
+                            ::visible { !favorited.current }
+                            content = "Add to Favorites"
+                        }
                     }
                 }
             } in alignCenter()

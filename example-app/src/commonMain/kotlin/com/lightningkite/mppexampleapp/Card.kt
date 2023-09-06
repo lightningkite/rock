@@ -32,7 +32,11 @@ fun ViewContext.card(
                     space() in weight(1f)
                     text { content = "->" } in stackCenter() in stackRight()
                 }
-            } in padding(Insets.symmetric(horizontal = 12.px))
+            } in padding(Insets.symmetric(horizontal = 12.px)) in sizedBox(
+                SizeConstraints(
+                    minHeight = 62.px
+                )
+            )
             if (background != null) image {
                 alpha = 0.25
                 source = background
@@ -108,7 +112,7 @@ fun ViewContext.cartCard(
                     cartItems set cartItems.once.filter { it.product.key != product.key }
                 }) {
                     text { content = "Remove" }
-                }
+                } in alignRight()
             } in alignCenter()
         } in padding(Insets.symmetric(horizontal = 12.px))
     } in background(

@@ -48,8 +48,8 @@ class MyApp : RockApp {
 
                 row {
                     ::exists { currentUser.current != null }
-
                     gravity = RowGravity.Center
+
                     navButton(text = { "Home" }, icon = ImageVector(
                         width = 24.px, height = 24.px, paths = listOf(
                             ImageVector.Path(
@@ -58,6 +58,7 @@ class MyApp : RockApp {
                             )
                         )
                     ), onClick = { navigator.replace(Dashboard()) })
+                    space() in weight(1f)
                     navButton(text = { "Favorites" }, icon = ImageVector(
                         width = 24.px, height = 24.px, paths = listOf(
                             ImageVector.Path(
@@ -67,6 +68,7 @@ class MyApp : RockApp {
                             )
                         )
                     ), onClick = { navigator.replace(Favorites()) })
+                    space() in weight(1f)
                     navButton(text = { "Search" }, icon = ImageVector(
                         width = 24.px, height = 24.px, paths = listOf(
                             ImageVector.Path(
@@ -76,6 +78,7 @@ class MyApp : RockApp {
                             )
                         )
                     ), onClick = { navigator.replace(Search()) })
+                    space() in weight(1f)
                     navButton(text = { "Account" }, icon = ImageVector(
                         viewBoxMinX = -16, viewBoxMinY = -16,
                         viewBoxWidth = 128, viewBoxHeight = 128,
@@ -86,6 +89,7 @@ class MyApp : RockApp {
                             )
                         )
                     ), onClick = { navigator.replace(Account()) })
+                    space() in weight(1f)
                     navButton(text = {
                         val size = cartItems.current.size
                         if (size == 0) "Cart" else "Cart ($size)"
@@ -115,9 +119,7 @@ private fun ViewContext.navButton(
     onClick: () -> Unit,
 ) {
     button(
-        options = ButtonOptions(
-            variant = ButtonVariant.Text, size = ButtonSize.Large, fullWidth = true
-        ), disabled = { false }, onClick = onClick
+        options = ButtonOptions(variant = ButtonVariant.Text), disabled = { false }, onClick = onClick
     ) {
         row {
             gravity = RowGravity.Center

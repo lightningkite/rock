@@ -102,6 +102,8 @@ data class Color(
             blue = value.and(0xFF).floatize()
         )
 
+        fun fromHexString(value: String): Color = fromHex(value.replace("#", "").toInt(16))
+
         fun interpolate(left: Color, right: Color, ratio: Float): Color {
             val invRatio = 1 - ratio
             return Color(

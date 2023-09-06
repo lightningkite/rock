@@ -29,6 +29,7 @@ open class CategoryScreen(
                         },
                         sizeConstraints = SizeConstraints(
                             maxHeight = 64.px,
+                            minHeight = 64.px,
                         )
                     )
                 })

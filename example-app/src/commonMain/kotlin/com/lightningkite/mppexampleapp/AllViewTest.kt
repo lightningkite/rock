@@ -59,7 +59,7 @@ fun ViewContext.allViewTest() {
                 hint = "Required Field"
             }
             row {
-                gravity = StackGravity.Center
+                gravity = RowGravity.Center
 
                 nativeText { content = "Primary" }
                 nativeButton {
@@ -87,7 +87,7 @@ fun ViewContext.allViewTest() {
                 }
             }
             row {
-                gravity = StackGravity.End
+                gravity = RowGravity.Right
 
                 nativeText { content = "Danger" }
                 nativeButton {
@@ -95,7 +95,7 @@ fun ViewContext.allViewTest() {
                 }
                 box {
                     column {
-                        gravity = StackGravity.Center
+                        gravity = ColumnGravity.Center
                         nativeButton {
                             nativeText { content = "Submit Form (outlined)" }
                         }

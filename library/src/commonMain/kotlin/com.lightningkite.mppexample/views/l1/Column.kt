@@ -1,7 +1,12 @@
 package com.lightningkite.mppexample
 
-@ViewDsl
-expect fun ViewContext.column(setup: Column.() -> Unit = {}): Unit
 expect class Column : NView
 
-expect var Column.gravity: StackGravity
+@ViewDsl
+expect fun ViewContext.column(setup: Column.() -> Unit = {}): Unit
+
+expect var Column.gravity: ColumnGravity
+
+enum class ColumnGravity {
+    Top, Center, Bottom
+}

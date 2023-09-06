@@ -1,6 +1,8 @@
 package com.lightningkite.mppexample
 
 
+expect class Text : NViewWithTextStyle
+
 @ViewDsl
 expect fun ViewContext.nativeText(setup: Text.() -> Unit = {}): Unit
 
@@ -21,8 +23,6 @@ expect fun ViewContext.nativeH5(setup: Text.() -> Unit = {}): Unit
 
 @ViewDsl
 expect fun ViewContext.nativeH6(setup: Text.() -> Unit = {}): Unit
-
-expect class Text : NViewWithTextStyle
 
 expect var Text.content: String
 expect var Text.textStyle: TextStyle

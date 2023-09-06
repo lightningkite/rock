@@ -7,6 +7,7 @@ enum class ForEachDirection {
     Vertical
 }
 
+@ViewDsl
 expect fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
     render: NView.(T) -> Unit,
@@ -14,6 +15,7 @@ expect fun <T> ViewContext.forEach(
     direction: ForEachDirection = ForEachDirection.Vertical,
 ): Unit
 
+@ViewDsl
 expect fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
     render: NView.(Int, T) -> Unit,

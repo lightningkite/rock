@@ -16,6 +16,7 @@ fun ActivityIndicator.setupSharedIndicator(color: Color) {
     style.borderColor = "${color.toWeb()} transparent transparent transparent"
 }
 
+@ViewDsl
 actual inline fun ViewContext.nativeActivityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
     element<HTMLDivElement>("div") {
         style.display = "inline-block"

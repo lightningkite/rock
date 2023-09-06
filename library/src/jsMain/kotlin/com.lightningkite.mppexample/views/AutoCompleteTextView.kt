@@ -6,6 +6,7 @@ import org.w3c.dom.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias AutoCompleteTextView = HTMLDataListElement
 
+@ViewDsl
 actual inline fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.() -> Unit): Unit =
     element<HTMLDataListElement>("div") {
         nativeTextField {}

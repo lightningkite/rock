@@ -14,6 +14,12 @@ expect fun ViewContext.alignCenter(): ViewWrapper
 expect fun ViewContext.stackCenter(): ViewWrapper
 
 @ViewModifierDsl3
+expect fun ViewContext.stackCenterLeft(): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.stackCenterRight(): ViewWrapper
+
+@ViewModifierDsl3
 expect fun ViewContext.stackRight(): ViewWrapper
 
 @ViewModifierDsl3
@@ -50,7 +56,13 @@ expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
 expect fun ViewContext.padding(insets: Dimension): ViewWrapper
 
 @ViewModifierDsl3
+expect fun ViewContext.padding(left: Dimension = 0.px, top: Dimension = 0.px, right: Dimension = 0.px, bottom: Dimension = 0.px): ViewWrapper
+
+@ViewModifierDsl3
 expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.margin(left: Dimension = 0.px, top: Dimension = 0.px, right: Dimension = 0.px, bottom: Dimension = 0.px): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.margin(insets: Dimension): ViewWrapper
@@ -96,4 +108,5 @@ expect fun ViewContext.clickable(
     onClick: suspend () -> Unit,
 ): ViewWrapper
 
+@ViewModifierDsl3
 expect fun ViewContext.ignoreInteraction(): ViewWrapper

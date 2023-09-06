@@ -13,6 +13,7 @@ fun TextLevel.toMultiplier(): Float = when (this) {
     TextLevel.H1 -> 2.2f
 }
 
+@ViewDsl
 inline fun ViewContext.text(level: TextLevel, crossinline setup: Text.() -> Unit) {
     val textSetup: Text.() -> Unit = {
         textStyle = TextStyle(
@@ -38,11 +39,26 @@ inline fun ViewContext.text(level: TextLevel, crossinline setup: Text.() -> Unit
     }
 }
 
+@ViewDsl
 inline fun ViewContext.caption(crossinline setup: Text.() -> Unit) = text(TextLevel.Caption, setup)
+
+@ViewDsl
 inline fun ViewContext.text(crossinline setup: Text.() -> Unit) = text(TextLevel.Body, setup)
+
+@ViewDsl
 inline fun ViewContext.h1(crossinline setup: Text.() -> Unit) = text(TextLevel.H1, setup)
+
+@ViewDsl
 inline fun ViewContext.h2(crossinline setup: Text.() -> Unit) = text(TextLevel.H2, setup)
+
+@ViewDsl
 inline fun ViewContext.h3(crossinline setup: Text.() -> Unit) = text(TextLevel.H3, setup)
+
+@ViewDsl
 inline fun ViewContext.h4(crossinline setup: Text.() -> Unit) = text(TextLevel.H4, setup)
+
+@ViewDsl
 inline fun ViewContext.h5(crossinline setup: Text.() -> Unit) = text(TextLevel.H5, setup)
+
+@ViewDsl
 inline fun ViewContext.h6(crossinline setup: Text.() -> Unit) = text(TextLevel.H6, setup)

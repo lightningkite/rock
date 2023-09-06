@@ -8,6 +8,7 @@ import org.w3c.dom.events.Event
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NativeDropDown = HTMLSelectElement
 
+@ViewDsl
 actual inline fun ViewContext.nativeDropDown(setup: NativeDropDown.() -> Unit): Unit = element<HTMLSelectElement>("select") {
     setup()
 }
@@ -66,10 +67,3 @@ actual fun <T> NativeDropDown.bind(
         addEventListener("change", lastListener)
     }
 }
-
-//actual fun DropDown.bind(writable: Writable<String>) {
-//    value = writable.once
-//    addEventListener("change", {
-//        writable set it.currentTarget.asDynamic().value as String
-//    })
-//}

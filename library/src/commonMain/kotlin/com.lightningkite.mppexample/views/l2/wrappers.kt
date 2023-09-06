@@ -1,5 +1,6 @@
 package com.lightningkite.mppexample
 
+@ViewModifierDsl3
 fun ViewContext.background(
     background: Background?,
     elevation: Dimension? = null,
@@ -10,6 +11,7 @@ fun ViewContext.background(
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 fun ViewContext.background(
     paint: Paint,
     padding: Insets = Insets(16.px)

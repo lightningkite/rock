@@ -6,6 +6,7 @@ import org.w3c.dom.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias ForEach = HTMLFormElement
 
+@ViewDsl
 actual inline fun <T> ViewContext.forEach(
     crossinline data: ReactiveScope.() -> List<T>,
     crossinline render: NView.(T) -> Unit,
@@ -18,6 +19,7 @@ actual inline fun <T> ViewContext.forEach(
     direction = direction
 )
 
+@ViewDsl
 actual inline fun <T> ViewContext.forEach(
     crossinline data: ReactiveScope.() -> List<T>,
     crossinline render: NView.(Int, T) -> Unit,

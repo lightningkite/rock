@@ -7,6 +7,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Image = HTMLImageElement
 
+@ViewDsl
 actual inline fun ViewContext.image(setup: Image.() -> Unit): Unit = element<HTMLImageElement>("img") {
     scaleType = ImageMode.Fit
     if (style.getPropertyValue("width") == "")

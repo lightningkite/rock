@@ -7,6 +7,7 @@ import org.w3c.dom.asList
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Form = HTMLFormElement
 
+@ViewDsl
 actual inline fun ViewContext.form(setup: Form.() -> Unit): Unit = element<HTMLFormElement>("form") {
     setup()
 }

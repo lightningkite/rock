@@ -1,5 +1,6 @@
 package com.lightningkite.mppexample
 
+@ViewDsl
 fun ViewContext.activityIndicator(visible: Readable<Boolean>? = null, exists: Property<Boolean>? = null) {
     nativeActivityIndicator {
         if (exists != null)

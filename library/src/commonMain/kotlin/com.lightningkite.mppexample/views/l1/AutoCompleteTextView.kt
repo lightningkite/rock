@@ -1,10 +1,11 @@
 package com.lightningkite.mppexample
 
-
 expect class AutoCompleteTextView : NView
 
+@ViewDsl
 expect fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.() -> Unit = {}): Unit
 
+@ViewDsl
 expect fun <T> AutoCompleteTextView.bind(
     options: ReactiveScope.() -> List<T>,
     getLabel: (T) -> String,

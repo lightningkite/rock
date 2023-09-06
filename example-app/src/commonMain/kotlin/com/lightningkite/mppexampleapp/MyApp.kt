@@ -47,7 +47,7 @@ class MyApp : RockApp {
                 row {
                     ::exists { currentUser.current != null }
 
-                    gravity = StackGravity.Center
+                    gravity = RowGravity.Center
                     navButton(text = { "Home" }, icon = ImageVector(
                         width = 24.px, height = 24.px, paths = listOf(
                             ImageVector.Path(
@@ -108,7 +108,7 @@ private fun ViewContext.navButton(
         ), disabled = { false }, onClick = onClick
     ) {
         row {
-            gravity = StackGravity.Center
+            gravity = RowGravity.Center
             image {
                 ::source {
                     icon.copy(

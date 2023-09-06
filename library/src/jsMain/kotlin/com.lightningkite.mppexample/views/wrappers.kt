@@ -88,6 +88,7 @@ fun HTMLElement.applyBackground(background: Background, prefix: String = "") {
     }
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.nativeBackground(background: Background?, elevation: Dimension?): ViewWrapper {
     elementToDoList.add {
         if (background != null) applyBackground(background)
@@ -99,8 +100,10 @@ actual fun ViewContext.nativeBackground(background: Background?, elevation: Dime
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.nativeBackground(paint: Paint) = nativeBackground(Background(fill = paint))
 
+@ViewModifierDsl3
 actual fun ViewContext.nativeChangingBackground(getBackground: ReactiveScope.() -> Background): ViewWrapper {
     elementToDoList.add {
         reactiveScope { applyBackground(getBackground()) }
@@ -108,6 +111,7 @@ actual fun ViewContext.nativeChangingBackground(getBackground: ReactiveScope.() 
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.interactive(
     transitions: Boolean,
     background: Background?,
@@ -138,44 +142,56 @@ actual fun ViewContext.interactive(
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.stackCenter(): ViewWrapper = containsNext<HTMLDivElement>("div") {
     style.display = "flex"
-    style.alignItems = "center"
     style.justifyContent = "center"
+    style.alignItems = "center"
 }
 
+@ViewModifierDsl3
+actual fun ViewContext.stackCenterLeft(): ViewWrapper {
+    elementToDoList.add {
+        style.alignSelf = "center"
+    }
+    return ViewWrapper
+}
+
+@ViewModifierDsl3
+actual fun ViewContext.stackCenterRight(): ViewWrapper = containsNext<HTMLDivElement>("div") {
+    style.display = "flex"
+    style.justifyContent = "flex-end"
+    style.alignItems = "center"
+}
+
+@ViewModifierDsl3
 actual fun ViewContext.stackRight(): ViewWrapper = containsNext<HTMLDivElement>("div") {
     style.display = "flex"
     style.justifyContent = "flex-end"
 }
 
-actual fun ViewContext.stackLeft(): ViewWrapper = containsNext<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.justifyContent = "flex-start"
+@ViewModifierDsl3
+actual fun ViewContext.stackLeft(): ViewWrapper {
+    return ViewWrapper
 }
 
-actual fun ViewContext.stackTop(): ViewWrapper = containsNext<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.alignItems = "flex-start"
+@ViewModifierDsl3
+actual fun ViewContext.stackTop(): ViewWrapper {
+    elementToDoList.add {
+        style.alignSelf = "flex-start"
+    }
+    return ViewWrapper
 }
 
-actual fun ViewContext.stackBottom(): ViewWrapper = containsNext<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.alignItems = "flex-end"
+@ViewModifierDsl3
+actual fun ViewContext.stackBottom(): ViewWrapper {
+    elementToDoList.add {
+        style.alignSelf = "flex-end"
+    }
+    return ViewWrapper
 }
 
-//actual fun ViewContext.background(background: Background): ViewWrapper = containsNext<HTMLDivElement>("div") {
-//    style.removeProperty("background")
-//    style.removeProperty("backgroundImage")
-//    if (background.fill is Color)
-//        style.background = background.fill.toWeb()
-//    if (background.fill is LinearGradient) {
-//        this.style.backgroundImage = "linear-gradient(${background.fill.angle.turns}turn, ${
-//            background.fill.stops.joinToString { it.color.toWeb() }
-//        })"
-//    }
-//}
-
+@ViewModifierDsl3
 actual fun ViewContext.padding(insets: Insets): ViewWrapper {
     elementToDoList.add {
         style.paddingLeft = insets.left?.value ?: "0"
@@ -186,8 +202,14 @@ actual fun ViewContext.padding(insets: Insets): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.padding(insets: Dimension): ViewWrapper = padding(Insets(insets))
 
+@ViewModifierDsl3
+actual fun ViewContext.padding(left: Dimension, top: Dimension, right: Dimension, bottom: Dimension): ViewWrapper =
+    padding(Insets(left, top, right, bottom))
+
+@ViewModifierDsl3
 actual fun ViewContext.margin(insets: Insets): ViewWrapper {
     elementToDoList.add {
         style.marginLeft = insets.left?.value ?: "0"
@@ -198,8 +220,14 @@ actual fun ViewContext.margin(insets: Insets): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
+actual fun ViewContext.margin(left: Dimension, top: Dimension, right: Dimension, bottom: Dimension): ViewWrapper =
+    margin(Insets(left, top, right, bottom))
+
+@ViewModifierDsl3
 actual fun ViewContext.margin(insets: Dimension): ViewWrapper = margin(Insets(insets))
 
+@ViewModifierDsl3
 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
     elementToDoList.add {
         if (constraints.minHeight == null) style.removeProperty("minHeight")
@@ -227,6 +255,7 @@ actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.fullWidth(): ViewWrapper {
     elementToDoList.add {
         style.width = "100%"
@@ -234,6 +263,7 @@ actual fun ViewContext.fullWidth(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.fullHeight(): ViewWrapper {
     elementToDoList.add {
         style.height = "100%"
@@ -241,6 +271,7 @@ actual fun ViewContext.fullHeight(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.alignLeft(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {
@@ -251,6 +282,7 @@ actual fun ViewContext.alignLeft(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.alignRight(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {
@@ -261,6 +293,7 @@ actual fun ViewContext.alignRight(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.alignCenter(): ViewWrapper {
     elementToDoList.add {
         style.alignSelf = "center"
@@ -268,6 +301,7 @@ actual fun ViewContext.alignCenter(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.alignTop(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {
@@ -278,6 +312,7 @@ actual fun ViewContext.alignTop(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.alignBottom(): ViewWrapper {
     val parent = this.stack.last()
     when (parent.style.flexDirection) {
@@ -288,6 +323,7 @@ actual fun ViewContext.alignBottom(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.weight(amount: Float): ViewWrapper {
     elementToDoList.add {
         style.flexGrow = "$amount"
@@ -296,6 +332,7 @@ actual fun ViewContext.weight(amount: Float): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.scrolls(): ViewWrapper {
     elementToDoList.add {
         style.overflowY = "scroll"
@@ -303,6 +340,7 @@ actual fun ViewContext.scrolls(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.scrollsHorizontally(): ViewWrapper {
     elementToDoList.add {
         style.display = "flex"
@@ -312,6 +350,7 @@ actual fun ViewContext.scrollsHorizontally(): ViewWrapper {
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.clickable(
     enabled: Readable<Boolean>,
     onClick: suspend () -> Unit,
@@ -324,6 +363,7 @@ actual fun ViewContext.clickable(
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.clickable(
     onClick: suspend () -> Unit,
 ): ViewWrapper {
@@ -336,6 +376,7 @@ actual fun ViewContext.clickable(
     return ViewWrapper
 }
 
+@ViewModifierDsl3
 actual fun ViewContext.ignoreInteraction(): ViewWrapper {
     elementToDoList.add {
         style.setProperty("pointer-events", "none")

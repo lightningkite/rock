@@ -7,6 +7,7 @@ import org.w3c.dom.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias RadioGroup = HTMLDivElement
 
+@ViewDsl
 actual inline fun ViewContext.radioGroup(setup: RadioGroup.() -> Unit): Unit = element<HTMLDivElement>("div") {
     style.display = "flex"
     style.flexDirection = "column"

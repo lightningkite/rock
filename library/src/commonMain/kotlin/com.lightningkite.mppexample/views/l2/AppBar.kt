@@ -1,11 +1,12 @@
 package com.lightningkite.mppexample
 
+@ViewDsl
 fun ViewContext.appBar(
     title: ReactiveScope.() -> String, showBackButton: Boolean = true, setup: NView.() -> Unit = {}
 ) {
     withTheme(theme.primaryTheme()) {
         row {
-            gravity = StackGravity.Center
+            gravity = RowGravity.Center
 
             if (showBackButton) image {
                 source = ImageVector(
@@ -36,5 +37,6 @@ fun ViewContext.appBar(
     } in margin(Insets(bottom = 16.px))
 }
 
+@ViewDsl
 fun ViewContext.appBar(title: String, showBackButton: Boolean = true, setup: NView.() -> Unit = {}) =
     appBar(title = { title }, showBackButton = showBackButton, setup = setup)

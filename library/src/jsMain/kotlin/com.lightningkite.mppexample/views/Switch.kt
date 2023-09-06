@@ -6,6 +6,7 @@ import org.w3c.dom.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Switch = HTMLUnknownElement
 
+@ViewDsl
 actual inline fun ViewContext.switch(setup: Switch.() -> Unit): Unit = element<HTMLUnknownElement>("label") {
     className = "rock-mui-switch"
 
@@ -22,7 +23,6 @@ actual inline fun ViewContext.switch(setup: Switch.() -> Unit): Unit = element<H
 
 actual fun Switch.bind(checked: Writable<Boolean>) {
     val checkbox = this.querySelector("input[type='checkbox']") as HTMLInputElement? ?: return
-//    val span = this.querySelector("span") as HTMLSpanElement? ?: return
 
     checkbox.checked = checked.once
     checkbox.addEventListener("input", {

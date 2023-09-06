@@ -72,7 +72,6 @@ fun ViewContext.cartCard(
 
     reactiveScope {
         val newQuantity = quantityInput.current
-//        println("Rewriting")
         cartItems.modify { list ->
             list.map { item ->
                 if (item.product.key == product.key) {

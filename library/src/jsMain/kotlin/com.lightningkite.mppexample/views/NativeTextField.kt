@@ -6,6 +6,7 @@ import org.w3c.dom.HTMLInputElement
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NativeTextField = HTMLInputElement
 
+@ViewDsl
 actual inline fun ViewContext.nativeTextField(
     setup: NativeTextField.() -> Unit
 ): Unit =
@@ -125,19 +126,3 @@ actual var NativeTextField.validation: InputValidation
         else
             maxLength = value.maxLength
     }
-
-//actual var NativeTextField.leadingIcon: ImageVector?
-//    get() = throw NotImplementedError()
-//    set(value) {
-//        val div = previousElementSibling as? HTMLDivElement
-//        if (value == null) {
-//            if (div != null) {
-//                div.remove()
-//            }
-//        } else {
-//            if (div == null) {
-//                insertAdjacentHTML("beforebegin", "<div class=\"rock-mui-text-field-icon\"></div>")
-//            }
-//            previousElementSibling?.firstChild?.asDynamic()?.src = value.toWeb()
-//        }
-//    }

@@ -11,6 +11,7 @@ data class ButtonOptions(
     val fullWidth: Boolean = false,
 )
 
+@ViewDsl
 fun ViewContext.button(
     options: ButtonOptions,
     onClick: suspend () -> Unit,
@@ -137,6 +138,7 @@ fun ViewContext.button(
     }
 }
 
+@ViewDsl
 fun ViewContext.button(
     onClick: suspend () -> Unit, disabled: ReactiveScope.() -> Boolean,
     loading: Writable<Boolean>? = null,
@@ -145,10 +147,12 @@ fun ViewContext.button(
     button(
         options = ButtonOptions(),
         disabled = disabled,
+        loading = loading,
         onClick = onClick,
         setup = setup,
     )
 
+@ViewDsl
 fun ViewContext.button(onClick: suspend () -> Unit, loading: Writable<Boolean>? = null, setup: NView.() -> Unit) =
     button(
         options = ButtonOptions(),
@@ -157,6 +161,7 @@ fun ViewContext.button(onClick: suspend () -> Unit, loading: Writable<Boolean>? 
         setup = setup,
     )
 
+@ViewDsl
 fun ViewContext.textButton(
     onClick: suspend () -> Unit,
     disabled: ReactiveScope.() -> Boolean = { false },

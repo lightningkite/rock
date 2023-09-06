@@ -6,6 +6,7 @@ data class ButtonGroupItem(
     val dangerous: Boolean = false
 )
 
+@ViewDsl
 fun ViewContext.buttonGroup(
     disabled: ReactiveScope.() -> Boolean,
     disableAllWhenLoading: Boolean = true,
@@ -45,7 +46,7 @@ fun ViewContext.buttonGroup(
     ) in padding(Insets.symmetric(vertical = 8.px)) in alignRight()
 }
 
-
+@ViewDsl
 fun ViewContext.buttonGroup(
     buttons: List<ButtonGroupItem>,
 ) = buttonGroup(

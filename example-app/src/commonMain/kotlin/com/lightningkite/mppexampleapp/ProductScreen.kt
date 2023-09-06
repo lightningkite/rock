@@ -60,7 +60,7 @@ class ProductScreen(
             } in alignCenter() in sizedBox(SizeConstraints(maxWidth = 968.px)) in padding(16.px)
 
             row {
-                gravity = StackGravity.End
+                gravity = RowGravity.Right
                 integerInput(
                     label = "Quantity",
                     value = quantity,

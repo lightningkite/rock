@@ -1,5 +1,6 @@
 package com.lightningkite.mppexample
 
+@ViewDsl
 private fun ViewContext.textField(
     label: ReactiveScope.() -> String = { "" },
     hint: ReactiveScope.() -> String = { "" },
@@ -39,11 +40,12 @@ private fun ViewContext.textField(
             )
             if (leadingIcon != null) image {
                 source = leadingIcon
-            } in stackCenter() in stackLeft() in margin(Insets(left = 8.px)) in ignoreInteraction()
+            } in stackCenterLeft() in margin(left = 8.px) in ignoreInteraction()
         }
     } in padding(Insets.symmetric(vertical = 8.px))
 }
 
+@ViewDsl
 fun ViewContext.textField(
     label: ReactiveScope.() -> String = { "" },
     hint: ReactiveScope.() -> String = { "" },
@@ -60,6 +62,7 @@ fun ViewContext.textField(
     leadingIcon = leadingIcon,
 )
 
+@ViewDsl
 fun ViewContext.integerInput(
     label: String = "",
     hint: String = "",
@@ -76,6 +79,7 @@ fun ViewContext.integerInput(
     leadingIcon = leadingIcon,
 )
 
+@ViewDsl
 fun ViewContext.integerInput(
     label: ReactiveScope.() -> String = { "" },
     hint: ReactiveScope.() -> String = { "" },

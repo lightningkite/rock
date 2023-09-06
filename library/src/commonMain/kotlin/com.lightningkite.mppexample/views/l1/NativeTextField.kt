@@ -2,7 +2,9 @@ package com.lightningkite.mppexample
 
 expect class NativeTextField : NViewWithTextStyle
 
+@ViewDsl
 expect fun ViewContext.nativeTextField(setup: NativeTextField.() -> Unit = {}): Unit
+
 expect fun NativeTextField.bind(text: Writable<String>): Unit
 
 expect var NativeTextField.textStyle: TextStyle

@@ -7,6 +7,7 @@ import org.w3c.dom.HTMLElement
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias SwapView = HTMLDivElement
 
+@ViewDsl
 actual fun ViewContext.swapView(child: Readable<ViewContext.() -> Unit>): Unit {
     box {
         className = "rock-stack"

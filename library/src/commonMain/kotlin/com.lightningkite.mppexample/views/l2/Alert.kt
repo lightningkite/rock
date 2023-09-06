@@ -1,5 +1,6 @@
 package com.lightningkite.mppexample
 
+@ViewDsl
 fun ViewContext.alert(
     content: ReactiveScope.() -> String?
 ) {
@@ -17,12 +18,14 @@ fun ViewContext.alert(
     ) in margin(Insets.symmetric(vertical = 12.px))
 }
 
+@ViewDsl
 fun ViewContext.errorAlert(
     content: ReactiveScope.() -> String?
 ) = withTheme(theme.dangerTheme()) {
     alert(content)
 }
 
+@ViewDsl
 fun ViewContext.successAlert(
     content: ReactiveScope.() -> String?
 ) = withTheme(theme.primaryTheme()) {

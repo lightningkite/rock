@@ -331,6 +331,17 @@ actual fun ViewContext.clickable(
         addEventListener("click", {
             launch(onClick)
         })
+        style.cursor = "pointer"
+    }
+    return ViewWrapper
+}
+
+actual fun ViewContext.ignoreInteraction(): ViewWrapper {
+    elementToDoList.add {
+        style.setProperty("pointer-events", "none")
+    }
+    wrapperToDoList.add {
+        style.setProperty("pointer-events", "none")
     }
     return ViewWrapper
 }

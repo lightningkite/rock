@@ -95,3 +95,5 @@ expect fun ViewContext.clickable(
 expect fun ViewContext.clickable(
     onClick: suspend () -> Unit,
 ): ViewWrapper
+
+expect fun ViewContext.ignoreInteraction(): ViewWrapper

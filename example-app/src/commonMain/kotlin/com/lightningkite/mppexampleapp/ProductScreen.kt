@@ -15,18 +15,13 @@ class ProductScreen(
 ) : RockScreen {
     override fun ViewContext.render() {
         val quantity = Property(1)
-        val favorited = Property(false)
+        val favorited = SharedReadable { favorites.current.contains(product) }
 
         column {
             val quantityInCart = SharedReadable {
                 cartItems.current.filter { it.product.key == product.key }.sumOf { it.quantity }
             }
-            withTheme(theme.primaryTheme()) {
-                h3 {
-                    content = product.name
-                } in background(theme.normal.background)
-            } in margin(Insets(bottom = 16.px))
-
+            appBar(title = product.name)
             row {
                 column {
                     image {
@@ -39,6 +34,8 @@ class ProductScreen(
                             minWidth = 256.px,
                             minHeight = 256.px,
                         )
+                    ) in nativeBackground(
+                        background = Background(corners = CornerRadii(4.px))
                     )
                     text {
                         textStyle = TextStyle(
@@ -65,8 +62,9 @@ class ProductScreen(
             row {
                 gravity = StackGravity.End
                 integerInput(
-                    label = { "Quantity" },
+                    label = "Quantity",
                     value = quantity,
+                    min = 1,
                 )
                 button(
                     onClick = {
@@ -81,18 +79,21 @@ class ProductScreen(
                                 it + CartItem(product = product, quantity = quantity.once)
                             }
                         }
-//                        quantityInCart.modify { it + quantity.once }
                         quantity set 1
                     }
                 ) {
-                    text {
-                        content = "Add to Cart"
-                    }
+                    text { content = "Add to Cart" }
                 } in padding(Insets.symmetric(horizontal = 8.px))
 
                 textButton(
                     onClick = {
-                        favorited.modify { !it }
+                        favorites.modify {
+                            if (favorited.once) {
+                                it - product
+                            } else {
+                                it + product
+                            }
+                        }
                     }
                 ) {
                     text {

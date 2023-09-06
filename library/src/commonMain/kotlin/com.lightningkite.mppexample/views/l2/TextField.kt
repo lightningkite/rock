@@ -1,46 +1,55 @@
 package com.lightningkite.mppexample
 
 private fun ViewContext.textField(
-    label: ReactiveScope.() -> String,
+    label: ReactiveScope.() -> String = { "" },
     hint: ReactiveScope.() -> String = { "" },
     text: Writable<String>,
     keyboardHints: KeyboardHints? = null,
     minValue: Double?,
     maxValue: Double?,
+    leadingIcon: ImageVector? = null,
 ) {
+    val padding = if (leadingIcon == null) Insets(8.px) else Insets(
+        left = leadingIcon.width + 12.px, top = 8.px, right = 8.px, bottom = 8.px
+    )
+
     column {
         caption {
             ::content{ label() }
+            ::exists { label().isNotEmpty() }
             selectable = false
         } in padding(Insets(bottom = 4.px))
-        nativeTextField {
-            bind(text)
-            ::hint { hint() }
-            if (keyboardHints != null)
-                this.keyboardHints = keyboardHints
-            if (minValue != null)
-                this.minValue = minValue
-            if (maxValue != null)
-                this.maxValue = maxValue
-        } in padding(8.px) in interactive(
-            background = Background(
-                corners = CornerRadii(8.px),
-                stroke = Color.gray(0.7f),
-                strokeWidth = 1.px,
-            ),
-            focusedBackground = Background(
-                stroke = theme.primary.background.closestColor(),
-                strokeWidth = 1.px,
+
+        stack {
+            nativeTextField {
+                bind(text)
+                ::hint { hint() }
+                if (keyboardHints != null) this.keyboardHints = keyboardHints
+                if (minValue != null) this.minValue = minValue
+                if (maxValue != null) this.maxValue = maxValue
+            } in padding(padding) in interactive(
+                background = Background(
+                    corners = CornerRadii(8.px),
+                    stroke = Color.gray(0.7f),
+                    strokeWidth = 1.px,
+                ), focusedBackground = Background(
+                    stroke = theme.primary.background.closestColor(),
+                    strokeWidth = 1.px,
+                )
             )
-        )
+            if (leadingIcon != null) image {
+                source = leadingIcon
+            } in stackCenter() in stackLeft() in margin(Insets(left = 8.px)) in ignoreInteraction()
+        }
     } in padding(Insets.symmetric(vertical = 8.px))
 }
 
 fun ViewContext.textField(
-    label: ReactiveScope.() -> String,
+    label: ReactiveScope.() -> String = { "" },
     hint: ReactiveScope.() -> String = { "" },
     text: Writable<String>,
     keyboardHints: KeyboardHints? = null,
+    leadingIcon: ImageVector? = null,
 ) = textField(
     label = label,
     hint = hint,
@@ -48,28 +57,32 @@ fun ViewContext.textField(
     keyboardHints = keyboardHints,
     minValue = null,
     maxValue = null,
+    leadingIcon = leadingIcon,
 )
 
 fun ViewContext.integerInput(
-    label: String,
+    label: String = "",
     hint: String = "",
     value: Writable<Int>,
     min: Int? = null,
-    max: Int? = null
+    max: Int? = null,
+    leadingIcon: ImageVector? = null,
 ) = integerInput(
     label = { label },
     hint = { hint },
     value = value,
     min = min,
     max = max,
+    leadingIcon = leadingIcon,
 )
 
 fun ViewContext.integerInput(
-    label: ReactiveScope.() -> String,
+    label: ReactiveScope.() -> String = { "" },
     hint: ReactiveScope.() -> String = { "" },
     value: Writable<Int>,
     min: Int? = null,
-    max: Int? = null
+    max: Int? = null,
+    leadingIcon: ImageVector? = null,
 ) {
     val text = Property(value.once.toString())
 
@@ -100,5 +113,6 @@ fun ViewContext.integerInput(
         keyboardHints = KeyboardHints.integer,
         minValue = min?.toDouble(),
         maxValue = max?.toDouble(),
+        leadingIcon = leadingIcon,
     )
 }

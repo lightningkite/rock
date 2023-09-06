@@ -5,18 +5,13 @@ import com.lightningkite.mppexample.*
 class Cart : RockScreen {
     override fun ViewContext.render() {
         column {
-            withTheme(theme.primaryTheme()) {
-                h3 {
-                    content = "Cart"
-                } in background(theme.normal.background)
-            } in margin(Insets(bottom = 16.px))
+            appBar(title = "Cart")
             val cartProducts = SharedReadable {
                 cartItems.current.map { it.product }
             }
             forEach(
                 data = { cartProducts.current },
                 render = { it ->
-                    println("Rendering card")
                     cartCard(
                         product = it
                     )

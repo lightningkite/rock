@@ -11,15 +11,12 @@ data class Category(
 )
 
 open class CategoryScreen(
-    private val category: Category
+    private val category: Category,
+    private val showBackButton: Boolean = true
 ) : RockScreen {
     override fun ViewContext.render() {
         box {
-            withTheme(theme.primaryTheme()) {
-                h3 {
-                    content = category.name
-                } in background(theme.normal.background)
-            } in margin(Insets(bottom = 16.px))
+            appBar(title = category.name, showBackButton = showBackButton)
 
             forEach(
                 data = { category.subcategories },

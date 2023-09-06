@@ -37,6 +37,7 @@ actual class ViewContext(
     }
 
     val elementToDoList = ArrayList<HTMLElement.() -> Unit>()
+    val wrapperToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
 
     inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
@@ -64,9 +65,11 @@ actual class ViewContext(
             stack.last().appendChild(this)
             while (toPop > 0) {
                 val item = stack.removeLast()
+                wrapperToDoList.forEach { it(item) }
                 stack.last().appendChild(item)
                 toPop--
             }
+            wrapperToDoList.clear()
         }
     }
 }

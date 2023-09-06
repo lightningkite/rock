@@ -1,15 +1,14 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLLabelElement
-import org.w3c.dom.get
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NativeTextField = HTMLInputElement
 
-actual inline fun ViewContext.nativeTextField(setup: NativeTextField.() -> Unit): Unit =
+actual inline fun ViewContext.nativeTextField(
+    setup: NativeTextField.() -> Unit
+): Unit =
     element<HTMLInputElement>("input") {
         type = "text"
         style.width = "100%"
@@ -127,11 +126,18 @@ actual var NativeTextField.validation: InputValidation
             maxLength = value.maxLength
     }
 
-//actual var NativeTextField.variant: TextFieldVariant
+//actual var NativeTextField.leadingIcon: ImageVector?
 //    get() = throw NotImplementedError()
 //    set(value) {
-//        className = when(value) {
-//            TextFieldVariant.Unstyled -> ""
-//            TextFieldVariant.Outlined -> "rock-mui-text-field"
+//        val div = previousElementSibling as? HTMLDivElement
+//        if (value == null) {
+//            if (div != null) {
+//                div.remove()
+//            }
+//        } else {
+//            if (div == null) {
+//                insertAdjacentHTML("beforebegin", "<div class=\"rock-mui-text-field-icon\"></div>")
+//            }
+//            previousElementSibling?.firstChild?.asDynamic()?.src = value.toWeb()
 //        }
 //    }

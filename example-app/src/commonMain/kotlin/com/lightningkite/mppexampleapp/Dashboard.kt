@@ -172,7 +172,8 @@ val rootCategory = Category(
 )
 
 class Dashboard : CategoryScreen(
-    category = rootCategory
+    category = rootCategory,
+    showBackButton = false
 ) {
 
     override fun createPath(): String = PATH

@@ -4,32 +4,7 @@ import com.lightningkite.mppexample.*
 
 class MyApp : RockApp {
     override fun ViewContext.render() {
-        val theme = Theme(
-            titleFont = systemDefaultFont,
-            bodyFont = systemDefaultFont,
-            baseSize = 18.0,
-            normal = PaintPair(
-                foreground = Color.black, background = Color.white
-            ),
-            primary = PaintPair(
-                foreground = Color.white, background = Color.fromHex(0x1566B7)
-            ),
-            accent = PaintPair(
-                foreground = Color.white,
-                background = Color.fromHex(0x9C27B0),
-            ),
-            normalDisabled = PaintPair(
-                foreground = Color.fromHex(0x999999), background = Color.white
-            ),
-            primaryDisabled = PaintPair(
-                foreground = Color.fromHex(0xededed), background = Color.fromHex(0x666666)
-            ),
-            accentDisabled = PaintPair(
-                foreground = Color.fromHex(0x999999), background = Color.green
-            ),
-        )
-
-        withTheme(theme) {
+        withTheme(appTheme) {
             column {
                 box {
                     routerView(
@@ -51,6 +26,8 @@ class MyApp : RockApp {
                                     )
                                 },
                                 Route(Cart.PATH) { _, _ -> Cart() },
+                                Route(Favorites.PATH) { _, _ -> Favorites() },
+                                Route(Search.PATH) { _, _ -> Search() },
                             ), fallback = NotFound()
                         )
                     )
@@ -74,7 +51,16 @@ class MyApp : RockApp {
                                 path = "M4.45067 13.9082L11.4033 20.4395C11.6428 20.6644 11.7625 20.7769 11.9037 20.8046C11.9673 20.8171 12.0327 20.8171 12.0963 20.8046C12.2375 20.7769 12.3572 20.6644 12.5967 20.4395L19.5493 13.9082C21.5055 12.0706 21.743 9.0466 20.0978 6.92607L19.7885 6.52734C17.8203 3.99058 13.8696 4.41601 12.4867 7.31365C12.2913 7.72296 11.7087 7.72296 11.5133 7.31365C10.1304 4.41601 6.17972 3.99058 4.21154 6.52735L3.90219 6.92607C2.25695 9.0466 2.4945 12.0706 4.45067 13.9082Z",
                             )
                         )
-                    ), onClick = { navigator.replace(Dashboard()) })
+                    ), onClick = { navigator.replace(Favorites()) })
+                    navButton(text = { "Search" }, icon = ImageVector(
+                        width = 24.px, height = 24.px, paths = listOf(
+                            ImageVector.Path(
+                                strokeColor = Color.black,
+                                path = "M15.7955 15.8111L21 21M18 10.5C18 14.6421 14.6421 18 10.5 18C6.35786 18 3 14.6421 3 10.5C3 6.35786 6.35786 3 10.5 3C14.6421 3 18 6.35786 18 10.5Z",
+                                strokeWidth = 2
+                            )
+                        )
+                    ), onClick = { navigator.replace(Search()) })
                     navButton(text = {
                         val size = cartItems.current.size
                         if (size == 0) "Cart" else "Cart ($size)"
@@ -150,6 +136,19 @@ private fun findProduct(key: String, category: Category): Product? {
     return null
 }
 
+fun searchProducts(query: String, category: Category): List<Product> {
+    val result = ArrayList<Product>()
+    for (product in category.products) {
+        if (product.name.contains(query, ignoreCase = true)) {
+            result.add(product)
+        }
+    }
+    for (sub in category.subcategories) {
+        result.addAll(searchProducts(query, sub))
+    }
+    return result.map { it.key to it }.toMap().values.toList() // filter out duplicates, not necessary if products are unique to a single category
+}
+
 data class CartItem(
     val product: Product, val quantity: Int
 )
@@ -162,19 +161,10 @@ val ViewContext.cartItems by viewContextAddon(
     )
 )
 
-fun <A, B> Readable<A>.distinctUntilChanged(map: (A) -> B): Readable<B> {
-    return object : Readable<B> {
-        override var once: B = map(this@distinctUntilChanged.once)
-            private set
-
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            return this@distinctUntilChanged.addListener {
-                val newValue = map(this@distinctUntilChanged.once)
-                if (newValue != once) {
-                    once = newValue
-                    listener()
-                }
-            }
-        }
-    }
-}
+val ViewContext.favorites by viewContextAddon(
+    Property<List<Product>>(
+        listOf(
+            findProduct("ic-surge-device", rootCategory)!!,
+        )
+    )
+)

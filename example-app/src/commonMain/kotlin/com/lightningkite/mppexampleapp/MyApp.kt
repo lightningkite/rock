@@ -23,25 +23,25 @@ class MyApp : RockApp {
                 navigationItems = listOf(
                     NavigationItem(
                         title = "Home", screen = Dashboard(),
-                        icon = Icon.Home,
+                        icon = RockIcon.Home,
                     ),
                     NavigationItem(
                         title = "Favorites", screen = Favorites(),
-                        icon = Icon.HeartOutlined,
+                        icon = RockIcon.HeartOutlined,
                     ),
                     NavigationItem(
                         title = "Search", screen = Search(),
-                        icon = Icon.Cart
+                        icon = RockIcon.Search
                     ),
                     NavigationItem(
                         title = "Account",
                         screen = Account(),
-                        icon = Icon.Account
+                        icon = RockIcon.Account
                     ),
                     NavigationItem(
                         title = "Cart",
                         screen = Cart(),
-                        icon = Icon.Cart
+                        icon = RockIcon.Cart
                     )
                 ),
                 router = Router(
@@ -106,12 +106,14 @@ fun searchProducts(query: String, category: Category): List<Product> {
         .toMap().values.toList() // filter out duplicates, not necessary if products are unique to a single category
 }
 
+@Serializable
 data class CartItem(
     val product: Product, val quantity: Int
 )
 
 val ViewContext.cartItems by viewContextAddon(
-    Property<List<CartItem>>(
+    PersistentProperty<List<CartItem>>(
+        "rock.demo.cart",
         listOf(
             CartItem(product = findProduct("ic-surge-device", rootCategory)!!, quantity = 1),
         )
@@ -119,7 +121,8 @@ val ViewContext.cartItems by viewContextAddon(
 )
 
 val ViewContext.favorites by viewContextAddon(
-    Property<List<Product>>(
+    PersistentProperty<List<Product>>(
+        "rock.demo.favorites",
         listOf(
             findProduct("ic-surge-device", rootCategory)!!,
         )

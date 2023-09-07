@@ -11,7 +11,7 @@ data class Category(
 )
 
 open class CategoryScreen(
-    private val category: Category, private val showBackButton: Boolean = true
+    private val category: Category, private val showBackButton: Boolean = false
 ) : AuthenticatedScreen() {
     override fun ViewContext.renderAuthenticated() {
         box {
@@ -32,9 +32,6 @@ open class CategoryScreen(
     }
 
     override fun createPath(): String = "/categories/${category.key}"
-    override val icon = null
-    override val title = category.name
-    override val showInNavigation = false
 
     companion object {
         const val PATH = "/categories/{categoryKey}"

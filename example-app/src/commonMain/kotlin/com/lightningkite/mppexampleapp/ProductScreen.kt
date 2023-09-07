@@ -1,7 +1,9 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexample.*
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Product(
     val name: String,
     val key: String,
@@ -82,39 +84,24 @@ class ProductScreen(
                         quantity set 1
                     }
                 ) {
-                    text { content = "Add to Cart" }
-                } in padding(Insets.symmetric(horizontal = 8.px))
+                    text("Add to Cart")
+                } in padding(horizontal = 8.px)
 
                 textButton(
-                    onClick = {
-                        favorites.modify {
-                            if (favorited.once) {
-                                it - product
-                            } else {
-                                it + product
-                            }
-                        }
-                    }
+                    onClick = { favorites.modify { if (favorited.once) it - product else it + product } }
                 ) {
-                    stack {
-                        text {
-                            ::visible { favorited.current }
-                            content = "Remove from Favorites"
-                        }
-                        text {
-                            ::visible { !favorited.current }
-                            content = "Add to Favorites"
-                        }
-                    }
+                    icon(
+                        icon = { if (favorited.current) RockIcon.HeartFilled else RockIcon.HeartOutlined },
+                        width = 24.px, height = 24.px,
+                        color = theme.normal.foreground.closestColor()
+                    ) in margin(right = 6.px)
+                    text { ::content{ if (favorited.current) "Remove from Favorites" else "Add to Favorites" } }
                 }
             } in alignCenter()
         }
     }
 
     override fun createPath(): String = "/product/${product.key}"
-    override val icon = null
-    override val title = "Product Screen"
-    override val showInNavigation = false
 
     companion object {
         const val PATH = "/product/{productKey}"

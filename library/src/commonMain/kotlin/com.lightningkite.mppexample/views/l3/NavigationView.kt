@@ -56,9 +56,7 @@ private fun ViewContext.navButton(
                         icon.toVector(
                             width = 32.px,
                             height = 32.px,
-                            strokeColor = theme.normal.foreground.closestColor(),
-                            strokeWidth = 1.0,
-                            fillColor = theme.normal.foreground.closestColor(),
+                            color = theme.normal.foreground.closestColor(),
                         )
                     }
                 } in padding(Insets(right = 6.px))

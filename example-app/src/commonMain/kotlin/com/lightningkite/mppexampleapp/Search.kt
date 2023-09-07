@@ -34,9 +34,6 @@ class Search : AuthenticatedScreen() {
     }
 
     override fun createPath(): String = PATH
-    override val icon = null
-    override val title = "Search"
-    override val showInNavigation = true
 
     companion object {
         const val PATH = "/search"

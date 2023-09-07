@@ -206,6 +206,10 @@ actual fun ViewContext.padding(insets: Insets): ViewWrapper {
 actual fun ViewContext.padding(insets: Dimension): ViewWrapper = padding(Insets(insets))
 
 @ViewModifierDsl3
+actual fun ViewContext.padding(horizontal: Dimension, vertical: Dimension): ViewWrapper =
+    padding(Insets.symmetric(horizontal = horizontal, vertical = vertical))
+
+@ViewModifierDsl3
 actual fun ViewContext.padding(left: Dimension, top: Dimension, right: Dimension, bottom: Dimension): ViewWrapper =
     padding(Insets(left, top, right, bottom))
 
@@ -226,6 +230,10 @@ actual fun ViewContext.margin(left: Dimension, top: Dimension, right: Dimension,
 
 @ViewModifierDsl3
 actual fun ViewContext.margin(insets: Dimension): ViewWrapper = margin(Insets(insets))
+
+@ViewModifierDsl3
+actual fun ViewContext.margin(horizontal: Dimension, vertical: Dimension): ViewWrapper =
+    margin(Insets.symmetric(horizontal = horizontal, vertical = vertical))
 
 @ViewModifierDsl3
 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {

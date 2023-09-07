@@ -56,13 +56,29 @@ expect fun ViewContext.padding(insets: Insets = Insets.zero()): ViewWrapper
 expect fun ViewContext.padding(insets: Dimension): ViewWrapper
 
 @ViewModifierDsl3
-expect fun ViewContext.padding(left: Dimension = 0.px, top: Dimension = 0.px, right: Dimension = 0.px, bottom: Dimension = 0.px): ViewWrapper
+expect fun ViewContext.padding(horizontal: Dimension = 0.px, vertical: Dimension = 0.px): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.padding(
+    left: Dimension = 0.px,
+    top: Dimension = 0.px,
+    right: Dimension = 0.px,
+    bottom: Dimension = 0.px
+): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.margin(insets: Insets = Insets.zero()): ViewWrapper
 
 @ViewModifierDsl3
-expect fun ViewContext.margin(left: Dimension = 0.px, top: Dimension = 0.px, right: Dimension = 0.px, bottom: Dimension = 0.px): ViewWrapper
+expect fun ViewContext.margin(horizontal: Dimension = 0.px, vertical: Dimension = 0.px): ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewContext.margin(
+    left: Dimension = 0.px,
+    top: Dimension = 0.px,
+    right: Dimension = 0.px,
+    bottom: Dimension = 0.px
+): ViewWrapper
 
 @ViewModifierDsl3
 expect fun ViewContext.margin(insets: Dimension): ViewWrapper

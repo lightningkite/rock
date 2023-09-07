@@ -85,9 +85,6 @@ data class RouteNode(
 interface RockScreen {
     fun ViewContext.render()
     fun createPath(): String
-    val title: String
-    val icon: ImageVector?
-    val showInNavigation: Boolean
 }
 
 interface RockApp {

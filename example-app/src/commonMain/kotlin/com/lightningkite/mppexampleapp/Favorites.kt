@@ -20,9 +20,6 @@ class Favorites : AuthenticatedScreen() {
     }
 
     override fun createPath(): String = PATH
-    override val icon = null
-    override val title = "Favorites"
-    override val showInNavigation = true
 
     companion object {
         const val PATH = "/favorites"

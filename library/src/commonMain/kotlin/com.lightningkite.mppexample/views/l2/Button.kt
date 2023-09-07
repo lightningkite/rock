@@ -91,7 +91,8 @@ fun ViewContext.button(
                 withTheme(buttonTheme) {
                     stack {
                         activityIndicator(visible = loadingProp) in stackCenter()
-                        box {
+                        row {
+                            gravity = RowGravity.Center
                             ::visible { !loadingProp.current }
                             setup()
                         } in stackCenter()

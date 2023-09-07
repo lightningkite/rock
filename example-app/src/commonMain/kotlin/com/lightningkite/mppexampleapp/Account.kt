@@ -23,9 +23,6 @@ class Account : AuthenticatedScreen() {
     }
 
     override fun createPath(): String = PATH
-    override val icon = null
-    override val title = "Account"
-    override val showInNavigation = true
 
     companion object {
         const val PATH = "/account"

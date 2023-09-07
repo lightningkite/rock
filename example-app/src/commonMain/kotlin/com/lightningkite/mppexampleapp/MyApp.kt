@@ -16,6 +16,26 @@ abstract class AuthenticatedScreen : RockScreen {
 class MyApp : RockApp {
     override fun ViewContext.render() {
         withTheme(appTheme) {
+
+//            val list = Property(listOf("1","2","3"))
+//
+//            box {
+//                text("outside")
+//                forEach(
+//                    data = { list.current },
+//                    render = { it ->
+//                        text(it)
+//                    }
+//                )
+//                text("outside")
+//                button(onClick = {
+//                    list.modify { it + "4" }
+//                    println(list.once)
+//                }) {
+//                    text("CLICK")
+//                }
+//            }
+
             navigationView(
                 showNavigation = {
                     currentUser.current != null

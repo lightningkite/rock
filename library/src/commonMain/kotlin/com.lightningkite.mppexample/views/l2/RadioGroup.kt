@@ -30,7 +30,7 @@ fun <T> ViewContext.radioGroup(
                     )
                     activeColor = theme.primary.background.closestColor()
                     ::radioDisabled { disabled() }
-                } in margin(right = 4.px)
+                } in margin(right = 6.px)
                 text(getLabel(option)) in clickable(enabled) { innerProp set getKey(option) }
             } in margin(vertical = 4.px)
         }

@@ -20,7 +20,6 @@ fun ViewContext.navigationView(
             ::exists { showNavigation() }
 
             forEach(
-                direction = ForEachDirection.Horizontal,
                 data = { navigationItems },
                 render = { it ->
                     navButton(

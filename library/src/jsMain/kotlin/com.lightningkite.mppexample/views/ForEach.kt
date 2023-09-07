@@ -7,57 +7,74 @@ import org.w3c.dom.*
 actual typealias ForEach = HTMLFormElement
 
 @ViewDsl
-actual inline fun <T> ViewContext.forEach(
-    crossinline data: ReactiveScope.() -> List<T>,
-    crossinline render: NView.(T) -> Unit,
-    crossinline fallback: NView.() -> Unit,
-    noinline separator: (NView.() -> Unit)?,
-    direction: ForEachDirection
+actual fun <T> ViewContext.forEach(
+    data: ReactiveScope.() -> List<T>,
+    render: NView.(T) -> Unit,
+    separator: (NView.() -> Unit)?,
+    fallback: NView.() -> Unit,
 ): Unit = forEach(
     data = data,
     render = { _, item -> render(item) },
     fallback = fallback,
     separator = separator,
-    direction = direction
 )
 
 @ViewDsl
-actual inline fun <T> ViewContext.forEach(
-    crossinline data: ReactiveScope.() -> List<T>,
-    crossinline render: NView.(Int, T) -> Unit,
-    crossinline fallback: NView.() -> Unit,
-    noinline separator: (NView.() -> Unit)?,
-    direction: ForEachDirection
+actual fun <T> ViewContext.forEach(
+    data: ReactiveScope.() -> List<T>,
+    render: NView.(Int, T) -> Unit,
+    separator: (NView.() -> Unit)?,
+    fallback: NView.() -> Unit,
 ) {
+    val container = this.stack.last()
     val theme = this.theme
+    var firstRun = true
+    lateinit var startMarker: HTMLElement
+    var endMarker: HTMLElement? = null
 
     box {
-        var container = this as HTMLElement
-        reactiveScope {
-            val items = data()
-            val newContainer = document.createElement("div") as HTMLDivElement
-            newContainer.style.display = "flex"
-            newContainer.style.flexDirection = when (direction) {
-                ForEachDirection.Horizontal -> "row"
-                ForEachDirection.Vertical -> "column"
+        startMarker = this
+        exists = false
+    }
+    reactiveScope {
+        val items = data()
+
+//        render new items into a temporary div
+        val newContainer = document.createElement("div") as HTMLDivElement
+        withTheme(theme) {
+            element(newContainer) {
+                if (items.isEmpty())
+                    fallback()
+                else
+                    items.forEachIndexed { index, item ->
+                        render(index, item)
+                        if (index != items.lastIndex && separator != null)
+                            separator()
+                    }
             }
-            withTheme(theme) {
-                element(newContainer) {
-                    if (items.isEmpty()) {
-                        fallback()
-                    } else
-                        items.forEachIndexed { index, item ->
-                            render(index, item)
-                            if (index != items.lastIndex && separator != null)
-                                separator()
-                        }
-                }
-            }
-            container.replaceWith(newContainer)
-            container = newContainer
         }
+        val startIndex = container.children.asList().indexOf(startMarker) + 1
+        val endIndex = (if (endMarker == null) startIndex else container.children.asList().indexOf(endMarker!!)) - 1
+
+//        remove previous items
+        for (i in endIndex downTo startIndex)
+            container.removeChild(container.children.asList()[i])
+
+//        move items from newContainer to the correct place in container
+        var insertAfter = startMarker
+        while (newContainer.children.asList().isNotEmpty()) {
+            val nextChild = newContainer.children.asList().first() as HTMLElement
+            insertAfter.after(nextChild)
+            insertAfter = nextChild
+        }
+        newContainer.remove()
+    }
+    box {
+        endMarker = this
+        exists = false
     }
 }
+
 
 //
 //actual inline fun <T> FLEXBOX.setChildren(

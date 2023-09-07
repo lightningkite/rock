@@ -14,7 +14,7 @@ fun ViewContext.switch(
             checkedColor = theme.primary.background.closestColor()
             checkedForegroundColor = theme.primary.foreground.closestColor()
             ::switchDisabled { disabled() }
-        } in margin(right = 4.px)
+        } in margin(right = 6.px)
         row {
             gravity = RowGravity.Center
             setup()

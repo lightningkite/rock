@@ -14,7 +14,7 @@ fun ViewContext.checkBox(
             ::disabled { disabled() }
             checkedColor = theme.primary.background.closestColor()
             checkedForegroundColor = theme.primary.foreground.closestColor()
-        } in margin(right = 4.px)
+        } in margin(right = 6.px)
         row {
             gravity = RowGravity.Center
             setup()
@@ -25,6 +25,5 @@ fun ViewContext.checkBox(
 @ViewDsl
 fun ViewContext.checkBox(
     checked: Writable<Boolean>,
-    disabled: Boolean = false,
     setup: NView.() -> Unit,
-) = checkBox(checked = checked, disabled = { disabled }, setup = setup)
+) = checkBox(checked = checked, disabled = { false }, setup = setup)

@@ -4,11 +4,9 @@ expect class NativeDropDown : NView
 typealias Spinner = NativeDropDown
 
 @ViewDsl
-expect fun ViewContext.nativeDropDown(setup: NativeDropDown.() -> Unit = {}): Unit
-
-expect fun <T> NativeDropDown.bind(
-    options: ReactiveScope.() -> List<T>,
+expect fun <T> ViewContext.nativeDropDown(
+    options: Readable<List<T>>,
     getLabel: (T) -> String,
     getKey: (T) -> String,
-    prop: Writable<T?>,
+    prop: Writable<T>,
 ): Unit

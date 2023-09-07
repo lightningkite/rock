@@ -1,9 +1,11 @@
 package com.lightningkite.mppexample
 
 
-expect class CheckBox : NView
+expect class NativeCheckBox : NView
 
 @ViewDsl
-expect fun ViewContext.checkBox(setup: CheckBox.() -> Unit = {}): Unit
+expect fun ViewContext.nativeCheckBox(setup: NativeCheckBox.() -> Unit = {}): Unit
 
-expect fun CheckBox.bind(checked: Writable<Boolean>): Unit
+expect fun NativeCheckBox.bind(checked: Writable<Boolean>): Unit
+expect var NativeCheckBox.checkedColor: Color
+expect var NativeCheckBox.checkedForegroundColor: Color

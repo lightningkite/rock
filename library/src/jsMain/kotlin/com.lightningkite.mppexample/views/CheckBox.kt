@@ -4,27 +4,36 @@ import org.w3c.dom.*
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias CheckBox = HTMLLabelElement
+actual typealias NativeCheckBox = HTMLInputElement
 
 @ViewDsl
-actual inline fun ViewContext.checkBox(setup: CheckBox.() -> Unit): Unit = element<HTMLLabelElement>("label") {
-    style.setProperty("user-select", "none")
-    element<HTMLInputElement>("input") {
-        type = "checkbox"
-    }
+actual inline fun ViewContext.nativeCheckBox(setup: NativeCheckBox.() -> Unit): Unit = element<HTMLInputElement>("input") {
+    classList.add("rock-checkbox")
+    type = "checkbox"
+    checkedColor = Color.black
+    checkedForegroundColor = Color.white
     setup()
 }
 
-@ViewDsl
-actual fun CheckBox.bind(checked: Writable<Boolean>) {
-    val checkbox = this.querySelector("input[type='checkbox']") as HTMLInputElement? ?: return
-    checkbox.checked = checked.once
-    checkbox.addEventListener("input", {
+actual fun NativeCheckBox.bind(checked: Writable<Boolean>) {
+    addEventListener("input", {
         checked set (it.currentTarget as HTMLInputElement).checked
     })
 
     reactiveScope {
         val checkedState = checked.current
-        checkbox.checked = checkedState
+        this@bind.checked = checkedState
     }
 }
+
+actual var NativeCheckBox.checkedColor: Color
+    get() = throw NotImplementedError()
+    set(value) {
+        style.setProperty("--active", value.toWeb())
+    }
+
+actual var NativeCheckBox.checkedForegroundColor: Color
+    get() = throw NotImplementedError()
+    set(value) {
+        style.setProperty("--active-inner", value.toWeb())
+    }

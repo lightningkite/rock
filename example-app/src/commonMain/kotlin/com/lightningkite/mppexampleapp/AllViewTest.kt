@@ -138,15 +138,6 @@ fun ViewContext.allViewTest() {
             ::visible { counter.current % 2 == 0 }
         }
 
-        radioGroup {
-            bind(
-                options = { listOf("one", "two") },
-                prop = radioProp,
-                getLabel = { it },
-                getKey = { it }
-            )
-        }
-
         row {
             alpha = 0.8
             rotation = Angle(-0.015f)
@@ -255,7 +246,7 @@ fun ViewContext.allViewTest() {
             ::content { "You selected: '${dropdownProp.current}'" }
         }
 
-        checkBox {
+        nativeCheckBox {
             bind(checkedProp)
             nativeText {
                 ::content { "I am ${if (checkedProp.current) "" else " not "} checked" }

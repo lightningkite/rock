@@ -4,10 +4,31 @@ import com.lightningkite.mppexample.*
 
 class Account : AuthenticatedScreen() {
     override fun ViewContext.renderAuthenticated() {
+        val checked = PersistentProperty("rock.demo.account.checkbox", true)
+        val radio = PersistentProperty("rock.demo.account.radio", "one")
+        val switch = PersistentProperty("rock.demo.account.switch", true)
+
         column {
             appBar(title = "Account")
             column {
                 text { content = "This is your account." }
+
+                checkBox(checked) {
+                    text("Some important setting")
+                }
+
+                radioGroup(
+                    options = { listOf("one", "two", "three") },
+                    value = radio,
+                    getKey = { it },
+                    getLabel = { it }
+                )
+
+                switch {
+                    bind(switch)
+                    text("Hello")
+                }
+
                 button(
                     onClick = {
                         currentUser set null

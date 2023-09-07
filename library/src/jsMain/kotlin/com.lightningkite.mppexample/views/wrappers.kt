@@ -367,6 +367,9 @@ actual fun ViewContext.clickable(
         addEventListener("click", {
             if (enabled.once) launch(onClick)
         })
+        reactiveScope {
+            style.cursor = if (enabled.current) "pointer" else "unset"
+        }
     }
     return ViewWrapper
 }

@@ -37,3 +37,9 @@ actual var NativeCheckBox.checkedForegroundColor: Color
     set(value) {
         style.setProperty("--active-inner", value.toWeb())
     }
+
+actual var NativeCheckBox.disabled: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        this.disabled = value
+    }

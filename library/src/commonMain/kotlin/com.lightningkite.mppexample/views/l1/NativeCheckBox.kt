@@ -9,3 +9,4 @@ expect fun ViewContext.nativeCheckBox(setup: NativeCheckBox.() -> Unit = {}): Un
 expect fun NativeCheckBox.bind(checked: Writable<Boolean>): Unit
 expect var NativeCheckBox.checkedColor: Color
 expect var NativeCheckBox.checkedForegroundColor: Color
+expect var NativeCheckBox.disabled: Boolean

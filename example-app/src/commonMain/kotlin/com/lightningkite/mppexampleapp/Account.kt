@@ -13,7 +13,7 @@ class Account : AuthenticatedScreen() {
             column {
                 text { content = "This is your account." }
 
-                checkBox(checked) {
+                checkBox(checked, disabled = { true }) {
                     text("Some important setting")
                 }
 
@@ -21,10 +21,11 @@ class Account : AuthenticatedScreen() {
                     options = { listOf("one", "two", "three") },
                     value = radio,
                     getKey = { it },
-                    getLabel = { it }
+                    getLabel = { it },
+                    disabled = { true }
                 )
 
-                switch(switch) {
+                switch(switch, disabled = { true }) {
                     text("Hello")
                 }
 

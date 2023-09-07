@@ -6,8 +6,10 @@ fun <T> ViewContext.radioGroup(
     value: Writable<T>,
     getKey: (T) -> String,
     getLabel: (T) -> String,
+    disabled: ReactiveScope.() -> Boolean = { false },
 ) {
     val innerProp = Property(getKey(value.once))
+    val enabled = SharedReadable { !disabled() }
 
     reactiveScope {
         val current = innerProp.current
@@ -17,7 +19,7 @@ fun <T> ViewContext.radioGroup(
     }
 
     forEach(
-        data = {options()},
+        data = { options() },
         render = { option ->
             row {
                 gravity = RowGravity.Center
@@ -27,8 +29,9 @@ fun <T> ViewContext.radioGroup(
                         value = getKey(option)
                     )
                     activeColor = theme.primary.background.closestColor()
+                    ::radioDisabled { disabled() }
                 } in margin(right = 4.px)
-                text(getLabel(option)) in clickable { innerProp set getKey(option) }
+                text(getLabel(option)) in clickable(enabled) { innerProp set getKey(option) }
             } in margin(vertical = 4.px)
         }
     ) in margin(vertical = 2.px)

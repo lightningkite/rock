@@ -38,3 +38,10 @@ actual fun NativeSwitch.bind(checked: Writable<Boolean>) {
         this@bind.checked = checkedState
     }
 }
+
+actual var NativeSwitch.switchDisabled: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        this as HTMLInputElement
+        disabled = value
+    }

@@ -9,4 +9,7 @@ expect fun <T> ViewContext.nativeDropDown(
     getLabel: (T) -> String,
     getKey: (T) -> String,
     prop: Writable<T>,
+    setup: NativeDropDown.() -> Unit = {},
 ): Unit
+
+expect var NativeDropDown.disabled: Boolean

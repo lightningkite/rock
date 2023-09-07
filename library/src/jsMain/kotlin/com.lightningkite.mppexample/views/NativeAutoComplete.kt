@@ -4,31 +4,31 @@ import kotlinx.browser.document
 import org.w3c.dom.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias AutoCompleteTextView = HTMLDataListElement
+actual typealias NativeAutoComplete = HTMLInputElement
 
 @ViewDsl
-actual inline fun ViewContext.autoCompleteTextView(setup: AutoCompleteTextView.() -> Unit): Unit =
-    element<HTMLDataListElement>("div") {
-        nativeTextField {}
+actual inline fun ViewContext.nativeAutoComplete(
+    setup: NativeAutoComplete.() -> Unit,
+): Unit {
+    nativeTextField {
         setup()
     }
+}
 
 var nextAutocompleteId = 0
 
 @JsName("AutocompleteTextViewBind")
-actual fun <T> AutoCompleteTextView.bind(
+actual fun <T> NativeAutoComplete.bind(
     options: ReactiveScope.() -> List<T>,
     getLabel: (T) -> String,
     getKey: (T) -> String,
     prop: Writable<T?>,
 ) {
-    val input = getElementsByTagName("input")[0] as HTMLInputElement
-
     val currentValue = prop.once
-    input.value = if (currentValue == null) "" else getLabel(currentValue)
+    value = if (currentValue == null) "" else getLabel(currentValue)
     reactiveScope {
         val newValue = prop.current
-        input.value = if (newValue == null) "" else getLabel(newValue)
+        value = if (newValue == null) "" else getLabel(newValue)
     }
 
 
@@ -51,9 +51,9 @@ actual fun <T> AutoCompleteTextView.bind(
         }
     }
     document.body?.appendChild(datalist)
-    input.setAttribute("list", datalist.id)
+    setAttribute("list", datalist.id)
 
-    input.addEventListener("input", {
+    addEventListener("input", {
         val stringValue = it.currentTarget.asDynamic().value as String
         val value = map[stringValue]
         if (prop.once != value)
@@ -61,23 +61,14 @@ actual fun <T> AutoCompleteTextView.bind(
     })
 }
 
-actual var AutoCompleteTextView.label: String
+actual var NativeAutoComplete.autoCompleteTextStyle: TextStyle
     get() = throw NotImplementedError()
     set(value) {
-        val label = getElementsByTagName("div")[0] as NativeTextField
-        label.hint = value
+        setStyles(value)
     }
 
-actual var AutoCompleteTextView.textStyle: TextStyle
+actual var NativeAutoComplete.autoCompleteHint: String
     get() = throw NotImplementedError()
     set(value) {
-        val input = getElementsByTagName("input")[0] as HTMLInputElement
-        input.setStyles(value)
-    }
-
-actual var AutoCompleteTextView.labelStyle: TextStyle
-    get() = throw NotImplementedError()
-    set(value) {
-        val child = firstChild as HTMLDivElement
-        child.style.setProperty("--text-field-color", value.color.toWeb()) // set the outline color to match the label color
+        placeholder = value
     }

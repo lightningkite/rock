@@ -1,4 +1,5 @@
 # TODO
 
-- [ ] Remove the unnecessary navigation details on RockScreen
+- [ ] review forms / validation
+- [ ] polish up autocomplete
 - 

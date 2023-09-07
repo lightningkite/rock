@@ -413,3 +413,7 @@ input[type='checkbox'].switch:checked {
   --ab: var(--active-inner);
   --x: 17px;
 }
+
+select:disabled {
+  cursor: not-allowed;
+}

@@ -8,6 +8,8 @@ class Account : AuthenticatedScreen() {
         val radio = PersistentProperty("rock.demo.account.radio", "one")
         val switch = PersistentProperty("rock.demo.account.switch", true)
         val dropdown = PersistentProperty<String?>("rock.demo.account.dropdown", "two")
+        val textField = Property(currentUser.once?.email ?: "")
+        val autocomplete = Property<String?>("one")
 
         column {
             appBar(title = "Account")
@@ -52,6 +54,19 @@ class Account : AuthenticatedScreen() {
                 button(onClick = {
                     dropdownOptions.modify { it + "another" }
                 }) { text("Add item to dropdown") }
+
+                textField(
+                    label = { "Test" },
+                    text = textField,
+                )
+
+                autoComplete(
+                    label = "AutoComplete",
+                    options = { listOf("one", "two", "three") },
+                    prop = autocomplete,
+                    getKey = { it },
+                    getLabel = { it }
+                )
             } in padding(16.px)
         }
     }

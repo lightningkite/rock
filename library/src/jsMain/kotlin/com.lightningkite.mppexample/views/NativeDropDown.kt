@@ -1,8 +1,6 @@
 package com.lightningkite.mppexample
 
-import kotlinx.browser.document
 import org.w3c.dom.*
-import org.w3c.dom.events.Event
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -14,6 +12,7 @@ actual inline fun <T> ViewContext.nativeDropDown(
     crossinline getLabel: (T) -> String,
     crossinline getKey: (T) -> String,
     prop: Writable<T>,
+    setup: NativeDropDown.() -> Unit,
 ): Unit = element<HTMLSelectElement>("select") {
     forEach(
         data = { options.current },
@@ -42,7 +41,15 @@ actual inline fun <T> ViewContext.nativeDropDown(
         if (!found && options.current.isNotEmpty())
             prop set options.current.first()
     }
+
+    setup()
 }
+
+actual var NativeDropDown.disabled: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        this.disabled = value
+    }
 
 
 //actual fun <T> NativeDropDown.bind(

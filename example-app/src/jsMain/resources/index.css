@@ -37,110 +37,6 @@ body > div {
 	}
 }
 
-.rock-mui-text-field {
-	position: relative;
-	--text-field-color: indigo;
-}
-
-.rock-mui-text-field input::placeholder {
-	opacity: 0;
-}
-
-.rock-mui-text-field input {
-	width: 100%;
-	height: 60px;
-	font-size: 1.2rem;
-	padding: 10px 16px 10px 16px;
-	outline: none;
-	border: 1px solid gray;
-	box-sizing: border-box;
-	border-radius: 5px;
-}
-
-.rock-mui-text-field input:invalid {
-	border: 1px solid red;
-}
-
-.rock-mui-text-field label {
-	position: absolute;
-	left: 16px;
-	top: 50%;
-	transform: translateY(-50%);
-	font-size: 1.2rem;
-	color: gray;
-	letter-spacing: 1px;
-	transition: .3s;
-	font-weight: 600;
-}
-
-.rock-mui-text-field input:focus + label,
-.rock-mui-text-field input:not(:placeholder-shown) + label {
-	top: 2px;
-	font-size: .8rem;
-	background: #fff;
-	padding: 7px;
-}
-
-.rock-mui-text-field input:focus + label {
-	color: var(--text-field-color);
-}
-
-.rock-mui-text-field input:focus {
-	border: 2px solid var(--text-field-color);
-}
-
-.rock-mui-switch {
-	user-select: none;
-	cursor: pointer;
-	display: inline-flex;
-	align-items: center;
-	position: relative;
-	height: 36px;
-}
-
-.rock-mui-switch>input[type="checkbox"] {
-	width: 1px;
-	height: 1px;
-	position: absolute;
-	top: 0;
-	left: 0;
-	opacity: 0;
-}
-
-.rock-mui-switch .rock-mui-switch-check {
-	width: 48px;
-	height: 16px;
-	background-color: #929292;
-	overflow-x: visible;
-	overflow-y: visible;
-	position: relative;
-	border-radius: 8px;
-	transition: linear all 0.2s;
-}
-
-.rock-mui-switch input[type="checkbox"]:checked~.rock-mui-switch-check {
-	background-color: #a2a2a2;
-}
-
-.rock-mui-switch .rock-mui-switch-check::after {
-	content: "";
-	transition: linear all 0.2s;
-	position: absolute;
-	display: block;
-	width: 22px;
-	height: 22px;
-	z-index: 2;
-	margin-top: -3px;
-	margin-left: -3px;
-	border-radius: 50%;
-	background-color: #555;
-	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-}
-
-.rock-mui-switch input:checked~.rock-mui-switch-check::after {
-	background-color: #00aba9;
-	transform: translateX(30px);
-}
 
 
 
@@ -394,7 +290,9 @@ button:disabled span, button[disabled] span {
 		 top: 0;
 		 position: absolute;
 		 transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s);
-		 opacity: var(--o, 0);
+	}
+	input[type='checkbox']:not(.switch)::after, input[type='radio']::after {
+	opacity: var(--o, 0);
 	}
 	 input[type='checkbox']:checked, input[type='radio']:checked {
 		 --b: var(--active);
@@ -413,13 +311,10 @@ button:disabled span, button[disabled] span {
 		 --b: var(--disabled-inner);
 		 --bc: var(--border);
 	}
-	 input[type='checkbox']:hover:not(:checked):not(:disabled), input[type='radio']:hover:not(:checked):not(:disabled) {
-		 --bc: var(--border-hover);
-	}
-	 input[type='checkbox'] {
+	 input[type='checkbox']:not(.switch) {
 		 border-radius: 7px;
 	}
-	 input[type='checkbox']::after {
+	 input[type='checkbox']:not(.switch)::after {
 		 width: 5px;
 		 height: 9px;
 		 border: 2px solid var(--active-inner);
@@ -429,7 +324,7 @@ button:disabled span, button[disabled] span {
 		 top: 50%;
 		 transform: translateX(-50%) translateY(-65%) rotate(var(--r, 20deg));
 	}
-	 input[type='checkbox']:checked {
+	 input[type='checkbox']:not(.switch):checked {
 		 --r: 43deg;
 	}
 	 input[type='radio'] {
@@ -449,4 +344,24 @@ button:disabled span, button[disabled] span {
 	 input[type='radio']:checked {
 		 --s: 0.5;
 	}
+	input[type='checkbox'].switch {
+	    width: 38px;
+	    border-radius: 11px;
+	}
+	input[type='checkbox'].switch::after {
+     		 left: 2px;
+     		 top: 2px;
+     		 border-radius: 50%;
+     		 width: 15px;
+     		 height: 15px;
+     		 background: var(--ab, var(--border));
+     		 transform: translateX(var(--x, 0));
+     	}
+     	 input[type='checkbox'].switch:checked {
+     		 --ab: var(--active-inner);
+     		 --x: 17px;
+     	}
+     	 input[type='checkbox'].switch:disabled:not(:checked)::after {
+     		 opacity: 0.6;
+     	}
 

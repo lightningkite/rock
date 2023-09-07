@@ -24,8 +24,7 @@ class Account : AuthenticatedScreen() {
                     getLabel = { it }
                 )
 
-                switch {
-                    bind(switch)
+                switch(switch) {
                     text("Hello")
                 }
 

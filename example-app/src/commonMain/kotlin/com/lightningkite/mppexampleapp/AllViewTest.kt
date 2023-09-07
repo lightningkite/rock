@@ -43,7 +43,7 @@ fun ViewContext.allViewTest() {
             listItems set listOf(counter.current, 2, 3, 4, 5)
         }
 
-        switch {
+        nativeSwitch {
             bind(switchProp)
 
             nativeText { content = "Switch Label" }

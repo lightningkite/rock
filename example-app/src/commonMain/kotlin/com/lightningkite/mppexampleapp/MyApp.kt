@@ -40,30 +40,32 @@ class MyApp : RockApp {
                 showNavigation = {
                     currentUser.current != null
                 },
-                navigationItems = listOf(
-                    NavigationItem(
-                        title = "Home", screen = Dashboard(),
-                        icon = RockIcon.Home,
-                    ),
-                    NavigationItem(
-                        title = "Favorites", screen = Favorites(),
-                        icon = RockIcon.HeartOutlined,
-                    ),
-                    NavigationItem(
-                        title = "Search", screen = Search(),
-                        icon = RockIcon.Search
-                    ),
-                    NavigationItem(
-                        title = "Account",
-                        screen = Account(),
-                        icon = RockIcon.Account
-                    ),
-                    NavigationItem(
-                        title = "Cart",
-                        screen = Cart(),
-                        icon = RockIcon.Cart
+                tabs = {
+                    listOf(
+                        NavigationTab(
+                            title = "Home", screen = Dashboard(),
+                            icon = RockIcon.Home,
+                        ),
+                        NavigationTab(
+                            title = "Favorites", screen = Favorites(),
+                            icon = RockIcon.HeartOutlined,
+                        ),
+                        NavigationTab(
+                            title = "Search", screen = Search(),
+                            icon = RockIcon.Search
+                        ),
+                        NavigationTab(
+                            title = "Account",
+                            screen = Account(),
+                            icon = RockIcon.Account
+                        ),
+                        NavigationTab(
+                            title = "Cart",
+                            screen = Cart(),
+                            icon = RockIcon.Cart
+                        )
                     )
-                ),
+                },
                 router = Router(
                     routes = listOf(
                         Route(Login.PATH) { _, params -> Login.create(params) },

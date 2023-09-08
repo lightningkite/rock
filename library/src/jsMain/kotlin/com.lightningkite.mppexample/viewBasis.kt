@@ -153,13 +153,6 @@ private val HTMLElement.removeListeners: MutableList<() -> Unit>
 private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
     get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
-actual var NView.id: String
-    get() = throw NotImplementedError()
-    set(value) {
-        id = value
-    }
-
 actual var NView.cursor: String
     get() = throw NotImplementedError()
     set(value) {

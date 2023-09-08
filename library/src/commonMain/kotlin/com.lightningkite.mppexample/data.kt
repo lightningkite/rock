@@ -93,7 +93,7 @@ expect val Int.rem: Dimension
 expect val Double.rem: Dimension
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 
-data class NavigationItem(
+data class NavigationTab(
     val title: String,
     val icon: Icon,
     val screen: RockScreen

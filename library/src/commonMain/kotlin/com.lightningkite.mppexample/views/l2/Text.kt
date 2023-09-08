@@ -14,8 +14,8 @@ fun TextLevel.toMultiplier(): Float = when (this) {
 }
 
 @ViewDsl
-inline fun ViewContext.text(level: TextLevel, crossinline setup: Text.() -> Unit) {
-    val textSetup: Text.() -> Unit = {
+inline fun ViewContext.text(level: TextLevel, crossinline setup: NativeText.() -> Unit) {
+    val textSetup: NativeText.() -> Unit = {
         textStyle = TextStyle(
             size = theme.baseSize * level.toMultiplier(),
             color = if (level == TextLevel.Caption) theme.normal.foreground.closestColor()
@@ -40,49 +40,49 @@ inline fun ViewContext.text(level: TextLevel, crossinline setup: Text.() -> Unit
 }
 
 @ViewDsl
-inline fun ViewContext.caption(crossinline setup: Text.() -> Unit) = text(TextLevel.Caption, setup)
+inline fun ViewContext.caption(crossinline setup: NativeText.() -> Unit) = text(TextLevel.Caption, setup)
 
 @ViewDsl
 fun ViewContext.caption(text: String) = caption { content = text }
 
 @ViewDsl
-inline fun ViewContext.text(crossinline setup: Text.() -> Unit) = text(TextLevel.Body, setup)
+inline fun ViewContext.text(crossinline setup: NativeText.() -> Unit) = text(TextLevel.Body, setup)
 
 @ViewDsl
 fun ViewContext.text(text: String) = text { content = text }
 
 @ViewDsl
-inline fun ViewContext.h1(crossinline setup: Text.() -> Unit) = text(TextLevel.H1, setup)
+inline fun ViewContext.h1(crossinline setup: NativeText.() -> Unit) = text(TextLevel.H1, setup)
 
 @ViewDsl
 fun ViewContext.h1(text: String) = h1 { content = text }
 
 @ViewDsl
-inline fun ViewContext.h2(crossinline setup: Text.() -> Unit) = text(TextLevel.H2, setup)
+inline fun ViewContext.h2(crossinline setup: NativeText.() -> Unit) = text(TextLevel.H2, setup)
 
 @ViewDsl
 fun ViewContext.h2(text: String) = h2 { content = text }
 
 @ViewDsl
-inline fun ViewContext.h3(crossinline setup: Text.() -> Unit) = text(TextLevel.H3, setup)
+inline fun ViewContext.h3(crossinline setup: NativeText.() -> Unit) = text(TextLevel.H3, setup)
 
 @ViewDsl
 fun ViewContext.h3(text: String) = h3 { content = text }
 
 @ViewDsl
-inline fun ViewContext.h4(crossinline setup: Text.() -> Unit) = text(TextLevel.H4, setup)
+inline fun ViewContext.h4(crossinline setup: NativeText.() -> Unit) = text(TextLevel.H4, setup)
 
 @ViewDsl
 fun ViewContext.h4(text: String) = h4 { content = text }
 
 @ViewDsl
-inline fun ViewContext.h5(crossinline setup: Text.() -> Unit) = text(TextLevel.H5, setup)
+inline fun ViewContext.h5(crossinline setup: NativeText.() -> Unit) = text(TextLevel.H5, setup)
 
 @ViewDsl
 fun ViewContext.h5(text: String) = h5 { content = text }
 
 @ViewDsl
-inline fun ViewContext.h6(crossinline setup: Text.() -> Unit) = text(TextLevel.H6, setup)
+inline fun ViewContext.h6(crossinline setup: NativeText.() -> Unit) = text(TextLevel.H6, setup)
 
 @ViewDsl
 fun ViewContext.h6(text: String) = h6 { content = text }

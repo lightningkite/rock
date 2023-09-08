@@ -3,7 +3,7 @@ package com.lightningkite.mppexample
 
 fun ViewContext.navigationView(
     router: Router,
-    navigationItems: List<NavigationItem>,
+    tabs: ReactiveScope.() -> List<NavigationTab>,
     showNavigation: ReactiveScope.() -> Boolean
 ) {
     column {
@@ -11,49 +11,9 @@ fun ViewContext.navigationView(
             routerView(router)
         } in background(paint = Color.fromHex(0xfafafa), padding = Insets.none) in weight(1f)
 
-        box {
-            ::exists { showNavigation() }
-
-            forEach(
-                data = { navigationItems },
-                render = { it ->
-                    navButton(
-                        text = it.title, icon = it.icon, screen = it.screen
-                    )
-                },
-                separator = { space() in weight(1f) }
-            ) in fullWidth()
-
-        } in background(paint = Color.white) in sizedBox(
-            SizeConstraints(
-                minHeight = 96.px, maxHeight = 96.px
-            )
+        tabLayout(
+            tabs = tabs,
+            exists = showNavigation
         )
     } in fullWidth() in fullHeight()
-}
-
-private fun ViewContext.navButton(
-    text: String,
-    icon: Icon,
-    screen: RockScreen
-) {
-    button(
-        options = ButtonOptions(variant = ButtonVariant.Text),
-        disabled = { false },
-        onClick = { navigator.navigate(screen) }
-    ) {
-        row {
-            gravity = RowGravity.Center
-            image {
-                ::source {
-                    icon.toVector(
-                        width = 32.px,
-                        height = 32.px,
-                        color = theme.normal.foreground.closestColor(),
-                    )
-                }
-            } in padding(Insets(right = 6.px))
-            text { content = text }
-        }
-    }
 }

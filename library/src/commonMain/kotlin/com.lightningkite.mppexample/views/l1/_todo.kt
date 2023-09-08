@@ -16,11 +16,6 @@ package com.lightningkite.mppexample
 //expect var SeekBar.progressBackgroundTint: Color
 //expect val SeekBar.value: Writable<Double>
 //
-//expect class TabLayout: NView
-//expect fun ViewContext.tabLayout(setup: TabLayout.()->Unit = {}): Unit
-//expect var TabLayout.scrolls: Boolean
-//expect var TabLayout.tabs: List<Tab>
-//
 //expect class ToggleButton: NView
 //expect fun ViewContext.toggleButton(setup: ToggleButton.()->Unit = {}): Unit
 //expect var ToggleButton.text: String

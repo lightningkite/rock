@@ -5,3 +5,4 @@
 - [X] View Navigation System (url based)
 - [ ] Consolidate platform specific modules into the one multiplatform module
 - [ ] URL encoder/decoder (a quick proof of concept is in URL.kt)
+- [ ] Extend the navigation view to allow side/drawer navigation

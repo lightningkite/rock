@@ -98,7 +98,16 @@ class Account : AuthenticatedScreen() {
                     to = CategoryScreen(rootCategory.subcategories[0])
                     content = "Cart Link With A Long Name"
                 }
-            } in padding(16.px)
+
+                recyclerView(
+                    data = (1..100).toList(),
+                    render = {
+                        text(it.toString())
+                    },
+                    height = 200.px,
+                    itemHeight = 20.px
+                ) in sizedBox(SizeConstraints(maxHeight = 400.px))
+            } in padding(16.px) in scrolls()
         }
     }
 

@@ -1,9 +1,6 @@
 package com.lightningkite.mppexample
 
 
-//expect class RecyclerView: NView
-//expect fun ViewContext.recyclerView(setup: RecyclerView.()->Unit = {}): Unit
-//
 //expect class Pager: NView
 //expect fun ViewContext.pager(setup: Pager.()->Unit = {}): Unit
 //

@@ -90,6 +90,13 @@ actual fun <T> ViewContext.recyclerView(
                     scrollPositionCache[i + 1] = height + scrollPositionCache[i]
                 }
                 lastIndexInCache set max(lastIndex, lastIndexInCache.once)
+
+//                check ahead for items that should be visible but aren't yet
+                if (scrollEndPosition.current > scrollPositionCache[lastIndex]) {
+                    val newItemsToShow =
+                        (scrollEndPosition.current - scrollPositionCache[lastIndex]) / estimatedItemHeightInPixels + 1
+                    lastVisibleIndex set min(lastIndex + newItemsToShow, data.lastIndex)
+                }
             }
         }
         val observer = ResizeObserver {

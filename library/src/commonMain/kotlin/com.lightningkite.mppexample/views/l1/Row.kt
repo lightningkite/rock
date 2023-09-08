@@ -8,5 +8,5 @@ expect fun ViewContext.row(setup: Row.() -> Unit = {}): Unit
 expect var Row.gravity: RowGravity
 
 enum class RowGravity {
-    Left, Center, Right
+    Top, Center, Bottom
 }

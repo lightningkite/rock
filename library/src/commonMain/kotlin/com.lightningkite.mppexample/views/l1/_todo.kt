@@ -13,12 +13,5 @@ package com.lightningkite.mppexample
 //expect var SeekBar.progressBackgroundTint: Color
 //expect val SeekBar.value: Writable<Double>
 //
-//expect class ToggleButton: NView
-//expect fun ViewContext.toggleButton(setup: ToggleButton.()->Unit = {}): Unit
-//expect var ToggleButton.text: String
-//expect var ToggleButton.textStyle: TextStyle
-//expect var ToggleButton.gravity: String
-//expect val ToggleButton.checked: Writable<Boolean>
-//
 //expect class Video: NView
 //expect fun ViewContext.videoView(setup: Video.()->Unit = {}): Video

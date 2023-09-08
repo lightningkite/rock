@@ -33,3 +33,18 @@ fun <T> ViewContext.dropDown(
         )
     )
 }
+
+@ViewDsl
+fun <T> ViewContext.spinner(
+    options: Readable<List<T>>,
+    getLabel: (T) -> String,
+    getKey: (T) -> String,
+    prop: Writable<T>,
+    disabled: ReactiveScope.() -> Boolean = { false },
+) = dropDown(
+    options = options,
+    getLabel = getLabel,
+    getKey = getKey,
+    prop = prop,
+    disabled = disabled,
+)

@@ -5,17 +5,6 @@ import org.w3c.dom.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias ActivityIndicator = HTMLDivElement
 
-fun ActivityIndicator.setupSharedIndicator(color: Color) {
-    style.display = "block"
-    style.position = "absolute"
-    style.width = "100%"
-    style.height = "100%"
-    style.border = "4px solid #fff"
-    style.borderRadius = "50%"
-    style.animation = "rock-activity-indicator 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite"
-    style.borderColor = "${color.toWeb()} transparent transparent transparent"
-}
-
 @ViewDsl
 actual inline fun ViewContext.nativeActivityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
     element<HTMLDivElement>("div") {
@@ -80,3 +69,14 @@ actual var ActivityIndicator.lineWidth: Dimension
             it.style.borderWidth = value.value
         }
     }
+
+fun ActivityIndicator.setupSharedIndicator(color: Color) {
+    style.display = "block"
+    style.position = "absolute"
+    style.width = "100%"
+    style.height = "100%"
+    style.border = "4px solid #fff"
+    style.borderRadius = "50%"
+    style.animation = "rock-activity-indicator 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite"
+    style.borderColor = "${color.toWeb()} transparent transparent transparent"
+}

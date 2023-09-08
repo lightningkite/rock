@@ -14,7 +14,7 @@ fun ViewContext.buttonGroup(
 ) = run {
     val loading = if (disableAllWhenLoading) Property(false) else null
 
-    forEach(
+    forEachIndexed(
         data = { buttons.reversed() },
         render = { index, item ->
             val actualIndex = buttons.size - index - 1

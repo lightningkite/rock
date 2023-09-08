@@ -1,9 +1,5 @@
 package com.lightningkite.mppexample
 
-import org.w3c.dom.HTMLDivElement
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias TabLayout = HTMLDivElement
 
 @ViewDsl
 actual fun ViewContext.tabLayout(tabs: ReactiveScope.() -> List<NavigationTab>, exists: ReactiveScope. () -> Boolean): Unit {

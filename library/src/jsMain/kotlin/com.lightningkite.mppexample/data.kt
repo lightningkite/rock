@@ -1,5 +1,8 @@
 package com.lightningkite.mppexample
 
+import org.w3c.dom.DOMRectReadOnly
+import org.w3c.dom.HTMLElement
+
 actual typealias DimensionRaw = String
 actual val Int.px: Dimension
     get() = Dimension("${this}px")

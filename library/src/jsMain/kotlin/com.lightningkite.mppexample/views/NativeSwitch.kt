@@ -2,7 +2,6 @@ package com.lightningkite.mppexample
 
 import org.w3c.dom.*
 
-
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NativeSwitch = HTMLElement
 

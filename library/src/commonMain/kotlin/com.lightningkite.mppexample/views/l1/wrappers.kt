@@ -108,6 +108,21 @@ expect fun ViewContext.interactive(
 ): ViewWrapper
 
 @ViewModifierDsl3
+expect fun ViewContext.changingInteractive(
+    transitions: Boolean = true,
+    background: (ReactiveScope.() -> Background)? = null,
+    hoverBackground: (ReactiveScope.() -> Background)? = null,
+    downBackground: (ReactiveScope.() -> Background)? = null,
+    focusedBackground: (ReactiveScope.() -> Background)? = null,
+    disabledBackground: (ReactiveScope.() -> Background)? = null,
+    elevation: (ReactiveScope.() -> Dimension)? = null,
+    hoverElevation: (ReactiveScope.() -> Dimension)? = null,
+    downElevation: (ReactiveScope.() -> Dimension)? = null,
+    focusedElevation: (ReactiveScope.() -> Dimension)? = null,
+    disabledElevation: (ReactiveScope.() -> Dimension)? = null,
+): ViewWrapper
+
+@ViewModifierDsl3
 expect fun ViewContext.scrolls(): ViewWrapper
 
 @ViewModifierDsl3

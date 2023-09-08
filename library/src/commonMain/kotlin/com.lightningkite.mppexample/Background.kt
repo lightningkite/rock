@@ -33,10 +33,10 @@ data class Background(
 }
 
 data class CornerRadii(
-    val topLeft: Dimension,
-    val topRight: Dimension,
-    val bottomLeft: Dimension,
-    val bottomRight: Dimension
+    val topLeft: Dimension = 0.px,
+    val topRight: Dimension = 0.px,
+    val bottomLeft: Dimension = 0.px,
+    val bottomRight: Dimension = 0.px
 ) {
     constructor(all: Dimension) : this(all, all, all, all)
 }

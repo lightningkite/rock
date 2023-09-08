@@ -3,16 +3,13 @@ package com.lightningkite.mppexample
 import kotlinx.browser.document
 import org.w3c.dom.*
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias ForEach = HTMLFormElement
-
 @ViewDsl
 actual fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
     render: ViewContext.(T) -> Unit,
     separator: (ViewContext.() -> Unit)?,
     fallback: ViewContext.() -> Unit,
-): Unit = forEach(
+): Unit = forEachIndexed(
     data = data,
     render = { _, item -> render(item) },
     fallback = fallback,
@@ -20,7 +17,7 @@ actual fun <T> ViewContext.forEach(
 )
 
 @ViewDsl
-actual fun <T> ViewContext.forEach(
+actual fun <T> ViewContext.forEachIndexed(
     data: ReactiveScope.() -> List<T>,
     render: ViewContext.(Int, T) -> Unit,
     separator: (ViewContext.() -> Unit)?,

@@ -9,7 +9,7 @@ actual typealias NativeAutoComplete = HTMLInputElement
 @ViewDsl
 actual inline fun ViewContext.nativeAutoComplete(
     setup: NativeAutoComplete.() -> Unit,
-): Unit {
+) {
     nativeTextField {
         setup()
     }

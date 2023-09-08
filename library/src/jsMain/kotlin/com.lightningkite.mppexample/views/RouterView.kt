@@ -1,11 +1,7 @@
 package com.lightningkite.mppexample
 
 
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias RouterView = HTMLDivElement
 
 const val MAX_REDIRECTS = 3
 

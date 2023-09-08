@@ -1,40 +1,6 @@
 package com.lightningkite.mppexample
 
-val BORDER_COLOR = Color.gray(0.8f)
-
-@ViewDsl
-fun <T> ViewContext.listTileGroup(
-    data: ReactiveScope.() -> List<T>,
-    render: ViewContext.(T) -> Unit,
-    fallback: ViewContext.() -> Unit = {},
-) {
-    val enabled = SharedReadable { data().isNotEmpty() }
-
-    column {
-        space() in fullWidth() in sizedBox(SizeConstraints(minHeight = 1.px)) in nativeChangingBackground {
-            Background(
-                fill = if (enabled.current) BORDER_COLOR else Color.transparent
-            )
-        }
-        forEach(
-            data = data, render = render, fallback = fallback
-        )
-        space() in fullWidth() in sizedBox(SizeConstraints(minHeight = 1.px)) in nativeChangingBackground {
-            Background(
-                fill = if (enabled.current) BORDER_COLOR else Color.transparent
-            )
-        }
-    }
-}
-
-@ViewDsl
-fun ViewContext.listTileGroup(setup: NView.() -> Unit) {
-    column {
-        space() in fullWidth() in sizedBox(SizeConstraints(minHeight = 1.px)) in nativeBackground(BORDER_COLOR)
-        setup()
-        space() in fullWidth() in sizedBox(SizeConstraints(minHeight = 1.px)) in nativeBackground(BORDER_COLOR)
-    }
-}
+val LIST_TILE_BORDER_COLOR = Color.gray(0.8f)
 
 @ViewDsl
 fun ViewContext.listTile(onClick: (() -> Unit)? = null, setup: NView.() -> Unit) {
@@ -61,15 +27,15 @@ fun ViewContext.listTile(onClick: (() -> Unit)? = null, setup: NView.() -> Unit)
         interactive(
             background = Background(
                 fill = theme.normal.background,
-                stroke = BORDER_COLOR,
+                stroke = LIST_TILE_BORDER_COLOR,
                 strokeWidth = 1.px,
             ), hoverBackground = Background(
                 fill = theme.normal.background.closestColor().darken(0.1f),
-                stroke = BORDER_COLOR,
+                stroke = LIST_TILE_BORDER_COLOR,
                 strokeWidth = 1.px,
             ), downBackground = Background(
                 fill = theme.normal.background.closestColor().darken(0.2f),
-                stroke = BORDER_COLOR,
+                stroke = LIST_TILE_BORDER_COLOR,
                 strokeWidth = 1.px,
             )
         )
@@ -77,7 +43,7 @@ fun ViewContext.listTile(onClick: (() -> Unit)? = null, setup: NView.() -> Unit)
         nativeBackground(
             Background(
                 fill = theme.normal.background,
-                stroke = BORDER_COLOR,
+                stroke = LIST_TILE_BORDER_COLOR,
                 strokeWidth = 1.px,
             )
         )

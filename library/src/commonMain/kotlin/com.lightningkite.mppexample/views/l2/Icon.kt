@@ -2,14 +2,16 @@ package com.lightningkite.mppexample
 
 @ViewDsl
 fun ViewContext.icon(
-    icon: Icon,
+    icon: Icon?,
     width: Dimension = 24.px,
     height: Dimension = 24.px,
     color: Color? = null,
 ) {
-    image {
-        source = icon.toVector(width = width, height = height, color = color ?: theme.normal.foreground.closestColor())
-    }
+    if (icon != null)
+        image {
+            source =
+                icon.toVector(width = width, height = height, color = color ?: theme.normal.foreground.closestColor())
+        }
 }
 
 @ViewDsl
@@ -38,7 +40,7 @@ fun ViewContext.icon(
 ) = icon(icon = icon, width = width, height = height, color = { color ?: theme.normal.foreground.closestColor() })
 
 enum class RockIcon : Icon {
-    Home, HeartOutlined, HeartFilled, Search, Account, Cart;
+    None, Home, HeartOutlined, HeartFilled, Search, Account, Cart;
 
     override fun toVector(
         width: Dimension,
@@ -46,6 +48,8 @@ enum class RockIcon : Icon {
         color: Color,
     ): ImageVector {
         return when (this) {
+            None -> ImageVector(width = 0.px, height = 0.px, paths = emptyList())
+
             Home -> ImageVector(
                 width = width, height = height, paths = listOf(
                     ImageVector.Path(

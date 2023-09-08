@@ -8,5 +8,5 @@ expect fun ViewContext.column(setup: Column.() -> Unit = {}): Unit
 expect var Column.gravity: ColumnGravity
 
 enum class ColumnGravity {
-    Top, Center, Bottom
+    Left, Center, Right
 }

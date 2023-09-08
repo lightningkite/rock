@@ -8,7 +8,6 @@ actual typealias NativeButton = HTMLButtonElement
 
 @ViewDsl
 actual inline fun ViewContext.nativeButton(setup: NativeButton.() -> Unit): Unit = element<HTMLButtonElement>("button") {
-    type = "submit" // may need to remove this and make it a variable
     style.display = "flex"
     style.flexDirection = "row"
     style.justifyContent = "center"

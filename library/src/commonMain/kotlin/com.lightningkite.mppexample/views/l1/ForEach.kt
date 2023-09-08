@@ -11,7 +11,7 @@ expect fun <T> ViewContext.forEach(
 ): Unit
 
 @ViewDsl
-expect fun <T> ViewContext.forEach(
+expect fun <T> ViewContext.forEachIndexed(
     data: ReactiveScope.() -> List<T>,
     render: ViewContext.(Int, T) -> Unit,
     separator: (ViewContext.() -> Unit)? = null,

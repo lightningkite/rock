@@ -16,8 +16,8 @@ actual var Row.gravity: RowGravity
     get() = throw NotImplementedError()
     set(value) {
         style.alignItems = when (value) {
-            RowGravity.Left -> "flex-start"
+            RowGravity.Top -> "flex-start"
             RowGravity.Center -> "center"
-            RowGravity.Right -> "flex-end"
+            RowGravity.Bottom -> "flex-end"
         }
     }

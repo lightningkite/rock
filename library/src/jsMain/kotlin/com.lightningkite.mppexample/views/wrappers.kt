@@ -134,6 +134,57 @@ actual fun ViewContext.interactive(
 }
 
 @ViewModifierDsl3
+actual fun ViewContext.changingInteractive(
+    transitions: Boolean,
+    background: (ReactiveScope.() -> Background)?,
+    hoverBackground: (ReactiveScope.() -> Background)?,
+    downBackground: (ReactiveScope.() -> Background)?,
+    focusedBackground: (ReactiveScope.() -> Background)?,
+    disabledBackground: (ReactiveScope.() -> Background)?,
+    elevation: (ReactiveScope.() -> Dimension)?,
+    hoverElevation: (ReactiveScope.() -> Dimension)?,
+    downElevation: (ReactiveScope.() -> Dimension)?,
+    focusedElevation: (ReactiveScope.() -> Dimension)?,
+    disabledElevation: (ReactiveScope.() -> Dimension)?
+): ViewWrapper {
+    elementToDoList.add {
+        if (transitions) style.transition = "all 0.15s linear"
+        else style.removeProperty("transition")
+        reactiveScope {
+            if (elevation != null) applyBoxShadow(elevation())
+        }
+        reactiveScope {
+            if (hoverElevation != null) applyBoxShadow(hoverElevation(), "hover-")
+        }
+        reactiveScope {
+            if (downElevation != null) applyBoxShadow(downElevation(), "down-")
+        }
+        reactiveScope {
+            if (focusedElevation != null) applyBoxShadow(focusedElevation(), "focused-")
+        }
+        reactiveScope {
+            if (disabledElevation != null) applyBoxShadow(disabledElevation(), "disabled-")
+        }
+        reactiveScope {
+            if (background != null) applyBackground(background())
+        }
+        reactiveScope {
+            if (hoverBackground != null) applyBackground(hoverBackground(), "hover-")
+        }
+        reactiveScope {
+            if (downBackground != null) applyBackground(downBackground(), "down-")
+        }
+        reactiveScope {
+            if (focusedBackground != null) applyBackground(focusedBackground(), "focused-")
+        }
+        reactiveScope {
+            if (disabledBackground != null) applyBackground(disabledBackground(), "disabled-")
+        }
+    }
+    return ViewWrapper
+}
+
+@ViewModifierDsl3
 actual fun ViewContext.stackCenter(): ViewWrapper = containsNext<HTMLDivElement>("div") {
     style.display = "flex"
     style.justifyContent = "center"

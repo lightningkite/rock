@@ -16,8 +16,8 @@ actual var Column.gravity: ColumnGravity
     get() = throw NotImplementedError()
     set(value) {
         style.alignItems = when (value) {
-            ColumnGravity.Top -> "flex-start"
+            ColumnGravity.Left -> "flex-start"
             ColumnGravity.Center -> "center"
-            ColumnGravity.Bottom -> "flex-end"
+            ColumnGravity.Right -> "flex-end"
         }
     }

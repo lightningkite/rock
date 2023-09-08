@@ -8,7 +8,6 @@ actual typealias NativeCheckBox = HTMLInputElement
 
 @ViewDsl
 actual inline fun ViewContext.nativeCheckBox(setup: NativeCheckBox.() -> Unit): Unit = element<HTMLInputElement>("input") {
-    classList.add("rock-checkbox")
     type = "checkbox"
     checkedColor = Color.black
     checkedForegroundColor = Color.white

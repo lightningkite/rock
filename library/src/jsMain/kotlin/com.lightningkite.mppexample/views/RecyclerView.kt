@@ -4,18 +4,6 @@ import org.w3c.dom.*
 import kotlin.math.max
 import kotlin.math.min
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias RecyclerView = HTMLDivElement
-
-external class ResizeObserver(callback: (Array<ResizeObserverEntry>, ResizeObserver) -> Unit) {
-    fun observe(element: HTMLElement)
-    fun disconnect()
-}
-
-external class ResizeObserverEntry {
-    val contentRect: DOMRectReadOnly
-}
-
 // implementation of binary search such that it returns the index of the first element greater than or equal to the value
 private fun Array<Int>.binarySearch(value: Int): Int {
     var low = 0
@@ -155,4 +143,13 @@ actual fun <T> ViewContext.recyclerView(
         )
         space { ::size { SizeConstraints(minHeight = bottomSpacing.current.px, maxHeight = bottomSpacing.current.px) } }
     } in scrolls()
+}
+
+external class ResizeObserver(callback: (Array<ResizeObserverEntry>, ResizeObserver) -> Unit) {
+    fun observe(element: HTMLElement)
+    fun disconnect()
+}
+
+external class ResizeObserverEntry {
+    val contentRect: DOMRectReadOnly
 }

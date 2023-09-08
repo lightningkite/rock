@@ -2,7 +2,7 @@ package com.lightningkite.mppexample
 
 @ViewDsl
 fun ViewContext.appBar(
-    title: ReactiveScope.() -> String, showBackButton: Boolean = false, setup: NView.() -> Unit = {}
+    title: ReactiveScope.() -> String, showBackButton: Boolean = false
 ) {
     withTheme(theme.primaryTheme()) {
         row {
@@ -38,5 +38,5 @@ fun ViewContext.appBar(
 }
 
 @ViewDsl
-fun ViewContext.appBar(title: String, showBackButton: Boolean = false, setup: NView.() -> Unit = {}) =
-    appBar(title = { title }, showBackButton = showBackButton, setup = setup)
+fun ViewContext.appBar(title: String, showBackButton: Boolean = false) =
+    appBar(title = { title }, showBackButton = showBackButton)

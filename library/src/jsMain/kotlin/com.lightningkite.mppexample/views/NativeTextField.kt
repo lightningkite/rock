@@ -106,23 +106,11 @@ actual var NativeTextField.keyboardHints: KeyboardHints
             }
         }
 
+// I don't think there's an implementation of casing for web other than using JS to manually override casing
 //        when (value.case) {
 //            KeyboardCase.None -> TODO()
 //            KeyboardCase.Letters -> TODO()
 //            KeyboardCase.Words -> TODO()
 //            KeyboardCase.Sentences -> TODO()
 //        }
-    }
-actual var NativeTextField.validation: InputValidation
-    get() = throw NotImplementedError()
-    set(value) {
-        required = value.required
-        if (value.minLength == null)
-            removeAttribute("minLength")
-        else
-            minLength = value.minLength
-        if (value.maxLength == null)
-            removeAttribute("maxLength")
-        else
-            maxLength = value.maxLength
     }

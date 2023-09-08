@@ -9,9 +9,9 @@ data class Theme(
     val normal: PaintPair,
     val primary: PaintPair,
     val accent: PaintPair,
-    val normalDisabled: PaintPair,
-    val primaryDisabled: PaintPair,
-    val accentDisabled: PaintPair,
+    val normalDisabled: PaintPair? = null,
+    val primaryDisabled: PaintPair? = null,
+    val accentDisabled: PaintPair? = null,
     val allCaps: Boolean = false
 ) {
     fun primaryTheme(allCaps: Boolean = false) = copy(

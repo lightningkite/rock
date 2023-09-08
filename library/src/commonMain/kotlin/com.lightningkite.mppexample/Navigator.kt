@@ -33,9 +33,3 @@ class DummyRockNavigator : RockNavigator {
         throw IllegalStateException("Cannot go back without a navigator.")
     }
 }
-
-data class NavigationOptions(
-    val transitions: ScreenTransitions? = null,
-    val pushState: Boolean = true,
-    val reverse: Boolean = false,
-)

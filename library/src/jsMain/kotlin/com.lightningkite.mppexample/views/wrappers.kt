@@ -10,15 +10,6 @@ private fun joinGradientStops(stops: List<GradientStop>): String {
     }
 }
 
-//fun getElementUuid(element: HTMLElement): String {
-//    var current = element.getAttribute("data-rock-uuid")
-//    if (current.isNullOrEmpty()) {
-//       current = uuid()
-//       element.setAttribute("data-rock-uuid", current)
-//    }
-//    return current
-//}
-
 fun LinearGradient.toCss() = "linear-gradient(${angle.turns}turn, ${joinGradientStops(stops)})"
 fun RadialGradient.toCss() = "radial-gradient(circle at center, ${joinGradientStops(stops)})"
 

@@ -6,3 +6,4 @@ expect class ExternalLink : NView
 expect fun ViewContext.externalLink(setup: ExternalLink.() -> Unit = {}): Unit
 
 expect var ExternalLink.to: String
+expect var ExternalLink.content: String

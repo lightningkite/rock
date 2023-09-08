@@ -27,7 +27,7 @@ fun <T> ViewContext.dropDown(
             stroke = theme.primary.background.closestColor().lighten(0.6f),
         ),
         disabledBackground = Background(
-            fill = theme.normalDisabled.background,
+            fill = theme.normalDisabled?.background,
             stroke = Color.gray(0.8f),
             strokeWidth = 1.px,
         )

@@ -11,9 +11,27 @@ class Account : AuthenticatedScreen() {
         val textField = Property(currentUser.once?.email ?: "")
         val autocomplete = Property<String?>("one")
 
+        val swapText = Property("a")
+        val swapProp = Property<ViewContext.() -> Unit>({
+            text("SWAP1")
+        })
+
         column {
             appBar(title = "Account")
+
             column {
+
+                swapView(swapProp)
+
+                button(onClick = {
+                    swapProp set {
+                        text("SWAP${swapText.once}")
+                        swapText.modify { it + "1" }
+                    }
+                }) {
+                    text("SWAP")
+                }
+
                 text { content = "This is your account." }
 
                 checkBox(checked) {
@@ -67,6 +85,19 @@ class Account : AuthenticatedScreen() {
                     getKey = { it },
                     getLabel = { it }
                 )
+
+                text {
+                    ::content { autocomplete.current ?: "n/a" }
+                }
+
+                stack {
+
+                }
+
+                link {
+                    to = CategoryScreen(rootCategory.subcategories[0])
+                    content = "Cart Link With A Long Name"
+                }
             } in padding(16.px)
         }
     }

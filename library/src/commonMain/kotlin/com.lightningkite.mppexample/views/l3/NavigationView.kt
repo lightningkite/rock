@@ -1,10 +1,5 @@
 package com.lightningkite.mppexample
 
-data class NavigationItem(
-    val title: String,
-    val screen: RockScreen,
-    val icon: Icon? = null,
-)
 
 fun ViewContext.navigationView(
     router: Router,
@@ -39,7 +34,7 @@ fun ViewContext.navigationView(
 
 private fun ViewContext.navButton(
     text: String,
-    icon: Icon?,
+    icon: Icon,
     screen: RockScreen
 ) {
     button(
@@ -49,16 +44,15 @@ private fun ViewContext.navButton(
     ) {
         row {
             gravity = RowGravity.Center
-            if (icon != null)
-                image {
-                    ::source {
-                        icon.toVector(
-                            width = 32.px,
-                            height = 32.px,
-                            color = theme.normal.foreground.closestColor(),
-                        )
-                    }
-                } in padding(Insets(right = 6.px))
+            image {
+                ::source {
+                    icon.toVector(
+                        width = 32.px,
+                        height = 32.px,
+                        color = theme.normal.foreground.closestColor(),
+                    )
+                }
+            } in padding(Insets(right = 6.px))
             text { content = text }
         }
     }

@@ -81,7 +81,6 @@ data class RouteNode(
     var create: ScreenCreator?, val children: RouteMap, var dynamicParam: String?
 )
 
-
 interface RockScreen {
     fun ViewContext.render()
     fun createPath(): String

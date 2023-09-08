@@ -21,8 +21,6 @@ actual inline fun ViewContext.nativeActivityIndicator(setup: ActivityIndicator.(
     element<HTMLDivElement>("div") {
         style.display = "inline-block"
         style.position = "relative"
-        width = 80.px
-        height = 80.px
 
         val defaultColor = Color.blue
         box {

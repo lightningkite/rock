@@ -20,7 +20,7 @@ inline fun ViewContext.text(level: TextLevel, crossinline setup: Text.() -> Unit
             size = theme.baseSize * level.toMultiplier(),
             color = if (level == TextLevel.Caption) theme.normal.foreground.closestColor()
                 .lighten(0.4f) else theme.normal.foreground.closestColor(),
-            disabledColor = theme.normalDisabled.foreground.closestColor(),
+            disabledColor = theme.normalDisabled?.foreground?.closestColor() ?: theme.normal.foreground.closestColor(),
             font = theme.bodyFont,
             allCaps = theme.allCaps
         )

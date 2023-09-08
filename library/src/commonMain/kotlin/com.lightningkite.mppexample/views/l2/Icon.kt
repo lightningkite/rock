@@ -1,13 +1,5 @@
 package com.lightningkite.mppexample
 
-interface Icon {
-    fun toVector(
-        width: Dimension,
-        height: Dimension,
-        color: Color,
-    ): ImageVector
-}
-
 @ViewDsl
 fun ViewContext.icon(
     icon: Icon,

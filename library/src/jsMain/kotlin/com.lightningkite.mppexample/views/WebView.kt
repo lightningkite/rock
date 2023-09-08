@@ -6,7 +6,7 @@ import org.w3c.dom.HTMLIFrameElement
 actual typealias WebView = HTMLIFrameElement
 
 @ViewDsl
-actual inline fun ViewContext.webView(setup: WebView.() -> Unit): Unit = element<HTMLIFrameElement>("iframe", setup)
+actual inline fun ViewContext.webView(setup: WebView.() -> Unit): Unit = element("iframe", setup)
 
 actual var WebView.url: String
     get() = src

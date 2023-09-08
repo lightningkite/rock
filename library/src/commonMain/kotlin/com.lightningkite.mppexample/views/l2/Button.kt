@@ -87,16 +87,29 @@ fun ViewContext.button(
             ::clickable { !loadingProp.current && !disabled() }
 
             cursor = "pointer"
-            withRenderContext(ButtonRenderContext(size = options.size)) {
-                withTheme(buttonTheme) {
-                    stack {
-                        activityIndicator(visible = loadingProp) in stackCenter()
-                        row {
-                            gravity = RowGravity.Center
-                            ::visible { !loadingProp.current }
-                            setup()
-                        } in stackCenter()
+            withTheme(buttonTheme) {
+                stack {
+                    val indicatorSize = when (options.size) {
+                        ButtonSize.Small -> 16.px
+                        ButtonSize.Medium -> 24.px
+                        ButtonSize.Large -> 32.px
                     }
+                    activityIndicator(
+                        visible = loadingProp,
+                        color = theme.normal.foreground.closestColor(),
+                        width = indicatorSize,
+                        height = indicatorSize,
+                        lineWidth = when (options.size) {
+                            ButtonSize.Small -> 1.px
+                            ButtonSize.Medium -> 2.px
+                            ButtonSize.Large -> 4.px
+                        }
+                    ) in stackCenter()
+                    row {
+                        gravity = RowGravity.Center
+                        ::visible { !loadingProp.current }
+                        setup()
+                    } in stackCenter()
                 }
             }
         } in padding(
@@ -126,7 +139,7 @@ fun ViewContext.button(
             ),
             downElevation = downElevation,
             disabledBackground = Background(
-                fill = buttonTheme.normalDisabled.background,
+                fill = buttonTheme.normalDisabled?.background,
                 stroke = outline?.toGrayscale(),
                 strokeWidth = if (outline != null) 1.px else 0.px
             ),
@@ -158,6 +171,7 @@ fun ViewContext.button(onClick: suspend () -> Unit, loading: Writable<Boolean>? 
     button(
         options = ButtonOptions(),
         disabled = { false },
+        loading = loading,
         onClick = onClick,
         setup = setup,
     )

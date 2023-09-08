@@ -1,6 +1,6 @@
 package com.lightningkite.mppexample
 
-// TODO replace this with a proper implementation of URL encoding
+// TODO replace this with a proper implementation of URL encoding. this is just a quick proof of concept
 
 val reverseCharMap by lazy {
     val charMap = mutableMapOf<String, Char>()

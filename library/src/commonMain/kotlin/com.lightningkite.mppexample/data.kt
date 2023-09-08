@@ -5,14 +5,12 @@ expect class Font
 expect val systemDefaultFont: Font
 
 expect sealed class ImageSource()
-
 data class ImageVector(
     val paths: List<Path>, val width: Dimension, val height: Dimension,
     val viewBoxMinX: Int = 0, val viewBoxMinY: Int = 0, val viewBoxWidth: Int = 24, val viewBoxHeight: Int = 24
 ) : ImageSource() {
     data class Path(val fillColor: Paint? = null, val strokeColor: Color? = null, val strokeWidth: Double? = null, val path: String)
 }
-
 data class ImageRemote(val url: String) : ImageSource()
 class ImageRaw(val data: ByteArray) : ImageSource()
 expect class ImageResource : ImageSource
@@ -60,7 +58,6 @@ enum class TextGravity {
     Left, Center, Right
 }
 
-
 data class KeyboardHints(
     val case: KeyboardCase = KeyboardCase.None,
     val type: KeyboardType = KeyboardType.Text,
@@ -78,7 +75,6 @@ data class KeyboardHints(
         val newPassword = KeyboardHints(autocomplete = AutoComplete.NewPassword)
     }
 }
-
 enum class AutoComplete { Email, Password, NewPassword, Phone }
 enum class KeyboardCase { None, Letters, Words, Sentences }
 enum class KeyboardType { Text, Integer, Phone, Decimal }
@@ -89,25 +85,24 @@ data class Action(
 )
 
 enum class ImageMode { Fit, Crop, Stretch, NoScale }
-data class Tab(
-    val title: String,
-    val icon: ImageSource,
-    val onSelect: () -> Unit,
-    val onReselect: () -> Unit = onSelect,
-)
 
 expect class DimensionRaw
 value class Dimension(val value: DimensionRaw)
-
 expect val Int.px: Dimension
 expect val Int.rem: Dimension
 expect val Double.rem: Dimension
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 
-data class InputValidation(
-    val required: Boolean = false,
-    val minLength: Int? = null,
-    val maxLength: Int? = null,
+data class NavigationItem(
+    val title: String,
+    val icon: Icon,
+    val screen: RockScreen
 )
 
-enum class TextFieldVariant { Unstyled, Outlined }
+interface Icon {
+    fun toVector(
+        width: Dimension,
+        height: Dimension,
+        color: Color,
+    ): ImageVector
+}

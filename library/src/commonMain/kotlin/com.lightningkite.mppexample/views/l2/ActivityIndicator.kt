@@ -1,33 +1,23 @@
 package com.lightningkite.mppexample
 
 @ViewDsl
-fun ViewContext.activityIndicator(visible: Readable<Boolean>? = null, exists: Property<Boolean>? = null) {
+fun ViewContext.activityIndicator(
+    visible: Readable<Boolean>? = null, exists: Readable<Boolean>? = null,
+    lineWidth: Dimension = 4.px,
+    width: Dimension = 32.px,
+    height: Dimension = 32.px,
+    color: Color? = null
+) {
     nativeActivityIndicator {
         if (exists != null)
             ::exists { exists.current }
         if (visible != null)
             ::visible { visible.current }
 
-        val context = renderContext
-        if (context is ButtonRenderContext) {
-            color = theme.normal.foreground.closestColor()
-
-            val size = when (context.size) {
-                ButtonSize.Small -> 16.px
-                ButtonSize.Medium -> 24.px
-                ButtonSize.Large -> 32.px
-            }
-            width = size
-            height = size
-            lineWidth = when (context.size) {
-                ButtonSize.Small -> 1.px
-                ButtonSize.Medium -> 2.px
-                ButtonSize.Large -> 4.px
-            }
-        } else {
-            color = theme.primary.background.closestColor()
-            lineWidth = 8.px
-        }
+        this.color = color ?: theme.primary.background.closestColor()
+        this.width = width
+        this.height = height
+        this.lineWidth = lineWidth
     }
 }
 

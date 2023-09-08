@@ -9,15 +9,18 @@ actual typealias SwapView = HTMLDivElement
 
 @ViewDsl
 actual fun ViewContext.swapView(child: Readable<ViewContext.() -> Unit>): Unit {
-    box {
-        className = "rock-stack"
-        style.position = "relative"
+    val theme = this.theme
 
+    box {
+        val container = stack.last()
+        val derivedContext = derive(container)
         var oldView: HTMLElement? = null
 
         reactiveScope {
-            with(child.current) {
-                this?.invoke(this@swapView)
+            withTheme(theme) {
+                with(child.current){
+                    invoke(derivedContext)
+                }
             }
             val newView = lastChild as HTMLElement? ?: return@reactiveScope
             oldView?.let { view ->

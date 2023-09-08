@@ -6,47 +6,38 @@ import org.w3c.dom.HTMLSpanElement
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias Text = HTMLSpanElement
 
-fun Text.sharedSetup() {}
-
 @ViewDsl
 actual inline fun ViewContext.nativeText(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("span") {
-    sharedSetup()
     setup()
 }
 
 @ViewDsl
 actual inline fun ViewContext.nativeH1(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h1") {
-    sharedSetup()
     setup()
 }
 
 @ViewDsl
 actual inline fun ViewContext.nativeH2(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h2") {
-    sharedSetup()
     setup()
 }
 
 @ViewDsl
 actual inline fun ViewContext.nativeH3(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h3") {
-    sharedSetup()
     setup()
 }
 
 @ViewDsl
 actual inline fun ViewContext.nativeH4(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h4") {
-    sharedSetup()
     setup()
 }
 
 @ViewDsl
 actual inline fun ViewContext.nativeH5(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h5") {
-    sharedSetup()
     setup()
 }
 
 @ViewDsl
 actual inline fun ViewContext.nativeH6(setup: Text.() -> Unit): Unit = element<HTMLSpanElement>("h6") {
-    sharedSetup()
     setup()
 }
 

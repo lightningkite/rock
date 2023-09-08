@@ -49,64 +49,6 @@ fun ViewContext.allViewTest() {
             nativeText { content = "Switch Label" }
         } in padding(2.rem)
 
-//        form {
-//            bind(formProp) { map ->
-//                println(map)
-//            }
-//            nativeTextField {
-//                validation = InputValidation(required = true)
-//                key = "required-field"
-//                hint = "Required Field"
-//            }
-//            row {
-//                gravity = RowGravity.Center
-//
-//                nativeText { content = "Primary" }
-//                nativeButton {
-//                    nativeText {
-//                        content = "Submit Form (contained)"
-//                    }
-//                    box {
-//                        image {
-//                            scaleType = ImageMode.Fit
-//                            source = ImageRemote("https://picsum.photos/64/64")
-//                        }
-//                    } in sizedBox(
-//                        SizeConstraints(
-//                            height = 32.px
-//                        )
-//                    )
-//                }
-//                nativeButton {
-//                    nativeText {
-//                        content = "Submit Form (outlined)"
-//                    }
-//                }
-//                nativeButton {
-//                    nativeText { content = "Submit Form (text)" }
-//                }
-//            }
-//            row {
-//                gravity = RowGravity.Right
-//
-//                nativeText { content = "Danger" }
-//                nativeButton {
-//                    nativeText { content = "Submit Form (contained)" }
-//                }
-//                box {
-//                    column {
-//                        gravity = ColumnGravity.Center
-//                        nativeButton {
-//                            nativeText { content = "Submit Form (outlined)" }
-//                        }
-//                    }
-//                } in weight(1f)
-//                nativeButton {
-//                    nativeText { content = "Submit Form (text)" }
-//                }
-//            }
-//        } in padding(1.rem)
-
         forEach(
             data = { listItems.current },
             render = { item ->

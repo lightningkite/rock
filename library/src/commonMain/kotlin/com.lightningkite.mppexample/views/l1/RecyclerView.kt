@@ -6,6 +6,5 @@ expect class RecyclerView : NView
 expect fun <T> ViewContext.recyclerView(
     data: List<T>,
     render: NView.(T) -> Unit,
-    height: Dimension,
-    itemHeight: Dimension,
+    estimatedItemHeight: Dimension,
 ): Unit

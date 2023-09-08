@@ -104,10 +104,9 @@ class Account : AuthenticatedScreen() {
                     render = {
                         text(it.toString())
                     },
-                    height = 200.px,
-                    itemHeight = 20.px
-                ) in sizedBox(SizeConstraints(maxHeight = 400.px))
-            } in padding(16.px) in scrolls()
+                    estimatedItemHeight = 20.px
+                ) in weight(1f) in nativeBackground(Color.blue.lighten(0.8f))
+            } in padding(16.px) in scrolls() in weight(1f)
         }
     }
 

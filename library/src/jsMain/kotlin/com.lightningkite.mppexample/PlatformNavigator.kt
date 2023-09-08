@@ -1,7 +1,9 @@
 package com.lightningkite.mppexample
 
 import kotlinx.browser.window
+import org.w3c.dom.MANUAL
 import org.w3c.dom.PopStateEvent
+import org.w3c.dom.ScrollRestoration
 
 actual class PlatformNavigator actual constructor(
     override val router: Router, val onScreenChanged: (RockScreen, Boolean) -> Unit
@@ -36,8 +38,10 @@ actual class PlatformNavigator actual constructor(
             window.history.pushState(
                 nextIndex++, "", path
             )
+            window.history.scrollRestoration = ScrollRestoration.MANUAL
         } else {
             window.history.replaceState(currentIndex, "", path)
+            window.history.scrollRestoration = ScrollRestoration.MANUAL
         }
         val screen = router.findScreen(path)
         if (router.isNavigating)

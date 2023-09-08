@@ -7,18 +7,13 @@ import kotlin.math.min
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias RecyclerView = HTMLDivElement
 
-private fun Dimension.toInt(): Int = value.replace("px", "").toInt()
-
 external class ResizeObserver(callback: (Array<ResizeObserverEntry>) -> Unit) {
     fun observe(element: HTMLElement)
-
-    //    fun unobserve(element: HTMLElement)
     fun disconnect()
 }
 
 external class ResizeObserverEntry {
     val contentRect: DOMRectReadOnly
-    val target: HTMLElement
 }
 
 // implementation of binary search such that it returns the index of the first element greater than or equal to the value
@@ -43,9 +38,9 @@ private fun Array<Int>.binarySearch(value: Int): Int {
 actual fun <T> ViewContext.recyclerView(
     data: List<T>,
     render: NView.(T) -> Unit,
-    estimatedItemHeight: Dimension,
+    estimatedItemHeightInPixels: Int,
 ): Unit {
-    val scrollPositionCache: Array<Int> = Array(data.size) { index -> index * estimatedItemHeight.toInt() }
+    val scrollPositionCache: Array<Int> = Array(data.size) { index -> index * estimatedItemHeightInPixels }
     val lastIndexInCache = Property(-1)
     val scrollEndPosition = Property(0)
     val outerHeight = Property(0)
@@ -59,30 +54,26 @@ actual fun <T> ViewContext.recyclerView(
         else data.subList(firstIndex, lastIndex)
     }
     val innerHeight = SharedReadable {
-        if (lastIndexInCache.current == 0) estimatedItemHeight.toInt() * data.size
+        if (lastIndexInCache.current == 0) estimatedItemHeightInPixels * data.size
         else
-            scrollPositionCache[lastIndexInCache.current] + (data.size - lastIndexInCache.current) * estimatedItemHeight.toInt()
+            scrollPositionCache[lastIndexInCache.current] + (data.size - lastIndexInCache.current) * estimatedItemHeightInPixels
     }
     val topSpacing = SharedReadable {
-//        println("recompute top")
-        if (outerHeight.current == 0) 0.px
+        if (outerHeight.current == 0) 0
         else {
             val firstIndex = firstVisibleIndex.current
-            if (firstIndex == 0) 0.px
+            if (firstIndex == 0) 0
             else
                 if (firstIndex >= lastIndexInCache.current) {
-                    println("HERE")
-                    (scrollPositionCache[lastIndexInCache.current] + (lastIndexInCache.current - firstIndex) * estimatedItemHeight.toInt()).px
+                    scrollPositionCache[lastIndexInCache.current] + (lastIndexInCache.current - firstIndex) * estimatedItemHeightInPixels
                 } else {
-                    println("HERE2, ${firstIndex}")
-                    (scrollPositionCache[firstIndex]).px
+                    scrollPositionCache[firstIndex]
                 }
         }
     }
     val bottomSpacing = SharedReadable {
-//        println("recompute bottom")
-        if (outerHeight.current == 0) 0.px
-        else (innerHeight.current - topSpacing.current.toInt() - outerHeight.current).px
+        if (outerHeight.current == 0) 0
+        else innerHeight.current - topSpacing.current - outerHeight.current
     }
 
     column {
@@ -95,23 +86,17 @@ actual fun <T> ViewContext.recyclerView(
                 for (i in startIndex..lastIndex) {
                     val child = this@column.children[i + 2 - firstIndex] ?: continue
                     val height = child.getBoundingClientRect().height.toInt()
-                    scrollPositionCache[i] = height + (if (i == 0) 0 else scrollPositionCache[i - 1])
+                    if (i >= scrollPositionCache.size) break
+                    scrollPositionCache[i + 1] = height + scrollPositionCache[i]
                 }
                 lastIndexInCache set max(lastIndex, lastIndexInCache.once)
-
-                if (scrollEndPosition.current > scrollPositionCache[lastIndex]) {
-//                check ahead for items that should be visible but aren't yet
-                    val newItemsToShow =
-                        (scrollEndPosition.current - scrollPositionCache[lastIndex]) / estimatedItemHeight.toInt() + 1
-                    lastVisibleIndex set min(lastIndex + newItemsToShow, data.lastIndex)
-                }
             }
         }
         val observer = ResizeObserver {
             val height = it[0].contentRect.height.toInt()
             outerHeight set height
             if (visibleItems.once.isEmpty()) {
-                val lastIndex = height / estimatedItemHeight.toInt() + 1
+                val lastIndex = height / estimatedItemHeightInPixels + 1
                 firstVisibleIndex set 0
                 lastVisibleIndex set lastIndex
                 scrollEndPosition set height
@@ -130,11 +115,11 @@ actual fun <T> ViewContext.recyclerView(
             lastVisibleIndex set min(lastIndex + 1, data.lastIndex)
         }, js("{passive:true}"))
 
-        space { ::size { SizeConstraints(minHeight = topSpacing.current, maxHeight = topSpacing.current) } }
+        space { ::size { SizeConstraints(minHeight = topSpacing.current.px, maxHeight = topSpacing.current.px) } }
         forEach(
             data = { visibleItems.current },
             render = render,
         )
-        space { ::size { SizeConstraints(minHeight = bottomSpacing.current, maxHeight = bottomSpacing.current) } }
+        space { ::size { SizeConstraints(minHeight = bottomSpacing.current.px, maxHeight = bottomSpacing.current.px) } }
     } in scrolls()
 }

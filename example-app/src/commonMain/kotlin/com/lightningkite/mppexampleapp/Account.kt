@@ -104,7 +104,7 @@ class Account : AuthenticatedScreen() {
                     render = {
                         text(it.toString())
                     },
-                    estimatedItemHeight = 20.px
+                    estimatedItemHeightInPixels = 20.px
                 ) in weight(1f) in nativeBackground(Color.blue.lighten(0.8f))
             } in padding(16.px) in scrolls() in weight(1f)
         }

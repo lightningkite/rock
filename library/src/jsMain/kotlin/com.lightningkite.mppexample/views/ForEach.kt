@@ -9,9 +9,9 @@ actual typealias ForEach = HTMLFormElement
 @ViewDsl
 actual fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
-    render: NView.(T) -> Unit,
-    separator: (NView.() -> Unit)?,
-    fallback: NView.() -> Unit,
+    render: ViewContext.(T) -> Unit,
+    separator: (ViewContext.() -> Unit)?,
+    fallback: ViewContext.() -> Unit,
 ): Unit = forEach(
     data = data,
     render = { _, item -> render(item) },
@@ -22,13 +22,12 @@ actual fun <T> ViewContext.forEach(
 @ViewDsl
 actual fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,
-    render: NView.(Int, T) -> Unit,
-    separator: (NView.() -> Unit)?,
-    fallback: NView.() -> Unit,
+    render: ViewContext.(Int, T) -> Unit,
+    separator: (ViewContext.() -> Unit)?,
+    fallback: ViewContext.() -> Unit,
 ) {
     val container = this.stack.last()
     val theme = this.theme
-    var firstRun = true
     lateinit var startMarker: HTMLElement
     var endMarker: HTMLElement? = null
 
@@ -74,32 +73,3 @@ actual fun <T> ViewContext.forEach(
         exists = false
     }
 }
-
-
-//
-//actual inline fun <T> FLEXBOX.setChildren(
-//    crossinline data: ReactiveScope.() -> List<T>,
-//    getKey: (T) -> String,
-//    crossinline render: NView.(T) -> Unit
-//): Unit = element<HTMLFormElement>("div") {
-//    reactiveScope {
-//        val items = data()
-//        innerHTML = ""
-//        items.forEach {
-//            render(it)
-//        }
-//    }
-//}
-//
-//fun <T> RECYCLER.setAdapter(
-//    crossinline data: ReactiveScope.() -> List<T>,
-//    crossinline makeCell: NView.(Readable<T>) -> Unit
-//) {
-//    reactiveScope {
-//        val items = data()
-//        innerHTML = ""
-//        items.forEach {
-//            render(it)
-//        }
-//    }
-//}

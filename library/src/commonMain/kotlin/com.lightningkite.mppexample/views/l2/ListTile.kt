@@ -5,8 +5,8 @@ val BORDER_COLOR = Color.gray(0.8f)
 @ViewDsl
 fun <T> ViewContext.listTileGroup(
     data: ReactiveScope.() -> List<T>,
-    render: NView.(T) -> Unit,
-    fallback: NView.() -> Unit = {},
+    render: ViewContext.(T) -> Unit,
+    fallback: ViewContext.() -> Unit = {},
 ) {
     val enabled = SharedReadable { data().isNotEmpty() }
 

@@ -40,6 +40,7 @@ actual class ViewContext(
     val wrapperToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
 
+    @Suppress("UNCHECKED_CAST")
     inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
         val element = (document.createElement(name) as T)
         ListeningLifecycleStack.useIn(element.onRemove) {
@@ -50,6 +51,7 @@ actual class ViewContext(
         return ViewWrapper
     }
 
+    @Suppress("UNCHECKED_CAST")
     inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) =
         element(document.createElement(name) as T, setup)
 

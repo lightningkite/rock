@@ -34,7 +34,8 @@ private fun Array<Int>.binarySearch(value: Int): Int {
     return low // key not found
 }
 
-fun <T> ViewContext.recyclerView(
+@ViewDsl
+actual fun <T> ViewContext.recyclerView(
     data: ReactiveScope.() -> List<T>,
     render: ViewContext.(T) -> Unit,
     estimatedItemHeightInPixels: Int,
@@ -59,7 +60,7 @@ actual fun <T> ViewContext.recyclerView(
     data: List<T>,
     render: ViewContext.(T) -> Unit,
     estimatedItemHeightInPixels: Int,
-): Unit {
+) {
     val scrollPositionCache: Array<Int> = Array(data.size) { index -> index * estimatedItemHeightInPixels }
     val lastIndexInCache = Property(-1)
     val scrollEndPosition = Property(0)

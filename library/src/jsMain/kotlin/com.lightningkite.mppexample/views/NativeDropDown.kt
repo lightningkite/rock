@@ -27,6 +27,7 @@ actual inline fun <T> ViewContext.nativeDropDown(
 
     addEventListener("change", {
         val key = (it.currentTarget as HTMLSelectElement).value
+        @Suppress("UNCHECKED_CAST")
         val selected = options.once.find { option -> getKey(option) == key } as T
         prop set selected
     })

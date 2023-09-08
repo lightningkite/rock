@@ -1,7 +1,5 @@
 package com.lightningkite.mppexample
 
-expect class RecyclerView : NView
-
 @ViewDsl
 expect fun <T> ViewContext.recyclerView(
     data: ReactiveScope.() -> List<T>,

@@ -1,7 +1,5 @@
 package com.lightningkite.mppexample
 
-expect class ForEach : NView
-
 @ViewDsl
 expect fun <T> ViewContext.forEach(
     data: ReactiveScope.() -> List<T>,

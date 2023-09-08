@@ -7,7 +7,7 @@ import kotlin.math.min
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias RecyclerView = HTMLDivElement
 
-external class ResizeObserver(callback: (Array<ResizeObserverEntry>) -> Unit) {
+external class ResizeObserver(callback: (Array<ResizeObserverEntry>, ResizeObserver) -> Unit) {
     fun observe(element: HTMLElement)
     fun disconnect()
 }
@@ -34,10 +34,30 @@ private fun Array<Int>.binarySearch(value: Int): Int {
     return low // key not found
 }
 
+fun <T> ViewContext.recyclerView(
+    data: ReactiveScope.() -> List<T>,
+    render: ViewContext.(T) -> Unit,
+    estimatedItemHeightInPixels: Int,
+) {
+    column {
+        val context = derive(this)
+        reactiveScope {
+            innerHTML = ""
+            with(context) {
+                recyclerView(
+                    data = data(),
+                    render = render,
+                    estimatedItemHeightInPixels = estimatedItemHeightInPixels,
+                ) in weight(1f) in scrolls()
+            }
+        }
+    }
+}
+
 @ViewDsl
 actual fun <T> ViewContext.recyclerView(
     data: List<T>,
-    render: NView.(T) -> Unit,
+    render: ViewContext.(T) -> Unit,
     estimatedItemHeightInPixels: Int,
 ): Unit {
     val scrollPositionCache: Array<Int> = Array(data.size) { index -> index * estimatedItemHeightInPixels }
@@ -99,33 +119,38 @@ actual fun <T> ViewContext.recyclerView(
                 }
             }
         }
-        val observer = ResizeObserver {
+        val observer = ResizeObserver { it, observer ->
             val height = it[0].contentRect.height.toInt()
             outerHeight set height
+            this@column.style.maxHeight = "${height}px"
             if (visibleItems.once.isEmpty()) {
                 val lastIndex = height / estimatedItemHeightInPixels + 1
                 firstVisibleIndex set 0
                 lastVisibleIndex set lastIndex
                 scrollEndPosition set height
+                observer.disconnect()
             }
         }
         observer.observe(this@column)
         onRemove { observer.disconnect() }
 
         addEventListener("scroll", {
-            val scrollBottom = min((it.target as HTMLDivElement).offsetHeight + (it.target as HTMLDivElement).scrollTop.toInt(), innerHeight.once)
+            val scrollBottom = min(
+                (it.target as HTMLDivElement).offsetHeight + (it.target as HTMLDivElement).scrollTop.toInt(),
+                innerHeight.once
+            )
             val scrollTop = scrollBottom - outerHeight.once
             val firstIndex = scrollPositionCache.binarySearch(scrollTop)
             val lastIndex = scrollPositionCache.binarySearch(scrollBottom)
             scrollEndPosition set scrollBottom
             firstVisibleIndex set max(firstIndex - 1, 0)
-            lastVisibleIndex set min(lastIndex + 1, data.lastIndex)
+            lastVisibleIndex set min(lastIndex + 1, data.size)
         }, js("{passive:true}"))
 
         space { ::size { SizeConstraints(minHeight = topSpacing.current.px, maxHeight = topSpacing.current.px) } }
         forEach(
             data = { visibleItems.current },
-            render = render,
+            render = { it -> render(it) },
         )
         space { ::size { SizeConstraints(minHeight = bottomSpacing.current.px, maxHeight = bottomSpacing.current.px) } }
     } in scrolls()

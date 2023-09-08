@@ -99,14 +99,32 @@ class Account : AuthenticatedScreen() {
                     content = "Cart Link With A Long Name"
                 }
 
+                val cyclerItems = Property((1..100).toList())
+
+                button(
+                    onClick = {
+                        cyclerItems.modify { it + 1 }
+                    }
+                ) {
+                    text("Add item to recycler")
+                }
+
                 recyclerView(
-                    data = (1..100).toList(),
+                    data = cyclerItems.once,
                     render = {
                         text(it.toString())
                     },
-                    estimatedItemHeightInPixels = 30
-                ) in weight(1f) in nativeBackground(Color.blue.lighten(0.8f))
-            } in padding(16.px) in scrolls() in weight(1f)
+                    estimatedItemHeightInPixels = 18
+                ) in weight(1f) in nativeBackground(Color.blue.lighten(0.8f)) in scrolls()
+
+//                recyclerView(
+//                    data = { cyclerItems.current },
+//                    render = {
+//                        text(it.toString())
+//                    },
+//                    estimatedItemHeightInPixels = 18
+//                ) in weight(1f) in nativeBackground(Color.blue.lighten(0.8f)) in scrolls()
+            } in padding(16.px) in weight(1f)
         }
     }
 

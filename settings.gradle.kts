@@ -1,6 +1,6 @@
 include(":mppexample")
 
-rootProject.name = "mpp-example"
+rootProject.name = "rock"
 
 include(":library")
 include(":example-app")

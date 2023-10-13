@@ -1,2 +1,2 @@
-package com.lightningkite.mppexample
+package com.lightningkite.rock
 

@@ -1,4 +1,4 @@
-package com.lightningkite.mppexample
+package com.lightningkite.rock
 
 import platform.UIKit.UIColor
 import platform.UIKit.UIView

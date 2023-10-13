@@ -1,0 +1,17 @@
+package com.lightningkite.rock.views.old
+
+import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewDsl
+import org.w3c.dom.HTMLIFrameElement
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias WebView = HTMLIFrameElement
+
+@ViewDsl
+actual inline fun ViewContext.webView(setup: WebView.() -> Unit): Unit = element("iframe", setup)
+
+actual var WebView.url: String
+    get() = src
+    set(value) {
+        src = value
+    }

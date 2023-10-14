@@ -1,18 +1,13 @@
-package com.lightningkite.rock
+package com.lightningkite.rock.models
 
-import com.lightningkite.rock.models.positiveRemainder
-import kotlin.jvm.JvmInline
 import kotlin.math.PI
 import kotlin.math.absoluteValue
 
-@JvmInline
 value class Angle(val turns: Float) {
     companion object {
         const val RADIANS_PER_CIRCLE = (PI * 2).toFloat()
         const val DEGREES_PER_CIRCLE = 360f
-        fun degrees(degrees: Float): Angle = Angle(degrees / DEGREES_PER_CIRCLE)
-        fun radians(radians: Float): Angle = Angle(radians / RADIANS_PER_CIRCLE)
-        fun atan2(y: Float, x: Float) = radians(kotlin.math.atan2(y, x))
+        fun atan2(y: Float, x: Float) = kotlin.math.atan2(y, x).radians
         val zero = Angle(0f)
         val circle = Angle(1f)
         val halfTurn = Angle(.5f)
@@ -46,3 +41,13 @@ value class Angle(val turns: Float) {
 
     val absoluteValue: Angle get() = Angle(turns.absoluteValue)
 }
+
+inline val Int.turns get() = Angle(this.toFloat())
+inline val Int.degrees get() = Angle(this.toFloat() / Angle.DEGREES_PER_CIRCLE)
+inline val Int.radians get() = Angle(this.toFloat() / Angle.RADIANS_PER_CIRCLE)
+inline val Float.turns get() = Angle(this)
+inline val Float.degrees get() = Angle(this / Angle.DEGREES_PER_CIRCLE)
+inline val Float.radians get() = Angle(this / Angle.RADIANS_PER_CIRCLE)
+inline val Double.turns get() = Angle(this.toFloat())
+inline val Double.degrees get() = Angle(this.toFloat() / Angle.DEGREES_PER_CIRCLE)
+inline val Double.radians get() = Angle(this.toFloat() / Angle.RADIANS_PER_CIRCLE)

@@ -1,7 +1,7 @@
 package com.lightningkite.rock.views
 
-import com.lightningkite.rock.models.ScreenTransitions
-import com.lightningkite.rock.models.Theme
+import com.lightningkite.rock.ViewWrapper
+import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.DummyRockNavigator
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.reactive.PersistentProperty
@@ -21,8 +21,8 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
 
 var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
 var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
+
 var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>())
-val ViewContext.getTheme: ReactiveScope.() -> Theme get() = themeStack.lastOrNull() ?: throw IllegalStateException("No theme set")
 inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
     val old = themeStack
     themeStack += { theme }
@@ -32,13 +32,17 @@ inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
         themeStack = old
     }
 }
-
-inline fun <reified T> ViewContext.persistentProperty(
-    key: String,
-    defaultValue: T,
-    overrideDebugName: String? = null
-) = PersistentProperty<T>(
-    key = key,
-    defaultValue = defaultValue,
-    overrideDebugName = overrideDebugName
-)
+expect fun ViewContext.setTheme(calculate: ReactiveScope.()->Theme): ViewWrapper
+inline fun ViewContext.themeFromLast(crossinline calculate: (Theme)->Theme): ViewWrapper {
+    val previous = themeStack.last()
+    return setTheme { calculate(previous()) }
+}
+val ViewContext.card: ViewWrapper get() = themeFromLast { it }
+val ViewContext.hover: ViewWrapper get() = themeFromLast { it.hover() }
+val ViewContext.down: ViewWrapper get() = themeFromLast { it.down() }
+val ViewContext.selected: ViewWrapper get() = themeFromLast { it.selected() }
+val ViewContext.disabled: ViewWrapper get() = themeFromLast { it.disabled() }
+val ViewContext.important: ViewWrapper get() = themeFromLast { it.important() }
+val ViewContext.critical: ViewWrapper get() = themeFromLast { it.critical() }
+val ViewContext.warning: ViewWrapper get() = themeFromLast { it.warning() }
+val ViewContext.danger: ViewWrapper get() = themeFromLast { it.danger() }

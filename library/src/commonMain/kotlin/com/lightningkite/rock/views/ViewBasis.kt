@@ -1,6 +1,6 @@
 package com.lightningkite.rock.views
 
-import com.lightningkite.rock.Angle
+import com.lightningkite.rock.models.Angle
 
 @DslMarker
 annotation class ViewDsl
@@ -11,6 +11,8 @@ annotation class ViewModifierDsl3
 expect class ViewContext {
     val addons: MutableMap<String, Any?>
     val onRemove: OnRemoveHandler
+    fun beforeNextElementSetup(action: NView.()->Unit)
+    fun afterNextElementSetup(action: NView.()->Unit)
 }
 
 expect open class NView()

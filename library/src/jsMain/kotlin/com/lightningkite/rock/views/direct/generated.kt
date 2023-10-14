@@ -1,41 +1,42 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.*
-import com.lightningkite.rock.data.toWeb
+import com.lightningkite.rock.models.toWeb
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.old.toBase64
 import kotlinx.browser.document
 import org.w3c.dom.*
+import org.w3c.dom.url.URL
+import kotlin.io.encoding.Base64
 import kotlin.random.Random
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ContainingView = HTMLElement
-@ViewDsl actual fun ViewContext.stack(setup: ContainingView.() -> Unit): Unit = element<HTMLDivElement>("div") {
+@ViewDsl actual fun ViewContext.stack(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-stack")
     setup()
 }
-@ViewDsl actual fun ViewContext.col(setup: ContainingView.() -> Unit): Unit = element<HTMLDivElement>("div") {
+@ViewDsl actual fun ViewContext.col(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     style.display = "flex"
     style.flexDirection = "column"
     setup()
 }
-@ViewDsl actual fun ViewContext.row(setup: ContainingView.() -> Unit): Unit = element<HTMLDivElement>("div") {
+@ViewDsl actual fun ViewContext.row(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     style.display = "flex"
     style.flexDirection = "row"
     setup()
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Link = HTMLAnchorElement
-@ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElement<HTMLAnchorElement>("a", setup)
+@ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementInteractive<HTMLAnchorElement>("a", setup)
 actual inline var Link.Link_to: RockScreen
     get() = TODO()
     set(value) { href = value.createPath() }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ExternalLink = HTMLAnchorElement
-@ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElement<HTMLAnchorElement>("a", setup)
+@ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElementInteractive<HTMLAnchorElement>("a", setup)
 actual inline var ExternalLink.ExternalLink_to: String
     get() = href
     set(value) { href = value }
@@ -47,7 +48,7 @@ actual inline var Image.Image_source: ImageSource
     set(value) {
         when (value) {
             is ImageRemote -> src = value.url
-            is ImageRaw -> src = value.data.toBase64()
+            is ImageRaw -> src = URL.Companion.createObjectURL(Blob(arrayOf(value.data)))
             is ImageResource -> throw NotImplementedError()
             is ImageVector -> {
                 src = value.toWeb()
@@ -69,12 +70,12 @@ actual inline var Image.Image_scaleType: ImageMode
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextView = HTMLElement
-@ViewDsl actual fun ViewContext.h1(setup: TextView.() -> Unit): Unit = textElement("h1", setup)
-@ViewDsl actual fun ViewContext.h2(setup: TextView.() -> Unit): Unit = textElement("h2", setup)
-@ViewDsl actual fun ViewContext.h3(setup: TextView.() -> Unit): Unit = textElement("h3", setup)
-@ViewDsl actual fun ViewContext.h4(setup: TextView.() -> Unit): Unit = textElement("h4", setup)
-@ViewDsl actual fun ViewContext.h5(setup: TextView.() -> Unit): Unit = textElement("h5", setup)
-@ViewDsl actual fun ViewContext.h6(setup: TextView.() -> Unit): Unit = textElement("h6", setup)
+@ViewDsl actual fun ViewContext.h1(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
+@ViewDsl actual fun ViewContext.h2(setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
+@ViewDsl actual fun ViewContext.h3(setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
+@ViewDsl actual fun ViewContext.h4(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
+@ViewDsl actual fun ViewContext.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
+@ViewDsl actual fun ViewContext.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
 @ViewDsl actual fun ViewContext.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
 actual inline var TextView.TextView_content: String
     get() = innerText
@@ -87,14 +88,14 @@ actual inline var TextView.TextView_content: String
 @ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = todo("space")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Button = HTMLButtonElement
-@ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElement<HTMLButtonElement>("button", setup)
+@ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElementInteractive<HTMLButtonElement>("button", setup)
 actual fun Button.onClick(action: () -> Unit): Unit { onclick = { action() } }
 actual inline var Button.Button_enabled: Boolean
     get() = !disabled
     set(value) { disabled = !value }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Checkbox = HTMLInputElement
-@ViewDsl actual fun ViewContext.checkbox(setup: Checkbox.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.checkbox(setup: Checkbox.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
     this.type = "checkbox"
     setup()
 }
@@ -104,7 +105,7 @@ actual inline var Checkbox.Checkbox_enabled: Boolean
 actual val Checkbox.Checkbox_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioButton = HTMLInputElement
-@ViewDsl actual fun ViewContext.radioButton(setup: RadioButton.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.radioButton(setup: RadioButton.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
     this.type = "radio"
     setup()
 }
@@ -113,45 +114,37 @@ actual inline var RadioButton.RadioButton_enabled: Boolean
     set(value) { disabled = !value }
 actual val RadioButton.RadioButton_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Switch = HTMLDivElement
-@ViewDsl actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = element<HTMLLabelElement>("label") {
-    element<HTMLInputElement>("input") {
-        this.type = "checkbox"
-        this.hidden = true
-    }
-    themedElement<HTMLDivElement>("div") {
-        setup()
-    }
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Switch = HTMLInputElement
+@ViewDsl actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
+    this.type = "checkbox"
+    this.classList.add("switch")
+    setup()
 }
 actual inline var Switch.Switch_enabled: Boolean
-    get() = !Switch_inputElement.disabled
-    set(value) { Switch_inputElement.disabled = !value }
-actual val Switch.Switch_checked: Writable<Boolean> get() = vprop("input", { Switch_inputElement.checked }, { Switch_inputElement.checked = it })
+    get() = !disabled
+    set(value) { disabled = !value }
+actual val Switch.Switch_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ToggleButton = HTMLDivElement
-@ViewDsl actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ToggleButton = HTMLLabelElement
+@ViewDsl actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = themedElementInteractive<HTMLLabelElement>("label") {
     element<HTMLInputElement>("input") {
         this.type = "checkbox"
         this.hidden = true
     }
-    themedElement<HTMLDivElement>("div") {
-        setup()
-    }
+    setup()
 }
 actual inline var ToggleButton.ToggleButton_enabled: Boolean
     get() = !ToggleButton_inputElement.disabled
     set(value) { ToggleButton_inputElement.disabled = !value }
 actual val ToggleButton.ToggleButton_checked: Writable<Boolean> get() = vprop("input", { ToggleButton_inputElement.checked }, { ToggleButton_inputElement.checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioToggleButton = HTMLDivElement
-@ViewDsl actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioToggleButton = HTMLLabelElement
+@ViewDsl actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = themedElementInteractive<HTMLLabelElement>("label") {
     element<HTMLInputElement>("input") {
-        this.type = "radio"
+        this.type = "checkbox"
         this.hidden = true
     }
-    themedElement<HTMLDivElement>("div") {
-        setup()
-    }
+    setup()
 }
 actual inline var RadioToggleButton.RadioToggleButton_enabled: Boolean
     get() = !ToggleButton_inputElement.disabled
@@ -159,7 +152,7 @@ actual inline var RadioToggleButton.RadioToggleButton_enabled: Boolean
 actual val RadioToggleButton.RadioToggleButton_checked: Writable<Boolean> get() = vprop("input", { ToggleButton_inputElement.checked }, { ToggleButton_inputElement.checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextField = HTMLInputElement
-@ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
     setup()
 }
 actual val TextField.TextField_content: Writable<String> get() = vprop("input", { value }, { value = it })
@@ -218,7 +211,7 @@ actual inline var TextField.TextField_range: ClosedRange<Double>?
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextArea = HTMLTextAreaElement
-@ViewDsl actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit = themedElement("textarea", setup)
+@ViewDsl actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit = themedElementInteractive("textarea", setup)
 actual val TextArea.TextArea_content: Writable<String> get() = vprop("input", { value }, { value = it })
 actual inline var TextArea.TextArea_keyboardHints: KeyboardHints
     get() = TODO()
@@ -250,7 +243,7 @@ actual inline var TextArea.TextArea_hint: String
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias DropDown = HTMLSelectElement
-@ViewDsl actual fun ViewContext.dropDown(setup: DropDown.() -> Unit): Unit = themedElement("select", setup)
+@ViewDsl actual fun ViewContext.dropDown(setup: DropDown.() -> Unit): Unit = themedElementInteractive("select", setup)
 actual val DropDown.DropDown_selected: Writable<String?> get() = vprop("change", { value }, { value = it ?: "" })
 actual inline var DropDown.DropDown_options: List<WidgetOption>
     get() = TODO()
@@ -261,7 +254,7 @@ actual inline var DropDown.DropDown_options: List<WidgetOption>
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias AutoCompleteTextField = HTMLInputElement
-@ViewDsl actual fun ViewContext.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = themedElement("input", setup)
+@ViewDsl actual fun ViewContext.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = themedElementInteractive("input", setup)
 actual val AutoCompleteTextField.AutoCompleteTextField_content: Writable<String> get() = vprop("input", { value }, { value = it })
 actual inline var AutoCompleteTextField.AutoCompleteTextField_suggestions: List<WidgetOption>
     get() = TODO()
@@ -288,9 +281,21 @@ actual inline var SwapView.SwapView_currentView: NView
         appendChild(value)
         oldView?.let { removeChild(it) }
     }
-actual fun SwapView.setCurrentViewWithTransition(view: NView, animation: ScreenTransition): Unit {
-    // TODO use a transition
-    SwapView_currentView = view
+actual fun SwapView.setCurrentViewWithTransition(view: NView, transition: ScreenTransition): Unit {
+    val oldView = lastElementChild as? HTMLElement
+    val newView = view
+    newView.classList.add("rock-screen")
+    val keyframeName = DynamicCSS.transition(transition)
+    newView.style.animation = "${keyframeName}-enter 0.25s"
+    newView.style.marginLeft = "auto"
+    newView.style.marginRight = "auto"
+    appendChild(newView)
+    oldView?.let { view ->
+        view.style.animation = "${keyframeName}-exit 0.25s"
+        view.addEventListener("animationend", {
+            removeChild(view)
+        })
+    }
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias WebView = HTMLIFrameElement
@@ -313,7 +318,7 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     get() = TODO()
     set(value) { }
 @ViewModifierDsl3 actual fun ViewContext.weight(amount: Float): ViewWrapper {
-    elementToDoList.add {
+    beforeNextElementSetup {
         style.flexGrow = "$amount"
         style.flexShrink = "$amount"
     }
@@ -321,13 +326,13 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
 }
 @ViewModifierDsl3 actual fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper = ViewWrapper
 @ViewModifierDsl3 actual fun ViewContext.scrolls(): ViewWrapper{
-    elementToDoList.add {
+    beforeNextElementSetup {
         style.overflowY = "scroll"
     }
     return ViewWrapper
 }
 @ViewModifierDsl3 actual fun ViewContext.scrollsHorizontally(): ViewWrapper{
-    elementToDoList.add {
+    beforeNextElementSetup {
         style.display = "flex"
         style.flexDirection = "row"
         style.overflowX = "scroll"
@@ -335,7 +340,7 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     return ViewWrapper
 }
 @ViewModifierDsl3 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
-    elementToDoList.add {
+    beforeNextElementSetup {
         if (constraints.minHeight == null) style.removeProperty("minHeight")
         else style.minHeight = constraints.minHeight.value
 

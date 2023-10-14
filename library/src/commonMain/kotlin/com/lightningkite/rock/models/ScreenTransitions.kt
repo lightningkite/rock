@@ -1,14 +1,16 @@
 package com.lightningkite.rock.models
 
-enum class ScreenTransition {
-    None,
-    Push,
-    Pop,
-    PullDown,
-    PullUp,
-    Fade,
-    GrowFade,
-    ShrinkFade,
+expect class ScreenTransition {
+    companion object {
+        val None: ScreenTransition
+        val Push: ScreenTransition
+        val Pop: ScreenTransition
+        val PullDown: ScreenTransition
+        val PullUp: ScreenTransition
+        val Fade: ScreenTransition
+        val GrowFade: ScreenTransition
+        val ShrinkFade: ScreenTransition
+    }
 }
 
 data class ScreenTransitions(

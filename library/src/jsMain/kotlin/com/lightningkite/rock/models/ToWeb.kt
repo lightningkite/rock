@@ -1,6 +1,4 @@
-package com.lightningkite.rock.data
-
-import com.lightningkite.rock.models.ImageVector
+package com.lightningkite.rock.models
 
 
 fun ImageVector.toWeb(): String {

@@ -89,8 +89,4 @@ interface RockScreen {
     fun createPath(): String
 }
 
-interface RockApp {
-    fun ViewContext.render()
-}
-
 class RedirectException(val screen: RockScreen) : Exception()

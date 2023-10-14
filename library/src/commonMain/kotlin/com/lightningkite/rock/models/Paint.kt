@@ -1,6 +1,5 @@
 package com.lightningkite.rock.models
 
-import com.lightningkite.rock.Angle
 import kotlin.math.max
 import kotlin.math.min
 
@@ -192,14 +191,14 @@ data class Color(
 }
 
 data class HSVColor(
-    val alpha: Float = 0f,
+    val alpha: Float = 1f,
     val hue: Angle = Angle(0f),
     val saturation: Float = 0f,
     val value: Float = 0f
 ) {
     fun toRGB(): Color {
-        val h = (hue.turns * 6).toInt()
-        val f = hue.turns * 6 - h
+        val h = (hue.turns.mod(1f) * 6).toInt()
+        val f = hue.turns.mod(1f) * 6 - h
         val p = value * (1 - saturation)
         val q = value * (1 - f * saturation)
         val t = value * (1 - (1 - f) * saturation)

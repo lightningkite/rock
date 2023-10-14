@@ -1,12 +1,10 @@
 package com.lightningkite.rock.views
 
-import com.lightningkite.rock.Angle
+import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.ViewWrapper
-import com.lightningkite.rock.models.Dimension
-import com.lightningkite.rock.models.toBoxShadow
+import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.ListeningLifecycleStack
-import com.lightningkite.rock.views.OnRemoveHandler
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.reactive.ReactiveScope
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
@@ -21,6 +19,8 @@ actual class ViewContext(
     fun derive(parent: HTMLElement): ViewContext = ViewContext(parent).also {
         it.addons.putAll(this.addons)
     }
+
+    var themeJustChanged: Boolean = false
 
     val stack = arrayListOf(parent)
     inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
@@ -43,8 +43,15 @@ actual class ViewContext(
         onRemoveList.clear()
     }
 
-    val elementToDoList = ArrayList<HTMLElement.() -> Unit>()
-    val wrapperToDoList = ArrayList<HTMLElement.() -> Unit>()
+    actual fun beforeNextElementSetup(action: NView.()->Unit) {
+        beforeNextElementSetupList.add(action)
+    }
+    actual fun afterNextElementSetup(action: NView.()->Unit) {
+        afterNextElementSetupList.add(action)
+    }
+    val beforeNextElementSetupList = ArrayList<HTMLElement.() -> Unit>()
+    var afterNextElementSetupList = ArrayList<HTMLElement.() -> Unit>()
+//    private val wrapperToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
 
     @Suppress("UNCHECKED_CAST")
@@ -64,21 +71,24 @@ actual class ViewContext(
 
     inline fun <T : HTMLElement> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
-            elementToDoList.forEach { it(this) }
-            elementToDoList.clear()
+            stack.last().appendChild(this)
+            beforeNextElementSetupList.forEach { it(this) }
+            beforeNextElementSetupList.clear()
+            val afterCopy = if(afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
+            afterNextElementSetupList = ArrayList()
             var toPop = popCount
             popCount = 0
             stackUse(this) {
                 setup()
             }
-            stack.last().appendChild(this)
+            afterCopy.forEach { it(this) }
             while (toPop > 0) {
                 val item = stack.removeLast()
-                wrapperToDoList.forEach { it(item) }
+//                wrapperToDoList.forEach { it(item) }
                 stack.last().appendChild(item)
                 toPop--
             }
-            wrapperToDoList.clear()
+//            wrapperToDoList.clear()
         }
     }
 }
@@ -156,3 +166,14 @@ private val HTMLElement.removeListeners: MutableList<() -> Unit>
 private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
     get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
 
+
+actual fun ViewContext.setTheme(calculate: ReactiveScope.()-> Theme): ViewWrapper {
+    val old = themeStack
+    themeStack += calculate
+    themeJustChanged = true
+    this.afterNextElementSetup {
+        themeStack = old
+        themeJustChanged = false
+    }
+    return ViewWrapper
+}

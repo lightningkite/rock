@@ -1,6 +1,8 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.contains
+import com.lightningkite.rock.delay
+import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.direct.*
@@ -58,10 +60,16 @@ fun ViewContext.testView() {
         }
 
         button {
-            text { TextView_content = "Alter Theme" }
+            text { TextView_content = "Alter Themes Randomly for Ten Seconds" }
             onClick {
-                currentTheme set MaterialLikeTheme.random().randomElevationAndCorners().randomTitleFontSettings()
+                launch {
+                    repeat(10) {
+                        currentTheme set MaterialLikeTheme.random().randomElevationAndCorners().randomTitleFontSettings()
+                        delay(1000)
+                    }
+                }
             }
         } in important
     } in scrolls() in setTheme { currentTheme.current }
+
 }

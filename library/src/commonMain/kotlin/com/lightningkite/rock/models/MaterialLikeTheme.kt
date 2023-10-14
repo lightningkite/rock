@@ -54,21 +54,25 @@ object MaterialLikeTheme {
 
     fun randomLight(): Theme {
         val hue = Random.nextFloat().turns
+        val saturation = Random.nextFloat() * 0.5f + 0.25f
+        val value = Random.nextFloat() * 0.5f + 0.25f
         return MaterialLikeTheme(
             id = "material-${Random.nextInt(100000)}",
-            primary = HSVColor(hue = hue, saturation = 0.5f, value = 0.5f).toRGB(),
-            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 0.5f, value = 0.5f).toRGB()
+            primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),
+            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB()
         )
     }
 
     fun randomDark(): Theme {
         val hue = Random.nextFloat().turns
+        val saturation = Random.nextFloat() * 0.5f + 0.25f
+        val value = Random.nextFloat() * 0.5f + 0.25f
         return MaterialLikeTheme(
             id = "material-${Random.nextInt(100000)}",
             foreground = Color.white,
             background = Color.gray(0.2f),
-            primary = HSVColor(hue = hue, saturation = 0.5f, value = 0.5f).toRGB(),
-            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 0.5f, value = 0.5f).toRGB()
+            primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),
+            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB()
         )
     }
 

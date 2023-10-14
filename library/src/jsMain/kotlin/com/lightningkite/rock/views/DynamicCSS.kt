@@ -32,7 +32,7 @@ object DynamicCSS {
         style("h6", mapOf("font-size" to "1.1rem"))
     }
 
-    fun rule(rule: String, index: Int = 0) = customStyleSheet.insertRule(rule.also { println(it) }, index)
+    fun rule(rule: String, index: Int = 0) = customStyleSheet.insertRule(rule, index)
 
     private val transitionHandled = HashSet<String>()
     fun transition(transition: ScreenTransition): String {

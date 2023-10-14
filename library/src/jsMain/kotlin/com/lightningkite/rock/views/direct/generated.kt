@@ -327,7 +327,7 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
 @ViewModifierDsl3 actual fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper = ViewWrapper
 @ViewModifierDsl3 actual fun ViewContext.scrolls(): ViewWrapper{
     beforeNextElementSetup {
-        style.overflowY = "scroll"
+        style.overflowY = "auto"
     }
     return ViewWrapper
 }
@@ -335,7 +335,7 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     beforeNextElementSetup {
         style.display = "flex"
         style.flexDirection = "row"
-        style.overflowX = "scroll"
+        style.overflowX = "auto"
     }
     return ViewWrapper
 }

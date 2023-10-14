@@ -60,8 +60,8 @@ fun ViewContext.testView() {
         button {
             text { TextView_content = "Alter Theme" }
             onClick {
-                currentTheme set MaterialLikeTheme.random()
+                currentTheme set MaterialLikeTheme.random().randomElevationAndCorners().randomTitleFontSettings()
             }
         } in important
-    } in setTheme { currentTheme.current }
+    } in scrolls() in setTheme { currentTheme.current }
 }

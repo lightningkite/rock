@@ -43,7 +43,7 @@ data class Theme(
     val warning: (Theme.() -> Theme) = {
         copy(
             id = "${this.id}-warning",
-            background = Color.fromHex(0xFFcce08d.toInt()),
+            background = Color.fromHex(0xFFd4cb79.toInt()),
             foreground = Color.black
         )
     },

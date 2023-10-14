@@ -60,7 +60,7 @@ fun ViewContext.testView() {
         }
 
         button {
-            text { TextView_content = "Alter Themes Randomly for Ten Seconds" }
+            h6 { TextView_content = "Alter Themes Randomly for Ten Seconds" }
             onClick {
                 launch {
                     repeat(10) {

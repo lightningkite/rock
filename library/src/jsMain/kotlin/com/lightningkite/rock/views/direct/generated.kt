@@ -113,35 +113,50 @@ actual inline var RadioButton.RadioButton_enabled: Boolean
     set(value) { disabled = !value }
 actual val RadioButton.RadioButton_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Switch = HTMLInputElement
-@ViewDsl actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
-    this.type = "checkbox"
-    setup()
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Switch = HTMLDivElement
+@ViewDsl actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+    element<HTMLInputElement>("input") {
+        this.type = "checkbox"
+        this.hidden = true
+    }
+    themedElement<HTMLDivElement>("div") {
+        setup()
+    }
 }
 actual inline var Switch.Switch_enabled: Boolean
-    get() = !disabled
-    set(value) { disabled = !value }
-actual val Switch.Switch_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
+    get() = !Switch_inputElement.disabled
+    set(value) { Switch_inputElement.disabled = !value }
+actual val Switch.Switch_checked: Writable<Boolean> get() = vprop("input", { Switch_inputElement.checked }, { Switch_inputElement.checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ToggleButton = HTMLInputElement
-@ViewDsl actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
-    this.type = "checkbox"
-    setup()
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ToggleButton = HTMLDivElement
+@ViewDsl actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+    element<HTMLInputElement>("input") {
+        this.type = "checkbox"
+        this.hidden = true
+    }
+    themedElement<HTMLDivElement>("div") {
+        setup()
+    }
 }
 actual inline var ToggleButton.ToggleButton_enabled: Boolean
-    get() = !disabled
-    set(value) { disabled = !value }
-actual val ToggleButton.ToggleButton_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
+    get() = !ToggleButton_inputElement.disabled
+    set(value) { ToggleButton_inputElement.disabled = !value }
+actual val ToggleButton.ToggleButton_checked: Writable<Boolean> get() = vprop("input", { ToggleButton_inputElement.checked }, { ToggleButton_inputElement.checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioToggleButton = HTMLInputElement
-@ViewDsl actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
-    this.type = "checkbox"
-    setup()
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioToggleButton = HTMLDivElement
+@ViewDsl actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+    element<HTMLInputElement>("input") {
+        this.type = "radio"
+        this.hidden = true
+    }
+    themedElement<HTMLDivElement>("div") {
+        setup()
+    }
 }
 actual inline var RadioToggleButton.RadioToggleButton_enabled: Boolean
-    get() = !disabled
-    set(value) { disabled = !value }
-actual val RadioToggleButton.RadioToggleButton_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
+    get() = !ToggleButton_inputElement.disabled
+    set(value) { ToggleButton_inputElement.disabled = !value }
+actual val RadioToggleButton.RadioToggleButton_checked: Writable<Boolean> get() = vprop("input", { ToggleButton_inputElement.checked }, { ToggleButton_inputElement.checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextField = HTMLInputElement
 @ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {

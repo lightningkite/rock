@@ -28,6 +28,7 @@ inline fun <T: HTMLElement, V> T.vprop(eventName: String, crossinline get: T.()-
 
     }
 }
+inline val ToggleButton.ToggleButton_inputElement: HTMLInputElement get() = this.previousElementSibling as HTMLInputElement
 
 //
 //actual var NView.animationId: AnimationId?

@@ -100,6 +100,12 @@ fun ViewContext.testView() {
         }
 
         button {
+            h6 { TextView_content = "Alter Theme" }
+            onClick {
+                currentTheme set MaterialLikeTheme.random().randomElevationAndCorners().randomTitleFontSettings()
+            }
+        } in important
+        button {
             h6 { TextView_content = "Alter Themes Randomly for Ten Seconds" }
             onClick {
                 launch {

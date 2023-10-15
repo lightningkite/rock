@@ -16,7 +16,7 @@ object MaterialLikeTheme {
         elevation: Dimension = 2.px,
         cornerRadii: CornerRadii = CornerRadii(8.px),
         spacing: Dimension = 8.px,
-        outline: Paint = Color.black,
+        outline: Paint = background.closestColor().highlight(0.1f),
         outlineWidth: Dimension = 0.px,
     ) = Theme(
         id = id,
@@ -34,11 +34,13 @@ object MaterialLikeTheme {
                 id = "$id-important",
                 foreground = primaryForeground,
                 background = primary,
+                outline = primary.highlight(0.1f),
                 important = {
                     copy(
                         id = "$id-critical",
                         foreground = secondaryForeground,
                         background = secondary,
+                        outline = secondary.highlight(0.1f),
                     )
                 }
             )
@@ -48,6 +50,7 @@ object MaterialLikeTheme {
                 id = "$id-critical",
                 foreground = secondaryForeground,
                 background = secondary,
+                outline = secondary.highlight(0.1f),
             )
         },
     )
@@ -59,7 +62,8 @@ object MaterialLikeTheme {
         return MaterialLikeTheme(
             id = "material-${Random.nextInt(100000)}",
             primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),
-            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB()
+            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB(),
+            outlineWidth = if(Random.nextBoolean()) 2.px else 0.px
         )
     }
 
@@ -72,7 +76,8 @@ object MaterialLikeTheme {
             foreground = Color.white,
             background = Color.gray(0.2f),
             primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),
-            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB()
+            secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB(),
+            outlineWidth = if(Random.nextBoolean()) 2.px else 0.px
         )
     }
 

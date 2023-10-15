@@ -87,17 +87,10 @@ input {
     border-bottom-color: gray;
     background: none;
 }
-input:focus {
+input:focus textarea:focus {
     outline: none;
     border-bottom-width: 2px;
 }
-input.inclBack {
-    border: none;
-}
-input.inclBack:focus {
-    border: none;
-}
-
 
 .switch {
     position: relative;

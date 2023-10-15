@@ -104,6 +104,7 @@ object DynamicCSS {
         }
         val border = mapOf(
             "border-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
+            "border-width" to theme.outlineWidth.value,
             "border-color" to theme.outline.toCss(),
             "box-shadow" to theme.elevation.toBoxShadow(),
             "border-top-left-radius" to theme.cornerRadii.topLeft.value,
@@ -152,7 +153,7 @@ object DynamicCSS {
             return "none"
         val offsetX = 0.px.value
         val offsetY = value
-        val blur = 4.px.value
+        val blur = value
         val spread = 0.px.value
         return "$offsetX $offsetY $blur $spread #77777799"
     }

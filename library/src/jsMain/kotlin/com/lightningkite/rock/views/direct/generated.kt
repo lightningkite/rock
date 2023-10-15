@@ -379,6 +379,7 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     beforeNextElementSetup {
         style.margin = 0.px.value
         style.borderRadius = 0.px.value
+        style.borderWidth = 0.px.value
     }
     return ViewWrapper
 }

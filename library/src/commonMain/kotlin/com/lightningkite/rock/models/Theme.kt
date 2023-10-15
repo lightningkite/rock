@@ -15,6 +15,7 @@ data class Theme(
         copy(
             id = "${this.id}-hover",
             background = this.background.closestColor().highlight(0.2f),
+            outline = this.background.closestColor().highlight(0.2f).highlight(0.1f),
             elevation = this.elevation * 2f,
         )
     },
@@ -22,6 +23,7 @@ data class Theme(
         copy(
             id = "${this.id}-down",
             background = this.background.closestColor().highlight(0.3f),
+            outline = this.background.closestColor().highlight(0.3f).highlight(0.1f),
             elevation = this.elevation / 2f,
         )
     },
@@ -36,7 +38,8 @@ data class Theme(
         copy(
             id = "${this.id}-important",
             foreground = this.background,
-            background = this.foreground
+            background = this.foreground,
+            outline = this.foreground.closestColor().highlight(1f)
         )
     },
     val critical: (Theme.() -> Theme) = { this.important(this).let { it.important(it) } },
@@ -44,6 +47,7 @@ data class Theme(
         copy(
             id = "${this.id}-warning",
             background = Color.fromHex(0xFFd4cb79.toInt()),
+            outline = Color.fromHex(0xFFd4cb79.toInt()).highlight(0.1f),
             foreground = Color.black
         )
     },
@@ -51,6 +55,7 @@ data class Theme(
         copy(
             id = "${this.id}-danger",
             background = Color.fromHex(0xFFB00020.toInt()),
+            outline = Color.fromHex(0xFFB00020.toInt()).highlight(0.1f),
             foreground = Color.white
         )
     },

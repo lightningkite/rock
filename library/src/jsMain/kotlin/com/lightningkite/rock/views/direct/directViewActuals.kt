@@ -12,109 +12,120 @@ fun ViewContext.todo(name: String) = element<HTMLSpanElement>("span") {
     innerText = name
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElementInteractive(name: String, setup: T.() -> Unit) = element<T>(name) {
-    classList.add("interactive")
+inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
+    name: String,
+    crossinline themeToClass: (Theme)->String = { DynamicCSS.theme(it) },
+    crossinline themeLogic: T.(rootTheme: Boolean, themeChanged: Boolean) -> Unit,
+    setup: T.() -> Unit,
+) = element<T>(name) {
     var previousThemeClass: String? = null
     val rootTheme = themeStack.size == 1
     val themeGetter = themeStack.lastOrNull()
     val themeChanged = themeJustChanged
     themeJustChanged = false
-    classList.add("inclMargin")
 
     if (themeGetter != null) {
         reactiveScope {
             previousThemeClass?.let { classList.remove(it) }
             val t = themeGetter()
-            val base = DynamicCSS.themeInteractive(t)
+            val base = themeToClass(t)
             classList.add(base)
             previousThemeClass = base
 
-            if (rootTheme) classList.add("rootTheme")
-
-            if (!themeChanged) {
-                classList.remove("inclBack")
-                if (!rootTheme) {
-                    classList.remove("inclBorder")
-                }
-            } else {
-                if (!rootTheme) {
-                    classList.add("inclBorder")
-                }
-                classList.add("inclBack")
-            }
+            themeLogic(rootTheme, themeChanged)
         }
     }
     setup()
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.() -> Unit) = element<T>(name) {
-    var previousThemeClass: String? = null
-    val rootTheme = themeStack.size == 1
-    val themeGetter = themeStack.lastOrNull()
-    val themeChanged = themeJustChanged
-    themeJustChanged = false
+inline fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+    name = name,
+    themeToClass = { DynamicCSS.themeInteractive(it) },
+    themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+
+        if (!themeChanged) {
+            classList.remove("inclBack")
+            if (!rootTheme) {
+                classList.remove("inclBorder")
+            }
+        } else {
+            if (!rootTheme) {
+                classList.add("inclBorder")
+            }
+            classList.add("inclBack")
+        }
+    }
+) {
+    classList.add("editable")
     classList.add("inclMargin")
-
-    if (themeGetter != null) {
-        reactiveScope {
-            previousThemeClass?.let { classList.remove(it) }
-            val t = themeGetter()
-            val base = DynamicCSS.theme(t)
-            classList.add(base)
-            previousThemeClass = base
-
-            if (rootTheme) classList.add("rootTheme")
-
-            if (!themeChanged) {
-                classList.remove("inclBack")
-                if (!rootTheme) {
-                    classList.remove("inclBorder")
-                }
-            } else {
-                if (!rootTheme) {
-                    classList.add("inclBorder")
-                }
-                classList.add("inclBack")
-            }
-        }
-    }
     setup()
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElementBackIfChanged(name: String, setup: T.() -> Unit) =
-    element<T>(name) {
-        var previousThemeClass: String? = null
-        val rootTheme = themeStack.size == 1
-        val themeGetter = themeStack.lastOrNull()
-        val themeChanged = themeJustChanged
-        themeJustChanged = false
-        if (themeGetter != null) {
-            reactiveScope {
-                previousThemeClass?.let { classList.remove(it) }
-                val t = themeGetter()
-                val base = DynamicCSS.theme(t)
-                classList.add(base)
-                previousThemeClass = base
+inline fun <T : HTMLElement> ViewContext.themedElementClickable(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+    name = name,
+    themeToClass = { DynamicCSS.themeInteractive(it) },
+    themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
 
-                if (rootTheme) classList.add("rootTheme")
-
-                if (!themeChanged) {
-                    classList.remove("inclBack")
-                    classList.remove("inclBorder")
-                    if (!rootTheme) {
-                        classList.remove("inclMargin")
-                    }
-                } else {
-                    if (!rootTheme) {
-                        classList.add("inclBorder")
-                        classList.add("inclMargin")
-                    }
-                    classList.add("inclBack")
-                }
+        if (!themeChanged) {
+            classList.remove("inclBack")
+            if (!rootTheme) {
+                classList.remove("inclBorder")
             }
+        } else {
+            if (!rootTheme) {
+                classList.add("inclBorder")
+            }
+            classList.add("inclBack")
         }
-        setup()
     }
+) {
+    classList.add("clickable")
+    classList.add("inclMargin")
+    setup()
+}
+
+inline fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+    name = name,
+    themeToClass = { DynamicCSS.theme(it) },
+    themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+        if (!themeChanged) {
+            classList.remove("inclBack")
+            if (!rootTheme) {
+                classList.remove("inclBorder")
+            }
+        } else {
+            if (!rootTheme) {
+                classList.add("inclBorder")
+            }
+            classList.add("inclBack")
+        }
+    }
+) {
+    classList.add("inclMargin")
+    setup()
+}
+
+inline fun <T : HTMLElement> ViewContext.themedElementBackIfChanged(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+    name = name,
+    themeToClass = { DynamicCSS.theme(it) },
+    themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+        if (!themeChanged) {
+            classList.remove("inclBack")
+            classList.remove("inclBorder")
+            if (!rootTheme) {
+                classList.remove("inclMargin")
+            }
+        } else {
+            if (!rootTheme) {
+                classList.add("inclBorder")
+                classList.add("inclMargin")
+            }
+            classList.add("inclBack")
+        }
+    }
+) {
+    setup()
+}
 
 inline fun <T : HTMLElement, V> T.vprop(
     eventName: String,
@@ -122,8 +133,11 @@ inline fun <T : HTMLElement, V> T.vprop(
     crossinline set: T.(V) -> Unit
 ): Writable<V> {
     return object : Writable<V> {
-        override fun set(value: V): Unit = set(value)
+        override fun set(value: V): Unit {
+            set(this@vprop, value)
+        }
         override val once: V get() = get()
+        private var block = false
 
         override fun addListener(listener: () -> Unit): () -> Unit {
             val callback: (Event) -> Unit = { listener() }
@@ -134,7 +148,7 @@ inline fun <T : HTMLElement, V> T.vprop(
     }
 }
 
-inline val ToggleButton.ToggleButton_inputElement: HTMLInputElement get() = this.children.get(0) as HTMLInputElement
+inline val ToggleButton.ToggleButton_inputElement: HTMLInputElement get() = this.previousElementSibling as HTMLInputElement
 
 @ViewDsl
 internal fun ViewContext.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =

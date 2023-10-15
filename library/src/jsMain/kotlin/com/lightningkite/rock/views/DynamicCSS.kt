@@ -77,17 +77,40 @@ object DynamicCSS {
 
     private val themeInteractiveHandled = HashSet<String>()
     fun themeInteractive(theme: Theme): String {
-        theme(theme.down(), ".theme-${theme.id}.interactive:active")
-        theme(theme.hover(), ".theme-${theme.id}.interactive:hover")
-        theme(theme.selected(), ".theme-${theme.id}.interactive~:checked")
-        theme(theme.selected().hover(), ".theme-${theme.id}.interactive~:checked:hover")
-        theme(theme.disabled(), ".theme-${theme.id}.interactive:disabled")
+        theme(theme.down(), ".theme-${theme.id}.clickable:active", includeBackAlways = true)
+        theme(theme.hover(), ".theme-${theme.id}.clickable:hover", includeBackAlways = true)
+        theme(theme.selected(), ".theme-${theme.id}.clickable:checked", includeBackAlways = true)
+        theme(theme.selected().hover(), ".theme-${theme.id}.clickable:checked:hover", includeBackAlways = true)
+        theme(theme.selected(), ":checked+.theme-${theme.id}.clickable.checkResponsive", includeBackAlways = true)
+        theme(theme.selected().hover(), ":checked+.theme-${theme.id}.clickable:hover.checkResponsive", includeBackAlways = true)
+        theme(theme.disabled(), ".theme-${theme.id}.clickable:disabled")
         return theme(theme)
     }
 
     private val themeHandled = HashSet<String>()
-    fun theme(theme: Theme, asSelector: String = ".theme-${theme.id}"): String {
+    fun theme(theme: Theme, asSelector: String = ".theme-${theme.id}", includeBackAlways: Boolean = false): String {
         if (!themeHandled.add(asSelector)) return "theme-${theme.id}"
+        val back = when (val it = theme.background) {
+            is Color -> mapOf("background-color" to it.toCss())
+            is LinearGradient -> mapOf(
+                "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
+                "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
+            )
+
+            is RadialGradient -> mapOf(
+                "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
+                "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
+            )
+        }
+        val border = mapOf(
+            "border-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
+            "border-color" to theme.outline.toCss(),
+            "box-shadow" to theme.elevation.toBoxShadow(),
+            "border-top-left-radius" to theme.cornerRadii.topLeft.value,
+            "border-top-right-radius" to theme.cornerRadii.topRight.value,
+            "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
+            "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
+        )
         style(
             asSelector, mapOf(
                 "color" to theme.foreground.toCss(),
@@ -97,43 +120,20 @@ object DynamicCSS {
                 "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
                 "line-height" to theme.body.lineSpacingMultiplier.toString(),
                 "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
-                "transition-property" to "color, background-image, background-color, border-color, box-shadow, border",
-                "transition-duration" to "0.25s",
+                "transition-property" to "color, background-image, background-color, border-color, box-shadow, border-radius",
+                "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
                 "transition-delay" to "0s",
-            )
+            ) +  (if(includeBackAlways) back + border else mapOf())
         )
-        style(
-            "$asSelector.inclBack", when (val it = theme.background) {
-                is Color -> mapOf("background-color" to it.toCss())
-                is LinearGradient -> mapOf(
-                    "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
-                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
-                )
-
-                is RadialGradient -> mapOf(
-                    "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
-                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
-                )
-            }
-        )
-        style(
-            "$asSelector.inclMargin", mapOf(
-                "margin" to theme.spacing.value,
-            )
-        )
-        style(
-            "$asSelector.inclBorder", mapOf(
-                "border-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
-                "border-color" to theme.outline.toCss(),
-                "padding" to theme.spacing.value,
-                "box-shadow" to theme.elevation.toBoxShadow(),
-                "border-top-left-radius" to theme.cornerRadii.topLeft.value,
-                "border-top-right-radius" to theme.cornerRadii.topRight.value,
-                "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
-                "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
-            )
-        )
+        if(includeBackAlways) {
+            style("$asSelector.inclBack", mapOf("padding" to theme.spacing.value,))
+        } else {
+            style("$asSelector.inclBack", back)
+            style("$asSelector.inclBorder", border + mapOf("padding" to theme.spacing.value,))
+        }
+        style("$asSelector.inclMargin", mapOf("margin" to theme.spacing.value))
+        style("$asSelector.addPadding", mapOf("padding" to theme.spacing.value))
         style(
             "$asSelector.title", mapOf(
                 "font-family" to font(theme.title.font),

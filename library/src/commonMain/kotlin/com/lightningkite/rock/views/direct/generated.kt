@@ -94,7 +94,7 @@ expect var DropDown.DropDown_options: List<WidgetOption>
 expect class AutoCompleteTextField : NView
 @ViewDsl expect fun ViewContext.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit = {}): Unit
 expect val AutoCompleteTextField.AutoCompleteTextField_content: Writable<String>
-expect var AutoCompleteTextField.AutoCompleteTextField_suggestions: List<WidgetOption>
+expect var AutoCompleteTextField.AutoCompleteTextField_suggestions: List<String>
 
 expect class SwapView : NView
 @ViewDsl expect fun ViewContext.swapView(setup: SwapView.() -> Unit = {}): Unit
@@ -117,3 +117,5 @@ expect var RecyclerView.RecyclerView_renderer: ListRenderer<*>
 @ViewModifierDsl3 expect fun ViewContext.scrolls(): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.scrollsHorizontally(): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
+@ViewModifierDsl3 expect val ViewContext.bordering: ViewWrapper
+@ViewModifierDsl3 expect val ViewContext.addPadding: ViewWrapper

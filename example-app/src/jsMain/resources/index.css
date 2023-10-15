@@ -14,6 +14,19 @@ body > div {
   overflow-x: hidden;
 }
 
+button {
+    background: none;
+    border: none;
+}
+
+.toggle-button {
+    display: flex;
+}
+.toggle-button > span {
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
 .rock-screen {
   position: absolute;
   top: 0;
@@ -35,6 +48,35 @@ body > div {
   grid-row-end: 1;
   z-index: 1;
 }
+
+.rock-stack > .hStart { justify-self: start; }
+.rock-stack > .hCenter { justify-self: center; }
+.rock-stack > .hStretch { justify-self: stretch; }
+.rock-stack > .hEnd { justify-self: end; }
+.rock-stack > .vStart { align-self: start; }
+.rock-stack > .vCenter { align-self: center; }
+.rock-stack > .vStretch { align-self: stretch; }
+.rock-stack > .vEnd { align-self: end; }
+
+.rock-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.rock-row > .vStart { align-self: start; }
+.rock-row > .vCenter { align-self: center; }
+.rock-row > .vStretch { align-self: stretch; }
+.rock-row > .vEnd { align-self: end; }
+
+.rock-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.rock-col > .hStart { align-self: start; }
+.rock-col > .hCenter { align-self: center; }
+.rock-col > .hStretch { align-self: stretch; }
+.rock-col > .hEnd { align-self: end; }
 
 input {
     border-top: none;

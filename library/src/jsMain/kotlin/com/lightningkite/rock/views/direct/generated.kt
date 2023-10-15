@@ -7,9 +7,9 @@ import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
+import kotlinx.dom.addClass
 import org.w3c.dom.*
 import org.w3c.dom.url.URL
-import kotlin.io.encoding.Base64
 import kotlin.random.Random
 
 
@@ -19,24 +19,22 @@ import kotlin.random.Random
     setup()
 }
 @ViewDsl actual fun ViewContext.col(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "column"
+    classList.add("rock-col")
     setup()
 }
 @ViewDsl actual fun ViewContext.row(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
-    style.display = "flex"
-    style.flexDirection = "row"
+    classList.add("rock-row")
     setup()
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Link = HTMLAnchorElement
-@ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementInteractive<HTMLAnchorElement>("a", setup)
+@ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementClickable<HTMLAnchorElement>("a", setup)
 actual inline var Link.Link_to: RockScreen
     get() = TODO()
     set(value) { href = value.createPath() }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ExternalLink = HTMLAnchorElement
-@ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElementInteractive<HTMLAnchorElement>("a", setup)
+@ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElementClickable<HTMLAnchorElement>("a", setup)
 actual inline var ExternalLink.ExternalLink_to: String
     get() = href
     set(value) { href = value }
@@ -88,14 +86,14 @@ actual inline var TextView.TextView_content: String
 @ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = todo("space")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Button = HTMLButtonElement
-@ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElementInteractive<HTMLButtonElement>("button", setup)
+@ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElementClickable<HTMLButtonElement>("button", setup)
 actual fun Button.onClick(action: () -> Unit): Unit { onclick = { action() } }
 actual inline var Button.Button_enabled: Boolean
     get() = !disabled
     set(value) { disabled = !value }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Checkbox = HTMLInputElement
-@ViewDsl actual fun ViewContext.checkbox(setup: Checkbox.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.checkbox(setup: Checkbox.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "checkbox"
     setup()
 }
@@ -105,7 +103,7 @@ actual inline var Checkbox.Checkbox_enabled: Boolean
 actual val Checkbox.Checkbox_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioButton = HTMLInputElement
-@ViewDsl actual fun ViewContext.radioButton(setup: RadioButton.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.radioButton(setup: RadioButton.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "radio"
     setup()
 }
@@ -115,7 +113,7 @@ actual inline var RadioButton.RadioButton_enabled: Boolean
 actual val RadioButton.RadioButton_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Switch = HTMLInputElement
-@ViewDsl actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "checkbox"
     this.classList.add("switch")
     setup()
@@ -125,34 +123,42 @@ actual inline var Switch.Switch_enabled: Boolean
     set(value) { disabled = !value }
 actual val Switch.Switch_checked: Writable<Boolean> get() = vprop("input", { checked }, { checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ToggleButton = HTMLLabelElement
-@ViewDsl actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = themedElementInteractive<HTMLLabelElement>("label") {
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ToggleButton = HTMLSpanElement
+@ViewDsl actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+    classList.add("toggle-button")
     element<HTMLInputElement>("input") {
         this.type = "checkbox"
         this.hidden = true
     }
-    setup()
+    themedElementClickable<HTMLSpanElement>("span") {
+        classList.add("checkResponsive")
+        setup()
+    }
 }
 actual inline var ToggleButton.ToggleButton_enabled: Boolean
     get() = !ToggleButton_inputElement.disabled
     set(value) { ToggleButton_inputElement.disabled = !value }
-actual val ToggleButton.ToggleButton_checked: Writable<Boolean> get() = vprop("input", { ToggleButton_inputElement.checked }, { ToggleButton_inputElement.checked = it })
+actual val ToggleButton.ToggleButton_checked: Writable<Boolean> get() = ToggleButton_inputElement.vprop("input", { checked }, { checked = it })
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioToggleButton = HTMLLabelElement
-@ViewDsl actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = themedElementInteractive<HTMLLabelElement>("label") {
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias RadioToggleButton = HTMLSpanElement
+@ViewDsl actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+    classList.add("toggle-button")
     element<HTMLInputElement>("input") {
-        this.type = "checkbox"
+        this.type = "radio"
         this.hidden = true
     }
-    setup()
+    themedElementClickable<HTMLSpanElement>("span") {
+        classList.add("checkResponsive")
+        setup()
+    }
 }
 actual inline var RadioToggleButton.RadioToggleButton_enabled: Boolean
     get() = !ToggleButton_inputElement.disabled
     set(value) { ToggleButton_inputElement.disabled = !value }
-actual val RadioToggleButton.RadioToggleButton_checked: Writable<Boolean> get() = vprop("input", { ToggleButton_inputElement.checked }, { ToggleButton_inputElement.checked = it })
+actual val RadioToggleButton.RadioToggleButton_checked: Writable<Boolean> get() = ToggleButton_inputElement.vprop("input", { checked }, { checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextField = HTMLInputElement
-@ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElementInteractive<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
     setup()
 }
 actual val TextField.TextField_content: Writable<String> get() = vprop("input", { value }, { value = it })
@@ -211,7 +217,7 @@ actual inline var TextField.TextField_range: ClosedRange<Double>?
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextArea = HTMLTextAreaElement
-@ViewDsl actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit = themedElementInteractive("textarea", setup)
+@ViewDsl actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit = themedElement("textarea", setup)
 actual val TextArea.TextArea_content: Writable<String> get() = vprop("input", { value }, { value = it })
 actual inline var TextArea.TextArea_keyboardHints: KeyboardHints
     get() = TODO()
@@ -243,20 +249,19 @@ actual inline var TextArea.TextArea_hint: String
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias DropDown = HTMLSelectElement
-@ViewDsl actual fun ViewContext.dropDown(setup: DropDown.() -> Unit): Unit = themedElementInteractive("select", setup)
+@ViewDsl actual fun ViewContext.dropDown(setup: DropDown.() -> Unit): Unit = themedElementClickable("select", setup)
 actual val DropDown.DropDown_selected: Writable<String?> get() = vprop("change", { value }, { value = it ?: "" })
 actual inline var DropDown.DropDown_options: List<WidgetOption>
     get() = TODO()
     set(value) {
         val v = this.value
-        innerHTML = ""
         __resetContentToOptionList(value, v)
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias AutoCompleteTextField = HTMLInputElement
-@ViewDsl actual fun ViewContext.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = themedElementInteractive("input", setup)
+@ViewDsl actual fun ViewContext.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = themedElementEditable("input", setup)
 actual val AutoCompleteTextField.AutoCompleteTextField_content: Writable<String> get() = vprop("input", { value }, { value = it })
-actual inline var AutoCompleteTextField.AutoCompleteTextField_suggestions: List<WidgetOption>
+actual inline var AutoCompleteTextField.AutoCompleteTextField_suggestions: List<String>
     get() = TODO()
     set(value) {
         val listId = getAttribute("list") ?: run {
@@ -267,8 +272,8 @@ actual inline var AutoCompleteTextField.AutoCompleteTextField_suggestions: List<
             setAttribute("list", newId)
             newId
         }
-        document.getElementById(listId).apply {
-            __resetContentToOptionList(value, this@AutoCompleteTextField_suggestions.value)
+        document.getElementById(listId)?.let { it as? HTMLElement }?.apply {
+            __resetContentToOptionList(value.map { WidgetOption(it, it) }, this@AutoCompleteTextField_suggestions.value)
         }
     }
 
@@ -324,7 +329,12 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     }
     return ViewWrapper
 }
-@ViewModifierDsl3 actual fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper = ViewWrapper
+@ViewModifierDsl3 actual fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper {
+    beforeNextElementSetup {
+        classList.add("h${horizontal}", "v${vertical}")
+    }
+    return ViewWrapper
+}
 @ViewModifierDsl3 actual fun ViewContext.scrolls(): ViewWrapper{
     beforeNextElementSetup {
         style.overflowY = "auto"
@@ -362,6 +372,19 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
         style.overflowX = "hidden"
         style.overflowY = "hidden"
 
+    }
+    return ViewWrapper
+}
+@ViewModifierDsl3 actual val ViewContext.bordering: ViewWrapper get() {
+    beforeNextElementSetup {
+        style.margin = 0.px.value
+        style.borderRadius = 0.px.value
+    }
+    return ViewWrapper
+}
+@ViewModifierDsl3 actual val ViewContext.addPadding: ViewWrapper get() {
+    beforeNextElementSetup {
+        classList.add("addPadding")
     }
     return ViewWrapper
 }

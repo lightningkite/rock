@@ -21,9 +21,11 @@ data class FontAndStyle(
 
 expect sealed class ImageSource()
 data class ImageVector(
-    val paths: List<Path>, val width: Dimension, val height: Dimension,
-    val viewBoxMinX: Int = 0, val viewBoxMinY: Int = 0, val viewBoxWidth: Int = 24, val viewBoxHeight: Int = 24
+    val width: Dimension, val height: Dimension,
+    val viewBoxMinX: Int = 0, val viewBoxMinY: Int = 0, val viewBoxWidth: Int = 24, val viewBoxHeight: Int = 24,
+    val paths: List<Path>,
 ) : ImageSource() {
+    fun color(fillColor: Paint? = null, strokeColor: Color? = null, strokeWidth: Double? = null) = copy(paths = paths.map { it.copy(fillColor = fillColor, strokeColor = strokeColor, strokeWidth = strokeWidth) })
     data class Path(val fillColor: Paint? = null, val strokeColor: Color? = null, val strokeWidth: Double? = null, val path: String)
 }
 data class ImageRemote(val url: String) : ImageSource()

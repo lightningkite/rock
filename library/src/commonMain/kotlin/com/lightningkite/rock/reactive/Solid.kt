@@ -41,3 +41,19 @@ interface Writable<T> : Readable<T> {
     infix fun modify(update: (T) -> T) = set(update(once))
 }
 
+infix fun <T> Writable<T>.bind(master: Writable<T>) {
+    this.set(master.once)
+    var setting = false
+    master.addListener {
+        if(setting) return@addListener
+        setting = true
+        this.set(master.once)
+        setting = false
+    }.also { ListeningLifecycleStack.onRemove(it) }
+    this.addListener {
+        if(setting) return@addListener
+        setting = true
+        master.set(this.once)
+        setting = false
+    }.also { ListeningLifecycleStack.onRemove(it) }
+}

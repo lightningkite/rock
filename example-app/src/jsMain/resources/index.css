@@ -137,6 +137,13 @@ input:focus textarea:focus {
     border-color: rgba(236, 72, 153, 1);
 }
 
+.crowd {
+    padding: 0 !important;
+}
+.crowd > * {
+    margin: 0 !important;
+}
+
 * {
     scrollbar-color: #999 #0000;
     scrollbar-width: thin;

@@ -57,3 +57,15 @@ infix fun <T> Writable<T>.bind(master: Writable<T>) {
         setting = false
     }.also { ListeningLifecycleStack.onRemove(it) }
 }
+
+infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writable<Boolean> {
+    override val once: Boolean
+        get() = this@equalTo.once == value
+
+    override fun addListener(listener: () -> Unit): () -> Unit = this@equalTo.addListener(listener)
+
+    val target = value
+    override fun set(value: Boolean) {
+        if(value) this@equalTo.set(target)
+    }
+}

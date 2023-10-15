@@ -6,6 +6,7 @@ import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.reactive.bind
+import com.lightningkite.rock.reactive.equalTo
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.*
 
@@ -32,8 +33,12 @@ fun ViewContext.testView() {
             }
         } in sizedBox(SizeConstraints(minHeight = 200.px))
         row {
+            val current = Property(0)
             repeat(5) {
-                button { h6 { TextView_content = "B$it" } } in important in weight(1f)
+                radioToggleButton {
+                    h6 { TextView_content = "B$it" }
+                    RadioToggleButton_checked bind (current equalTo it)
+                } in weight(1f)
             }
         }
         row {

@@ -119,3 +119,4 @@ expect var RecyclerView.RecyclerView_renderer: ListRenderer<*>
 @ViewModifierDsl3 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
 @ViewModifierDsl3 expect val ViewContext.bordering: ViewWrapper
 @ViewModifierDsl3 expect val ViewContext.withPadding: ViewWrapper
+@ViewModifierDsl3 expect val ViewContext.crowd: ViewWrapper

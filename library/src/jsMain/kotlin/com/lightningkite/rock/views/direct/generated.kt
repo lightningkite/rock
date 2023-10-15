@@ -388,4 +388,10 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     }
     return ViewWrapper
 }
+@ViewModifierDsl3 actual val ViewContext.crowd: ViewWrapper get() {
+    beforeNextElementSetup {
+        classList.add("crowd")
+    }
+    return ViewWrapper
+}
 // End

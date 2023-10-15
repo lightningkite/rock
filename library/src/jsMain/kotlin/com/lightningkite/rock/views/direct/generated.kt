@@ -7,7 +7,6 @@ import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
-import kotlinx.dom.addClass
 import org.w3c.dom.*
 import org.w3c.dom.url.URL
 import kotlin.random.Random
@@ -383,7 +382,7 @@ actual inline var RecyclerView.RecyclerView_renderer: ListRenderer<*>
     }
     return ViewWrapper
 }
-@ViewModifierDsl3 actual val ViewContext.addPadding: ViewWrapper get() {
+@ViewModifierDsl3 actual val ViewContext.withPadding: ViewWrapper get() {
     beforeNextElementSetup {
         classList.add("addPadding")
     }

@@ -22,7 +22,7 @@ fun ViewContext.testView() {
                 TextView_content =
                     "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.\n\nJust how it should be."
             }
-        } in addPadding
+        } in withPadding
         stack {
             val aligns = listOf(Align.Start, Align.Center, Align.End)
             for(h in aligns) {
@@ -39,7 +39,7 @@ fun ViewContext.testView() {
         row {
             h1 { TextView_content = "Unwrapped" }
             text { TextView_content = "Some Content" }
-        }
+        } in withPadding
         row {
             h1 { TextView_content = "Card" }
             text { TextView_content = "Some Content" } in gravity(Align.Center, Align.End)

@@ -101,7 +101,15 @@ object DynamicCSS {
                 "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
                 "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
             )
-        }
+        } + mapOf(
+            "color" to theme.foreground.toCss(),
+            "font-family" to font(theme.body.font),
+            "font-weight" to if (theme.body.bold) "bold" else "normal",
+            "font-style" to if (theme.body.italic) "italic" else "normal",
+            "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
+            "line-height" to theme.body.lineSpacingMultiplier.toString(),
+            "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
+            )
         val border = mapOf(
             "border-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
             "border-width" to theme.outlineWidth.value,
@@ -114,13 +122,6 @@ object DynamicCSS {
         )
         style(
             asSelector, mapOf(
-                "color" to theme.foreground.toCss(),
-                "font-family" to font(theme.body.font),
-                "font-weight" to if (theme.body.bold) "bold" else "normal",
-                "font-style" to if (theme.body.italic) "italic" else "normal",
-                "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
-                "line-height" to theme.body.lineSpacingMultiplier.toString(),
-                "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
                 "transition-property" to "color, background-image, background-color, border-color, box-shadow, border-radius",
                 "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",

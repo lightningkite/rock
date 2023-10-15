@@ -86,11 +86,11 @@ fun ViewContext.testView() {
                 switch { Switch_checked bind checked } in card
                 toggleButton {
                     ToggleButton_checked bind checked
-                    h6 { TextView_content = "Test" }
+                    h6 { TextView_content = "Toggle" }
                 } in important
                 radioToggleButton {
                     RadioToggleButton_checked bind checked
-                    h6 { TextView_content = "Test" }
+                    h6 { TextView_content = "On Only" }
                 } in important
             }
             textArea { this.TextArea_content bind textData } in card

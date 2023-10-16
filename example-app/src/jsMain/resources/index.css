@@ -221,10 +221,36 @@ input:focus textarea:focus {
     margin: 0 !important;
 }
 
+.rock-label {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.rock-label > :nth-child(1).inclMargin {
+    font-size: 0.8rem;
+    margin-bottom: 0px;
+}
+.rock-label > :nth-child(2).inclMargin {
+    margin-top: 0.25rem;
+}
+
 * {
     scrollbar-color: #999 #0000;
     scrollbar-width: thin;
     scrollbar-gutter: auto;
+    flex-shrink: 0;
+}
+
+::placeholder {
+    color: var(--foreground);
+    opacity: 0.3;
+}
+
+.rock-separator {
+    background-color: var(--foreground);
+    opacity: 0.25;
+    min-width: 1px;
+    min-height: 1px;
 }
 
 /*::-webkit-scrollbar {*/

@@ -15,7 +15,7 @@ object MaterialLikeTheme {
         body: FontAndStyle = FontAndStyle(systemDefaultFont),
         elevation: Dimension = 2.px,
         cornerRadii: CornerRadii = CornerRadii(8.px),
-        spacing: Dimension = 8.px,
+        spacing: Dimension = 0.5.rem,
         outline: Paint = background.closestColor().highlight(0.1f),
         outlineWidth: Dimension = 0.px,
     ) = Theme(

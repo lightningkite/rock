@@ -6,6 +6,10 @@ import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 
+expect class NSeparator : NView
+value class Separator(override val native: NSeparator) : RView<NSeparator>
+@ViewDsl expect fun ViewContext.separator(setup: Separator.() -> Unit = {}): Unit
+
 expect class NContainingView : NView
 value class ContainingView(override val native: NContainingView) : RView<NContainingView>
 @ViewDsl expect fun ViewContext.stack(setup: ContainingView.() -> Unit = {}): Unit
@@ -38,6 +42,11 @@ value class TextView(override val native: NTextView) : RView<NTextView>
 @ViewDsl expect fun ViewContext.h6(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.text(setup: TextView.() -> Unit = {}): Unit
 expect var TextView.content: String
+
+expect class NLabel : NView
+value class Label(override val native: NLabel) : RView<NLabel>
+@ViewDsl expect fun ViewContext.label(setup: Label.() -> Unit = {}): Unit
+expect var Label.content: String
 
 expect class NActivityIndicator : NView
 value class ActivityIndicator(override val native: NActivityIndicator) : RView<NActivityIndicator>

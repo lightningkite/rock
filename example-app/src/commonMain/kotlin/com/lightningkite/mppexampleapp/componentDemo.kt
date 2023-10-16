@@ -22,6 +22,7 @@ fun ViewContext.componentDemo() {
         } in important in bordering
         col {
             h1 { content = "Beautiful by default." }
+            separator()
             text {
                 content =
                     "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.\n\nJust how it should be."
@@ -34,13 +35,15 @@ fun ViewContext.componentDemo() {
                 button {
                     h6 { content = "M1 Light" }
                     onClick {
-                        currentTheme set MaterialLikeTheme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
+                        currentTheme set MaterialLikeTheme.randomLight().randomElevationAndCorners()
+                            .randomTitleFontSettings()
                     }
                 } in important
                 button {
                     h6 { content = "M1 Dark" }
                     onClick {
-                        currentTheme set MaterialLikeTheme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
+                        currentTheme set MaterialLikeTheme.randomDark().randomElevationAndCorners()
+                            .randomTitleFontSettings()
                     }
                 } in important
                 button {
@@ -161,7 +164,7 @@ fun ViewContext.componentDemo() {
             h2 { content = "Stack Layout" }
             stack {
                 val aligns = listOf(Align.Start, Align.Center, Align.End)
-                for(h in aligns) {
+                for (h in aligns) {
                     for (v in aligns) {
                         text { content = "$h $v" } in gravity(h, v)
                     }
@@ -173,7 +176,7 @@ fun ViewContext.componentDemo() {
             h2 { content = "Column Gravity" }
             col {
                 val aligns = listOf(Align.Start, Align.Center, Align.End)
-                for(h in aligns) {
+                for (h in aligns) {
                     text { content = "$h" } in gravity(h, Align.Stretch)
                 }
             }
@@ -183,28 +186,44 @@ fun ViewContext.componentDemo() {
             h2 { content = "Row Gravity / Weight" }
             row {
                 val aligns = listOf(Align.Start, Align.Center, Align.End)
-                for(v in aligns) {
+                for (v in aligns) {
                     text { content = "$v" } in gravity(Align.Stretch, v)
                 }
                 stack { text { content = "Weight 1" } in gravity(Align.Center, Align.Center) } in weight(1f)
-                for(v in aligns) {
+                for (v in aligns) {
                     text { content = "$v" } in gravity(Align.Stretch, v)
                 }
             } in sizedBox(SizeConstraints(minHeight = 200.px))
-        } in cardD
+        } in card
 
         col {
             h2 { content = "Dynamic List" }
             val countString = Property("5")
             row {
                 forEachUpdating(
-                    SharedReadable { (1 .. (countString.current.toIntOrNull() ?: 0).coerceAtMost(100)).map { "Item $it" } }
+                    SharedReadable {
+                        (1..(countString.current.toIntOrNull() ?: 1).coerceAtMost(100)).map { "Item $it" }
+                    }
                 ) {
                     text { ::content.invoke { it.current } }
                 }
             } in scrollsHorizontally()
-            text { content = "Element count:" }
-            textField { content bind countString }
+            label {
+                content = "Element count:"
+                textField { content bind countString }
+            }
+        } in card
+
+        col {
+            h2 { content = "Sample Form" }
+            h3 { content = "Without cards" }
+            label { content = "First Name"; textField { hint = "Bill" } }
+            label { content = "Last Name"; textField { hint = "Murray" } }
+            label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } }
+            h3 { content = "With cards" }
+            label { content = "First Name"; textField { hint = "Bill" } in card }
+            label { content = "Last Name"; textField { hint = "Murray" } in card }
+            label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } in card }
         } in card
 
     } in scrolls() in setTheme { currentTheme.current } in bordering

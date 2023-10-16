@@ -115,7 +115,9 @@ expect val Double.rem: Dimension
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 expect inline operator fun Dimension.minus(other: Dimension): Dimension
 expect inline operator fun Dimension.times(other: Float): Dimension
+inline operator fun Dimension.times(other: Int): Dimension = this * other.toFloat()
 expect inline operator fun Dimension.div(other: Float): Dimension
+inline operator fun Dimension.div(other: Int): Dimension = this * other.toFloat()
 
 data class NavigationTab(
     val title: String,

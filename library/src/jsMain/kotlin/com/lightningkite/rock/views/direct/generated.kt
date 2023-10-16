@@ -13,6 +13,12 @@ import org.w3c.dom.url.URL
 import kotlin.random.Random
 
 
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSeparator = HTMLElement
+@ViewDsl actual fun ViewContext.separator(setup: Separator.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
+    classList.add("rock-separator")
+    setup(Separator(this))
+}
+
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NContainingView = HTMLElement
 @ViewDsl actual fun ViewContext.stack(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-stack")
@@ -79,13 +85,31 @@ actual inline var TextView.content: String
     get() = native.innerText
     set(value) { native.innerText = value }
 
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLabel = HTMLElement
+@ViewDsl actual fun ViewContext.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
+    textElement("span") {
+        classList.add("rock-label")
+    }
+    setup(Label(this))
+}
+actual inline var Label.content: String
+    get() = (native.firstElementChild as? HTMLElement)?.innerText ?: ""
+    set(value) { (native.firstElementChild as? HTMLElement)?.innerText = value }
+
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NActivityIndicator = HTMLSpanElement
 @ViewDsl actual fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit = themedElement<HTMLSpanElement>("span") {
     addClass("spinner")
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSpace = HTMLElement
-@ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") { setup(Space(this))}
+@ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
+    val getter = themeStack.last()
+    reactiveScope {
+        style.width = (getter().spacing * 4).value
+        style.height = (getter().spacing * 4).value
+    }
+    setup(Space(this))
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NButton = HTMLButtonElement
 @ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElementClickable<NButton>("button") { setup(Button(this))}

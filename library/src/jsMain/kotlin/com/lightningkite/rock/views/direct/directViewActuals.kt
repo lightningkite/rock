@@ -44,6 +44,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, set
     themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
 
         if (!themeChanged) {
+            classList.add("sameThemeText")
             classList.remove("inclBack")
             if (!rootTheme) {
                 classList.remove("inclBorder")
@@ -52,6 +53,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, set
             if (!rootTheme) {
                 classList.add("inclBorder")
             }
+            classList.remove("sameThemeText")
             classList.add("inclBack")
         }
     }

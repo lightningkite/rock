@@ -87,11 +87,11 @@ fun ViewContext.testView() {
                 toggleButton {
                     ToggleButton_checked bind checked
                     h6 { TextView_content = "Toggle" }
-                } in important
+                } in card
                 radioToggleButton {
                     RadioToggleButton_checked bind checked
                     h6 { TextView_content = "On Only" }
-                } in important
+                } in card
             }
             textArea { this.TextArea_content bind textData } in card
             autoCompleteTextField {
@@ -104,23 +104,43 @@ fun ViewContext.testView() {
             } in card
         }
 
-        button {
-            h6 { TextView_content = "Alter Theme" }
-            onClick {
-                currentTheme set MaterialLikeTheme.random().randomElevationAndCorners().randomTitleFontSettings()
-            }
-        } in important
+        row {
+            button {
+                h6 { TextView_content = "M1 Light" }
+                onClick {
+                    currentTheme set MaterialLikeTheme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
+                }
+            } in important
+            button {
+                h6 { TextView_content = "M1 Dark" }
+                onClick {
+                    currentTheme set MaterialLikeTheme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
+                }
+            } in important
+            button {
+                h6 { TextView_content = "M3 Light" }
+                onClick {
+                    currentTheme set M3Theme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
+                }
+            } in important
+            button {
+                h6 { TextView_content = "M3 Dark" }
+                onClick {
+                    currentTheme set M3Theme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
+                }
+            } in important
+        }
         button {
             h6 { TextView_content = "Alter Themes Randomly for Ten Seconds" }
             onClick {
                 launch {
                     repeat(10) {
-                        currentTheme set MaterialLikeTheme.random().randomElevationAndCorners().randomTitleFontSettings()
+                        currentTheme set M3Theme.random().randomElevationAndCorners().randomTitleFontSettings()
                         delay(1000)
                     }
                 }
             }
         } in important
-    } in scrolls() in setTheme { currentTheme.current }
+    } in scrolls() in setTheme { currentTheme.current } in bordering
 
 }

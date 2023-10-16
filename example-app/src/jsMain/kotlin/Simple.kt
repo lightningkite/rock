@@ -5,5 +5,5 @@ import kotlinx.browser.document
 
 fun main() {
     val context = ViewContext(document.body!!)
-    context.testView()
+    context.componentDemo()
 }

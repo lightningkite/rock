@@ -119,6 +119,7 @@ data class Color(
     }
 
     val average: Float get() = (red + green + blue) / 3f
+    val perceivedBrightness: Float get() = (red + green * 2 + blue) / 4f
     val redInt: Int get() = red.byteize()
     val greenInt: Int get() = green.byteize()
     val blueInt: Int get() = blue.byteize()
@@ -150,6 +151,7 @@ data class Color(
     fun toWhite(ratio: Float) = interpolate(this, white, ratio)
     fun toBlack(ratio: Float) = interpolate(this, black, ratio)
     fun highlight(ratio: Float) = if (average > .5) toBlack(ratio) else toWhite(ratio)
+    fun invert(): Color = Color(alpha = alpha, red = 1f - red, green = 1f - green, blue = 1f - blue)
 
     fun toHSV(): HSVColor = HSVColor(
         alpha = alpha,

@@ -82,7 +82,7 @@ actual inline var TextView.TextView_content: String
 @ViewDsl actual fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit = todo("activityIndicator")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Space = HTMLElement
-@ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = todo("space")
+@ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<HTMLSpanElement>("span", setup)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Button = HTMLButtonElement
 @ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElementClickable<HTMLButtonElement>("button", setup)
@@ -157,7 +157,7 @@ actual inline var RadioToggleButton.RadioToggleButton_enabled: Boolean
 actual val RadioToggleButton.RadioToggleButton_checked: Writable<Boolean> get() = ToggleButton_inputElement.vprop("input", { checked }, { checked = it })
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextField = HTMLInputElement
-@ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElement<HTMLInputElement>("input") {
+@ViewDsl actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit = themedElementEditable<HTMLInputElement>("input") {
     setup()
 }
 actual val TextField.TextField_content: Writable<String> get() = vprop("input", { value }, { value = it })
@@ -216,7 +216,7 @@ actual inline var TextField.TextField_range: ClosedRange<Double>?
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias TextArea = HTMLTextAreaElement
-@ViewDsl actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit = themedElement("textarea", setup)
+@ViewDsl actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit = themedElementEditable("textarea", setup)
 actual val TextArea.TextArea_content: Writable<String> get() = vprop("input", { value }, { value = it })
 actual inline var TextArea.TextArea_keyboardHints: KeyboardHints
     get() = TODO()

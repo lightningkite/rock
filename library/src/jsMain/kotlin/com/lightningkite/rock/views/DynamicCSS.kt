@@ -23,7 +23,7 @@ object DynamicCSS {
 
     init {
         // basis rules
-        style("*", mapOf("box-sizing" to "border-box"))
+        style("*", mapOf("box-sizing" to "border-box", "line-height" to "unset"))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
         style("h3", mapOf("font-size" to "1.4rem"))
@@ -111,23 +111,28 @@ object DynamicCSS {
             "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
             )
         val border = mapOf(
-            "border-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
-            "border-width" to theme.outlineWidth.value,
-            "border-color" to theme.outline.toCss(),
+            "outline-width" to theme.outlineWidth.value,
             "box-shadow" to theme.elevation.toBoxShadow(),
-            "border-top-left-radius" to theme.cornerRadii.topLeft.value,
-            "border-top-right-radius" to theme.cornerRadii.topRight.value,
-            "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
-            "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
         )
         style(
             asSelector, mapOf(
-                "transition-property" to "color, background-image, background-color, border-color, box-shadow, border-radius",
+                "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
+                "outline-color" to theme.outline.toCss(),
+                "outline-width" to 0.px.value,
+                "border-top-left-radius" to theme.cornerRadii.topLeft.value,
+                "border-top-right-radius" to theme.cornerRadii.topRight.value,
+                "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
+                "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
+                "transition-property" to "color, background-image, background-color, outline-color, box-shadow, border-radius",
                 "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
                 "transition-delay" to "0s",
             ) +  (if(includeBackAlways) back + border else mapOf())
         )
+        style("$asSelector.sameThemeText", mapOf("border-bottom-color" to theme.hover().background.toCss()))
+        style("$asSelector.sameThemeText:hover", mapOf("border-bottom-color" to theme.hover().hover().background.toCss()))
+        style("$asSelector.sameThemeText:hover:focus", mapOf("border-bottom-color" to theme.selected().background.toCss()))
+        style("$asSelector.sameThemeText:focus", mapOf("border-bottom-color" to theme.selected().background.toCss()))
         if(includeBackAlways) {
             style("$asSelector.inclBack", mapOf("padding" to theme.spacing.value,))
         } else {

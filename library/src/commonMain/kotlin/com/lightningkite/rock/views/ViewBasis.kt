@@ -1,6 +1,8 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.reactive.Readable
+import com.lightningkite.rock.reactive.reactiveScope
 
 @DslMarker
 annotation class ViewDsl
@@ -13,6 +15,9 @@ expect class ViewContext {
     val onRemove: OnRemoveHandler
     fun beforeNextElementSetup(action: NView.()->Unit)
     fun afterNextElementSetup(action: NView.()->Unit)
+    fun split(): ViewContext
+    fun clearChildren()
+    fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewContext.(Readable<T>)->Unit)
 }
 
 expect open class NView()
@@ -39,3 +44,11 @@ var RView<*>.visible: Boolean
     get() = native.visible
     set(value) { native.visible = value }
 
+fun <T> ViewContext.forEach(items: Readable<List<T>>, render: ViewContext.(T)->Unit) = with(split()) {
+    reactiveScope {
+        clearChildren()
+        items.current.forEach {
+            render(it)
+        }
+    }
+}

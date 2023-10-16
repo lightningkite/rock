@@ -3,7 +3,9 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.SharedReadable
 import com.lightningkite.rock.reactive.bind
+import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.*
 
@@ -189,6 +191,20 @@ fun ViewContext.componentDemo() {
                     text { content = "$v" } in gravity(Align.Stretch, v)
                 }
             } in sizedBox(SizeConstraints(minHeight = 200.px))
+        } in cardD
+
+        col {
+            h2 { content = "Dynamic List" }
+            val countString = Property("5")
+            row {
+                forEachUpdating(
+                    SharedReadable { (1 .. (countString.current.toIntOrNull() ?: 0).coerceAtMost(100)).map { "Item $it" } }
+                ) {
+                    text { ::content.invoke { it.current } }
+                }
+            } in scrollsHorizontally()
+            text { content = "Element count:" }
+            textField { content bind countString }
         } in card
 
     } in scrolls() in setTheme { currentTheme.current } in bordering

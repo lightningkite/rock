@@ -321,9 +321,7 @@ actual inline var WebView.content: String
 @ViewDsl actual fun ViewContext.recyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}
 @ViewDsl actual fun ViewContext.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}
 @ViewDsl actual fun ViewContext.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}
-actual inline var RecyclerView.renderer: ListRenderer<*>
-    get() = TODO()
-    set(value) { }
+actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit = TODO()
 @ViewModifierDsl3 actual fun ViewContext.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         style.flexGrow = "$amount"

@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*

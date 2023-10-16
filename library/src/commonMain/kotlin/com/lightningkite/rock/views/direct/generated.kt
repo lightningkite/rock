@@ -3,7 +3,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.*
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 
 expect class NContainingView : NView
@@ -128,7 +128,7 @@ value class RecyclerView(override val native: NRecyclerView) : RView<NRecyclerVi
 @ViewDsl expect fun ViewContext.recyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.horizontalRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.gridRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
-expect var RecyclerView.renderer: ListRenderer<*>
+expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit
 @ViewModifierDsl3 expect fun ViewContext.weight(amount: Float): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.scrolls(): ViewWrapper

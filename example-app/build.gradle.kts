@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
     kotlin("multiplatform")
@@ -106,4 +107,8 @@ kotlin {
 //    dependencies {
 //        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 //    }
+//}
+
+//tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
+//    this.args
 //}

@@ -3,8 +3,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Theme
-import com.lightningkite.rock.reactive.ListeningLifecycleStack
-import com.lightningkite.rock.reactive.ReactiveScope
+import com.lightningkite.rock.reactive.*
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.MutationObserver
@@ -16,7 +15,7 @@ actual class ViewContext(
     parent: HTMLElement
 ) {
     actual val addons: MutableMap<String, Any?> = mutableMapOf()
-    fun derive(parent: HTMLElement): ViewContext = ViewContext(parent).also {
+    actual fun split(): ViewContext = ViewContext(stack.last()).also {
         it.addons.putAll(this.addons)
     }
 
@@ -90,6 +89,15 @@ actual class ViewContext(
             }
 //            wrapperToDoList.clear()
         }
+    }
+
+    actual fun clearChildren() {
+        stack.last().innerHTML = ""
+    }
+
+    actual fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewContext.(Readable<T>)->Unit) {
+        // TODO: Faster version
+        forEach(items) { render(this, Constant(it)) }
     }
 }
 

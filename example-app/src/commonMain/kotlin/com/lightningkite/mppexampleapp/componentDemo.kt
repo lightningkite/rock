@@ -15,40 +15,40 @@ fun ViewContext.componentDemo() {
 
     col {
         row {
-            h2 { TextView_content = "Top Bar Example" } in weight(1f) in gravity(Align.Center, Align.Center)
-            button { image { this.Image_source = Icons.search.color(Color.white) } }
+            h2 { content = "Top Bar Example" } in weight(1f) in gravity(Align.Center, Align.Center)
+            button { image { this.source = Icons.search.color(Color.white) } }
         } in important in bordering
         col {
-            h1 { TextView_content = "Beautiful by default." }
+            h1 { content = "Beautiful by default." }
             text {
-                TextView_content =
+                content =
                     "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.\n\nJust how it should be."
             }
         } in withPadding
 
         col {
-            h2 { TextView_content = "Theme Control" }
+            h2 { content = "Theme Control" }
             row {
                 button {
-                    h6 { TextView_content = "M1 Light" }
+                    h6 { content = "M1 Light" }
                     onClick {
                         currentTheme set MaterialLikeTheme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
                     }
                 } in important
                 button {
-                    h6 { TextView_content = "M1 Dark" }
+                    h6 { content = "M1 Dark" }
                     onClick {
                         currentTheme set MaterialLikeTheme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
                     }
                 } in important
                 button {
-                    h6 { TextView_content = "M3 Light" }
+                    h6 { content = "M3 Light" }
                     onClick {
                         currentTheme set M3Theme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
                     }
                 } in important
                 button {
-                    h6 { TextView_content = "M3 Dark" }
+                    h6 { content = "M3 Dark" }
                     onClick {
                         currentTheme set M3Theme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
                     }
@@ -57,15 +57,15 @@ fun ViewContext.componentDemo() {
         } in card
 
         col {
-            h2 { TextView_content = "Buttons" }
+            h2 { content = "Buttons" }
             row {
                 space {} in weight(1f)
-                button { text { TextView_content = "Sample" } }
-                button { text { TextView_content = "Card" } } in card
-                button { text { TextView_content = "Important" } } in important
-                button { text { TextView_content = "Critical" } } in critical
-                button { text { TextView_content = "Warning" } } in warning
-                button { text { TextView_content = "Danger" } } in danger
+                button { text { content = "Sample" } }
+                button { text { content = "Card" } } in card
+                button { text { content = "Important" } } in important
+                button { text { content = "Critical" } } in critical
+                button { text { content = "Warning" } } in warning
+                button { text { content = "Danger" } } in danger
                 space {} in weight(1f)
             }
         } in card /*themeFromLast {
@@ -77,31 +77,31 @@ fun ViewContext.componentDemo() {
         }*/
 
         col {
-            h2 { TextView_content = "Toggle Buttons" }
+            h2 { content = "Toggle Buttons" }
             row {
                 space {} in weight(1f)
-                toggleButton { ToggleButton_checked bind booleanContent; text { TextView_content = "Sample" } }
-                toggleButton { ToggleButton_checked bind booleanContent; text { TextView_content = "Card" } } in card
-                toggleButton { ToggleButton_checked bind booleanContent; text { TextView_content = "Important" } } in important
-                toggleButton { ToggleButton_checked bind booleanContent; text { TextView_content = "Critical" } } in critical
+                toggleButton { checked bind booleanContent; text { content = "Sample" } }
+                toggleButton { checked bind booleanContent; text { content = "Card" } } in card
+                toggleButton { checked bind booleanContent; text { content = "Important" } } in important
+                toggleButton { checked bind booleanContent; text { content = "Critical" } } in critical
                 space {} in weight(1f)
             }
         } in card
 
         col {
-            h2 { TextView_content = "Switches" }
+            h2 { content = "Switches" }
             row {
                 space {} in weight(1f)
-                switch { Switch_checked bind booleanContent; }
-                switch { Switch_checked bind booleanContent; } in card
-                switch { Switch_checked bind booleanContent; } in important
-                switch { Switch_checked bind booleanContent; } in critical
+                switch { checked bind booleanContent; }
+                switch { checked bind booleanContent; } in card
+                switch { checked bind booleanContent; } in important
+                switch { checked bind booleanContent; } in critical
                 space {} in weight(1f)
             }
         } in card
 
         col {
-            h2 { TextView_content = "Activity Indicators" }
+            h2 { content = "Activity Indicators" }
             row {
                 space {} in weight(1f)
                 stack { activityIndicator { } } in withPadding
@@ -115,37 +115,37 @@ fun ViewContext.componentDemo() {
         } in card
 
         col {
-            h2 { TextView_content = "Drop Downs" }
+            h2 { content = "Drop Downs" }
             val options = listOf("Apple", "Banana", "Crepe").map { WidgetOption(it, it) }
-            dropDown { this.DropDown_options = options } in withPadding
-            dropDown { this.DropDown_options = options } in card
-            dropDown { this.DropDown_options = options } in important
-            dropDown { this.DropDown_options = options } in critical
-            dropDown { this.DropDown_options = options } in warning
-            dropDown { this.DropDown_options = options } in danger
+            dropDown { this.options = options } in withPadding
+            dropDown { this.options = options } in card
+            dropDown { this.options = options } in important
+            dropDown { this.options = options } in critical
+            dropDown { this.options = options } in warning
+            dropDown { this.options = options } in danger
         } in card
 
         col {
-            h2 { TextView_content = "Text Fields" }
-            textField { TextField_content bind stringContent }
-            textField { TextField_content bind stringContent } in card
-            textField { TextField_content bind stringContent } in important
-            textField { TextField_content bind stringContent } in critical
+            h2 { content = "Text Fields" }
+            textField { content bind stringContent }
+            textField { content bind stringContent } in card
+            textField { content bind stringContent } in important
+            textField { content bind stringContent } in critical
         } in card
 
         col {
-            h2 { TextView_content = "Text Areas" }
-            textArea { TextArea_content bind stringContent }
-            textArea { TextArea_content bind stringContent } in card
-            textArea { TextArea_content bind stringContent } in important
-            textArea { TextArea_content bind stringContent } in critical
+            h2 { content = "Text Areas" }
+            textArea { content bind stringContent }
+            textArea { content bind stringContent } in card
+            textArea { content bind stringContent } in important
+            textArea { content bind stringContent } in critical
         } in card
 
         col {
-            h2 { TextView_content = "Images" }
+            h2 { content = "Images" }
             row {
                 repeat(5) {
-                    image { Image_source = ImageRemote("https://picsum.photos/seed/${it}/200/300") } in sizedBox(
+                    image { source = ImageRemote("https://picsum.photos/seed/${it}/200/300") } in sizedBox(
                         SizeConstraints(
                             maxWidth = 100.px,
                             minWidth = 100.px
@@ -156,37 +156,37 @@ fun ViewContext.componentDemo() {
         } in card
 
         col {
-            h2 { TextView_content = "Stack Layout" }
+            h2 { content = "Stack Layout" }
             stack {
                 val aligns = listOf(Align.Start, Align.Center, Align.End)
                 for(h in aligns) {
                     for (v in aligns) {
-                        text { TextView_content = "$h $v" } in gravity(h, v)
+                        text { content = "$h $v" } in gravity(h, v)
                     }
                 }
             } in sizedBox(SizeConstraints(minHeight = 200.px))
         } in card
 
         col {
-            h2 { TextView_content = "Column Gravity" }
+            h2 { content = "Column Gravity" }
             col {
                 val aligns = listOf(Align.Start, Align.Center, Align.End)
                 for(h in aligns) {
-                    text { TextView_content = "$h" } in gravity(h, Align.Stretch)
+                    text { content = "$h" } in gravity(h, Align.Stretch)
                 }
             }
         } in card
 
         col {
-            h2 { TextView_content = "Row Gravity / Weight" }
+            h2 { content = "Row Gravity / Weight" }
             row {
                 val aligns = listOf(Align.Start, Align.Center, Align.End)
                 for(v in aligns) {
-                    text { TextView_content = "$v" } in gravity(Align.Stretch, v)
+                    text { content = "$v" } in gravity(Align.Stretch, v)
                 }
-                stack { text { TextView_content = "Weight 1" } in gravity(Align.Center, Align.Center) } in weight(1f)
+                stack { text { content = "Weight 1" } in gravity(Align.Center, Align.Center) } in weight(1f)
                 for(v in aligns) {
-                    text { TextView_content = "$v" } in gravity(Align.Stretch, v)
+                    text { content = "$v" } in gravity(Align.Stretch, v)
                 }
             } in sizedBox(SizeConstraints(minHeight = 200.px))
         } in card

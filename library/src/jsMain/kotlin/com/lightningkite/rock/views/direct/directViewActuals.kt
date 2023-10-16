@@ -150,19 +150,17 @@ inline fun <T : HTMLElement, V> T.vprop(
     }
 }
 
-inline val ToggleButton.ToggleButton_inputElement: HTMLInputElement get() = this.previousElementSibling as HTMLInputElement
-
 @ViewDsl
 internal fun ViewContext.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =
     themedElement<HTMLDivElement>(elementBase) {
-        setup()
+        setup(TextView(this))
         style.whiteSpace = "pre-wrap"
     }
 @ViewDsl
 
 internal fun ViewContext.headerElement(elementBase: String, setup: TextView.() -> Unit): Unit =
     themedElement<HTMLDivElement>(elementBase) {
-        setup()
+        setup(TextView(this))
         style.whiteSpace = "pre-wrap"
         classList.add("title")
     }

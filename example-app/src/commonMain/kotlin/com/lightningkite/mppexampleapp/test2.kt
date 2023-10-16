@@ -14,13 +14,13 @@ fun ViewContext.testView() {
     val currentTheme = Property<Theme>(MaterialLikeTheme())
     col {
         row {
-            h2 { TextView_content = "Top Bar Example" } in weight(1f) in gravity(Align.Center, Align.Center)
-            button { image { this.Image_source = Icons.search.color(Color.white) } }
+            h2 { content = "Top Bar Example" } in weight(1f) in gravity(Align.Center, Align.Center)
+            button { image { this.source = Icons.search.color(Color.white) } }
         } in important in bordering
         col {
-            h1 { TextView_content = "Beautiful by default." }
+            h1 { content = "Beautiful by default." }
             text {
-                TextView_content =
+                content =
                     "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.\n\nJust how it should be."
             }
         } in withPadding
@@ -28,7 +28,7 @@ fun ViewContext.testView() {
             val aligns = listOf(Align.Start, Align.Center, Align.End)
             for(h in aligns) {
                 for (v in aligns) {
-                    text { TextView_content = "$h $v" } in gravity(h, v)
+                    text { content = "$h $v" } in gravity(h, v)
                 }
             }
         } in sizedBox(SizeConstraints(minHeight = 200.px))
@@ -36,41 +36,41 @@ fun ViewContext.testView() {
             val current = Property(0)
             repeat(5) {
                 radioToggleButton {
-                    h6 { TextView_content = "B$it" }
-                    RadioToggleButton_checked bind (current equalTo it)
+                    h6 { content = "B$it" }
+                    checked bind (current equalTo it)
                 } in weight(1f)
             }
         }
         row {
-            h1 { TextView_content = "Unwrapped" }
-            text { TextView_content = "Some Content" }
+            h1 { content = "Unwrapped" }
+            text { content = "Some Content" }
         } in withPadding
         row {
-            h1 { TextView_content = "Card" }
-            text { TextView_content = "Some Content" } in gravity(Align.Center, Align.End)
+            h1 { content = "Card" }
+            text { content = "Some Content" } in gravity(Align.Center, Align.End)
         } in card
         row {
-            h1 { TextView_content = "Important" }
-            text { TextView_content = "Some Content" }
+            h1 { content = "Important" }
+            text { content = "Some Content" }
         } in important
         row {
-            h1 { TextView_content = "Critical" }
-            text { TextView_content = "Some Content" }
+            h1 { content = "Critical" }
+            text { content = "Some Content" }
         } in critical
         row {
-            h1 { TextView_content = "Warning" }
-            text { TextView_content = "Some Content" }
+            h1 { content = "Warning" }
+            text { content = "Some Content" }
         } in warning
         row {
-            h1 { TextView_content = "Danger" }
-            text { TextView_content = "Some Content" }
+            h1 { content = "Danger" }
+            text { content = "Some Content" }
         } in danger
 
         col {
-            h1 { TextView_content = "Important" }
+            h1 { content = "Important" }
             row {
-                h1 { TextView_content = "Important Important" }
-                text { TextView_content = "Some Content" }
+                h1 { content = "Important Important" }
+                text { content = "Some Content" }
             } in important
         } in important
 
@@ -78,60 +78,60 @@ fun ViewContext.testView() {
         val checked = Property(false)
 
         col {
-            textField { this.TextField_content bind textData }
-            textField { this.TextField_content bind textData } in card
+            textField { this.content bind textData }
+            textField { this.content bind textData } in card
             row {
-                checkbox { this.Checkbox_checked bind checked } in card
-                radioButton { this.RadioButton_checked bind checked } in card
-                switch { Switch_checked bind checked } in card
+                checkbox { this.checked bind checked } in card
+                radioButton { this.checked bind checked } in card
+                switch { checked bind checked } in card
                 toggleButton {
-                    ToggleButton_checked bind checked
-                    h6 { TextView_content = "Toggle" }
+                    checked bind checked
+                    h6 { content = "Toggle" }
                 } in card
                 radioToggleButton {
-                    RadioToggleButton_checked bind checked
-                    h6 { TextView_content = "On Only" }
+                    checked bind checked
+                    h6 { content = "On Only" }
                 } in card
             }
-            textArea { this.TextArea_content bind textData } in card
+            textArea { this.content bind textData } in card
             autoCompleteTextField {
-                this.AutoCompleteTextField_content bind textData
-                this.AutoCompleteTextField_suggestions = listOf("Apple", "Banana", "Crepe")
+                this.content bind textData
+                this.suggestions = listOf("Apple", "Banana", "Crepe")
             } in card
             dropDown {
-                this.DropDown_options = listOf("Apple", "Banana", "Crepe").map { WidgetOption(it, it) }
-//                this.DropDown_selected bind textData
+                this.options = listOf("Apple", "Banana", "Crepe").map { WidgetOption(it, it) }
+//                this.selected bind textData
             } in card
         }
 
         row {
             button {
-                h6 { TextView_content = "M1 Light" }
+                h6 { content = "M1 Light" }
                 onClick {
                     currentTheme set MaterialLikeTheme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
                 }
             } in important
             button {
-                h6 { TextView_content = "M1 Dark" }
+                h6 { content = "M1 Dark" }
                 onClick {
                     currentTheme set MaterialLikeTheme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
                 }
             } in important
             button {
-                h6 { TextView_content = "M3 Light" }
+                h6 { content = "M3 Light" }
                 onClick {
                     currentTheme set M3Theme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
                 }
             } in important
             button {
-                h6 { TextView_content = "M3 Dark" }
+                h6 { content = "M3 Dark" }
                 onClick {
                     currentTheme set M3Theme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
                 }
             } in important
         }
         button {
-            h6 { TextView_content = "Alter Themes Randomly for Ten Seconds" }
+            h6 { content = "Alter Themes Randomly for Ten Seconds" }
             onClick {
                 launch {
                     repeat(10) {

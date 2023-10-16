@@ -101,6 +101,31 @@ fun ViewContext.componentDemo() {
         } in card
 
         col {
+            h2 { TextView_content = "Activity Indicators" }
+            row {
+                space {} in weight(1f)
+                stack { activityIndicator { } } in withPadding
+                stack { activityIndicator { } } in card
+                stack { activityIndicator { } } in important
+                stack { activityIndicator { } } in critical
+                stack { activityIndicator { } } in warning
+                stack { activityIndicator { } } in danger
+                space {} in weight(1f)
+            }
+        } in card
+
+        col {
+            h2 { TextView_content = "Drop Downs" }
+            val options = listOf("Apple", "Banana", "Crepe").map { WidgetOption(it, it) }
+            dropDown { this.DropDown_options = options } in withPadding
+            dropDown { this.DropDown_options = options } in card
+            dropDown { this.DropDown_options = options } in important
+            dropDown { this.DropDown_options = options } in critical
+            dropDown { this.DropDown_options = options } in warning
+            dropDown { this.DropDown_options = options } in danger
+        } in card
+
+        col {
             h2 { TextView_content = "Text Fields" }
             textField { TextField_content bind stringContent }
             textField { TextField_content bind stringContent } in card
@@ -118,7 +143,16 @@ fun ViewContext.componentDemo() {
 
         col {
             h2 { TextView_content = "Images" }
-            image { Image_source = ImageRemote("https://picsum.photos/200/300") } in sizedBox(SizeConstraints(maxWidth = 100.px, minWidth = 100.px))
+            row {
+                repeat(5) {
+                    image { Image_source = ImageRemote("https://picsum.photos/seed/${it}/200/300") } in sizedBox(
+                        SizeConstraints(
+                            maxWidth = 100.px,
+                            minWidth = 100.px
+                        )
+                    )
+                }
+            }
         } in card
 
         col {

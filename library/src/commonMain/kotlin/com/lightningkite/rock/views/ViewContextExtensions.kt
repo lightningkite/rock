@@ -23,7 +23,7 @@ var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator(
 var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
 
 var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>())
-inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
+@ViewModifierDsl3 inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
     val old = themeStack
     themeStack += { theme }
     try {
@@ -32,17 +32,17 @@ inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
         themeStack = old
     }
 }
-expect fun ViewContext.setTheme(calculate: ReactiveScope.()->Theme): ViewWrapper
-inline fun ViewContext.themeFromLast(crossinline calculate: (Theme)->Theme): ViewWrapper {
+@ViewModifierDsl3 expect fun ViewContext.setTheme(calculate: ReactiveScope.()->Theme): ViewWrapper
+@ViewModifierDsl3 inline fun ViewContext.themeFromLast(crossinline calculate: (Theme)->Theme): ViewWrapper {
     val previous = themeStack.last()
     return setTheme { calculate(previous()) }
 }
-val ViewContext.card: ViewWrapper get() = themeFromLast { it }
-val ViewContext.hover: ViewWrapper get() = themeFromLast { it.hover() }
-val ViewContext.down: ViewWrapper get() = themeFromLast { it.down() }
-val ViewContext.selected: ViewWrapper get() = themeFromLast { it.selected() }
-val ViewContext.disabled: ViewWrapper get() = themeFromLast { it.disabled() }
-val ViewContext.important: ViewWrapper get() = themeFromLast { it.important() }
-val ViewContext.critical: ViewWrapper get() = themeFromLast { it.critical() }
-val ViewContext.warning: ViewWrapper get() = themeFromLast { it.warning() }
-val ViewContext.danger: ViewWrapper get() = themeFromLast { it.danger() }
+@ViewModifierDsl3 val ViewContext.card: ViewWrapper get() = themeFromLast { it }
+@ViewModifierDsl3 val ViewContext.hover: ViewWrapper get() = themeFromLast { it.hover() }
+@ViewModifierDsl3 val ViewContext.down: ViewWrapper get() = themeFromLast { it.down() }
+@ViewModifierDsl3 val ViewContext.selected: ViewWrapper get() = themeFromLast { it.selected() }
+@ViewModifierDsl3 val ViewContext.disabled: ViewWrapper get() = themeFromLast { it.disabled() }
+@ViewModifierDsl3 val ViewContext.important: ViewWrapper get() = themeFromLast { it.important() }
+@ViewModifierDsl3 val ViewContext.critical: ViewWrapper get() = themeFromLast { it.critical() }
+@ViewModifierDsl3 val ViewContext.warning: ViewWrapper get() = themeFromLast { it.warning() }
+@ViewModifierDsl3 val ViewContext.danger: ViewWrapper get() = themeFromLast { it.danger() }

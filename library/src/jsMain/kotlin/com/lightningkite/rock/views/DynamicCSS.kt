@@ -103,6 +103,7 @@ object DynamicCSS {
             )
         } + mapOf(
             "color" to theme.foreground.toCss(),
+            "--foreground" to theme.foreground.toCss(),
             "font-family" to font(theme.body.font),
             "font-weight" to if (theme.body.bold) "bold" else "normal",
             "font-style" to if (theme.body.italic) "italic" else "normal",

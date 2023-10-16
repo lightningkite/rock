@@ -7,6 +7,7 @@ import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
+import kotlinx.dom.addClass
 import org.w3c.dom.*
 import org.w3c.dom.url.URL
 import kotlin.random.Random
@@ -78,8 +79,10 @@ actual inline var TextView.TextView_content: String
     get() = innerText
     set(value) { innerText = value }
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ActivityIndicator = HTMLElement
-@ViewDsl actual fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit = todo("activityIndicator")
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias ActivityIndicator = HTMLSpanElement
+@ViewDsl actual fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit = themedElement<HTMLSpanElement>("span") {
+    addClass("spinner")
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias Space = HTMLElement
 @ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<HTMLSpanElement>("span", setup)

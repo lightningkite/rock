@@ -2,18 +2,34 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.reactive.SharedReadable
 import com.lightningkite.rock.reactive.bind
 import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.*
+import com.lightningkite.rock.views.l2.navigatorView
+
+class RockScreenExample(val x: String): RockScreen {
+    override fun ViewContext.render() = text { content = x.toString() }
+}
 
 fun ViewContext.componentDemo() {
     val currentTheme = Property<Theme>(MaterialLikeTheme())
 
     val stringContent = Property("Test")
     val booleanContent = Property(false)
+    val navigator = PlatformNavigator(Routes(
+        parsers = listOf({
+            println(it)
+            RockScreenExample(it.segments.firstOrNull() ?: "???")
+        }),
+        renderers = mapOf(
+            RockScreenExample::class to { UrlLikePath(listOf((it as? RockScreenExample)?.x ?: "X"), mapOf()) }
+        ),
+        fallback = RockScreenExample("404")
+    ))
 
     col {
         row {
@@ -28,6 +44,10 @@ fun ViewContext.componentDemo() {
                     "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.\n\nJust how it should be."
             }
         } in withPadding
+
+        navigatorView(navigator) in sizedBox(SizeConstraints(height = 200.px))
+
+        button { text { content = "GO"}; onClick { navigator.navigate(RockScreenExample("hello")) }}
 
         col {
             h2 { content = "Theme Control" }

@@ -1,42 +1,61 @@
 package com.lightningkite.rock.navigation
 
-import com.lightningkite.rock.navigation.RedirectException
-import com.lightningkite.rock.navigation.RockNavigator
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.navigation.Router
+import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.Readable
+import com.lightningkite.rock.reactive.SharedReadable
+import com.lightningkite.rock.reactive.Writable
 import kotlinx.browser.window
 import org.w3c.dom.MANUAL
 import org.w3c.dom.PopStateEvent
 import org.w3c.dom.ScrollRestoration
+import org.w3c.dom.url.URLSearchParams
 
 actual class PlatformNavigator actual constructor(
-    override val router: Router, val onScreenChanged: (RockScreen, Boolean) -> Unit
+    val routes: Routes
 ) : RockNavigator {
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0
 
+    private val params: Map<String, String>
+        get() = window.location.search.split('&').associate { it.substringBefore('=') to it.substringAfter('=') }
+
     init {
-        navigate("${currentPath}${currentSearch}", reverse = false, pushState = false)
         window.addEventListener("popstate", { event ->
             event as PopStateEvent
             val index = event.state as Int?
-            val reverse = index == null || index < currentIndex
+            when {
+                index == null -> RockNavigator.Direction.Neutral
+                index > currentIndex -> direction = RockNavigator.Direction.Forward
+                index < currentIndex -> direction = RockNavigator.Direction.Back
+                else -> direction = RockNavigator.Direction.Neutral
+            }
             currentIndex = index ?: 0
-            navigate(
-                "${currentPath}${currentSearch}", reverse = reverse, pushState = false
-            )
+            navigate(window.location.pathname, params, false)
         })
     }
 
-    override var currentPath: String
-        get() = window.location.pathname
-        set(value) = throw NotImplementedError()
+    private val String.asSegments: List<String> get() = split('/').filter { it.isNotBlank() }
+    private val _currentScreen = Property(run {
+        val path = window.location.pathname
+        val args = params
+        if (isNavigating)
+            throw RedirectException(routes.parse(UrlLikePath(path.asSegments, args))!!)
+        window.history.replaceState(currentIndex, "", path)
+        window.history.scrollRestoration = ScrollRestoration.MANUAL
+        isNavigating = true
+        val screen = routes.parse(UrlLikePath(path.asSegments, args)) ?: routes.fallback
+        isNavigating = false
+        (screen)
+    })
+    override val currentScreen: Readable<RockScreen>
+        get() = SharedReadable { _currentScreen.current }
 
-    var currentSearch: String
-        get() = window.location.search
-        set(value) = throw NotImplementedError()
-
-    private fun navigate(path: String, reverse: Boolean, pushState: Boolean) {
+    private var isNavigating = false
+    override var direction: RockNavigator.Direction? = null
+        private set
+    private fun navigate(path: String, args: Map<String, String>, pushState: Boolean) {
+        if (isNavigating)
+            throw RedirectException(routes.parse(UrlLikePath(path.asSegments, args))!!)
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(
@@ -47,15 +66,45 @@ actual class PlatformNavigator actual constructor(
             window.history.replaceState(currentIndex, "", path)
             window.history.scrollRestoration = ScrollRestoration.MANUAL
         }
-        val screen = router.findScreen(path)
-        if (router.isNavigating)
-            throw RedirectException(screen)
-        onScreenChanged(screen, reverse)
+        isNavigating = true
+        val screen = routes.parse(UrlLikePath(path.asSegments, args)) ?: routes.fallback
+        isNavigating = false
+        _currentScreen set screen
+    }
+    private fun navigate(rockScreen: RockScreen, pushState: Boolean) {
+        if (isNavigating)
+            throw RedirectException(rockScreen)
+        val path = routes.render(rockScreen)?.segments?.joinToString("/")
+        if (pushState) {
+            currentIndex = nextIndex
+            window.history.pushState(
+                nextIndex++, "", path
+            )
+            window.history.scrollRestoration = ScrollRestoration.MANUAL
+        } else {
+            window.history.replaceState(currentIndex, "", path)
+            window.history.scrollRestoration = ScrollRestoration.MANUAL
+        }
+        isNavigating = true
+        isNavigating = false
+        _currentScreen set rockScreen
     }
 
-    override fun navigate(screen: RockScreen) = navigate(screen.createPath(), reverse = false, pushState = true)
+    override fun navigate(screen: RockScreen) {
+        direction = RockNavigator.Direction.Forward
+        navigate(screen, pushState = true)
+    }
 
-    override fun replace(screen: RockScreen) = navigate(screen.createPath(), reverse = false, pushState = false)
+    override fun replace(screen: RockScreen) {
+        direction = RockNavigator.Direction.Neutral
+        navigate(screen, pushState = false)
+    }
 
-    override fun goBack() = window.history.go(-1)
+    override fun notifyParamUpdate() {
+        window.location.search = routes.render(currentScreen.once)?.parameters?.entries?.joinToString("&") { it.key + "=" + it.value } ?: ""
+    }
+
+    override fun goBack() {
+        window.history.go(-1)
+    }
 }

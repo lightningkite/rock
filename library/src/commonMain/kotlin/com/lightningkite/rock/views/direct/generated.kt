@@ -122,8 +122,7 @@ expect var AutoCompleteTextField.suggestions: List<String>
 expect class NSwapView : NView
 value class SwapView(override val native: NSwapView) : RView<NSwapView>
 @ViewDsl expect fun ViewContext.swapView(setup: SwapView.() -> Unit = {}): Unit
-expect var SwapView.currentView: NView
-expect fun SwapView.setCurrentViewWithTransition(view: NView, transition: ScreenTransition): Unit
+expect fun SwapView.swap(transition: ScreenTransition = ScreenTransition.Fade, createNewView: ()->Unit): Unit
 
 expect class NWebView : NView
 value class WebView(override val native: NWebView) : RView<NWebView>

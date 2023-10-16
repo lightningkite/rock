@@ -2,7 +2,6 @@ package com.lightningkite.rock.views
 
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.DummyRockNavigator
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.reactive.PersistentProperty
 import com.lightningkite.rock.reactive.ReactiveScope
@@ -19,8 +18,8 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
     }
 }
 
-var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
-var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
+//var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
+//var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
 
 var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>())
 @ViewModifierDsl3 inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {

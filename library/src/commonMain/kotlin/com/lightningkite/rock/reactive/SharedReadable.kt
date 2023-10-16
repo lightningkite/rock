@@ -38,3 +38,7 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
         }
     }
 }
+
+fun <T> Readable<T>.withWrite(action: (T)->Unit): Writable<T> = object: Writable<T>, Readable<T> by this {
+    override fun set(value: T) = action(value)
+}

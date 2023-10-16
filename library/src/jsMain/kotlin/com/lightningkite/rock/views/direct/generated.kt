@@ -37,7 +37,7 @@ import kotlin.random.Random
 @ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") { setup(Link(this))}
 actual inline var Link.to: RockScreen
     get() = TODO()
-    set(value) { native.href = value.createPath() }
+    set(value) { native.href = "TODO" }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NExternalLink = HTMLAnchorElement
 @ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElementClickable<NExternalLink>("a") { setup(ExternalLink(this))}
@@ -304,29 +304,26 @@ actual inline var AutoCompleteTextField.suggestions: List<String>
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSwapView = HTMLDivElement
-@ViewDsl actual fun ViewContext.swapView(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") { setup(SwapView(this))}
-actual inline var SwapView.currentView: NView
-    get() = TODO()
-    set(value) {
-        val oldView = native.lastElementChild as? HTMLElement
-        native.appendChild(value)
-        oldView?.let { native.removeChild(it) }
-    }
-actual fun SwapView.setCurrentViewWithTransition(view: NView, transition: ScreenTransition): Unit {
-    val oldView = native.lastElementChild as? HTMLElement
-    val newView = view
-    newView.classList.add("rock-screen")
+@ViewDsl actual fun ViewContext.swapView(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
+    classList.add("rock-swap")
+    setup(SwapView(this))
+}
+actual fun SwapView.swap(transition: ScreenTransition, createNewView: ()->Unit): Unit {
     val keyframeName = DynamicCSS.transition(transition)
-    newView.style.animation = "${keyframeName}-enter 0.25s"
-    newView.style.marginLeft = "auto"
-    newView.style.marginRight = "auto"
-    native.appendChild(newView)
-    oldView?.let { view ->
+    native.children.let { (0 until it.length).map { i -> it.get(i) } }.filterIsInstance<HTMLElement>().forEach { view ->
         view.style.animation = "${keyframeName}-exit 0.25s"
         view.addEventListener("animationend", {
             native.removeChild(view)
         })
     }
+    createNewView()
+    val newView = native.lastElementChild as? HTMLElement ?: run {
+        println("WARNING: No element created!")
+        return
+    }
+    newView.style.animation = "${keyframeName}-enter 0.25s"
+    newView.style.marginLeft = "auto"
+    newView.style.marginRight = "auto"
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NWebView = HTMLIFrameElement

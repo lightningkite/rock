@@ -1,35 +1,38 @@
 package com.lightningkite.rock.navigation
 
+import com.lightningkite.rock.reactive.*
+
 interface RockNavigator {
-    var currentPath: String
-    val router: Router
+    val currentScreen: Readable<RockScreen>
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
     fun goBack()
+    fun notifyParamUpdate()
+    val direction: Direction?
+    enum class Direction { Back, Neutral, Forward }
+}
+
+class LocalNavigator(val routes: Routes): RockNavigator {
+    override var direction: RockNavigator.Direction? = null
+        private set
+    val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback)))
+    override val currentScreen: Readable<RockScreen>
+        get() = SharedReadable { stack.current.last() }
+    override fun goBack() {
+        direction = RockNavigator.Direction.Back
+        if(stack.once.size > 1) stack set stack.once.dropLast(1)
+    }
+    override fun notifyParamUpdate() {}
+    override fun navigate(screen: RockScreen) {
+        direction = RockNavigator.Direction.Forward
+        stack set stack.once.plus(screen)
+    }
+    override fun replace(screen: RockScreen) {
+        direction = RockNavigator.Direction.Neutral
+        stack set stack.once.dropLast(1).plus(screen)
+    }
 }
 
 expect class PlatformNavigator(
-    router: Router,
-    onScreenChanged: (RockScreen, Boolean) -> Unit
+    routes: Routes
 ) : RockNavigator
-
-class DummyRockNavigator : RockNavigator {
-    override var currentPath: String
-        get() = throw NotImplementedError()
-        set(value) = throw IllegalStateException("Cannot get current path without a navigator.")
-
-    override val router: Router
-        get() = throw NotImplementedError()
-
-    override fun navigate(screen: RockScreen) {
-        throw IllegalStateException("Cannot navigate without a navigator.")
-    }
-
-    override fun replace(screen: RockScreen) {
-        throw IllegalStateException("Cannot replace screen without a navigator.")
-    }
-
-    override fun goBack() {
-        throw IllegalStateException("Cannot go back without a navigator.")
-    }
-}

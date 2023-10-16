@@ -82,7 +82,11 @@ object DynamicCSS {
         theme(theme.selected(), ".theme-${theme.id}.clickable:checked", includeBackAlways = true)
         theme(theme.selected().hover(), ".theme-${theme.id}.clickable:checked:hover", includeBackAlways = true)
         theme(theme.selected(), ":checked+.theme-${theme.id}.clickable.checkResponsive", includeBackAlways = true)
-        theme(theme.selected().hover(), ":checked+.theme-${theme.id}.clickable:hover.checkResponsive", includeBackAlways = true)
+        theme(
+            theme.selected().hover(),
+            ":checked+.theme-${theme.id}.clickable:hover.checkResponsive",
+            includeBackAlways = true
+        )
         theme(theme.disabled(), ".theme-${theme.id}.clickable:disabled")
         return theme(theme)
     }
@@ -110,7 +114,7 @@ object DynamicCSS {
             "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
             "line-height" to theme.body.lineSpacingMultiplier.toString(),
             "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
-            )
+        )
         val border = mapOf(
             "outline-width" to theme.outlineWidth.value,
             "box-shadow" to theme.elevation.toBoxShadow(),
@@ -128,17 +132,23 @@ object DynamicCSS {
                 "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
                 "transition-delay" to "0s",
-            ) +  (if(includeBackAlways) back + border else mapOf())
+            ) + (if (includeBackAlways) back + border else mapOf())
         )
         style("$asSelector.sameThemeText", mapOf("border-bottom-color" to theme.hover().background.toCss()))
-        style("$asSelector.sameThemeText:hover", mapOf("border-bottom-color" to theme.hover().hover().background.toCss()))
-        style("$asSelector.sameThemeText:hover:focus", mapOf("border-bottom-color" to theme.selected().background.toCss()))
+        style(
+            "$asSelector.sameThemeText:hover",
+            mapOf("border-bottom-color" to theme.hover().hover().background.toCss())
+        )
+        style(
+            "$asSelector.sameThemeText:hover:focus",
+            mapOf("border-bottom-color" to theme.selected().background.toCss())
+        )
         style("$asSelector.sameThemeText:focus", mapOf("border-bottom-color" to theme.selected().background.toCss()))
-        if(includeBackAlways) {
-            style("$asSelector.inclBack", mapOf("padding" to theme.spacing.value,))
+        if (includeBackAlways) {
+            style("$asSelector.inclBack", mapOf("padding" to theme.spacing.value))
         } else {
             style("$asSelector.inclBack", back)
-            style("$asSelector.inclBorder", border + mapOf("padding" to theme.spacing.value,))
+            style("$asSelector.inclBorder", border + mapOf("padding" to theme.spacing.value))
         }
         style("$asSelector.inclMargin", mapOf("margin" to theme.spacing.value))
         style("$asSelector.addPadding", mapOf("padding" to theme.spacing.value))
@@ -160,7 +170,7 @@ object DynamicCSS {
             return "none"
         val offsetX = 0.px.value
         val offsetY = value
-        val blur = value
+        val blur = (this * 2).value
         val spread = 0.px.value
         return "$offsetX $offsetY $blur $spread #77777799"
     }

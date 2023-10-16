@@ -73,13 +73,7 @@ fun ViewContext.componentDemo() {
                 button { text { content = "Danger" } } in danger
                 space {} in weight(1f)
             } in scrollsHorizontally()
-        } in card /*themeFromLast {
-            it.copy(
-                foreground = Color.red,
-                outline = Color.red,
-                outlineWidth = 4.px,
-            )
-        }*/
+        } in card
 
         col {
             h2 { content = "Toggle Buttons" }

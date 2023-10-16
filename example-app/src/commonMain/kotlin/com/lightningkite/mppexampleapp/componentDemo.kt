@@ -58,7 +58,7 @@ fun ViewContext.componentDemo() {
                         currentTheme set M3Theme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
                     }
                 } in important
-            }
+            } in scrollsHorizontally()
         } in card
 
         col {
@@ -72,7 +72,7 @@ fun ViewContext.componentDemo() {
                 button { text { content = "Warning" } } in warning
                 button { text { content = "Danger" } } in danger
                 space {} in weight(1f)
-            }
+            } in scrollsHorizontally()
         } in card /*themeFromLast {
             it.copy(
                 foreground = Color.red,
@@ -90,7 +90,7 @@ fun ViewContext.componentDemo() {
                 toggleButton { checked bind booleanContent; text { content = "Important" } } in important
                 toggleButton { checked bind booleanContent; text { content = "Critical" } } in critical
                 space {} in weight(1f)
-            }
+            } in scrollsHorizontally()
         } in card
 
         col {
@@ -102,7 +102,7 @@ fun ViewContext.componentDemo() {
                 switch { checked bind booleanContent; } in important
                 switch { checked bind booleanContent; } in critical
                 space {} in weight(1f)
-            }
+            } in scrollsHorizontally()
         } in card
 
         col {
@@ -116,7 +116,7 @@ fun ViewContext.componentDemo() {
                 stack { activityIndicator { } } in warning
                 stack { activityIndicator { } } in danger
                 space {} in weight(1f)
-            }
+            } in scrollsHorizontally()
         } in card
 
         col {

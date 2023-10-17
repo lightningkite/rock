@@ -33,8 +33,10 @@ actual class ViewContext(
         }
 
     val onRemoveList = ArrayList<() -> Unit>()
-    actual val onRemove: OnRemoveHandler = {
-        onRemoveList.add(it)
+    actual val onRemove: OnRemoveHandler = object: OnRemoveHandler {
+        override fun onRemove(action: () -> Unit) {
+            onRemoveList.add(action)
+        }
     }
 
     fun close() {
@@ -97,7 +99,21 @@ actual class ViewContext(
 
     actual fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewContext.(Readable<T>)->Unit) {
         // TODO: Faster version
-        forEach(items) { render(this, Constant(it)) }
+        return with(split()) {
+            reactiveScope {
+                try {
+                    clearChildren()
+                    items.current.forEach {
+                        render(Constant(it))
+                    }
+                } catch(_: Loading) {
+                    clearChildren()
+                    repeat(5) {
+                        render(LoadingForever)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -106,8 +122,26 @@ actual typealias NView = HTMLElement
 
 actual val NView.onRemove: OnRemoveHandler
     get() {
-        return {
-            this.removeListeners.add(it)
+        return object: OnRemoveHandler{
+            val native:NView = this@onRemove
+            override fun onRemove(action: () -> Unit) {
+                native.removeListeners.add(action)
+            }
+
+            override fun onLoading() {
+                native.classList.add("loading")
+            }
+
+            override fun onTry() {
+                native.classList.remove("loading")
+            }
+
+            override fun onFail() {
+
+            }
+
+            override fun onOk() {
+            }
         }
     }
 

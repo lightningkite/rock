@@ -1,8 +1,7 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.Angle
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.reactiveScope
+import com.lightningkite.rock.reactive.*
 
 @DslMarker
 annotation class ViewDsl
@@ -22,7 +21,6 @@ expect class ViewContext {
 
 expect open class NView()
 interface RView<Wraps: NView> { val native: Wraps }
-typealias OnRemoveHandler = (onRemove: () -> Unit) -> Unit
 
 expect val NView.onRemove: OnRemoveHandler
 expect var NView.rotation: Angle

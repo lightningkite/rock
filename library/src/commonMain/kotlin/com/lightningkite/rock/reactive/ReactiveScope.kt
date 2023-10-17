@@ -17,8 +17,19 @@ operator fun <T> KMutableProperty0<T>.invoke(actionToCalculate: ReactiveScope.()
 
 @ReactiveB
 fun reactiveScope(action: ReactiveScope.() -> Unit) {
-    val dm = ReactiveScope(action)
-    ListeningLifecycleStack.onRemove { dm.clear() }
+    val current = ListeningLifecycleStack.current()
+    val dm = ReactiveScope {
+        current.onTry()
+        try {
+            action()
+            current.onOk()
+        } catch(l: Loading) {
+            current.onLoading()
+        } catch(e: Exception) {
+            current.onFail()
+        }
+    }
+    ListeningLifecycleStack.current().onRemove { dm.clear() }
 }
 
 class ReactiveScope(val action: ReactiveScope.() -> Unit) {

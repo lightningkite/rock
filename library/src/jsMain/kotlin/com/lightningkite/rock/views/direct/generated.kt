@@ -399,19 +399,24 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
 }
 @ViewModifierDsl3 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
     beforeNextElementSetup {
-        classList.add("rock-sized")
 
         if (constraints.minHeight == null) style.removeProperty("minHeight")
         else style.minHeight = constraints.minHeight.value
 
         if (constraints.maxHeight == null) style.removeProperty("maxHeight")
-        else style.maxHeight = constraints.maxHeight.value
+        else {
+            style.maxHeight = constraints.maxHeight.value
+            classList.add("rock-max-sized")
+        }
 
         if (constraints.minWidth == null) style.removeProperty("minWidth")
         else style.minWidth = constraints.minWidth.value
 
         if (constraints.maxWidth == null) style.removeProperty("maxWidth")
-        else style.maxWidth = constraints.maxWidth.value
+        else {
+            style.maxWidth = constraints.maxWidth.value
+            classList.add("rock-max-sized")
+        }
 
         if (constraints.width == null) style.removeProperty("width")
         else style.width = constraints.width.value

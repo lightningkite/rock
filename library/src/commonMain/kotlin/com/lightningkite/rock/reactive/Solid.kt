@@ -1,17 +1,16 @@
 package com.lightningkite.rock.reactive
 
-import com.lightningkite.rock.views.OnRemoveHandler
-
 /**
  * Keeps track of the current builder's lifecycle to add listeners to.
  * TODO: Remove this in favor of context receivers when they are available
  */
 object ListeningLifecycleStack {
     val stack = ArrayList<OnRemoveHandler>()
+    fun current() = stack.lastOrNull() ?: throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
     fun onRemove(action: () -> Unit) =
-        if (stack.isNotEmpty()) stack.last()(action) else throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
+        if (stack.isNotEmpty()) stack.last().onRemove(action) else throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
 
-    inline fun useIn(noinline handler: OnRemoveHandler, action: () -> Unit) {
+    inline fun useIn(handler: OnRemoveHandler, action: () -> Unit) {
         stack.add(handler)
         try {
             action()
@@ -27,7 +26,7 @@ interface Listenable {
     fun addListener(listener: () -> Unit): () -> Unit
 }
 
-interface Readable<T> : Listenable {
+interface Readable<out T> : Listenable {
     override val debugName: String
         get() = "Readable whose value is $once"
     val once: T

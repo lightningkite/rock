@@ -22,6 +22,3 @@ class Property<T>(startValue: T, private val overrideDebugName: String? = null) 
     }
 }
 
-class Constant<T>(override val once: T): Readable<T> {
-    override fun addListener(listener: () -> Unit): () -> Unit = {}
-}

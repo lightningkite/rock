@@ -14,6 +14,7 @@ body > div {
     max-width: 100vw;
     overflow-x: hidden;
 }
+
 a {
     text-decoration: none;
 }
@@ -62,18 +63,20 @@ input:focus textarea:focus {
     border-radius: 50% !important;
     animation: spin 2s infinite linear !important;
 }
+
 @keyframes spin {
     from {
-        transform:rotate(0deg);
+        transform: rotate(0deg);
     }
     to {
-        transform:rotate(360deg);
+        transform: rotate(360deg);
     }
 }
 
 .rock-swap {
     position: relative;
 }
+
 .rock-swap > * {
     position: absolute;
     top: 0;
@@ -172,9 +175,28 @@ input:focus textarea:focus {
     align-self: end;
 }
 
-.rock-sized {
+.rock-max-sized {
     align-self: center;
     justify-self: center;
+}
+
+@keyframes flickerAnimation {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.loading {
+    min-height: 1em;
+    background: color-mix(in srgb, currentColor, transparent 70%) !important;
+    animation: flickerAnimation 2s infinite !important;
+    animation-timing-function: linear;
 }
 
 .clickable {
@@ -239,10 +261,12 @@ input:focus textarea:focus {
     flex-direction: column;
     align-items: stretch;
 }
+
 .rock-label > :nth-child(1).inclMargin {
     font-size: 0.8rem;
     margin-bottom: 0px;
 }
+
 .rock-label > :nth-child(2).inclMargin {
     margin-top: 0.25rem;
 }

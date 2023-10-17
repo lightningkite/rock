@@ -151,9 +151,9 @@ fun launchGlobal(action: suspend () -> Unit): Cancellable {
 
 fun ViewContext.launch(action: suspend () -> Unit) {
     val cancel = launchGlobal(action)
-    this.onRemove { cancel.cancel() }
+    this.onRemove.onRemove { cancel.cancel() }
 }
 fun NView.launch(action: suspend () -> Unit) {
     val cancel = launchGlobal(action)
-    this.onRemove { cancel.cancel() }
+    this.onRemove.onRemove { cancel.cancel() }
 }

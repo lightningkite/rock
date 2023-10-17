@@ -18,7 +18,7 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
     val rs = ReactiveScope { currentValue = computer() }
 
     init {
-        rs.clear()
+        rs.clearScopeListeners()
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
@@ -34,7 +34,7 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
         listeners.remove(listener)
         if (listeners.isEmpty()) {
             // shutdown
-            rs.clear()
+            rs.clearScopeListeners()
         }
     }
 }

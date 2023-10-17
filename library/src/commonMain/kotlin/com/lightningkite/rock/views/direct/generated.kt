@@ -5,6 +5,7 @@ import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
+import com.lightningkite.rock.views.canvas.DrawingContext2D
 
 expect class NSeparator : NView
 value class Separator(override val native: NSeparator) : RView<NSeparator>
@@ -133,6 +134,17 @@ value class WebView(override val native: NWebView) : RView<NWebView>
 expect var WebView.url: String
 expect var WebView.permitJs: Boolean
 expect var WebView.content: String
+
+expect class NCanvas : NView
+value class Canvas(override val native: NCanvas) : RView<NCanvas>
+@ViewDsl expect fun ViewContext.canvas(setup: Canvas.() -> Unit = {}): Unit
+expect fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit
+expect val Canvas.width: Readable<Double>
+expect val Canvas.height: Readable<Double>
+expect fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit
+expect fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit
+expect fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit
+expect fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit
 
 expect class NRecyclerView : NView
 value class RecyclerView(override val native: NRecyclerView) : RView<NRecyclerView>

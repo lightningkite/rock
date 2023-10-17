@@ -35,6 +35,8 @@ object RootScreen : RockScreen {
             linkScreen(LayoutExamplesScreen)
             linkScreen(SampleLogInScreen)
             linkScreen(DataLoadingExampleScreen)
+            linkScreen(CanvasSampleScreen)
+            linkScreen(AnimationSampleScreen)
             linkScreen(ReactivityScreen)
             linkScreen(ArgumentsExampleScreen("test-id"))
         } in withPadding

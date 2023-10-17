@@ -292,3 +292,5 @@ input:focus textarea:focus {
     min-width: 1px;
     min-height: 1px;
 }
+
+iframe#webpack-dev-server-client-overlay{display:none!important}

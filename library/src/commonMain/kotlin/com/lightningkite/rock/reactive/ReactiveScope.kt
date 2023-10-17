@@ -29,7 +29,7 @@ fun reactiveScope(action: ReactiveScope.() -> Unit) {
             current.onFail()
         }
     }
-    ListeningLifecycleStack.current().onRemove { dm.clear() }
+    ListeningLifecycleStack.current().onRemove { dm.clearScopeListeners() }
 }
 
 class ReactiveScope(val action: ReactiveScope.() -> Unit) {
@@ -78,7 +78,7 @@ class ReactiveScope(val action: ReactiveScope.() -> Unit) {
             return once
         }
 
-    fun clear() {
+    fun clearScopeListeners() {
         removers.forEach { it.value() }
         removers.clear()
     }

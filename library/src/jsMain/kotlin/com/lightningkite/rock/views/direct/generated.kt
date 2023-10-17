@@ -6,9 +6,12 @@ import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
+import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.browser.document
 import kotlinx.dom.addClass
 import org.w3c.dom.*
+import org.w3c.dom.events.Event
+import org.w3c.dom.pointerevents.PointerEvent
 import org.w3c.dom.url.URL
 import kotlin.random.Random
 
@@ -371,6 +374,82 @@ actual inline var WebView.permitJs: Boolean
 actual inline var WebView.content: String
     get() = TODO()
     set(value) { TODO() }
+
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NCanvas = HTMLCanvasElement
+@ViewDsl actual fun ViewContext.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
+    style.width = "100%"
+    style.height = "100%"
+    setup(Canvas(this))
+}
+actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {
+    if(native.width != native.scrollWidth || native.height != native.scrollHeight) {
+        native.width = native.scrollWidth
+        native.height = native.scrollHeight
+    }
+    native.getContext("2d").apply {
+        this as DrawingContext2D
+        this.lineCap = CanvasLineCap.ROUND
+        this.lineJoin = CanvasLineJoin.ROUND
+        action(this)
+    }
+}
+
+external class ResizeObserver(callback: (Array<ResizeObserverEntry>, observer: ResizeObserver)->Unit) {
+    fun disconnect()
+    fun observe(target: Element, options: ResizeObserverOptions = definedExternally)
+    fun unobserve(target: Element)
+}
+external interface ResizeObserverOptions {
+    val box: String
+}
+external interface ResizeObserverEntry {
+    val target: Element
+    val contentRect: DOMRectReadOnly
+    val contentBoxSize: ResizeObserverEntryBoxSize
+    val borderBoxSize: ResizeObserverEntryBoxSize
+}
+external interface ResizeObserverEntryBoxSize {
+    val blockSize: Double
+    val inlineSize: Double
+}
+
+actual val Canvas.width: Readable<Double> get() = object: Readable<Double> {
+    override val once: Double
+        get() = native.scrollWidth.toDouble()
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        val o = ResizeObserver { _, _ ->
+            listener()
+        }
+        o.observe(native)
+        return { o.disconnect() }
+    }
+}
+actual val Canvas.height: Readable<Double> get() = object: Readable<Double> {
+    override val once: Double
+        get() = native.scrollHeight.toDouble()
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        val o = ResizeObserver { _, _ ->
+            listener()
+        }
+        o.observe(native)
+        return { o.disconnect() }
+    }
+}
+actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.addEventListener("pointerdown", pointerListenerHandler(action))
+}
+actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.addEventListener("pointermove", pointerListenerHandler(action))
+}
+actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    val l = pointerListenerHandler(action)
+    native.addEventListener("pointercancel", l)
+    native.addEventListener("pointerleave", l)
+}
+actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.addEventListener("pointerup", pointerListenerHandler(action))
+}
+
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRecyclerView = HTMLDivElement
 @ViewDsl actual fun ViewContext.recyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}

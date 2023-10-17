@@ -7,7 +7,6 @@ import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.ViewContext
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
-import kotlin.to
 
 @Routable("/")
 object RootScreen : RockScreen {
@@ -33,7 +32,8 @@ object RootScreen : RockScreen {
             linkScreen(LayoutExamplesScreen)
             linkScreen(SampleLogInScreen)
             linkScreen(DataLoadingExampleScreen)
-            linkScreen(ItemDetailScreen("test-id"))
+            linkScreen(ReactivityScreen)
+            linkScreen(ArgumentsExampleScreen("test-id"))
         } in withPadding
     }
 }

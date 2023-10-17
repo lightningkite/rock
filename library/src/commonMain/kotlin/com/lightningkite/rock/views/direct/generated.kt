@@ -20,17 +20,20 @@ expect class NLink : NView
 value class Link(override val native: NLink) : RView<NLink>
 @ViewDsl expect fun ViewContext.link(setup: Link.() -> Unit = {}): Unit
 expect var Link.to: RockScreen
+expect var Link.newTab: Boolean
 
 expect class NExternalLink : NView
 value class ExternalLink(override val native: NExternalLink) : RView<NExternalLink>
 @ViewDsl expect fun ViewContext.externalLink(setup: ExternalLink.() -> Unit = {}): Unit
 expect var ExternalLink.to: String
+expect var ExternalLink.newTab: Boolean
 
 expect class NImage : NView
 value class Image(override val native: NImage) : RView<NImage>
 @ViewDsl expect fun ViewContext.image(setup: Image.() -> Unit = {}): Unit
 expect var Image.source: ImageSource
-expect var Image.scaleType: ImageMode
+expect var Image.scaleType: ImageScaleType
+expect var Image.description: String?
 
 expect class NTextView : NView
 value class TextView(override val native: NTextView) : RView<NTextView>

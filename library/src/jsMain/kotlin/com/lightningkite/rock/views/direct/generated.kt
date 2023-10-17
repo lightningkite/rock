@@ -53,15 +53,21 @@ actual inline var Link.to: RockScreen
             navigator.navigate(value)
         }
     }
+actual inline var Link.newTab: Boolean
+    get() = native.target == "_blank"
+    set(value) { native.target = if(value) "_blank" else "_self" }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NExternalLink = HTMLAnchorElement
 @ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElementClickable<NExternalLink>("a") { setup(ExternalLink(this))}
 actual inline var ExternalLink.to: String
     get() = native.href
     set(value) { native.href = value }
+actual inline var ExternalLink.newTab: Boolean
+    get() = native.target == "_blank"
+    set(value) { native.target = if(value) "_blank" else "_self" }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NImage = HTMLImageElement
-@ViewDsl actual fun ViewContext.image(setup: Image.() -> Unit): Unit = themedElement<NImage>("img") { setup(Image(this))}
+@ViewDsl actual fun ViewContext.image(setup: Image.() -> Unit): Unit = themedElement<NImage>("img") { classList.add("tooltip"); setup(Image(this))}
 actual inline var Image.source: ImageSource
     get() = TODO()
     set(value) {
@@ -77,16 +83,19 @@ actual inline var Image.source: ImageSource
             else -> {}
         }
     }
-actual inline var Image.scaleType: ImageMode
+actual inline var Image.scaleType: ImageScaleType
     get() = TODO()
     set(value) {
         native.style.objectFit = when (value) {
-            ImageMode.Fit -> "contain"
-            ImageMode.Crop -> "cover"
-            ImageMode.Stretch -> "fill"
-            ImageMode.NoScale -> "none"
+            ImageScaleType.Fit -> "contain"
+            ImageScaleType.Crop -> "cover"
+            ImageScaleType.Stretch -> "fill"
+            ImageScaleType.NoScale -> "none"
         }
     }
+actual inline var Image.description: String?
+    get() = native.alt
+    set(value) { native.alt = value ?: "" }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NTextView = HTMLElement
 @ViewDsl actual fun ViewContext.h1(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)

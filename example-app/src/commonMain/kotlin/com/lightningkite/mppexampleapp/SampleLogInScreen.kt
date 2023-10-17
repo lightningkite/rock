@@ -19,7 +19,7 @@ object SampleLogInScreen : RockScreen {
         stack {
             image {
                 source = ImageRemote("https://picsum.photos/seed/login/1080/1920")
-                scaleType = ImageMode.Crop
+                scaleType = ImageScaleType.Crop
                 alpha = 0.5
             } in bordering
             col {

@@ -17,7 +17,6 @@ object ControlsScreen : RockScreen {
         col {
 
             val stringContent = PersistentProperty("test-data", "Test")
-//            val stringContent = Property("Test")
             val booleanContent = Property(false)
 
             h1 { content = "Controls" } in withPadding

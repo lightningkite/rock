@@ -106,7 +106,7 @@ data class Action(
     val onSelect: () -> Unit
 )
 
-enum class ImageMode { Fit, Crop, Stretch, NoScale }
+enum class ImageScaleType { Fit, Crop, Stretch, NoScale }
 
 expect class DimensionRaw
 value class Dimension(val value: DimensionRaw)

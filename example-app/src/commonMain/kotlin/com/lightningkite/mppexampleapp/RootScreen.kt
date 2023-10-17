@@ -31,6 +31,7 @@ object RootScreen : RockScreen {
             linkScreen(ThemesScreen)
             linkScreen(ControlsScreen)
             linkScreen(LayoutExamplesScreen)
+            linkScreen(SampleLogInScreen)
         } in withPadding
     }
 }

@@ -211,6 +211,14 @@ actual inline var TextField.keyboardHints: KeyboardHints
             KeyboardType.Decimal -> "number"
             KeyboardType.Integer -> "number"
             KeyboardType.Phone -> "tel"
+            KeyboardType.Email -> "text"
+        }
+        native.inputMode = when(value.type) {
+            KeyboardType.Text -> "text"
+            KeyboardType.Decimal -> "decimal"
+            KeyboardType.Integer -> "numeric"
+            KeyboardType.Phone -> "tel"
+            KeyboardType.Email -> "email"
         }
 
         when (value.autocomplete) {
@@ -391,6 +399,8 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
 }
 @ViewModifierDsl3 actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
     beforeNextElementSetup {
+        classList.add("rock-sized")
+
         if (constraints.minHeight == null) style.removeProperty("minHeight")
         else style.minHeight = constraints.minHeight.value
 
@@ -408,10 +418,6 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
 
         if (constraints.height == null) style.removeProperty("height")
         else style.height = constraints.height.value
-
-        style.overflowX = "hidden"
-        style.overflowY = "hidden"
-
     }
     return ViewWrapper
 }

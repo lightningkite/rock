@@ -18,7 +18,7 @@ fun ViewContext.app() {
             h2 { content = "Top Bar Example" } in weight(1f) in gravity(Align.Center, Align.Center)
             button { image { this.source = Icons.search.color(Color.white) } }
         } in important in bordering
-        navigatorView(navigator) in weight(1f)
+        navigatorView(navigator) in weight(1f) in bordering
     } in setTheme { appTheme.current } in bordering
 }
 

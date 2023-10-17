@@ -13,7 +13,6 @@ plugins {
 
 group = "com.lightningkite"
 version = "1.0-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }

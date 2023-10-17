@@ -1,6 +1,7 @@
 package com.lightningkite.rock.navigation
 
 import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.direct.space
 import kotlin.reflect.KClass
 
 class Routes(
@@ -23,6 +24,11 @@ data class UrlLikePath(
 
 interface RockScreen {
     fun ViewContext.render()
+    object Empty: RockScreen {
+        override fun ViewContext.render() {
+            space { }
+        }
+    }
 }
 
 class RedirectException(val screen: RockScreen) : Exception()

@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
+    id("com.google.devtools.ksp")
 //    kotlin("native.cocoapods")
 //    id("com.android.library")
 }
@@ -88,6 +89,15 @@ kotlin {
 //        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
 //        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
 //    }
+}
+ksp {
+    arg("generateFields", "true")
+}
+
+dependencies {
+    configurations.filter { it.name.startsWith("ksp") && it.name != "ksp" }.forEach {
+        add(it.name, project(":processor"))
+    }
 }
 
 //android {

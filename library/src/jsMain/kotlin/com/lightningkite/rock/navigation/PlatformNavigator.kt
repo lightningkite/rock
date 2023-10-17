@@ -74,7 +74,7 @@ actual class PlatformNavigator actual constructor(
     private fun navigate(rockScreen: RockScreen, pushState: Boolean) {
         if (isNavigating)
             throw RedirectException(rockScreen)
-        val path = routes.render(rockScreen)?.segments?.joinToString("/")
+        val path = routes.render(rockScreen)?.segments?.joinToString("/")?.let { "/$it" }
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(

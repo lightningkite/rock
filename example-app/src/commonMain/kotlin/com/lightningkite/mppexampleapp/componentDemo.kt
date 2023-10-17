@@ -1,5 +1,8 @@
 package com.lightningkite.mppexampleapp
 
+import com.lightningkite.mppexampleapp.AutoRoutes
+import com.lightningkite.rock.FallbackRoute
+import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.*
@@ -11,25 +14,22 @@ import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.l2.navigatorView
 
+@Routable("sample/{x}")
 class RockScreenExample(val x: String): RockScreen {
-    override fun ViewContext.render() = text { content = x.toString() }
+    override fun ViewContext.render() = text { content = x }
 }
+
+//@FallbackRoute
+//class FourOhFour(): RockScreen {
+//    override fun ViewContext.render() = text { content = "MISSING" }
+//}
 
 fun ViewContext.componentDemo() {
     val currentTheme = Property<Theme>(MaterialLikeTheme())
 
     val stringContent = Property("Test")
     val booleanContent = Property(false)
-    val navigator = PlatformNavigator(Routes(
-        parsers = listOf({
-            println(it)
-            RockScreenExample(it.segments.firstOrNull() ?: "???")
-        }),
-        renderers = mapOf(
-            RockScreenExample::class to { UrlLikePath(listOf((it as? RockScreenExample)?.x ?: "X"), mapOf()) }
-        ),
-        fallback = RockScreenExample("404")
-    ))
+    val navigator = PlatformNavigator(AutoRoutes)
 
     col {
         row {

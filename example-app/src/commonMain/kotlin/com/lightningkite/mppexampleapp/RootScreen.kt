@@ -33,6 +33,7 @@ object RootScreen : RockScreen {
             linkScreen(LayoutExamplesScreen)
             linkScreen(SampleLogInScreen)
             linkScreen(DataLoadingExampleScreen)
+            linkScreen(ItemDetailScreen("test-id"))
         } in withPadding
     }
 }

@@ -6,6 +6,5 @@ import kotlinx.browser.document
 
 fun main() {
     val context = ViewContext(document.body!!)
-    console.log(document.body!!::exists)
     context.app()
 }

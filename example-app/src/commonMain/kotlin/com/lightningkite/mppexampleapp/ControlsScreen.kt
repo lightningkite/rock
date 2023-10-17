@@ -7,8 +7,7 @@ import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.models.WidgetOption
 import com.lightningkite.rock.models.px
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.bind
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
@@ -17,7 +16,8 @@ object ControlsScreen : RockScreen {
     override fun ViewContext.render() {
         col {
 
-            val stringContent = Property("Test")
+            val stringContent = PersistentProperty("test-data", "Test")
+//            val stringContent = Property("Test")
             val booleanContent = Property(false)
 
             h1 { content = "Controls" } in withPadding
@@ -34,6 +34,13 @@ object ControlsScreen : RockScreen {
                     space {} in weight(1f)
                 } in scrollsHorizontally()
             } in card
+
+            text{ ::content { stringContent.current } }
+            text{
+                reactiveScope {
+                    content = stringContent.current
+                }
+            }
 
             col {
                 h2 { content = "Toggle Buttons" }

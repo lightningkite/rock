@@ -1,6 +1,6 @@
 # Rock
 
-A Kotlin Multiplatform UI Framework based on Solid.js.
+A Kotlin Multiplatform UI Framework inspired by Solid.js.
 
 ## Goals
 
@@ -13,11 +13,11 @@ A Kotlin Multiplatform UI Framework based on Solid.js.
 
 ## Interesting design decisions
 
-- Don't use kotlinx.coroutines, it's too big - include a custom, simpler, and more limited implementation
-- Don't use a KMP network client, they're all too big - include a custom, simpler, and more limited implementation
 - Base navigation around URLs to be very compatible with web
 - Use themes for styling; avoid direct styling.
 - Derive theme variants from existing themes.  Make theme variants semantically based.
+- Don't use kotlinx.coroutines, it's too big - include a custom, simpler, and more limited implementation
+- Don't use a KMP network client, they're all too big - include a custom, simpler, and more limited implementation
 
 ## Project Status
 
@@ -36,7 +36,13 @@ Early in development.  Web is basically usable at this point, but everything is 
 - [ ] Android
 - [ ] iOS
 
-## Sample View
+## Take a look!
+
+You can look at the [example project we're hosting](https://rock.cs.lightningkite.com/) to get an idea of what you can do.
+
+Click the magnifying glass in the app to see the source!
+
+### One example directly on this page:
 
 [See for yourself](https://rock.cs.lightningkite.com/sample/login)
 
@@ -89,38 +95,4 @@ object SampleLogInScreen : RockScreen {
         } in bordering
     }
 }
-```
-
-## Reactivity
-
-Simply works like this:
-
-```kotlin
-text {
-    content = "Constant Value"
-}
-val changing = Property("Changing Data")
-text {
-    reactiveScope { content = "Here is some changing information: ${changing.current}" }
-}
-text {
-    // Shorthand for the above
-    ::content { "Here is some changing information: ${changing.current}" }
-}
-
-// If you're not in a reactive context, attempting this is a compile error:
-changing.current
-
-// However, you can retrieve the immediate value upon execution by using:
-changing.once
-
-// You may set the value via:
-changing.set("Test")
-
-// You can make a suspending call via:
-val dataFromWeb = Fetching { fetch("...").text() }
-text {
-    ::content { "Loaded from internet: ${dataFromWeb.current}" }
-}
-// The text view will shimmer while it is loading automatically.
 ```

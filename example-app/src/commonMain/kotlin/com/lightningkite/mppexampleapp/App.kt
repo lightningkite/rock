@@ -15,6 +15,10 @@ fun ViewContext.app() {
 
     col {
         row {
+            button {
+                image { this.source = Icons.arrowBack.color(Color.white) }
+                onClick { navigator.goBack() }
+            }
             h2 { content = "Top Bar Example" } in weight(1f) in gravity(Align.Center, Align.Center)
             button { image { this.source = Icons.search.color(Color.white) } }
         } in important in bordering

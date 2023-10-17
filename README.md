@@ -34,6 +34,8 @@ Early in development.  Web is basically usable at this point, but everything is 
 
 [See for yourself](https://rock.cs.lightningkite.com/sample/login)
 
+If you want to try another theme, start [here](https://rock.cs.lightningkite.com/), change the theme, then go to the "Sample Log In" sreen.
+
 ![Screenshot 1](docs/SampleLoginScreen_A.png) ![Screenshot 2](docs/SampleLoginScreen_B.png)
 
 ```kotlin

@@ -70,25 +70,29 @@ class RouterGeneration(
                                                 else -> {}
                                             }
                                         }
-                                        appendLine("${routable.source.simpleName!!.asString()}(")
-                                        tab {
-                                            for ((index, part) in route.withIndex()) {
-                                                when (part) {
-                                                    is ParsedRoutable.Segment.Variable -> {
-                                                        when (part.type.declaration.simpleName?.asString()) {
-                                                            "kotlin.String" -> appendLine("${part.name} = it.segments[$index],")
-                                                            else -> appendLine("${part.name} = it.segments[$index].to${part.type.declaration.simpleName!!.asString()}(),")
+                                        if(routable.source.classKind == ClassKind.OBJECT)
+                                            appendLine("${routable.source.simpleName!!.asString()}")
+                                        else {
+                                            appendLine("${routable.source.simpleName!!.asString()}(")
+                                            tab {
+                                                for ((index, part) in route.withIndex()) {
+                                                    when (part) {
+                                                        is ParsedRoutable.Segment.Variable -> {
+                                                            when (part.type.declaration.simpleName?.asString()) {
+                                                                "kotlin.String" -> appendLine("${part.name} = it.segments[$index],")
+                                                                else -> appendLine("${part.name} = it.segments[$index].to${part.type.declaration.simpleName!!.asString()}(),")
+                                                            }
                                                         }
-                                                    }
 
-                                                    else -> {}
+                                                        else -> {}
+                                                    }
                                                 }
                                             }
+                                            appendLine(")")
                                         }
-                                        appendLine(")")
                                         // TODO: Handle parameters
                                     }
-                                    appendLine("}")
+                                    appendLine("},")
                                 }
                             }
                         }
@@ -113,7 +117,7 @@ class RouterGeneration(
                                     }
                                     appendLine(")")
                                 }
-                                appendLine("}")
+                                appendLine("},")
                             }
                         }
                         appendLine("),")
@@ -152,6 +156,7 @@ class ParsedRoutable(
         it.arguments[0].value as String
     }.map {
         it.split('/')
+            .filter { it.isNotBlank() }
             .map {
                 if (it.startsWith('{')) {
                     val n = it.trim('{', '}')

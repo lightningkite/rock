@@ -15,7 +15,7 @@ data class FontAndStyle(
     val bold: Boolean = false,
     val italic: Boolean = false,
     val allCaps: Boolean = false,
-    val lineSpacingMultiplier: Double = 1.0,
+    val lineSpacingMultiplier: Double = 1.2,
     val additionalLetterSpacing: Dimension = 0.px,
 )
 

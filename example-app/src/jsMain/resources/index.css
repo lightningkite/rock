@@ -14,6 +14,9 @@ body > div {
     max-width: 100vw;
     overflow-x: hidden;
 }
+a {
+    text-decoration: none;
+}
 
 button, input, textarea, select {
     background: none;

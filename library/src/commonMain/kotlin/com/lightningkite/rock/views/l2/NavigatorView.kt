@@ -11,9 +11,9 @@ import com.lightningkite.rock.views.direct.*
 fun ViewContext.navigatorView(navigator: RockNavigator) {
     this.swapView {
         val fork = split()
+        fork.navigator = navigator
         reactiveScope {
             val screen = navigator.currentScreen.current
-            println("Rendering screen $screen")
             this@swapView.swap {
                 with(screen) { fork.render() }
             }

@@ -11,7 +11,7 @@ import org.w3c.dom.ScrollRestoration
 import org.w3c.dom.url.URLSearchParams
 
 actual class PlatformNavigator actual constructor(
-    val routes: Routes
+    override val routes: Routes
 ) : RockNavigator {
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0

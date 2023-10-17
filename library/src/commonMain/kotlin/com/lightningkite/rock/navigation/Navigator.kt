@@ -3,6 +3,7 @@ package com.lightningkite.rock.navigation
 import com.lightningkite.rock.reactive.*
 
 interface RockNavigator {
+    val routes: Routes
     val currentScreen: Readable<RockScreen>
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
@@ -12,7 +13,7 @@ interface RockNavigator {
     enum class Direction { Back, Neutral, Forward }
 }
 
-class LocalNavigator(val routes: Routes): RockNavigator {
+class LocalNavigator(override val routes: Routes): RockNavigator {
     override var direction: RockNavigator.Direction? = null
         private set
     val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback)))

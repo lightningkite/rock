@@ -1,5 +1,7 @@
 package com.lightningkite.rock.navigation
 
+import com.lightningkite.rock.reactive.Constant
+import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.views.ViewContext
 import com.lightningkite.rock.views.direct.space
 import kotlin.reflect.KClass
@@ -23,6 +25,7 @@ data class UrlLikePath(
 }
 
 interface RockScreen {
+    val title: Readable<String> get() = Constant(this::class.toString().removePrefix("class ").removeSuffix("Screen").camelToHuman())
     fun ViewContext.render()
     object Empty: RockScreen {
         override fun ViewContext.render() {
@@ -30,5 +33,8 @@ interface RockScreen {
         }
     }
 }
+
+private val camelRegex = Regex("([a-z])([A-Z]+)")
+private fun String.camelToHuman(): String = this.replace(camelRegex) { it.groupValues[1] + " " + it.groupValues[2] }
 
 class RedirectException(val screen: RockScreen) : Exception()

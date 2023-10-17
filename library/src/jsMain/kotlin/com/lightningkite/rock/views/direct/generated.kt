@@ -34,10 +34,25 @@ import kotlin.random.Random
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLink = HTMLAnchorElement
-@ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") { setup(Link(this))}
+@ViewDsl actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
+    this.asDynamic().__ROCK__navigator = navigator
+    setup(Link(this))
+}
 actual inline var Link.to: RockScreen
-    get() = TODO()
-    set(value) { native.href = "TODO" }
+    get() = this.native.asDynamic().__ROCK__screen as RockScreen
+    set(value) {
+        this.native.asDynamic().__ROCK__screen = value
+        val navigator = (this.native.asDynamic().__ROCK__navigator as RockNavigator)
+        navigator.routes.render(value)?.let {
+            native.href = "/" + it.segments.joinToString("/") + (it.parameters.takeUnless { it.isEmpty() }?.let {
+                "?" + it.entries.joinToString("&") { "${it.key}=${it.value}" }
+            } ?: "")
+        }
+        native.onclick = {
+            it.preventDefault()
+            navigator.navigate(value)
+        }
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NExternalLink = HTMLAnchorElement
 @ViewDsl actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit = themedElementClickable<NExternalLink>("a") { setup(ExternalLink(this))}
@@ -361,6 +376,7 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
 @ViewModifierDsl3 actual fun ViewContext.scrolls(): ViewWrapper{
     beforeNextElementSetup {
         style.overflowY = "auto"
+        style.overflowX = "hidden"
     }
     return ViewWrapper
 }
@@ -369,6 +385,7 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
         style.display = "flex"
         style.flexDirection = "row"
         style.overflowX = "auto"
+        style.overflowY = "hidden"
     }
     return ViewWrapper
 }

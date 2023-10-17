@@ -1,0 +1,67 @@
+package com.lightningkite.mppexampleapp
+
+import com.lightningkite.rock.Routable
+import com.lightningkite.rock.contains
+import com.lightningkite.rock.models.M3Theme
+import com.lightningkite.rock.models.MaterialLikeTheme
+import com.lightningkite.rock.models.randomElevationAndCorners
+import com.lightningkite.rock.models.randomTitleFontSettings
+import com.lightningkite.rock.navigation.RockScreen
+import com.lightningkite.rock.views.*
+import com.lightningkite.rock.views.direct.*
+
+@Routable("themes")
+object ThemesScreen : RockScreen {
+    override fun ViewContext.render() {
+        col {
+            h1 { content = "Theme Control" }
+            col {
+                h2 { content = "Theme Sampling" }
+                row {
+                    space {} in weight(1f)
+                    text { content = "Sample" }
+                    text { content = "Card" } in card
+                    text { content = "Important" } in important
+                    space {} in weight(1f)
+                } in scrollsHorizontally()
+                row {
+                    space {} in weight(1f)
+                    text { content = "Critical" } in critical
+                    text { content = "Warning" } in warning
+                    text { content = "Danger" } in danger
+                    space {} in weight(1f)
+                } in scrollsHorizontally()
+            } in card
+            col {
+                h2 { content = "Randomly Generate Themes" }
+
+                button {
+                    h6 { content = "M1 Light" }
+                    onClick {
+                        appTheme set MaterialLikeTheme.randomLight().randomElevationAndCorners()
+                            .randomTitleFontSettings()
+                    }
+                } in important
+                button {
+                    h6 { content = "M1 Dark" }
+                    onClick {
+                        appTheme set MaterialLikeTheme.randomDark().randomElevationAndCorners()
+                            .randomTitleFontSettings()
+                    }
+                } in important
+                button {
+                    h6 { content = "M3 Light" }
+                    onClick {
+                        appTheme set M3Theme.randomLight().randomElevationAndCorners().randomTitleFontSettings()
+                    }
+                } in important
+                button {
+                    h6 { content = "M3 Dark" }
+                    onClick {
+                        appTheme set M3Theme.randomDark().randomElevationAndCorners().randomTitleFontSettings()
+                    }
+                } in important
+            } in card
+        } in scrolls()
+    }
+}

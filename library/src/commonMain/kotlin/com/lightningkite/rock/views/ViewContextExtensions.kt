@@ -18,7 +18,17 @@ fun <T> viewContextAddon(init: T): ReadWriteProperty<ViewContext, T> = object : 
     }
 }
 
-//var ViewContext.navigator by viewContextAddon<RockNavigator>(DummyRockNavigator())
+@Suppress("UNCHECKED_CAST")
+fun <T> viewContextAddonLateInit(): ReadWriteProperty<ViewContext, T> = object : ReadWriteProperty<ViewContext, T> {
+    override fun getValue(thisRef: ViewContext, property: KProperty<*>): T =
+        thisRef.addons.getOrPut(property.name) { throw IllegalStateException("${property.name} has not been initialized.") } as T
+
+    override fun setValue(thisRef: ViewContext, property: KProperty<*>, value: T) {
+        thisRef.addons[property.name] = value
+    }
+}
+
+var ViewContext.navigator by viewContextAddonLateInit<RockNavigator>()
 //var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
 
 var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>())

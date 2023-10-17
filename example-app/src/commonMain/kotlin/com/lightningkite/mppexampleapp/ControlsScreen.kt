@@ -35,13 +35,6 @@ object ControlsScreen : RockScreen {
                 } in scrollsHorizontally()
             } in card
 
-            text{ ::content { stringContent.current } }
-            text{
-                reactiveScope {
-                    content = stringContent.current
-                }
-            }
-
             col {
                 h2 { content = "Toggle Buttons" }
                 row {
@@ -93,6 +86,12 @@ object ControlsScreen : RockScreen {
 
             col {
                 h2 { content = "Text Fields" }
+                text{ ::content { "Content: " + stringContent.current } }
+                text{
+                    reactiveScope {
+                        content = "Reactive scope style: " + stringContent.current
+                    }
+                }
                 textField { content bind stringContent }
                 textField { content bind stringContent } in card
                 textField { content bind stringContent } in important

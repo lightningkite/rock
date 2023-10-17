@@ -9,6 +9,7 @@ A Kotlin Multiplatform UI Framework based on Solid.js.
 - Pretty by default - ugliness should take effort
 - Simple Routing
 - Easy to extend into native components on the platform
+- Make loading and issue handling pretty without manual work
 
 ## Interesting design decisions
 
@@ -25,7 +26,9 @@ Early in development.  Web is basically usable at this point, but everything is 
 ### TO DO:
 
 - [X] Web Client
+- [X] Automatic loading shimmer
 - [ ] Elegant handling of query parameters
+- [ ] Some kind of simple validation system
 - [ ] Server-side rendering
 - [ ] Android
 - [ ] iOS

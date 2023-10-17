@@ -27,6 +27,9 @@ Early in development.  Web is basically usable at this point, but everything is 
 
 - [X] Web Client
 - [X] Automatic loading shimmer
+- [X] Fetch
+- [X] Themes and Modifiers
+- [X] Reactive updates
 - [ ] Elegant handling of query parameters
 - [ ] Some kind of simple validation system
 - [ ] Server-side rendering
@@ -86,4 +89,38 @@ object SampleLogInScreen : RockScreen {
         } in bordering
     }
 }
+```
+
+## Reactivity
+
+Simply works like this:
+
+```kotlin
+text {
+    content = "Constant Value"
+}
+val changing = Property("Changing Data")
+text {
+    reactiveScope { content = "Here is some changing information: ${changing.current}" }
+}
+text {
+    // Shorthand for the above
+    ::content { "Here is some changing information: ${changing.current}" }
+}
+
+// If you're not in a reactive context, attempting this is a compile error:
+changing.current
+
+// However, you can retrieve the immediate value upon execution by using:
+changing.once
+
+// You may set the value via:
+changing.set("Test")
+
+// You can make a suspending call via:
+val dataFromWeb = Fetching { fetch("...").text() }
+text {
+    ::content { "Loaded from internet: ${dataFromWeb.current}" }
+}
+// The text view will shimmer while it is loading automatically.
 ```

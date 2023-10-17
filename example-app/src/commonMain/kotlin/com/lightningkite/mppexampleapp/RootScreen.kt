@@ -21,6 +21,9 @@ object RootScreen : RockScreen {
             text {
                 content = "Take a look below at some examples."
             }
+            text {
+                content = "Note the magnifying glass in the top right corner - clicking it will open the source of the current screen on GitHub!"
+            }
         } in withPadding
         col {
             fun linkScreen(screen: RockScreen) = link {

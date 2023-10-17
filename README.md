@@ -1,16 +1,42 @@
-package com.lightningkite.mppexampleapp
+# Rock
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.fetch
-import com.lightningkite.rock.launch
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.bind
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+A Kotlin Multiplatform UI Framework based on Solid.js.
 
+## Goals
+
+- Small JS size
+- Web Client and server-side rendering, Android, iOS, eventually desktop
+- Pretty by default - ugliness should take effort
+- Simple Routing
+- Easy to extend into native components on the platform
+
+## Interesting design decisions
+
+- Don't use kotlinx.coroutines, it's too big - include a custom, simpler, and more limited implementation
+- Don't use a KMP network client, they're all too big - include a custom, simpler, and more limited implementation
+- Base navigation around URLs to be very compatible with web
+- Use themes for styling; avoid direct styling.
+- Derive theme variants from existing themes.  Make theme variants semantically based.
+
+## Project Status
+
+Early in development.  Web is basically usable at this point, but everything is subject to change.
+
+### TO DO:
+
+- [X] Web Client
+- [ ] Elegant handling of query parameters
+- [ ] Server-side rendering
+- [ ] Android
+- [ ] iOS
+
+## Sample View
+
+[See for yourself](https://rock.cs.lightningkite.com/sample/login)
+
+![Screenshot 1](docs/SampleLoginScreen_A.png) ![Screenshot 2](docs/SampleLoginScreen_B.png)
+
+```kotlin
 @Routable("sample/login")
 object SampleLogInScreen : RockScreen {
     override fun ViewContext.render() {
@@ -55,3 +81,4 @@ object SampleLogInScreen : RockScreen {
         } in bordering
     }
 }
+```

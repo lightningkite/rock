@@ -17,7 +17,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
     name: String,
     crossinline themeToClass: (Theme)->String = { DynamicCSS.theme(it) },
     crossinline themeLogic: T.(rootTheme: Boolean, themeChanged: Boolean) -> Unit,
-    setup: T.() -> Unit,
+    crossinline setup: T.() -> Unit,
 ) = element<T>(name) {
     var previousThemeClass: String? = null
     val rootTheme = themeStack.size == 1
@@ -39,7 +39,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
     setup()
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
     name = name,
     themeToClass = { DynamicCSS.themeInteractive(it) },
     themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
@@ -64,7 +64,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, set
     setup()
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElementClickable(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+fun <T : HTMLElement> ViewContext.themedElementClickable(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
     name = name,
     themeToClass = { DynamicCSS.themeInteractive(it) },
     themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
@@ -87,7 +87,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementClickable(name: String, se
     setup()
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
     name = name,
     themeToClass = { DynamicCSS.theme(it) },
     themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
@@ -108,7 +108,7 @@ inline fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.()
     setup()
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElementBackIfChanged(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+fun <T : HTMLElement> ViewContext.themedElementBackIfChanged(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
     name = name,
     themeToClass = { DynamicCSS.theme(it) },
     themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
@@ -130,10 +130,10 @@ inline fun <T : HTMLElement> ViewContext.themedElementBackIfChanged(name: String
     setup()
 }
 
-inline fun <T : HTMLElement, V> T.vprop(
+fun <T : HTMLElement, V> T.vprop(
     eventName: String,
-    crossinline get: T.() -> V,
-    crossinline set: T.(V) -> Unit
+    get: T.() -> V,
+    set: T.(V) -> Unit
 ): Writable<V> {
     return object : Writable<V> {
         override fun set(value: V): Unit {

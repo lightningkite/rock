@@ -22,7 +22,7 @@ actual class ViewContext(
     var themeJustChanged: Boolean = false
 
     val stack = arrayListOf(parent)
-    inline fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
+    fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
         ListeningLifecycleStack.useIn(item.onRemove) {
             stack.add(item)
             try {
@@ -67,10 +67,10 @@ actual class ViewContext(
     }
 
     @Suppress("UNCHECKED_CAST")
-    inline fun <T : HTMLElement> element(name: String, setup: T.() -> Unit) =
+    inline fun <T : HTMLElement> element(name: String, noinline setup: T.() -> Unit) =
         element(document.createElement(name) as T, setup)
 
-    inline fun <T : HTMLElement> element(initialElement: T, setup: T.() -> Unit) {
+    fun <T : HTMLElement> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
             stack.last().appendChild(this)
             beforeNextElementSetupList.forEach { it(this) }

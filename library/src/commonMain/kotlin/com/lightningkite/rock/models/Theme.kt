@@ -60,13 +60,13 @@ data class Theme(
         )
     },
 ) {
-    @JsName("hoverDirect") fun hover() = hover(this)
-    @JsName("downDirect") fun down() = down(this)
-    @JsName("selectedDirect") fun selected() = selected(this)
-    @JsName("disabledDirect") fun disabled() = disabled(this)
-    @JsName("importantDirect") fun important() = important(this)
-    @JsName("criticalDirect") fun critical() = critical(this)
-    @JsName("warningDirect") fun warning() = warning(this)
-    @JsName("dangerDirect") fun danger() = danger(this)
+    @JsName("hoverDirect") inline fun hover() = hover(this)
+    @JsName("downDirect") inline fun down() = down(this)
+    @JsName("selectedDirect") inline fun selected() = selected(this)
+    @JsName("disabledDirect") inline fun disabled() = disabled(this)
+    @JsName("importantDirect") inline fun important() = important(this)
+    @JsName("criticalDirect") inline fun critical() = critical(this)
+    @JsName("warningDirect") inline fun warning() = warning(this)
+    @JsName("dangerDirect") inline fun danger() = danger(this)
 }
 

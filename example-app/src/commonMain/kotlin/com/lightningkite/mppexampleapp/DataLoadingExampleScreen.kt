@@ -33,7 +33,7 @@ object DataLoadingExampleScreen : RockScreen {
                         text { ::content{ it.current.body + f.current } }
                     } in card
                 }
-            } in scrolls()
+            } in scrolls
         }
     }
 }

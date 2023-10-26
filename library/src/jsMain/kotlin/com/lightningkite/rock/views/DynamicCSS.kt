@@ -107,6 +107,7 @@ object DynamicCSS {
             )
         } + mapOf(
             "color" to theme.foreground.toCss(),
+            "--spacing" to theme.spacing.value,
             "--foreground" to theme.foreground.toCss(),
             "font-family" to font(theme.body.font),
             "font-weight" to if (theme.body.bold) "bold" else "normal",

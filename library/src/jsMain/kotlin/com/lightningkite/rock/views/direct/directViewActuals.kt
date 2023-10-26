@@ -187,3 +187,35 @@ internal fun Canvas.pointerListenerHandler(action: (id: Int, x: Double, y: Doubl
         val b = native.getBoundingClientRect()
         action(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height)
     }
+
+
+external class ResizeObserver(callback: (Array<ResizeObserverEntry>, observer: ResizeObserver)->Unit) {
+    fun disconnect()
+    fun observe(target: Element, options: ResizeObserverOptions = definedExternally)
+    fun unobserve(target: Element)
+}
+external interface ResizeObserverOptions {
+    val box: String
+}
+external interface ResizeObserverEntry {
+    val target: Element
+    val contentRect: DOMRectReadOnly
+    val contentBoxSize: ResizeObserverEntryBoxSize
+    val borderBoxSize: ResizeObserverEntryBoxSize
+}
+external interface ResizeObserverEntryBoxSize {
+    val blockSize: Double
+    val inlineSize: Double
+}
+
+class SizeReader(val native: HTMLElement, val key: String): Readable<Double> {
+    override val once: Double
+        get() = native.asDynamic()[key].unsafeCast<Int>().toDouble()
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        val o = ResizeObserver { _, _ ->
+            listener()
+        }
+        o.observe(native)
+        return { o.disconnect() }
+    }
+}

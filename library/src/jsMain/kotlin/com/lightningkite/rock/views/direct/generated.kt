@@ -106,9 +106,20 @@ actual inline var Image.description: String?
 @ViewDsl actual fun ViewContext.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
 @ViewDsl actual fun ViewContext.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
 @ViewDsl actual fun ViewContext.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
+@ViewDsl actual fun ViewContext.subtext(setup: TextView.() -> Unit): Unit = textElement("span", setup)
 actual inline var TextView.content: String
     get() = native.innerText
     set(value) { native.innerText = value }
+actual inline var TextView.align: Align
+    get() = TODO()
+    set(value) {
+        native.style.textAlign = when(value) {
+            Align.Start -> "start"
+            Align.Center -> "center"
+            Align.End -> "end"
+            Align.Stretch -> "justify"
+        }
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLabel = HTMLElement
 @ViewDsl actual fun ViewContext.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
@@ -307,10 +318,10 @@ actual inline var TextArea.hint: String
     get() = TODO()
     set(value) { }
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NDropDown = HTMLSelectElement
-@ViewDsl actual fun ViewContext.dropDown(setup: DropDown.() -> Unit): Unit = themedElementClickable<NDropDown>("select") { setup(DropDown(this))}
-actual val DropDown.selected: Writable<String?> get() = native.vprop("change", { value }, { value = it ?: "" })
-actual inline var DropDown.options: List<WidgetOption>
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSelect = HTMLSelectElement
+@ViewDsl actual fun ViewContext.select(setup: Select.() -> Unit): Unit = themedElementClickable<NSelect>("select") { setup(Select(this))}
+actual val Select.selected: Writable<String?> get() = native.vprop("change", { value }, { value = it ?: "" })
+actual inline var Select.options: List<WidgetOption>
     get() = TODO()
     set(value) {
         val v = this.native.value
@@ -391,48 +402,8 @@ actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {
         action(this)
     }
 }
-
-external class ResizeObserver(callback: (Array<ResizeObserverEntry>, observer: ResizeObserver)->Unit) {
-    fun disconnect()
-    fun observe(target: Element, options: ResizeObserverOptions = definedExternally)
-    fun unobserve(target: Element)
-}
-external interface ResizeObserverOptions {
-    val box: String
-}
-external interface ResizeObserverEntry {
-    val target: Element
-    val contentRect: DOMRectReadOnly
-    val contentBoxSize: ResizeObserverEntryBoxSize
-    val borderBoxSize: ResizeObserverEntryBoxSize
-}
-external interface ResizeObserverEntryBoxSize {
-    val blockSize: Double
-    val inlineSize: Double
-}
-
-actual val Canvas.width: Readable<Double> get() = object: Readable<Double> {
-    override val once: Double
-        get() = native.scrollWidth.toDouble()
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        val o = ResizeObserver { _, _ ->
-            listener()
-        }
-        o.observe(native)
-        return { o.disconnect() }
-    }
-}
-actual val Canvas.height: Readable<Double> get() = object: Readable<Double> {
-    override val once: Double
-        get() = native.scrollHeight.toDouble()
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        val o = ResizeObserver { _, _ ->
-            listener()
-        }
-        o.observe(native)
-        return { o.disconnect() }
-    }
-}
+actual val Canvas.width: Readable<Double> get() = SizeReader(native, "scrollWidth")
+actual val Canvas.height: Readable<Double> get() = SizeReader(native, "scrollHeight")
 actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
     native.addEventListener("pointerdown", pointerListenerHandler(action))
 }
@@ -448,12 +419,45 @@ actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Dou
     native.addEventListener("pointerup", pointerListenerHandler(action))
 }
 
-
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRecyclerView = HTMLDivElement
 @ViewDsl actual fun ViewContext.recyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}
 @ViewDsl actual fun ViewContext.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}
 @ViewDsl actual fun ViewContext.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = themedElement<NRecyclerView>("div") { setup(RecyclerView(this))}
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit = TODO()
+@ViewModifierDsl3 actual fun ViewContext.hasPopover(preferredDirection: PopoverPreferredDirection, setup: ViewContext.()->Unit): ViewWrapper {
+    containsNext<HTMLDivElement>("div") {
+        style.position = "relative"
+        beforeNextElementSetup {
+            style.position = "absolute"
+            style.zIndex = "9999"
+            if(preferredDirection.horizontal) {
+                if(preferredDirection.after) {
+                    style.left = "100%"
+                } else {
+                    style.right = "0"
+                }
+                when(preferredDirection.align) {
+                    Align.Start -> style.bottom = "0"
+                    Align.End -> style.top = "0"
+                    else -> style.top = "calc(50% - 0)"
+                }
+            } else {
+                if(preferredDirection.after) {
+                    style.top = "100%"
+                } else {
+                    style.bottom = "0"
+                }
+                when(preferredDirection.align) {
+                    Align.Start -> style.right = "0"
+                    Align.End -> style.left = "0"
+                    else -> style.left = "calc(50% - 0)"
+                }
+            }
+        }
+        setup()
+    }
+    return ViewWrapper
+}
 @ViewModifierDsl3 actual fun ViewContext.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         style.flexGrow = "$amount"
@@ -467,19 +471,19 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
     }
     return ViewWrapper
 }
-@ViewModifierDsl3 actual fun ViewContext.scrolls(): ViewWrapper{
+@ViewModifierDsl3 actual val ViewContext.scrolls: ViewWrapper get() {
     beforeNextElementSetup {
         style.overflowY = "auto"
-        style.overflowX = "hidden"
+//        style.overflowX = "hidden"
     }
     return ViewWrapper
 }
-@ViewModifierDsl3 actual fun ViewContext.scrollsHorizontally(): ViewWrapper{
+@ViewModifierDsl3 actual val ViewContext.scrollsHorizontally: ViewWrapper get() {
     beforeNextElementSetup {
         style.display = "flex"
         style.flexDirection = "row"
         style.overflowX = "auto"
-        style.overflowY = "hidden"
+//        style.overflowY = "hidden"
     }
     return ViewWrapper
 }
@@ -526,10 +530,42 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
     }
     return ViewWrapper
 }
-@ViewModifierDsl3 actual val ViewContext.crowd: ViewWrapper get() {
-    beforeNextElementSetup {
-        classList.add("crowd")
-    }
-    return ViewWrapper
-}
 // End
+
+
+
+//@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NPopOver = HTMLDivElement
+//@ViewDsl actual fun ViewContext.popOver(setup: PopOver.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
+//    this@popOver.stack[stack.size - 1].style.position = "relative"
+//    style.position = "absolute"
+//    style.zIndex = "9999"
+//    val p = PopOver(this)
+//    setup(p)
+//}
+//actual inline var PopOver.preferredDirection: PopoverPreferredDirection
+//    get() = TODO()
+//    set(value) {
+//        if(value.horizontal) {
+//            if(value.after) {
+//                native.style.left = "var(--spacing)"
+//            } else {
+//                native.style.right = "var(--spacing)"
+//            }
+//            when(value.align) {
+//                Align.Start -> native.style.bottom = "var(--spacing)"
+//                Align.End -> native.style.top = "var(--spacing)"
+//                else -> native.style.top = "calc(50% - var(--spacing))"
+//            }
+//        } else {
+//            if(value.after) {
+//                native.style.top = "var(--spacing)"
+//            } else {
+//                native.style.bottom = "var(--spacing)"
+//            }
+//            when(value.align) {
+//                Align.Start -> native.style.right = "var(--spacing)"
+//                Align.End -> native.style.left = "var(--spacing)"
+//                else -> native.style.left = "calc(50% - var(--spacing))"
+//            }
+//        }
+//    }

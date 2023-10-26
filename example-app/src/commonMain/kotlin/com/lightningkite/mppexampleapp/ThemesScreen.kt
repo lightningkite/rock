@@ -24,7 +24,7 @@ object ThemesScreen : RockScreen {
                     text { content = "Important" } in important
                     text { content = "Critical" } in critical
                     space {} in weight(1f)
-                } in scrollsHorizontally()
+                } in scrollsHorizontally
                 row {
                     space {} in weight(1f)
 
@@ -32,7 +32,7 @@ object ThemesScreen : RockScreen {
                     text { content = "Danger" } in danger
                     text { content = "Affirmitive" } in affirmitive
                     space {} in weight(1f)
-                } in scrollsHorizontally()
+                } in scrollsHorizontally
             } in card
             col {
                 h2 { content = "Randomly Generate Themes" }
@@ -64,6 +64,6 @@ object ThemesScreen : RockScreen {
                     }
                 } in important
             } in card
-        } in scrolls()
+        } in scrolls
     }
 }

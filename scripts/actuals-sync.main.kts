@@ -142,12 +142,10 @@ CodeEmitter.common(
 
     import com.lightningkite.rock.*
     import com.lightningkite.rock.models.*
-    import com.lightningkite.rock.navigation.RockScreen
-    import com.lightningkite.rock.reactive.Writable
-    import com.lightningkite.rock.views.NView
-    import com.lightningkite.rock.views.ViewContext
-    import com.lightningkite.rock.views.ViewDsl
-    import com.lightningkite.rock.views.ViewModifierDsl3
+    import com.lightningkite.rock.navigation.*
+    import com.lightningkite.rock.reactive.*
+    import com.lightningkite.rock.views.*
+    import com.lightningkite.rock.views.canvas.*
 """.trimIndent()
 )
 
@@ -166,8 +164,9 @@ CodeEmitter.common(
     prop("scaleType", "ImageScaleType")
     prop("description", "String?")
 }
-"TextView"("h1", "h2", "h3", "h4", "h5", "h6", "text") {
+"TextView"("h1", "h2", "h3", "h4", "h5", "h6", "text", "subtext") {
     prop("content", "String")
+    prop("align", "Align")
 }
 "Label" {
     prop("content", "String")
@@ -207,7 +206,7 @@ listOf(
     prop("hint", "String")
 }
 
-"DropDown" {
+"Select" {
     writable("selected", "String?", "null")
     prop("options", "List<WidgetOption>")
 }
@@ -252,14 +251,14 @@ listOf(
     impl("actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit", " = TODO()")
 }
 
+modifier("hasPopover", "preferredDirection" ofType "PopoverPreferredDirection" default "PopoverPreferredDirection.belowRight",  "setup" ofType "ViewContext.()->Unit")
 modifier("weight", "amount" ofType "Float")
 modifier("gravity", "horizontal" ofType "Align", "vertical" ofType "Align")
-modifier("scrolls", )
-modifier("scrollsHorizontally", )
+modifierVal("scrolls", )
+modifierVal("scrollsHorizontally", )
 modifier("sizedBox", ("constraints" ofType "SizeConstraints"))
-modifierVal("bordering", )
+modifierVal("marginless", )
 modifierVal("withPadding", )
-modifierVal("crowd", )
 
 
 CodeEmitter.impl("// End")

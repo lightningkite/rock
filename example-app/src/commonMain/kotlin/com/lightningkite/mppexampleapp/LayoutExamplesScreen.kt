@@ -66,13 +66,13 @@ object LayoutExamplesScreen : RockScreen {
                     ) {
                         text { ::content.invoke { it.current } }
                     }
-                } in scrollsHorizontally()
+                } in scrollsHorizontally
                 label {
                     content = "Element count:"
                     textField { content bind countString }
                 }
             } in card
-        } in scrolls()
+        } in scrolls
     }
 }
 
@@ -94,6 +94,6 @@ fun ViewContext.componentDemo() {
             label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } in card }
         } in card
 
-    } in scrolls() in setTheme { currentTheme.current } in marginless
+    } in scrolls in setTheme { currentTheme.current } in marginless
 
 }

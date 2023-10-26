@@ -19,7 +19,7 @@ expect class ViewContext {
     fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewContext.(Readable<T>)->Unit)
 }
 
-expect open class NView()
+expect open class NView
 interface RView<Wraps: NView> { val native: Wraps }
 
 expect val NView.onRemove: OnRemoveHandler

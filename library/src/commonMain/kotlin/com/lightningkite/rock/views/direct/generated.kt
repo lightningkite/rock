@@ -2,10 +2,10 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.*
 import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
+import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.canvas.DrawingContext2D
+import com.lightningkite.rock.views.canvas.*
 
 expect class NSeparator : NView
 value class Separator(override val native: NSeparator) : RView<NSeparator>
@@ -45,7 +45,9 @@ value class TextView(override val native: NTextView) : RView<NTextView>
 @ViewDsl expect fun ViewContext.h5(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.h6(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.text(setup: TextView.() -> Unit = {}): Unit
+@ViewDsl expect fun ViewContext.subtext(setup: TextView.() -> Unit = {}): Unit
 expect var TextView.content: String
+expect var TextView.align: Align
 
 expect class NLabel : NView
 value class Label(override val native: NLabel) : RView<NLabel>
@@ -111,11 +113,11 @@ expect val TextArea.content: Writable<String>
 expect var TextArea.keyboardHints: KeyboardHints
 expect var TextArea.hint: String
 
-expect class NDropDown : NView
-value class DropDown(override val native: NDropDown) : RView<NDropDown>
-@ViewDsl expect fun ViewContext.dropDown(setup: DropDown.() -> Unit = {}): Unit
-expect val DropDown.selected: Writable<String?>
-expect var DropDown.options: List<WidgetOption>
+expect class NSelect : NView
+value class Select(override val native: NSelect) : RView<NSelect>
+@ViewDsl expect fun ViewContext.select(setup: Select.() -> Unit = {}): Unit
+expect val Select.selected: Writable<String?>
+expect var Select.options: List<WidgetOption>
 
 expect class NAutoCompleteTextField : NView
 value class AutoCompleteTextField(override val native: NAutoCompleteTextField) : RView<NAutoCompleteTextField>
@@ -152,11 +154,11 @@ value class RecyclerView(override val native: NRecyclerView) : RView<NRecyclerVi
 @ViewDsl expect fun ViewContext.horizontalRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.gridRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit
+@ViewModifierDsl3 expect fun ViewContext.hasPopover(preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewContext.()->Unit): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.weight(amount: Float): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.scrolls(): ViewWrapper
-@ViewModifierDsl3 expect fun ViewContext.scrollsHorizontally(): ViewWrapper
+@ViewModifierDsl3 expect val ViewContext.scrolls: ViewWrapper
+@ViewModifierDsl3 expect val ViewContext.scrollsHorizontally: ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
 @ViewModifierDsl3 expect val ViewContext.marginless: ViewWrapper
 @ViewModifierDsl3 expect val ViewContext.withPadding: ViewWrapper
-@ViewModifierDsl3 expect val ViewContext.crowd: ViewWrapper

@@ -58,10 +58,10 @@ actual class ViewContext(
     @Suppress("UNCHECKED_CAST")
     inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
         val element = (document.createElement(name) as T)
+        stack.add(element)
         ListeningLifecycleStack.useIn(element.onRemove) {
             setup(element)
         }
-        stack.add(element)
         popCount++
         return ViewWrapper
     }
@@ -85,7 +85,6 @@ actual class ViewContext(
             afterCopy.forEach { it(this) }
             while (toPop > 0) {
                 val item = stack.removeLast()
-//                wrapperToDoList.forEach { it(item) }
                 stack.last().appendChild(item)
                 toPop--
             }
@@ -120,30 +119,28 @@ actual class ViewContext(
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = HTMLElement
 
-actual val NView.onRemove: OnRemoveHandler
-    get() {
-        return object: OnRemoveHandler{
-            val native:NView = this@onRemove
-            override fun onRemove(action: () -> Unit) {
-                native.removeListeners.add(action)
-            }
-
-            override fun onLoading() {
-                native.classList.add("loading")
-            }
-
-            override fun onTry() {
-                native.classList.remove("loading")
-            }
-
-            override fun onFail() {
-
-            }
-
-            override fun onOk() {
-            }
-        }
+data class NViewOnRemoveHandler(val native: NView): OnRemoveHandler {
+    override fun onRemove(action: () -> Unit) {
+        native.removeListeners.add(action)
     }
+
+    override fun onLoading() {
+        native.classList.add("loading")
+    }
+
+    override fun onTry() {
+        native.classList.remove("loading")
+    }
+
+    override fun onFail() {
+
+    }
+
+    override fun onOk() {
+    }
+}
+actual val NView.onRemove: OnRemoveHandler
+    get() = NViewOnRemoveHandler(this)
 
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()

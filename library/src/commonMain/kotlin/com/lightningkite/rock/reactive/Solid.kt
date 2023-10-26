@@ -14,13 +14,19 @@ object ListeningLifecycleStack {
         if (stack.isNotEmpty()) stack.last().onRemove(action) else throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
 
     inline fun useIn(handler: OnRemoveHandler, action: () -> Unit) {
-        stack.add(handler)
+        start(handler)
         try {
             action()
         } finally {
-            if (stack.removeLast() != handler)
-                throw ConcurrentModificationException("Multiple threads have been attempting to instantiate views at the same time.")
+            end(handler)
         }
+    }
+    inline fun start(handler: OnRemoveHandler) {
+        stack.add(handler)
+    }
+    inline fun end(handler: OnRemoveHandler) {
+        if (stack.removeLast() != handler)
+            throw ConcurrentModificationException("Multiple threads have been attempting to instantiate views at the same time.")
     }
 }
 

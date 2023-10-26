@@ -73,8 +73,14 @@ enum class Align {
     Start, Center, End, Stretch
 }
 
-enum class TextGravity {
-    Left, Center, Right
+data class PopoverPreferredDirection(
+    val horizontal: Boolean = false,
+    val after: Boolean = true,
+    val align: Align = Align.End,
+) {
+    companion object {
+        val belowRight: PopoverPreferredDirection = PopoverPreferredDirection(false, after = true, align = Align.End)
+    }
 }
 
 data class KeyboardHints(

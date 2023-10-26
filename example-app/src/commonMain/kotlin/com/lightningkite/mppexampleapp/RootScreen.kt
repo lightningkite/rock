@@ -50,6 +50,6 @@ object RootScreen : RockScreen {
                 linkScreen(ArgumentsExampleScreen("test-id"))
 
             } in withPadding
-        } in scrolls()
+        } in scrolls
     }
 }

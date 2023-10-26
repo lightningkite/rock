@@ -42,7 +42,7 @@ var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>
     }
 }
 @ViewModifierDsl3 expect fun ViewContext.setTheme(calculate: ReactiveScope.()->Theme): ViewWrapper
-@ViewModifierDsl3 inline fun ViewContext.themeFromLast(crossinline calculate: (Theme)->Theme): ViewWrapper {
+@ViewModifierDsl3 inline fun ViewContext.themeFromLast(crossinline calculate: ReactiveScope.(Theme)->Theme): ViewWrapper {
     val previous = themeStack.last()
     return setTheme { calculate(previous()) }
 }
@@ -55,3 +55,4 @@ var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>
 @ViewModifierDsl3 val ViewContext.critical: ViewWrapper get() = themeFromLast { it.critical() }
 @ViewModifierDsl3 val ViewContext.warning: ViewWrapper get() = themeFromLast { it.warning() }
 @ViewModifierDsl3 val ViewContext.danger: ViewWrapper get() = themeFromLast { it.danger() }
+@ViewModifierDsl3 val ViewContext.affirmitive: ViewWrapper get() = themeFromLast { it.affirmitive() }

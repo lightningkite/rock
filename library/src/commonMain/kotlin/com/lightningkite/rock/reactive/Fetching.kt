@@ -8,15 +8,7 @@ class Fetching<T>(val getter: suspend () -> T) : Readable<T> {
     var value: T? = null
     private val listeners = HashSet<() -> Unit>()
 
-    @Suppress("UNCHECKED_CAST")
-    override val once: T
-        get() = when {
-            exception != null -> throw exception!!
-            loaded -> value as T
-            else -> throw Loading
-        }
-
-    init {
+    private fun fetch() {
         launchGlobal {
             try {
                 value = getter()
@@ -26,6 +18,25 @@ class Fetching<T>(val getter: suspend () -> T) : Readable<T> {
                 exception = e
             }
         }
+    }
+    fun refetch() {
+        loaded = false
+        exception = null
+        value = null
+        listeners.toList().forEach { it() }
+        fetch()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override val once: T
+        get() = when {
+            exception != null -> throw exception!!
+            loaded -> value as T
+            else -> throw Loading
+        }
+
+    init {
+        fetch()
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {

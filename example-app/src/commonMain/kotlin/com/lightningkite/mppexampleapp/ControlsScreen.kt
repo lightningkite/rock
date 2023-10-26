@@ -48,14 +48,32 @@ object ControlsScreen : RockScreen {
 
             col {
                 h2 { content = "Switches" }
-                row {
-                    space {} in weight(1f)
-                    switch { checked bind booleanContent; }
-                    switch { checked bind booleanContent; } in card
-                    switch { checked bind booleanContent; } in important
-                    switch { checked bind booleanContent; } in critical
-                    space {} in weight(1f)
-                } in scrollsHorizontally()
+                col {
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            switch { checked bind booleanContent; }
+                        }
+                    } in withPadding
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            switch { checked bind booleanContent; }
+                        }
+                    } in card
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            switch { checked bind booleanContent; }
+                        }
+                    } in important
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            switch { checked bind booleanContent; }
+                        }
+                    } in critical
+                }
             } in card
 
             col {
@@ -85,7 +103,7 @@ object ControlsScreen : RockScreen {
 
             col {
                 h2 { content = "Text Fields" }
-                text{ ::content { "Content: " + stringContent.current } }
+                text{ ::content{ "Content: " + stringContent.current } }
                 text{
                     reactiveScope {
                         content = "Reactive scope style: " + stringContent.current

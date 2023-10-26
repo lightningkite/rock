@@ -19,16 +19,18 @@ object ThemesScreen : RockScreen {
                 h2 { content = "Theme Sampling" }
                 row {
                     space {} in weight(1f)
-                    text { content = "Sample" }
+                    text { content = "Sample" } in withPadding
                     text { content = "Card" } in card
                     text { content = "Important" } in important
+                    text { content = "Critical" } in critical
                     space {} in weight(1f)
                 } in scrollsHorizontally()
                 row {
                     space {} in weight(1f)
-                    text { content = "Critical" } in critical
+
                     text { content = "Warning" } in warning
                     text { content = "Danger" } in danger
+                    text { content = "Affirmitive" } in affirmitive
                     space {} in weight(1f)
                 } in scrollsHorizontally()
             } in card

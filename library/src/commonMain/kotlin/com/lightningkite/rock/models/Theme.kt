@@ -59,6 +59,14 @@ data class Theme(
             foreground = Color.white
         )
     },
+    val affirmitive: (Theme.() -> Theme) = {
+        copy(
+            id = "${this.id}-affirmitive",
+            background = Color.fromHex(0xFF20a020.toInt()),
+            outline = Color.fromHex(0xFF20a020.toInt()).highlight(0.1f),
+            foreground = Color.white
+        )
+    },
 ) {
     @JsName("hoverDirect") inline fun hover() = hover(this)
     @JsName("downDirect") inline fun down() = down(this)
@@ -68,5 +76,6 @@ data class Theme(
     @JsName("criticalDirect") inline fun critical() = critical(this)
     @JsName("warningDirect") inline fun warning() = warning(this)
     @JsName("dangerDirect") inline fun danger() = danger(this)
+    @JsName("affirmitiveDirect") inline fun affirmitive() = affirmitive(this)
 }
 

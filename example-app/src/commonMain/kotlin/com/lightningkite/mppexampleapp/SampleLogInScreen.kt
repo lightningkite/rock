@@ -20,8 +20,8 @@ object SampleLogInScreen : RockScreen {
             image {
                 source = ImageRemote("https://picsum.photos/seed/login/1080/1920")
                 scaleType = ImageScaleType.Crop
-                alpha = 0.5
-            } in bordering
+                opacity = 0.5
+            } in marginless
             col {
                 space {} in weight(1f)
                 col {
@@ -52,6 +52,6 @@ object SampleLogInScreen : RockScreen {
                 } in card in sizedBox(SizeConstraints(maxWidth = 50.rem))
                 space {} in weight(1f)
             } in scrolls() in withPadding
-        } in bordering
+        } in marginless
     }
 }

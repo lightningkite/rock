@@ -1,5 +1,8 @@
 package com.lightningkite.rock.reactive
 
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
+
 /**
  * Keeps track of the current builder's lifecycle to add listeners to.
  * TODO: Remove this in favor of context receivers when they are available
@@ -68,3 +71,10 @@ infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writabl
         if(value) this@equalTo.set(target)
     }
 }
+
+
+class WritableDelegate<T>(val writable: Writable<T>): ReadWriteProperty<Any?, T> {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = writable.once
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) = writable.set(value)
+}
+val <T> Writable<T>.delegate get() = WritableDelegate(this)

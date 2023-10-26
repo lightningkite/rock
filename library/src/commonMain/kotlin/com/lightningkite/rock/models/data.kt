@@ -1,7 +1,5 @@
 package com.lightningkite.rock.models
 
-import com.lightningkite.rock.models.Color
-import com.lightningkite.rock.models.Paint
 import com.lightningkite.rock.navigation.RockScreen
 
 class AnimationId
@@ -123,7 +121,7 @@ inline operator fun Dimension.div(other: Int): Dimension = this * other.toFloat(
 data class NavigationTab(
     val title: String,
     val icon: Icon,
-    val screen: RockScreen
+    val destination: RockScreen
 )
 
 interface Icon {

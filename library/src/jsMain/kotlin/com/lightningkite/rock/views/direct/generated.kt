@@ -10,8 +10,6 @@ import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.browser.document
 import kotlinx.dom.addClass
 import org.w3c.dom.*
-import org.w3c.dom.events.Event
-import org.w3c.dom.pointerevents.PointerEvent
 import org.w3c.dom.url.URL
 import kotlin.random.Random
 
@@ -514,7 +512,7 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
     }
     return ViewWrapper
 }
-@ViewModifierDsl3 actual val ViewContext.bordering: ViewWrapper get() {
+@ViewModifierDsl3 actual val ViewContext.marginless: ViewWrapper get() {
     beforeNextElementSetup {
         style.margin = 0.px.value
         style.borderRadius = 0.px.value

@@ -1,23 +1,23 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.*
-import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 @Routable("reactivity")
 object ReactivityScreen : RockScreen {
+    override val title: Readable<String>
+        get() = super.title
+
     override fun ViewContext.render() {
         val local = Property("Local")
         val persist = PersistentProperty("persistent-example", "Persistent")
-        val fetching: Property<Fetching<String>> = Property(Fetching {
+        val fetching: Fetching<String> = Fetching {
             delay(1000)
             "Loaded!"
-        })
+        }
         col {
             col {
                 h1 { content = "This screen demonstrates various forms of reactivity." }
@@ -37,10 +37,7 @@ object ReactivityScreen : RockScreen {
                 button {
                     text { content = "Reload 'fetching'" }
                     onClick {
-                        fetching set Fetching {
-                            delay(1000)
-                            "Loaded!"
-                        }
+                        fetching.refetch()
                     }
                 } in important
             } in card
@@ -49,14 +46,14 @@ object ReactivityScreen : RockScreen {
                 h2 { content = "Using reactiveScope()" }
                 text { reactiveScope { content = local.current } }
                 text { reactiveScope { content = persist.current } }
-                text { reactiveScope { content = fetching.current.current } }
+                text { reactiveScope { content = fetching.current } }
             } in card
 
             col {
                 h2 { content = "Using ::content {}" }
-                text { ::content { local.current } }
-                text { ::content { persist.current } }
-                text { ::content { fetching.current.current } }
+                text { ::content{ local.current } }
+                text { ::content{ persist.current } }
+                text { ::content{ fetching.current } }
             } in card
         }
     }

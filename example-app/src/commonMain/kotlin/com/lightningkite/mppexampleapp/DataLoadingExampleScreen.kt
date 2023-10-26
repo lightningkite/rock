@@ -1,7 +1,6 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.*
-import com.lightningkite.rock.navigation.RedirectException
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.Fetching
 import com.lightningkite.rock.reactive.invoke
@@ -30,8 +29,8 @@ object DataLoadingExampleScreen : RockScreen {
                 forEachUpdating(data) {
                     col {
                         val f = Fetching { delay(Random.nextLong(0, 10000)); "" }
-                        h3 { ::content { it.current.title + f.current }}
-                        text { ::content { it.current.body + f.current }}
+                        h3 { ::content{ it.current.title + f.current } }
+                        text { ::content{ it.current.body + f.current } }
                     } in card
                 }
             } in scrolls()

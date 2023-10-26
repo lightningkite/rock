@@ -94,6 +94,6 @@ fun ViewContext.componentDemo() {
             label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } in card }
         } in card
 
-    } in scrolls() in setTheme { currentTheme.current } in bordering
+    } in scrolls() in setTheme { currentTheme.current } in marginless
 
 }

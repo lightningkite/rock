@@ -32,7 +32,7 @@ val RView<*>.onRemove: OnRemoveHandler get() = native.onRemove
 var RView<*>.rotation: Angle
     get() = native.rotation
     set(value) { native.rotation = value }
-var RView<*>.alpha: Double
+var RView<*>.opacity: Double
     get() = native.alpha
     set(value) { native.alpha = value }
 var RView<*>.exists: Boolean

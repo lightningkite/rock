@@ -157,6 +157,6 @@ expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
 @ViewModifierDsl3 expect fun ViewContext.scrolls(): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.scrollsHorizontally(): ViewWrapper
 @ViewModifierDsl3 expect fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper
-@ViewModifierDsl3 expect val ViewContext.bordering: ViewWrapper
+@ViewModifierDsl3 expect val ViewContext.marginless: ViewWrapper
 @ViewModifierDsl3 expect val ViewContext.withPadding: ViewWrapper
 @ViewModifierDsl3 expect val ViewContext.crowd: ViewWrapper

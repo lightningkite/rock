@@ -46,7 +46,7 @@ fun ViewContext.app() {
                 )
             )
         }
-    } in setTheme { appTheme.current } in marginless
+    } in setTheme { appTheme.current }
 }
 
 val booleanContent = Property(false)
@@ -110,7 +110,7 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
             }
         } in important in marginless
         navigatorView(navigator) in weight(1f) in marginless
-    } in setTheme { appTheme.current } in marginless
+    } in marginless
 }
 
 fun hamburgerNav() {

@@ -16,6 +16,11 @@ class RouterGeneration(
         if (invoked) return listOf()
         invoked = true
         val deferredSymbols = ArrayList<KSClassDeclaration>()
+//        val examplePath = resolver.getAllFiles()
+//            .map { it.filePath.replace('\\', '/') }
+//            .filter { it.matches(Regex("src/[a-zA-Z]+/kotlin")) }
+//            .first()
+//        val srcFolder = examplePath.substringBeforeLast("/src/")
         val allRoutables = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()
@@ -34,13 +39,15 @@ class RouterGeneration(
             .reduce { a, b -> a.commonPrefixWith(b) }
 
         codeGenerator.createNewFile(
+//        codeGenerator.createNewFileByPath(
 //            dependencies = Dependencies(
 //                aggregating = true,
 //                sources = *allRoutables.mapNotNull { it.source.containingFile }.toTypedArray()
 //            ),
             dependencies = Dependencies.ALL_FILES,
             packageName = topPackage,
-            fileName = "AutoRoutes"
+            fileName = "AutoRoutes",
+//            path = allRoutables.first().source.containingFile?.filePath
         )
             .bufferedWriter()
             .use {

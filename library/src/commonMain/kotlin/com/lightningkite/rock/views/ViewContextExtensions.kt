@@ -3,7 +3,6 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockNavigator
-import com.lightningkite.rock.reactive.PersistentProperty
 import com.lightningkite.rock.reactive.ReactiveScope
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -51,8 +50,9 @@ var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme>
 @ViewModifierDsl3 val ViewContext.down: ViewWrapper get() = themeFromLast { it.down() }
 @ViewModifierDsl3 val ViewContext.selected: ViewWrapper get() = themeFromLast { it.selected() }
 @ViewModifierDsl3 val ViewContext.disabled: ViewWrapper get() = themeFromLast { it.disabled() }
+@ViewModifierDsl3 val ViewContext.bar: ViewWrapper get() = themeFromLast { it.bar() }
 @ViewModifierDsl3 val ViewContext.important: ViewWrapper get() = themeFromLast { it.important() }
 @ViewModifierDsl3 val ViewContext.critical: ViewWrapper get() = themeFromLast { it.critical() }
 @ViewModifierDsl3 val ViewContext.warning: ViewWrapper get() = themeFromLast { it.warning() }
 @ViewModifierDsl3 val ViewContext.danger: ViewWrapper get() = themeFromLast { it.danger() }
-@ViewModifierDsl3 val ViewContext.affirmitive: ViewWrapper get() = themeFromLast { it.affirmitive() }
+@ViewModifierDsl3 val ViewContext.affirmative: ViewWrapper get() = themeFromLast { it.affirmative() }

@@ -46,6 +46,7 @@ object M3Theme {
                 elevation = this.elevation / 2f,
             )
         },
+        bar = { this },
         important = {
             copy(
                 id = "$id-important",

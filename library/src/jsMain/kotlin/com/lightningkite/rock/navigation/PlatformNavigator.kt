@@ -49,6 +49,10 @@ actual class PlatformNavigator actual constructor(
     })
     override val currentScreen: Readable<RockScreen>
         get() = SharedReadable { _currentScreen.current }
+    override val canGoBack: Readable<Boolean>
+        get() = SharedReadable {
+            true
+        }
 
     private var isNavigating = false
     override var direction: RockNavigator.Direction? = null

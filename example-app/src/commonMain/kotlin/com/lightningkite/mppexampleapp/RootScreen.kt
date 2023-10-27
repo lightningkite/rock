@@ -3,7 +3,7 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Color
-import com.lightningkite.rock.models.Icons
+import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewContext
@@ -35,7 +35,7 @@ object RootScreen : RockScreen {
                     to = screen
                     row {
                         text { ::content{ screen.title.current } } in weight(1f)
-                        image { source = Icons.chevronRight.color(Color.black) }
+                        image { source = Icon.chevronRight.toImageSource(Color.black) }
                     }
                 } in card
 

@@ -45,6 +45,22 @@ object MaterialLikeTheme {
                 }
             )
         },
+        bar = {
+            copy(
+                id = "$id-important",
+                foreground = primaryForeground,
+                background = primary,
+                outline = primary.highlight(0.1f),
+                important = {
+                    copy(
+                        id = "$id-critical",
+                        foreground = secondaryForeground,
+                        background = secondary,
+                        outline = secondary.highlight(0.1f),
+                    )
+                }
+            )
+        },
         critical = {
             copy(
                 id = "$id-critical",

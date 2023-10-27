@@ -34,6 +34,14 @@ data class Theme(
             foreground = this.foreground.closestColor().copy(alpha = 0.5f)
         )
     },
+    val bar: (Theme.() -> Theme) = {
+        copy(
+            id = "${this.id}-bar",
+            foreground = this.background,
+            background = this.foreground,
+            outline = this.foreground.closestColor().highlight(1f)
+        )
+    },
     val important: (Theme.() -> Theme) = {
         copy(
             id = "${this.id}-important",
@@ -59,7 +67,7 @@ data class Theme(
             foreground = Color.white
         )
     },
-    val affirmitive: (Theme.() -> Theme) = {
+    val affirmative: (Theme.() -> Theme) = {
         copy(
             id = "${this.id}-affirmitive",
             background = Color.fromHex(0xFF20a020.toInt()),
@@ -72,10 +80,11 @@ data class Theme(
     @JsName("downDirect") inline fun down() = down(this)
     @JsName("selectedDirect") inline fun selected() = selected(this)
     @JsName("disabledDirect") inline fun disabled() = disabled(this)
+    @JsName("barDirect") inline fun bar() = bar(this)
     @JsName("importantDirect") inline fun important() = important(this)
     @JsName("criticalDirect") inline fun critical() = critical(this)
     @JsName("warningDirect") inline fun warning() = warning(this)
     @JsName("dangerDirect") inline fun danger() = danger(this)
-    @JsName("affirmitiveDirect") inline fun affirmitive() = affirmitive(this)
+    @JsName("affirmativeDirect") inline fun affirmative() = affirmative(this)
 }
 

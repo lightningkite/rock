@@ -5,6 +5,7 @@ import com.lightningkite.rock.reactive.*
 interface RockNavigator {
     val routes: Routes
     val currentScreen: Readable<RockScreen>
+    val canGoBack: Readable<Boolean>
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
     fun goBack()
@@ -17,6 +18,8 @@ class LocalNavigator(override val routes: Routes): RockNavigator {
     override var direction: RockNavigator.Direction? = null
         private set
     val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback)))
+    override val canGoBack: Readable<Boolean>
+        get() = SharedReadable { stack.current.size > 1 }
     override val currentScreen: Readable<RockScreen>
         get() = SharedReadable { stack.current.last() }
     override fun goBack() {

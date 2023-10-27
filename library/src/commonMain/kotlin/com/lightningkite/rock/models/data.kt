@@ -106,7 +106,7 @@ enum class KeyboardCase { None, Letters, Words, Sentences }
 enum class KeyboardType { Text, Integer, Phone, Decimal, Email }
 data class Action(
     val title: String,
-    val icon: ImageSource,
+    val icon: Icon,
     val onSelect: () -> Unit
 )
 
@@ -123,19 +123,5 @@ expect inline operator fun Dimension.times(other: Float): Dimension
 inline operator fun Dimension.times(other: Int): Dimension = this * other.toFloat()
 expect inline operator fun Dimension.div(other: Float): Dimension
 inline operator fun Dimension.div(other: Int): Dimension = this * other.toFloat()
-
-data class NavigationTab(
-    val title: String,
-    val icon: Icon,
-    val destination: RockScreen
-)
-
-interface Icon {
-    fun toVector(
-        width: Dimension,
-        height: Dimension,
-        color: Color,
-    ): ImageVector
-}
 
 data class WidgetOption(val key: String, val display: String)

@@ -53,7 +53,12 @@ interface AppNav {
     }
 }
 
-val ViewContext.appNavFactory by viewContextAddon<Property<ViewContext.(AppNav.() -> Unit) -> Unit>>(Property(ViewContext::appNavBottomTabs))
+val ViewContext.appNavFactory by viewContextAddon<Property<ViewContext.(AppNav.() -> Unit) -> Unit>>(
+    Property(
+        ViewContext::appNavTopAndLeft
+    )
+)
+
 fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
     swapView {
         val navigator = PlatformNavigator(routes)
@@ -70,19 +75,46 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
 fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     col {
+// Nav 1 hamburger
         row {
-            h1 { ::content.invoke { appNav.appNameProperty.current } }
             setup(appNav)
+            button {
+                image {
+                    val currentTheme = themeStack.last()
+                    ::source { Icon.menu.toImageSource(currentTheme().foreground) }
+                    description = "Open naviagation menu"
+                }
+               // onClick { navigator.goBack() }
+            }
+            h1 { ::content.invoke { appNav.appNameProperty.current } }
+
+            button {
+                image {
+                    val currentTheme = themeStack.last()
+                    ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
+                    description = "Go Back"
+                    ::visible { navigator.canGoBack.current }
+                }
+                onClick { navigator.goBack() }
+            }
+            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+                Align.Center,
+                Align.Center
+            ) in weight(1f)
+
             row {
-                forEachUpdating(appNav.navItemsProperty) {
-                    link {
-                        ::to { it.current.destination }
-                        text { ::content { it.current.title } }
+                forEachUpdating(appNav.actionsProperty) {
+                    button {
+                        image {
+                            val currentTheme = themeStack.last()
+                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.current.title }
+                        }
+                        onClick { it.once.onSelect() }
                     }
                 }
-            } in card
-        }
-        //stacked nav
+            }
+        } in bar in marginless
         row {
             col {
                 col {
@@ -90,10 +122,10 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                         link {
                             ::to { it.current.destination }
                             text { ::content { it.current.title } }
-                        }
+                        } in bar
                     }
                 }
-            } in card
+            } in bar in marginless
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
     } in marginless
@@ -105,16 +137,43 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
     col {
         row {
             setup(appNav)
-            h1 { ::content.invoke { appNav.appNameProperty.current } }
+            button {
+                image {
+                    val currentTheme = themeStack.last()
+                    ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
+                    description = "Go Back"
+                    ::visible { navigator.canGoBack.current }
+                }
+                onClick { navigator.goBack() }
+            }
+            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+                Align.Center,
+                Align.Center
+            ) in weight(1f)
+
             row {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
                         ::to { it.current.destination }
                         text { ::content { it.current.title } }
+                    } in bar
+                }
+            }
+            row {
+                forEachUpdating(appNav.actionsProperty) {
+                    button {
+                        image {
+                            val currentTheme = themeStack.last()
+                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.current.title }
+                        }
+                        onClick { it.once.onSelect() }
                     }
                 }
             }
-        } in card in marginless
+
+
+        } in bar in marginless
         navigatorView(navigator) in weight(1f)
     } in marginless
 }
@@ -134,7 +193,10 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(Align.Center, Align.Center) in weight(1f)
+            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+                Align.Center,
+                Align.Center
+            ) in weight(1f)
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
@@ -179,30 +241,52 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
         row {
             setup(appNav)
             h1 { ::content.invoke { appNav.appNameProperty.current } }
-            row {
-                forEachUpdating(appNav.navItemsProperty) {
-                    link {
-                        ::to { it.current.destination }
-                        text { ::content { it.current.title } }
-                    }
-                }
-            }
-            row {
+
+            button {
                 image {
-                    source = appNav.currentUser?.currentUser?.profileImage ?: Icon.add.toImageSource(Color.gray)
-                    description = "User icon"
+                    val currentTheme = themeStack.last()
+                    ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
+                    description = "Go Back"
+                    ::visible { navigator.canGoBack.current }
                 }
-                h6 { ::content.invoke { appNav.currentUser?.currentUser?.name ?: "No user information" } }
-                col {
-                    forEachUpdating(appNav.navItemsProperty) {
-                        link {
-                            ::to { it.current.destination }
-                            text { ::content { it.current.title } }
+                onClick { navigator.goBack() }
+            }
+            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+                Align.Center,
+                Align.Center
+            ) in weight(1f)
+
+            row {
+                forEachUpdating(appNav.actionsProperty) {
+                    row {
+                        image {
+                            val currentTheme = themeStack.last()
+                            ::source {
+                                appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                                    currentTheme().foreground
+                                )
+                            }
+                            description = "User icon"
+                        }
+                        val first = appNav.currentUser?.currentUser?.name ?: "No user"
+                        val userLinks = appNav.navItemsProperty
+                        col {
+                            val options = listOf(first, userLinks).map { WidgetOption(it.toString(), it.toString()) }
+                            select { this.options = options } in withPadding
+
                         }
                     }
+                    button {
+                        image {
+                            val currentTheme = themeStack.last()
+                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.current.title }
+                        }
+                        onClick { it.once.onSelect() }
+                    }
                 }
             }
-        } in card in marginless
+        } in bar in marginless
         row {
             col {
                 col {
@@ -210,10 +294,10 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         link {
                             ::to { it.current.destination }
                             text { ::content { it.current.title } }
-                        }
+                        } in bar
                     }
                 }
-            } in card in marginless
+            } in bar in marginless
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
     } in marginless
@@ -221,8 +305,8 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
 ///TO DO
 //appNav()
 //functions
-//search, jump to, screen name, theme derivation for bar - tie nav bar styling to theme, Rock UI toggle theme, remove back arrow on root screen?
-//Nav 1 - stacked nav toggle animation
-//Nav 2 - update link text
-//Nav 3 - text align center
-//Nav 4 - pop over
+//search, jump to, screen name
+//Nav 1 - hamburger menu toggle, animation?
+//Nav 2 - align nav links left
+//Nav 3 - only using home icon, max?
+//Nav 4 - user dropdown options, user icon stays black

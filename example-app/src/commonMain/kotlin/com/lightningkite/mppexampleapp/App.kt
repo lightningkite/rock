@@ -33,6 +33,7 @@ fun ViewContext.app() {
                 NavItem("Root", Icon.home, RootScreen),
                 NavItem("Themes", Icon.home, ThemesScreen),
                 NavItem("Controls", Icon.home, ControlsScreen),
+                NavItem("Navigation", Icon.home, NavigationScreen)
             )
         }
         ::currentUser{

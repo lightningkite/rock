@@ -1,4 +1,81 @@
 package com.lightningkite.mppexampleapp
 
-object NavigationScreen {
+import com.lightningkite.rock.Routable
+import com.lightningkite.rock.contains
+import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.navigation.RockScreen
+import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.card
+import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.*
+
+
+@Routable("navigation")
+object NavigationScreen : RockScreen {
+    override fun ViewContext.render() {
+        col {
+            h1 { content = "Navigation" }
+            fun navSelector(label: String, value: ViewContext.(AppNav.() -> Unit) -> Unit) {
+                button {
+                    text { content = label }
+                    onClick {
+                        appNavFactory set value
+                    }
+                } in card
+            }
+            row {
+                text {
+                    content = "Choose an option below to update the navigation layout."
+                }
+            }
+            row {
+                col {
+                    navSelector("Hamburger Menu", ViewContext::appNavHamburger)
+                    text {
+                        content = "Caption test."
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+                col {
+                    navSelector("Top Navigation", ViewContext::appNavTop)
+                    text {
+                        content = "Caption test."
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+            }
+            row {
+                col {
+                    navSelector("Bottom Tab Navigation", ViewContext::appNavBottomTabs)
+                    text {
+                        content = "Caption test."
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+                col {
+                    navSelector("Top and Left Navigation", ViewContext::appNavTopAndLeft)
+                    text {
+                        content = "Caption test."
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+            }
+            row {
+                col {
+                    h3 { content = "Documentation" }
+                    text {
+                        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut mollis felis ut mi aliquet, scelerisque laoreet tortor porttitor. Aliquam erat volutpat. Etiam a mauris eu tellus hendrerit mattis. Vivamus est nibh, feugiat a orci eu, facilisis vestibulum massa. Nam tempus enim in ipsum hendrerit, tincidunt dictum tellus lacinia. Sed sit amet dui consectetur, vulputate eros vel, consectetur urna. Morbi faucibus, odio sed tristique fringilla, risus tellus fringilla sapien, sed tincidunt velit nisi eget urna. Proin ante sem, lobortis vehicula nunc vitae, pulvinar aliquam nisi. Praesent placerat finibus felis, non pulvinar augue ullamcorper sed. Praesent ornare neque augue. Fusce elementum sem cursus, ullamcorper tellus quis, faucibus nisl. Integer tincidunt dapibus ultrices. Vivamus id volutpat orci, eget ultricies orci."
+                    }
+                }
+            } in card
+        } in card
+    }
 }

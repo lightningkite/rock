@@ -36,21 +36,6 @@ object ThemesScreen : RockScreen {
                 } in scrollsHorizontally
             } in card
             col {
-                h2 { content = "App Nav Control" }
-                fun navSelector(label: String, value: ViewContext.(AppNav.()->Unit)->Unit) {
-                    button {
-                        text { content = label }
-                        onClick {
-                            appNavFactory set value
-                        }
-                    } in card
-                }
-                navSelector("appNavHamburger", ViewContext::appNavHamburger)
-                navSelector("appNavTop", ViewContext::appNavTop)
-                navSelector("appNavBottomTabs", ViewContext::appNavBottomTabs)
-                navSelector("appNavTopAndLeft", ViewContext::appNavTopAndLeft)
-            } in card
-            col {
                 h2 { content = "Randomly Generate Themes" }
 
                 button {

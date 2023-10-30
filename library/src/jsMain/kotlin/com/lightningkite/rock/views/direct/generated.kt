@@ -139,7 +139,7 @@ actual inline var Label.content: String
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSpace = HTMLElement
 @ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
-    val getter = themeStack.last()
+    val getter = currentTheme
     reactiveScope {
         style.width = (getter().spacing * 4).value
         style.height = (getter().spacing * 4).value

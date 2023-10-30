@@ -11,6 +11,7 @@ data class Theme(
     val outline: Paint = Color.black,
     val outlineWidth: Dimension = 0.px,
     val background: Paint = Color.white,
+    val noMarginOnSwitch: Boolean = false,
     val hover: (Theme.() -> Theme) = {
         copy(
             id = "${this.id}-hover",
@@ -27,6 +28,7 @@ data class Theme(
             elevation = this.elevation / 2f,
         )
     },
+    val unselected: (Theme.() -> Theme) = { this.important(this).let { it.copy(id = it.id + "-outline", background = Color.transparent, outline = it.background, outlineWidth = 4.px, foreground = it.background)} },
     val selected: (Theme.() -> Theme) = { this.important(this) },
     val disabled: (Theme.() -> Theme) = {
         copy(
@@ -34,7 +36,7 @@ data class Theme(
             foreground = this.foreground.closestColor().copy(alpha = 0.5f)
         )
     },
-    val bar: (Theme.() -> Theme) = {
+    val bar: (Theme.() -> Theme?) = {
         copy(
             id = "${this.id}-bar",
             foreground = this.background,
@@ -79,6 +81,7 @@ data class Theme(
     @JsName("hoverDirect") inline fun hover() = hover(this)
     @JsName("downDirect") inline fun down() = down(this)
     @JsName("selectedDirect") inline fun selected() = selected(this)
+    @JsName("unselectedDirect") inline fun unselected() = unselected(this)
     @JsName("disabledDirect") inline fun disabled() = disabled(this)
     @JsName("barDirect") inline fun bar() = bar(this)
     @JsName("importantDirect") inline fun important() = important(this)

@@ -52,3 +52,17 @@ sealed interface RequestBody
 data class RequestBodyText(val content: String): RequestBody
 data class RequestBodyBlob(val content: Blob): RequestBody
 data class RequestBodyFile(val content: FileReference): RequestBody
+
+expect fun websocket(
+    url: String,
+    open: ()->Unit = {},
+    message: (String)->Unit = {},
+    binaryMessage: (Blob)->Unit = {},
+    close: (Int)->Unit = {},
+): WebSocket
+
+expect class WebSocket {
+    fun close(code: Short, reason: String)
+    fun send(data: String)
+    fun send(data: Blob)
+}

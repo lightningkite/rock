@@ -17,6 +17,10 @@ body > div {
 
 a {
     text-decoration: none;
+    color: unset;
+}
+a:visited {
+    color: unset;
 }
 
 button, input, textarea, select {

@@ -127,7 +127,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
             setup(appNav)
             button {
                 image {
-                    val currentTheme = themeStack.last()
+                    val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
                     ::visible { navigator.canGoBack.current }
@@ -139,7 +139,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
                         image {
-                            val currentTheme = themeStack.last()
+                            val currentTheme = currentTheme
                             ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                             ::description { it.current.title }
                         }
@@ -156,16 +156,16 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                     ::to { it.current.destination }
                     col {
                         image {
-                            val currentTheme = themeStack.last()
+                            val currentTheme = currentTheme
                             ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                         } in gravity(Align.Center, Align.Center)
                         subtext { ::content { it.current.title } } in gravity(Align.Center, Align.Center)
                     }
                 } in weight(1f) in marginless in themeFromLast { existing ->
                     if (navigator.currentScreen.current == it.current.destination)
-                        existing.bar().down()
+                        (existing.bar() ?: existing).down()
                     else
-                        existing.bar()
+                        existing.bar() ?: existing
                 } in marginless
             }
         } in marginless

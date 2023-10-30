@@ -1,6 +1,8 @@
 package com.lightningkite.rock
 
 import kotlinx.browser.window
+import org.w3c.dom.CloseEvent
+import org.w3c.dom.MessageEvent
 import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
@@ -61,3 +63,24 @@ actual class RequestResponse(val wraps: Response) {
 
 actual typealias Blob = org.w3c.files.Blob
 actual typealias FileReference = File
+
+actual fun websocket(
+    url: String,
+    open: ()->Unit,
+    message: (String)->Unit,
+    binaryMessage: (Blob)->Unit,
+    close: (Int)->Unit,
+): WebSocket {
+    return WebSocket(url).apply {
+        onclose = { close((it as CloseEvent).code) }
+        onopen = { open() }
+        onmessage = {
+            when(val d = it.data) {
+                is String -> message(d)
+                is Blob -> binaryMessage(d)
+            }
+        }
+    }
+}
+
+actual typealias WebSocket = org.w3c.dom.WebSocket

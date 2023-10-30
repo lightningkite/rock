@@ -44,10 +44,12 @@ value class TextView(override val native: NTextView) : RView<NTextView>
 @ViewDsl expect fun ViewContext.h4(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.h5(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.h6(setup: TextView.() -> Unit = {}): Unit
+@ViewDsl expect fun ViewContext.header(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.text(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewContext.subtext(setup: TextView.() -> Unit = {}): Unit
 expect var TextView.content: String
 expect var TextView.align: Align
+expect var TextView.textSize: Dimension
 
 expect class NLabel : NView
 value class Label(override val native: NLabel) : RView<NLabel>
@@ -61,6 +63,7 @@ value class ActivityIndicator(override val native: NActivityIndicator) : RView<N
 expect class NSpace : NView
 value class Space(override val native: NSpace) : RView<NSpace>
 @ViewDsl expect fun ViewContext.space(setup: Space.() -> Unit = {}): Unit
+expect fun ViewContext.space(multiplier: Double, setup: Space.() -> Unit = {})
 
 expect class NDismissBackground : NView
 value class DismissBackground(override val native: NDismissBackground) : RView<NDismissBackground>

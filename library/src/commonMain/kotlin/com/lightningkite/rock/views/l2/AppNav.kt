@@ -158,7 +158,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
-        navigatorView(navigator) in weight(1f)
+        navigatorView(navigator) in marginless in weight(1f)
         //Nav 3 - top and bottom (bottom/tabs)
         row {
             forEachUpdating(appNav.navItemsProperty) {

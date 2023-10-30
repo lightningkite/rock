@@ -54,6 +54,7 @@ class Implementation(val variant: String, val todoElementType: String) {
                     }
                     // Continue
                 }
+                ')',
                 '}',
                 '\n' -> { }
                 else -> {
@@ -117,6 +118,11 @@ class Type(val typeName: String, val constructors: List<String> = listOf(typeNam
         common("expect fun $typeName.$name(action: () -> Unit)")
         impl("actual fun $typeName.$name(action: () -> Unit): Unit", " = TODO()")
     }
+
+    fun specialConstructor(name: String, vararg arguments: Argument) {
+        common("expect fun ViewContext.$name(${arguments.joinToString() { "${it.name}: ${it.type}" + (it.default?.let { " = $it" } ?: "") }}, setup: $typeName.() -> Unit = {})")
+        impl("actual fun ViewContext.$name(${arguments.joinToString() { "${it.name}: ${it.type}" }}, setup: $typeName.() -> Unit): Unit", " = TODO()")
+    }
 }
 
 operator fun String.invoke(vararg constructors: String, setup: Type.() -> Unit = {}) {
@@ -164,9 +170,10 @@ CodeEmitter.common(
     prop("scaleType", "ImageScaleType")
     prop("description", "String?")
 }
-"TextView"("h1", "h2", "h3", "h4", "h5", "h6", "text", "subtext") {
+"TextView"("h1", "h2", "h3", "h4", "h5", "h6", "header", "text", "subtext") {
     prop("content", "String")
     prop("align", "Align")
+    prop("textSize", "Dimension")
 }
 "Label" {
     prop("content", "String")
@@ -175,7 +182,7 @@ CodeEmitter.common(
 
 }
 "Space" {
-
+    specialConstructor("space", "multiplier" ofType "Double")
 }
 "DismissBackground" {
     action("onClick")

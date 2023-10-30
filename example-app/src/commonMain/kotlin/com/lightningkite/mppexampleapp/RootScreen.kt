@@ -47,6 +47,7 @@ object RootScreen : RockScreen {
                 linkScreen(CanvasSampleScreen)
                 linkScreen(AnimationSampleScreen)
                 linkScreen(ReactivityScreen)
+                linkScreen(DialogSamplesScreen)
                 linkScreen(ArgumentsExampleScreen("test-id"))
 
             } in withPadding

@@ -62,6 +62,11 @@ expect class NSpace : NView
 value class Space(override val native: NSpace) : RView<NSpace>
 @ViewDsl expect fun ViewContext.space(setup: Space.() -> Unit = {}): Unit
 
+expect class NDismissBackground : NView
+value class DismissBackground(override val native: NDismissBackground) : RView<NDismissBackground>
+@ViewDsl expect fun ViewContext.dismissBackground(setup: DismissBackground.() -> Unit = {}): Unit
+expect fun DismissBackground.onClick(action: () -> Unit)
+
 expect class NButton : NView
 value class Button(override val native: NButton) : RView<NButton>
 @ViewDsl expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
@@ -128,6 +133,7 @@ expect var AutoCompleteTextField.suggestions: List<String>
 expect class NSwapView : NView
 value class SwapView(override val native: NSwapView) : RView<NSwapView>
 @ViewDsl expect fun ViewContext.swapView(setup: SwapView.() -> Unit = {}): Unit
+@ViewDsl expect fun ViewContext.swapViewDialog(setup: SwapView.() -> Unit = {}): Unit
 expect fun SwapView.swap(transition: ScreenTransition = ScreenTransition.Fade, createNewView: ()->Unit): Unit
 
 expect class NWebView : NView

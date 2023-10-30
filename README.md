@@ -30,6 +30,11 @@ Early in development.  Web is basically usable at this point, but everything is 
 - [X] Fetch
 - [X] Themes and Modifiers
 - [X] Reactive updates
+- [X] App Nav abstraction
+- [ ] Stepped VS form abstraction
+- [ ] Dialogs
+- [ ] Common widget shortcuts
+- [ ] Improve popover API
 - [ ] Elegant handling of query parameters
 - [ ] Some kind of simple validation system
 - [ ] Server-side rendering

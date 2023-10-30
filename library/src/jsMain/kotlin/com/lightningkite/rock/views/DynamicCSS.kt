@@ -168,6 +168,7 @@ object DynamicCSS {
             style("$asSelector.inclBack", back)
             style("$asSelector.inclBorder", border + mapOf("padding" to theme.spacing.value))
         }
+        style("$asSelector.dismissBackground", mapOf("border-radius" to "0", "margin" to "0", "outline-width" to "0", "opacity" to "0.5"))
         return "theme-${theme.id}"
     }
 

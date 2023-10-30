@@ -146,7 +146,8 @@ actual val NView.onRemove: OnRemoveHandler
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()
     set(value) {
-        style.display = if (value) "flex" else "none"
+//        style.display = if (value) "flex" else "none"
+        hidden = !value
     }
 
 actual var NView.visible: Boolean

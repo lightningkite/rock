@@ -48,7 +48,7 @@ fun ViewContext.app() {
             Action(
                 title = "Open on GitHub",
                 icon = Icon.star,
-                onSelect = { ExternalServices.openTab("https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${navigator.currentScreen.once::class.toString().removePrefix("class ")}.kt") }
+                onSelect = { ExternalServices.openTab("https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${navigator.currentScreen.once!!::class.toString().removePrefix("class ")}.kt") }
             )
         )
     } in setTheme { appTheme.current }

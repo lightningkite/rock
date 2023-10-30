@@ -55,16 +55,26 @@ interface AppNav {
 
 val ViewContext.appNavFactory by viewContextAddon<Property<ViewContext.(AppNav.() -> Unit) -> Unit>>(Property(ViewContext::appNavBottomTabs))
 fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
-    swapView {
+    stack {
         val navigator = PlatformNavigator(routes)
         this@appNav.navigator = navigator
-        val alt = split()
-        reactiveScope {
-            swap {
-                appNavFactory.current.invoke(alt, setup)
+        swapView {
+            val alt = split()
+            reactiveScope {
+                swap {
+                    appNavFactory.current.invoke(alt, setup)
+                }
             }
+        } in marginless
+        stack {
+            val nav = navigator.dialog
+            dismissBackground {
+                onClick { nav.dismiss() }
+            }
+            ::exists { nav.currentScreen.current != null }
+            navigatorViewDialog() in scrolls in card in gravity(Align.Center, Align.Center)
         }
-    } in marginless
+    }
 }
 
 fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
@@ -134,7 +144,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(Align.Center, Align.Center) in weight(1f)
+            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(Align.Center, Align.Center) in weight(1f)
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     button {

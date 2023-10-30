@@ -177,6 +177,9 @@ CodeEmitter.common(
 "Space" {
 
 }
+"DismissBackground" {
+    action("onClick")
+}
 "Button" {
     action("onClick")
     prop("enabled", "Boolean")
@@ -215,7 +218,7 @@ listOf(
     prop("suggestions", "List<String>")
 }
 
-"SwapView" {
+"SwapView"("swapView", "swapViewDialog") {
     common("expect fun SwapView.swap(transition: ScreenTransition = ScreenTransition.Fade, createNewView: ()->Unit): Unit")
     impl("actual fun SwapView.swap(transition: ScreenTransition, createNewView: ()->Unit): Unit", " = TODO()")
 }

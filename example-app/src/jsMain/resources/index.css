@@ -92,6 +92,16 @@ input:focus textarea:focus {
     overflow: hidden;
 }
 
+.rock-swap.dialog {
+    display: flex;
+}
+
+.rock-swap.dialog > * {
+    position: unset;
+    align-items: stretch;
+    justify-items: stretch;
+}
+
 .rock-stack {
     display: grid !important;
     grid-template-columns: 100%;
@@ -298,6 +308,10 @@ input:focus textarea:focus {
     opacity: 0.25;
     min-width: 1px;
     min-height: 1px;
+}
+
+[hidden] {
+    visibility: hidden !important;
 }
 
 iframe#webpack-dev-server-client-overlay{display:none!important}

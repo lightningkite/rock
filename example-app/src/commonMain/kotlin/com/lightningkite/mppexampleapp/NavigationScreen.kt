@@ -76,6 +76,6 @@ object NavigationScreen : RockScreen {
                     }
                 }
             } in card
-        } in card
+        }
     }
 }

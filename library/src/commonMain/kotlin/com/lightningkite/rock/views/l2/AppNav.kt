@@ -5,10 +5,7 @@ import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.navigation.Routes
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.delegate
-import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.reactive.reactiveScope
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
@@ -74,18 +71,24 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
 
 fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
+    val booleanContent = Property(false)
+
     col {
 // Nav 1 hamburger
         row {
             setup(appNav)
             button {
-                image {
-                    val currentTheme = themeStack.last()
-                    ::source { Icon.menu.toImageSource(currentTheme().foreground) }
-                    description = "Open naviagation menu"
-                }
-               // onClick { navigator.goBack() }
+
+                // onClick { navigator.goBack() }
             }
+            toggleButton {
+                checked bind booleanContent; image {
+                val currentTheme = themeStack.last()
+                ::source { Icon.menu.toImageSource(currentTheme().foreground) }
+                description = "Open naviagation menu"
+            }
+            }
+
             h1 { ::content.invoke { appNav.appNameProperty.current } }
 
             button {
@@ -116,13 +119,19 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
             }
         } in bar in marginless
         row {
+
             col {
                 col {
-                    forEachUpdating(appNav.navItemsProperty) {
-                        link {
-                            ::to { it.current.destination }
-                            text { ::content { it.current.title } }
-                        } in bar
+                    text {
+                        col {
+                            forEachUpdating(appNav.navItemsProperty) {
+                                link {
+                                    ::to { it.current.destination }
+                                    text { ::content { it.current.title } }
+                                } in bar
+                            }.toString()
+                            ::exists { booleanContent.current }
+                        }
                     }
                 }
             } in bar in marginless
@@ -306,7 +315,7 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
 //appNav()
 //functions
 //search, jump to, screen name
-//Nav 1 - hamburger menu toggle, animation?
+//Nav 1 - col for popover is still visible, animation?
 //Nav 2 - align nav links left
 //Nav 3 - only using home icon, max?
 //Nav 4 - user dropdown options, user icon stays black

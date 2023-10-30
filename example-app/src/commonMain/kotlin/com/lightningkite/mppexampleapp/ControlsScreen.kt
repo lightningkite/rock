@@ -20,10 +20,7 @@ object ControlsScreen : RockScreen {
             val booleanContent = Property(false)
 
             h1 { content = "Controls" } in withPadding in hasPopover {
-                text {
-                    content = "Pop over!"
-                    ::exists { booleanContent.current }
-                } in card
+
             }
             col {
                 h2 { content = "Buttons" }

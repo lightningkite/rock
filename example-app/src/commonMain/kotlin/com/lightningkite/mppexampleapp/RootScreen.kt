@@ -41,6 +41,7 @@ object RootScreen : RockScreen {
 
                 linkScreen(ThemesScreen)
                 linkScreen(ControlsScreen)
+                linkScreen(FormsScreen)
                 linkScreen(NavigationScreen)
                 linkScreen(LayoutExamplesScreen)
                 linkScreen(SampleLogInScreen)

@@ -50,6 +50,8 @@ interface AppNav {
     }
 }
 
+val search = Property("")
+
 val ViewContext.appNavFactory by viewContextAddon<Property<ViewContext.(AppNav.() -> Unit) -> Unit>>(
     Property(
         ViewContext::appNavTopAndLeft
@@ -77,10 +79,6 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
 // Nav 1 hamburger
         row {
             setup(appNav)
-            button {
-
-                // onClick { navigator.goBack() }
-            }
             toggleButton {
                 checked bind booleanContent; image {
                 val currentTheme = themeStack.last()
@@ -155,10 +153,13 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
-                Align.Center,
-                Align.Center
-            ) in weight(1f)
+            row{
+                h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+                    Align.Center,
+                    Align.Center
+                ) in weight(1f)
+            }
+
 
             row {
                 forEachUpdating(appNav.navItemsProperty) {
@@ -167,21 +168,31 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                         text { ::content { it.current.title } }
                     } in bar
                 }
-            }
+
+            } in weight(1f)
             row {
-                forEachUpdating(appNav.actionsProperty) {
-                    button {
-                        image {
-                            val currentTheme = themeStack.last()
-                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.current.title }
+                row{
+                    label {
+                        content = "Search"
+                        textField {
+                            content bind search
                         }
-                        onClick { it.once.onSelect() }
                     }
                 }
+    row{
+        forEachUpdating(appNav.actionsProperty) {
+            button {
+                image {
+                    val currentTheme = themeStack.last()
+                    ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                    ::description { it.current.title }
+                }
+                onClick { it.once.onSelect() }
             }
+        }
 
-
+    }
+            }
         } in bar in marginless
         navigatorView(navigator) in weight(1f)
     } in marginless
@@ -245,6 +256,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
 
 fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
+    val booleanContent = Property(false)
     col {
 // Nav 4 left and top - add dropdown for user info
         row {
@@ -268,21 +280,26 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     row {
-                        image {
-                            val currentTheme = themeStack.last()
-                            ::source {
-                                appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                    currentTheme().foreground
-                                )
-                            }
-                            description = "User icon"
-                        }
                         val first = appNav.currentUser?.currentUser?.name ?: "No user"
                         val userLinks = appNav.navItemsProperty
                         col {
-                            val options = listOf(first, userLinks).map { WidgetOption(it.toString(), it.toString()) }
-                            select { this.options = options } in withPadding
-
+//                            val options = listOf(first, userLinks).map { WidgetOption(it.toString(), it.toString()) }
+                            toggleButton {
+                                checked bind booleanContent;
+                                image {
+                                    val currentTheme = themeStack.last()
+                                    ::source {
+                                        appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                                            currentTheme().foreground
+                                        )
+                                    } in bar
+                                    description = "User icon"
+                                }
+                                text {
+                                    content = "Pop over!"
+                                    ::exists { booleanContent.current }
+                                } in card
+                            }
                         }
                     }
                     button {
@@ -293,6 +310,7 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         }
                         onClick { it.once.onSelect() }
                     }
+
                 }
             }
         } in bar in marginless

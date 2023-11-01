@@ -30,10 +30,10 @@ fun ViewContext.app() {
         appName = "Rock Sample App"
         ::navItems{
             listOf(
-                NavItem("Root", Icon.home, RootScreen),
-                NavItem("Themes", Icon.home, ThemesScreen),
-                NavItem("Controls", Icon.home, ControlsScreen),
-                NavItem("Navigation", Icon.home, NavigationScreen)
+                NavItem("Home", Icon.home, RootScreen),
+                NavItem("Themes", Icon.sync, ThemesScreen),
+                NavItem("Controls", Icon.settings, ControlsScreen),
+                NavItem("Navigation", Icon.menu, NavigationScreen)
             )
         }
         ::currentUser{
@@ -46,6 +46,11 @@ fun ViewContext.app() {
             )
         }
         actions = listOf(
+            Action (
+                title = "Search",
+                icon = Icon.search,
+                onSelect = { ExternalServices.openTab("https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${navigator.currentScreen.once::class.toString().removePrefix("class ")}.kt") }
+            ),
             Action(
                 title = "Open on GitHub",
                 icon = Icon.star,

@@ -102,8 +102,15 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
-
+            label {
+                content = "Search"
+                textField {
+                    content bind search
+                }
+            }
             row {
+
+
                 forEachUpdating(appNav.actionsProperty) {
                     button {
                         image {
@@ -118,21 +125,20 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
         } in bar in marginless
         row {
 
-            col {
+
+            text {
                 col {
-                    text {
-                        col {
-                            forEachUpdating(appNav.navItemsProperty) {
-                                link {
-                                    ::to { it.current.destination }
-                                    text { ::content { it.current.title } }
-                                } in bar
-                            }.toString()
-                            ::exists { booleanContent.current }
-                        }
-                    }
+                    forEachUpdating(appNav.navItemsProperty) {
+                        link {
+                            ::to { it.current.destination }
+                            text { ::content { it.current.title } }
+                        } in bar
+                    }.toString()
+                    ::exists { booleanContent.current }
                 }
             } in bar in marginless
+
+
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
     } in marginless
@@ -153,7 +159,7 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                 }
                 onClick { navigator.goBack() }
             }
-            row{
+            row {
                 h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
                     Align.Center,
                     Align.Center
@@ -171,7 +177,7 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
 
             } in weight(1f)
             row {
-                row{
+                row {
                     label {
                         content = "Search"
                         textField {
@@ -179,19 +185,19 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                         }
                     }
                 }
-    row{
-        forEachUpdating(appNav.actionsProperty) {
-            button {
-                image {
-                    val currentTheme = themeStack.last()
-                    ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                    ::description { it.current.title }
-                }
-                onClick { it.once.onSelect() }
-            }
-        }
+                row {
+                    forEachUpdating(appNav.actionsProperty) {
+                        button {
+                            image {
+                                val currentTheme = themeStack.last()
+                                ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                                ::description { it.current.title }
+                            }
+                            onClick { it.once.onSelect() }
+                        }
+                    }
 
-    }
+                }
             }
         } in bar in marginless
         navigatorView(navigator) in weight(1f)
@@ -217,6 +223,12 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
+            label {
+                content = "Search"
+                textField {
+                    content bind search
+                }
+            }
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
@@ -276,33 +288,38 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
+            row {
+                val first = appNav.currentUser?.currentUser?.name ?: "No user"
+                val userLinks = appNav.navItemsProperty
+                col {
+//                            val options = listOf(first, userLinks).map { WidgetOption(it.toString(), it.toString()) }
+                    toggleButton {
+                        checked bind booleanContent;
+                        image {
+                            val currentTheme = themeStack.last()
+                            ::source {
+                                appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                                    currentTheme().foreground
+                                )
+                            } in bar
+                            description = "User icon"
+                        }
 
+                    }
+                }
+
+            }
+            row {
+                label {
+                    content = "Search"
+                    textField {
+                        content bind search
+                    }
+                }
+            }
             row {
                 forEachUpdating(appNav.actionsProperty) {
-                    row {
-                        val first = appNav.currentUser?.currentUser?.name ?: "No user"
-                        val userLinks = appNav.navItemsProperty
-                        col {
-//                            val options = listOf(first, userLinks).map { WidgetOption(it.toString(), it.toString()) }
-                            toggleButton {
-                                checked bind booleanContent;
-                                image {
-                                    val currentTheme = themeStack.last()
-                                    ::source {
-                                        appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                            currentTheme().foreground
-                                        )
-                                    } in bar
-                                    description = "User icon"
-                                }
-                                text {
-                                    content = "Pop over!"
-                                    ::exists { booleanContent.current }
-                                } in card
-                            }
-                        }
-                    }
-                    button {
+                button {
                         image {
                             val currentTheme = themeStack.last()
                             ::source { it.current.icon.toImageSource(currentTheme().foreground) }
@@ -314,6 +331,15 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
+        row{
+            col{
+                text {
+                    content = "Pop over!"
+                    ::exists { booleanContent.current }
+                } in card
+            }
+        }
+
         row {
             col {
                 col {
@@ -330,10 +356,8 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     } in marginless
 }
 ///TO DO
-//appNav()
-//functions
-//search, jump to, screen name
-//Nav 1 - col for popover is still visible, animation?
-//Nav 2 - align nav links left
-//Nav 3 - only using home icon, max?
+//search, jump to
+//Nav 1 -
+//Nav 2 -
+//Nav 3 - official tab icons
 //Nav 4 - user dropdown options, user icon stays black

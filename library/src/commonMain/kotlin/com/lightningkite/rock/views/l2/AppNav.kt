@@ -159,14 +159,10 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                 }
                 onClick { navigator.goBack() }
             }
-            row {
                 h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
                     Align.Center,
                     Align.Center
-                ) in weight(1f)
-            }
-
-
+                )
             row {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
@@ -273,8 +269,6 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
 // Nav 4 left and top - add dropdown for user info
         row {
             setup(appNav)
-            h1 { ::content.invoke { appNav.appNameProperty.current } }
-
             button {
                 image {
                     val currentTheme = themeStack.last()
@@ -288,58 +282,52 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
+            val first = appNav.currentUser?.currentUser?.name ?: "No user"
+            val userLinks = appNav.navItemsProperty
             row {
-                val first = appNav.currentUser?.currentUser?.name ?: "No user"
-                val userLinks = appNav.navItemsProperty
-                col {
-//                            val options = listOf(first, userLinks).map { WidgetOption(it.toString(), it.toString()) }
-                    toggleButton {
-                        checked bind booleanContent;
-                        image {
-                            val currentTheme = themeStack.last()
-                            ::source {
-                                appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                    currentTheme().foreground
-                                )
-                            } in bar
-                            description = "User icon"
+                toggleButton {
+                    checked bind booleanContent;
+                    image {
+                        val currentTheme = themeStack.last()
+                        ::source {
+                            appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                                currentTheme().foreground
+                            )
                         }
-
+                        description = "User icon"
                     }
-                }
 
-            }
-            row {
+                }
                 label {
                     content = "Search"
                     textField {
                         content bind search
                     }
                 }
-            }
-            row {
-                forEachUpdating(appNav.actionsProperty) {
-                button {
-                        image {
-                            val currentTheme = themeStack.last()
-                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.current.title }
+                row {
+                    forEachUpdating(appNav.actionsProperty) {
+                        button {
+                            image {
+                                val currentTheme = themeStack.last()
+                                ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                                ::description { it.current.title }
+                            }
+                            onClick { it.once.onSelect() }
                         }
-                        onClick { it.once.onSelect() }
                     }
-
                 }
-            }
-        } in bar in marginless
-        row{
-            col{
-                text {
-                    content = "Pop over!"
+            }  in withPadding in hasPopover{
+                col{
+                    forEachUpdating(appNav.navItemsProperty) {
+                           link {
+                               ::to { it.current.destination }
+                               text { ::content { it.current.title } }
+                           } in bar
+                    }
                     ::exists { booleanContent.current }
-                } in card
-            }
-        }
-
+                }
+            } in bar
+        } in bar in marginless
         row {
             col {
                 col {
@@ -360,4 +348,4 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
 //Nav 1 -
 //Nav 2 -
 //Nav 3 - official tab icons
-//Nav 4 - user dropdown options, user icon stays black
+//Nav 4 - user dropdown style

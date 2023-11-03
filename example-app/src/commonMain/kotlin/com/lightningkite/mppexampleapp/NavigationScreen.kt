@@ -23,11 +23,7 @@ object NavigationScreen : RockScreen {
                     }
                 } in card
             }
-            row {
-                text {
-                    content = "Choose an option below to update the navigation layout."
-                }
-            }
+            h2 { content = "Layouts" }
             row {
                 col {
                     navSelector("Hamburger Menu", ViewContext::appNavHamburger)
@@ -68,11 +64,40 @@ object NavigationScreen : RockScreen {
                     )
                 } in weight(1f)
             }
+            h2 { content = "Table of Contents" }
+
+            row {
+                col {
+                    text {
+                        content = "Vertical"
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+                col {
+                    text {
+                        content = "Horizontal"
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+                col {
+                    text {
+                        content = "Multicolumn"
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in weight(1f)
+            }
             row {
                 col {
                     h3 { content = "Documentation" }
                     text {
-                        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut mollis felis ut mi aliquet, scelerisque laoreet tortor porttitor. Aliquam erat volutpat. Etiam a mauris eu tellus hendrerit mattis. Vivamus est nibh, feugiat a orci eu, facilisis vestibulum massa. Nam tempus enim in ipsum hendrerit, tincidunt dictum tellus lacinia. Sed sit amet dui consectetur, vulputate eros vel, consectetur urna. Morbi faucibus, odio sed tristique fringilla, risus tellus fringilla sapien, sed tincidunt velit nisi eget urna. Proin ante sem, lobortis vehicula nunc vitae, pulvinar aliquam nisi. Praesent placerat finibus felis, non pulvinar augue ullamcorper sed. Praesent ornare neque augue. Fusce elementum sem cursus, ullamcorper tellus quis, faucibus nisl. Integer tincidunt dapibus ultrices. Vivamus id volutpat orci, eget ultricies orci."
+                        content =
+                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut mollis felis ut mi aliquet, scelerisque laoreet tortor porttitor. Aliquam erat volutpat. Etiam a mauris eu tellus hendrerit mattis. Vivamus est nibh, feugiat a orci eu, facilisis vestibulum massa. Nam tempus enim in ipsum hendrerit, tincidunt dictum tellus lacinia. Sed sit amet dui consectetur, vulputate eros vel, consectetur urna. Morbi faucibus, odio sed tristique fringilla, risus tellus fringilla sapien, sed tincidunt velit nisi eget urna. Proin ante sem, lobortis vehicula nunc vitae, pulvinar aliquam nisi. Praesent placerat finibus felis, non pulvinar augue ullamcorper sed. Praesent ornare neque augue. Fusce elementum sem cursus, ullamcorper tellus quis, faucibus nisl. Integer tincidunt dapibus ultrices. Vivamus id volutpat orci, eget ultricies orci."
                     }
                 }
             } in card

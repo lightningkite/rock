@@ -13,14 +13,17 @@ import com.lightningkite.rock.views.direct.*
 
 @Routable("controls")
 object ControlsScreen : RockScreen {
+
+
     override fun ViewContext.render() {
+        val booleanContent = Property(false)
         col {
 
-            val stringContent = PersistentProperty("test-data", "Test")
-            val booleanContent = Property(false)
-
             h1 { content = "Controls" } in withPadding in hasPopover {
-
+                text {
+                    content = "Pop over!"
+                    ::exists { booleanContent.current }
+                } in card
             }
             col {
                 h2 { content = "Buttons" }
@@ -54,25 +57,25 @@ object ControlsScreen : RockScreen {
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { checked bind booleanContent; }
+                            switch { }
                         }
                     } in withPadding
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { checked bind booleanContent; }
+                            switch { }
                         }
                     } in card
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { checked bind booleanContent; }
+                            switch { }
                         }
                     } in important
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { checked bind booleanContent; }
+                            switch { }
                         }
                     } in critical
                 }
@@ -105,24 +108,18 @@ object ControlsScreen : RockScreen {
 
             col {
                 h2 { content = "Text Fields" }
-                text{ ::content{ "Content: " + stringContent.current } }
-                text{
-                    reactiveScope {
-                        content = "Reactive scope style: " + stringContent.current
-                    }
-                }
-                textField { content bind stringContent }
-                textField { content bind stringContent } in card
-                textField { content bind stringContent } in important
-                textField { content bind stringContent } in critical
+                textField {  }
+                textField {  } in card
+                textField {  } in important
+                textField {  } in critical
             } in card
 
             col {
                 h2 { content = "Text Areas" }
-                textArea { content bind stringContent }
-                textArea { content bind stringContent } in card
-                textArea { content bind stringContent } in important
-                textArea { content bind stringContent } in critical
+                textArea {  }
+                textArea {  } in card
+                textArea {  } in important
+                textArea {  } in critical
             } in card
 
             col {

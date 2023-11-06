@@ -1,31 +1,137 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.contains
+import com.lightningkite.rock.Routable
+import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.ViewContext
-import com.lightningkite.rock.views.card
+import com.lightningkite.rock.reactive.*
+import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.titledSection
 
+@Routable("forms")
 object FormsScreen : RockScreen {
-    override fun ViewContext.render() {
-        col {
-            h2 { content = "Forms" }
-            row{
-                col{
-                    button { text { content = "Form" } } in card
+
+    fun leafExample(propName: String): SectionLeaf {
+        val prop = Property("")
+        return SectionLeaf(
+            title = propName,
+            editor = {
+                label {
+                    content = propName
+                    textField { content bind prop }
                 }
-                col{
-                    button { text { content = "Flow" } } in card
-                }
+            },
+            viewer = {
+                h2 { ::content { prop.current } }
             }
-            row {
-                col {
-                    h3 { content = "Documentation" }
-                    text {
-                        content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut mollis felis ut mi aliquet, scelerisque laoreet tortor porttitor. Aliquam erat volutpat. Etiam a mauris eu tellus hendrerit mattis. Vivamus est nibh, feugiat a orci eu, facilisis vestibulum massa. Nam tempus enim in ipsum hendrerit, tincidunt dictum tellus lacinia. Sed sit amet dui consectetur, vulputate eros vel, consectetur urna. Morbi faucibus, odio sed tristique fringilla, risus tellus fringilla sapien, sed tincidunt velit nisi eget urna. Proin ante sem, lobortis vehicula nunc vitae, pulvinar aliquam nisi. Praesent placerat finibus felis, non pulvinar augue ullamcorper sed. Praesent ornare neque augue. Fusce elementum sem cursus, ullamcorper tellus quis, faucibus nisl. Integer tincidunt dapibus ultrices. Vivamus id volutpat orci, eget ultricies orci."
+        )
+    }
+
+    val lp = Property(false)
+    val form = Section(
+        title = "Vehicle for Sale",
+        subsections = {
+            listOf(
+                Section(
+                    title = "Vehicle Information",
+                    leaves = {
+                        listOf(
+                            leafExample("Year"),
+                            leafExample("Make"),
+                            leafExample("Model"),
+                            leafExample("Submodel"),
+                        )
                     }
-                }
-            } in card
+                ),
+                Section(
+                    title = "Sale Information",
+                    leaves = {
+                        listOf(
+                            leafExample("Mileage"),
+                            leafExample("Price"),
+                            leafExample("Seller"),
+                        )
+                    }
+                ),
+                Section(
+                    title = "Requires Legal Paperwork",
+                    leaves = {
+                        listOf(
+                            SectionLeaf(
+                                title = "Requires Legal Paperwork",
+                                editor = {
+                                    row {
+                                        checkbox {
+                                            checked bind lp
+                                        }
+                                        text("Requires legal paperwork?")
+                                    }
+                                },
+                                viewer = {}
+                            )
+                        ) + (if(lp.current) {
+                            listOf(
+                                leafExample("Paperwork Entry"),
+                            )
+                        } else listOf())
+                    }
+                )
+            )
+        }
+    )
+
+    override fun ViewContext.render() {
+        titledSection("Form Testing") {
+            renderForm(form)
         }
     }
 }
+
+fun ViewContext.renderForm(section: Section) {
+    titledSection(
+        titleSetup = { content = section.title },
+        content = {
+            col {
+                forEach(SharedReadable(section.subsections)) {
+                    renderForm(it)
+                }
+            }
+            col {
+                forEach(SharedReadable(section.leaves)) {
+                    it.editor(this)
+                }
+            }
+        }
+    )
+}
+
+
+data class Issue(
+    val field: String,
+    val summary: String,
+    val description: String,
+    val importance: Importance
+) {
+    enum class Importance {
+        WARNING, ERROR
+    }
+}
+
+data class Section(
+    val title: String,
+    val icon: Icon? = null,
+    val helperText: String? = null,
+    val directIssues: ReactiveScope.() -> List<Issue> = { listOf() },
+    val leaves: ReactiveScope.() -> List<SectionLeaf> = { listOf() },
+    val subsections: ReactiveScope.() -> List<Section> = { listOf() },
+)
+
+data class SectionLeaf(
+    val title: String,
+    val icon: Icon? = null,
+    val helperText: String? = null,
+    val directWorkSize: Int = 1,
+    val directIssues: ReactiveScope.() -> List<Issue> = { listOf() },
+    val editor: ViewContext.() -> Unit,
+    val viewer: ViewContext.() -> Unit,
+)

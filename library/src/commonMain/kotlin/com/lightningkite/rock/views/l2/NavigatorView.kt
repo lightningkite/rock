@@ -4,6 +4,7 @@ import com.lightningkite.rock.models.ScreenTransition
 import com.lightningkite.rock.models.ScreenTransitions
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.navigation.Routes
+import com.lightningkite.rock.reactive.ReactiveScope
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*

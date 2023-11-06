@@ -81,7 +81,7 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
             ::exists { nav.currentScreen.current != null }
             navigatorViewDialog() in scrolls in card in gravity(Align.Center, Align.Center)
         }
-    }
+    } in marginless
 }
 
 fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
@@ -93,25 +93,26 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
         row {
             setup(appNav)
             toggleButton {
-                checked bind booleanContent; image {
-                val currentTheme = themeStack.last()
-                ::source { Icon.menu.toImageSource(currentTheme().foreground) }
-                description = "Open naviagation menu"
-            }
+                checked bind booleanContent
+                image {
+                    val currentTheme = currentTheme
+                    ::source { Icon.menu.toImageSource(currentTheme().foreground) }
+                    description = "Open naviagation menu"
+                }
             }
 
             h1 { ::content.invoke { appNav.appNameProperty.current } }
 
             button {
                 image {
-                    val currentTheme = themeStack.last()
+                    val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
                     ::visible { navigator.canGoBack.current }
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             ) in weight(1f)
@@ -127,7 +128,7 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
                         image {
-                            val currentTheme = themeStack.last()
+                            val currentTheme = currentTheme
                             ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                             ::description { it.current.title }
                         }
@@ -165,17 +166,17 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
             setup(appNav)
             button {
                 image {
-                    val currentTheme = themeStack.last()
+                    val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
                     ::visible { navigator.canGoBack.current }
                 }
                 onClick { navigator.goBack() }
             }
-                h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
-                    Align.Center,
-                    Align.Center
-                )
+            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
+                Align.Center,
+                Align.Center
+            )
             row {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
@@ -198,7 +199,7 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                     forEachUpdating(appNav.actionsProperty) {
                         button {
                             image {
-                                val currentTheme = themeStack.last()
+                                val currentTheme = currentTheme
                                 ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                                 ::description { it.current.title }
                             }
@@ -228,7 +229,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             ) in weight(1f)
@@ -284,23 +285,23 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             setup(appNav)
             button {
                 image {
-                    val currentTheme = themeStack.last()
+                    val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
                     ::visible { navigator.canGoBack.current }
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             )
             row {
-                row{
+                row {
                     toggleButton {
                         checked bind booleanContent;
                         image {
-                            val currentTheme = themeStack.last()
+                            val currentTheme = currentTheme
                             ::source {
                                 appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
                                     currentTheme().foreground
@@ -316,18 +317,18 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         Align.Center,
                         Align.Center
                     )
-                }  in withPadding in hasPopover{
-                    col{
-                    forEachUpdating(appNav.userLinksProperty) {
-                           link {
-                               ::to { it.current.destination }
-                               text { ::content { it.current.title } }
-                           } in bar
-                    }
+                } in withPadding in hasPopover {
+                    col {
+                        forEachUpdating(appNav.userLinksProperty) {
+                            link {
+                                ::to { it.current.destination }
+                                text { ::content { it.current.title } }
+                            } in bar
+                        }
                         ::exists { booleanContent.current }
                     }
                 } in card
-            }  in weight (1f)
+            } in weight(1f)
             row {
                 label {
                     content = "Search"
@@ -339,7 +340,7 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     forEachUpdating(appNav.actionsProperty) {
                         button {
                             image {
-                                val currentTheme = themeStack.last()
+                                val currentTheme = currentTheme
                                 ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                                 ::description { it.current.title }
                             }

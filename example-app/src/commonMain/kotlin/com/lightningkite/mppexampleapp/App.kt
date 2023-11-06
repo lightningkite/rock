@@ -59,10 +59,9 @@ fun ViewContext.app() {
                 title = "Open on GitHub",
                 icon = Icon.star,
                 onSelect = {
+                    val className = navigator.currentScreen.once?.let { it::class.toString().removePrefix("class ") } ?: "App"
                     ExternalServices.openTab(
-                        "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${
-                            navigator.currentScreen.once::class.toString().removePrefix("class ")
-                        }.kt"
+                        "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/$className.kt"
                     )
                 }
             )

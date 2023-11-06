@@ -6,6 +6,7 @@ import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.*
+import kotlinx.datetime.*
 
 expect class NSeparator : NView
 value class Separator(override val native: NSeparator) : RView<NSeparator>
@@ -105,6 +106,24 @@ value class RadioToggleButton(override val native: NRadioToggleButton) : RView<N
 @ViewDsl expect fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit = {}): Unit
 expect var RadioToggleButton.enabled: Boolean
 expect val RadioToggleButton.checked: Writable<Boolean>
+
+expect class NLocalDateField : NView
+value class LocalDateField(override val native: NLocalDateField) : RView<NLocalDateField>
+@ViewDsl expect fun ViewContext.localDateField(setup: LocalDateField.() -> Unit = {}): Unit
+expect val LocalDateField.content: Writable<LocalDate?>
+expect var LocalDateField.range: ClosedRange<LocalDate>?
+
+expect class NLocalTimeField : NView
+value class LocalTimeField(override val native: NLocalTimeField) : RView<NLocalTimeField>
+@ViewDsl expect fun ViewContext.localTimeField(setup: LocalTimeField.() -> Unit = {}): Unit
+expect val LocalTimeField.content: Writable<LocalTime?>
+expect var LocalTimeField.range: ClosedRange<LocalTime>?
+
+expect class NLocalDateTimeField : NView
+value class LocalDateTimeField(override val native: NLocalDateTimeField) : RView<NLocalDateTimeField>
+@ViewDsl expect fun ViewContext.localDateTimeField(setup: LocalDateTimeField.() -> Unit = {}): Unit
+expect val LocalDateTimeField.content: Writable<LocalDateTime?>
+expect var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
 
 expect class NTextField : NView
 value class TextField(override val native: NTextField) : RView<NTextField>

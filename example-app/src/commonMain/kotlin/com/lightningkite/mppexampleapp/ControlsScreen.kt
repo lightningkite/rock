@@ -106,6 +106,30 @@ object ControlsScreen : RockScreen {
             } in card
 
             col {
+                h2 { content = "Date Fields" }
+                localDateField {  }
+                localDateField {  } in card
+                localDateField {  } in important
+                localDateField {  } in critical
+            } in card
+
+            col {
+                h2 { content = "Time Fields" }
+                localTimeField {  }
+                localTimeField {  } in card
+                localTimeField {  } in important
+                localTimeField {  } in critical
+            } in card
+
+            col {
+                h2 { content = "Date Time Fields" }
+                localDateTimeField {  }
+                localDateTimeField {  } in card
+                localDateTimeField {  } in important
+                localDateTimeField {  } in critical
+            } in card
+
+            col {
                 h2 { content = "Text Fields" }
                 textField {  }
                 textField {  } in card

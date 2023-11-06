@@ -27,6 +27,7 @@ class Implementation(val variant: String, val todoElementType: String) {
             import com.lightningkite.rock.navigation.*
             import com.lightningkite.rock.reactive.*
             import com.lightningkite.rock.views.*
+            import kotlinx.datetime.*
         """.trimIndent())
         out.appendLine()
     }
@@ -152,6 +153,7 @@ CodeEmitter.common(
     import com.lightningkite.rock.reactive.*
     import com.lightningkite.rock.views.*
     import com.lightningkite.rock.views.canvas.*
+    import kotlinx.datetime.*
 """.trimIndent()
 )
 
@@ -204,6 +206,18 @@ listOf(
     }
 }
 
+"LocalDateField" {
+    writable("content", "LocalDate", "\"\"")
+    prop("range", "ClosedRange<LocalDate>?")
+}
+"LocalTimeField" {
+    writable("content", "LocalTime", "\"\"")
+    prop("range", "ClosedRange<LocalTime>?")
+}
+"LocalDateTimeField" {
+    writable("content", "LocalDateTime", "\"\"")
+    prop("range", "ClosedRange<LocalDateTime>?")
+}
 "TextField" {
     writable("content", "String", "\"\"")
     prop("keyboardHints", "KeyboardHints")

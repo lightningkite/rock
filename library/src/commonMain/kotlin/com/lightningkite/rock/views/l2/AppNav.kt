@@ -138,8 +138,6 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
             }
         } in bar in marginless
         row {
-
-
             text {
                 col {
                     forEachUpdating(appNav.navItemsProperty) {
@@ -151,8 +149,6 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                     ::exists { booleanContent.current }
                 }
             } in bar in marginless
-
-
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
     } in marginless
@@ -296,57 +292,54 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             )
+            space {} in weight(1f)
+            label {
+                content = "Search"
+                textField {
+                    content bind search
+                }
+            }
             row {
-                row {
-                    toggleButton {
-                        checked bind booleanContent;
+                forEachUpdating(appNav.actionsProperty) {
+                    button {
                         image {
                             val currentTheme = currentTheme
-                            ::source {
-                                appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                    currentTheme().foreground
-                                )
-                            }
-                            description = "User icon"
+                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.current.title }
                         }
-
-                    }
-                    text {
-                        content = appNav.currentUser?.currentUser?.name ?: "No user"
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
-                } in withPadding in hasPopover {
-                    col {
-                        forEachUpdating(appNav.userLinksProperty) {
-                            link {
-                                ::to { it.current.destination }
-                                text { ::content { it.current.title } }
-                            } in bar
-                        }
-                        ::exists { booleanContent.current }
-                    }
-                } in card
-            } in weight(1f)
-            row {
-                label {
-                    content = "Search"
-                    textField {
-                        content bind search
+                        onClick { it.once.onSelect() }
                     }
                 }
-                row {
-                    forEachUpdating(appNav.actionsProperty) {
-                        button {
-                            image {
-                                val currentTheme = currentTheme
-                                ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                                ::description { it.current.title }
-                            }
-                            onClick { it.once.onSelect() }
+            }
+            row {
+                toggleButton {
+                    checked bind booleanContent
+                    image {
+                        val currentTheme = currentTheme
+                        ::source {
+                            appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                                currentTheme().foreground
+                            )
+                        }
+                        description = "User icon"
+                    }
+
+                }
+                text {
+                    content = appNav.currentUser?.currentUser?.name ?: "No user"
+                } in gravity(
+                    Align.Center,
+                    Align.Center
+                )
+            } in withPadding in hasPopover {
+                col {
+                    forEachUpdating(appNav.userLinksProperty) {
+                        link {
+                            ::to { it.current.destination }
+                            text { ::content { it.current.title } }
                         }
                     }
+                    ::exists { booleanContent.current }
                 }
             }
 
@@ -358,10 +351,10 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         link {
                             ::to { it.current.destination }
                             text { ::content { it.current.title } }
-                        } in bar
+                        }
                     }
                 }
-            } in bar in marginless
+            } in marginless
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
     } in marginless

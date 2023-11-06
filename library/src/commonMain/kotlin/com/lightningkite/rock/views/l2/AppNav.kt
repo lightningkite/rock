@@ -20,7 +20,6 @@ data class NavItem(
 data class ProfileInfo(
     //...
     val currentUser: UserInfo?,
-    val children: List<NavItem>
 )
 
 data class UserInfo(val name: String, val profileImage: ImageVector? = null, val defaultIcon: Icon)
@@ -32,6 +31,7 @@ interface AppNav {
     var appLogo: ImageSource
     var navItems: List<NavItem>
     var currentUser: ProfileInfo?
+    var userLinks: List<NavItem>
     var actions: List<Action>
 
 
@@ -48,6 +48,8 @@ interface AppNav {
         override var currentUser: ProfileInfo? by currentUserProperty.delegate
         val actionsProperty = Property<List<Action>>(listOf())
         override var actions: List<Action> by actionsProperty.delegate
+        val userLinksProperty = Property(listOf<NavItem>())
+        override var userLinks: List<NavItem> by userLinksProperty.delegate
     }
 }
 
@@ -306,18 +308,18 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     )
                 } in withPadding in hasPopover{
                     col{
-//                    forEachUpdating(appNav.currentUserProperty) {
-//                           link {
-//                               ::to { it.current.destination }
-//                               text { ::content { it.current.title } }
-//                           } in bar
-//                    }
-                        forEachUpdating(appNav.navItemsProperty) {
-                            link {
-                                ::to { it.current.destination }
-                                text { ::content { it.current.title } }
-                            } in bar
-                        }
+                    forEachUpdating(appNav.userLinksProperty) {
+                           link {
+                               ::to { it.current.destination }
+                               text { ::content { it.current.title } }
+                           } in bar
+                    }
+//                        forEachUpdating(appNav.navItemsProperty) {
+//                            link {
+//                                ::to { it.current.destination }
+//                                text { ::content { it.current.title } }
+//                            } in bar
+//                        }
                         ::exists { booleanContent.current }
                     }
                 } in bar

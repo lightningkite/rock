@@ -40,10 +40,13 @@ fun ViewContext.app() {
         ::currentUser{
             ProfileInfo(
                 UserInfo("Test User", null, Icon.person),
-                listOf(
-                    NavItem("Root", Icon.home, RootScreen),
-                    NavItem("Login", Icon.home, SampleLogInScreen),
-                )
+            )
+        }
+
+        ::userLinks {
+            listOf(
+                NavItem("Root", Icon.home, RootScreen),
+                NavItem("Login", Icon.home, SampleLogInScreen),
             )
         }
         actions = listOf(

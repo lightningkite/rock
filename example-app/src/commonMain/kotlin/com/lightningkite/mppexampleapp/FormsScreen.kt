@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
+import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
@@ -11,8 +12,9 @@ import com.lightningkite.rock.views.l2.titledSection
 @Routable("forms")
 object FormsScreen : RockScreen {
 
+    val externals = HashMap<String, Property<String>>()
     fun leafExample(propName: String): SectionLeaf {
-        val prop = Property("")
+        val prop = externals.getOrPut(propName) { Property("Test") }
         return SectionLeaf(
             title = propName,
             editor = {
@@ -83,7 +85,8 @@ object FormsScreen : RockScreen {
     override fun ViewContext.render() {
         titledSection("Form Testing") {
             renderForm(form)
-        }
+            renderFormReadOnly(form)
+        } in scrolls
     }
 }
 
@@ -99,6 +102,24 @@ fun ViewContext.renderForm(section: Section) {
             col {
                 forEach(SharedReadable(section.leaves)) {
                     it.editor(this)
+                }
+            }
+        }
+    )
+}
+
+fun ViewContext.renderFormReadOnly(section: Section) {
+    titledSection(
+        titleSetup = { content = section.title },
+        content = {
+            col {
+                forEach(SharedReadable(section.subsections)) {
+                    renderFormReadOnly(it)
+                }
+            }
+            col {
+                forEach(SharedReadable(section.leaves)) {
+                    it.viewer(this)
                 }
             }
         }

@@ -13,9 +13,9 @@ import com.lightningkite.rock.views.l2.titledSection
 object FormsScreen : RockScreen {
 
     val externals = HashMap<String, Property<String>>()
-    fun leafExample(propName: String): SectionLeaf {
+    fun leafExample(propName: String): FormLeaf {
         val prop = externals.getOrPut(propName) { Property("Test") }
-        return SectionLeaf(
+        return FormLeaf(
             title = propName,
             editor = {
                 label {
@@ -30,11 +30,11 @@ object FormsScreen : RockScreen {
     }
 
     val lp = Property(false)
-    val form = Section(
+    val form = FormSection(
         title = "Vehicle for Sale",
         subsections = {
             listOf(
-                Section(
+                FormSection(
                     title = "Vehicle Information",
                     leaves = {
                         listOf(
@@ -45,7 +45,7 @@ object FormsScreen : RockScreen {
                         )
                     }
                 ),
-                Section(
+                FormSection(
                     title = "Sale Information",
                     leaves = {
                         listOf(
@@ -55,11 +55,11 @@ object FormsScreen : RockScreen {
                         )
                     }
                 ),
-                Section(
+                FormSection(
                     title = "Requires Legal Paperwork",
                     leaves = {
                         listOf(
-                            SectionLeaf(
+                            FormLeaf(
                                 title = "Requires Legal Paperwork",
                                 editor = {
                                     row {
@@ -90,7 +90,7 @@ object FormsScreen : RockScreen {
     }
 }
 
-fun ViewContext.renderForm(section: Section) {
+fun ViewContext.renderForm(section: FormSection) {
     titledSection(
         titleSetup = { content = section.title },
         content = {
@@ -108,7 +108,7 @@ fun ViewContext.renderForm(section: Section) {
     )
 }
 
-fun ViewContext.renderFormReadOnly(section: Section) {
+fun ViewContext.renderFormReadOnly(section: FormSection) {
     titledSection(
         titleSetup = { content = section.title },
         content = {
@@ -127,7 +127,7 @@ fun ViewContext.renderFormReadOnly(section: Section) {
 }
 
 
-data class Issue(
+data class FormIssue(
     val field: String,
     val summary: String,
     val description: String,
@@ -138,21 +138,21 @@ data class Issue(
     }
 }
 
-data class Section(
+data class FormSection(
     val title: String,
     val icon: Icon? = null,
     val helperText: String? = null,
-    val directIssues: ReactiveScope.() -> List<Issue> = { listOf() },
-    val leaves: ReactiveScope.() -> List<SectionLeaf> = { listOf() },
-    val subsections: ReactiveScope.() -> List<Section> = { listOf() },
+    val directIssues: ReactiveScope.() -> List<FormIssue> = { listOf() },
+    val leaves: ReactiveScope.() -> List<FormLeaf> = { listOf() },
+    val subsections: ReactiveScope.() -> List<FormSection> = { listOf() },
 )
 
-data class SectionLeaf(
+data class FormLeaf(
     val title: String,
     val icon: Icon? = null,
     val helperText: String? = null,
     val directWorkSize: Int = 1,
-    val directIssues: ReactiveScope.() -> List<Issue> = { listOf() },
+    val directIssues: ReactiveScope.() -> List<FormIssue> = { listOf() },
     val editor: ViewContext.() -> Unit,
     val viewer: ViewContext.() -> Unit,
 )

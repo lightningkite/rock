@@ -5,3 +5,5 @@ build
 *.xcworkspace
 *.hprof
 local.properties
+.DS_Store
+**/.DS_Store

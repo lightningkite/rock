@@ -50,7 +50,7 @@ actual class ViewContext(
     actual fun afterNextElementSetup(action: NView.()->Unit) {
         afterNextElementSetupList.add(action)
     }
-    val beforeNextElementSetupList = ArrayList<HTMLElement.() -> Unit>()
+    var beforeNextElementSetupList = ArrayList<HTMLElement.() -> Unit>()
     var afterNextElementSetupList = ArrayList<HTMLElement.() -> Unit>()
     //    private val wrapperToDoList = ArrayList<HTMLElement.() -> Unit>()
     var popCount = 0
@@ -73,16 +73,17 @@ actual class ViewContext(
     fun <T : HTMLElement> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
             stack.last().appendChild(this)
-            beforeNextElementSetupList.forEach { it(this) }
-            beforeNextElementSetupList.clear()
+            val beforeCopy = if(beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
+            beforeNextElementSetupList = ArrayList()
             val afterCopy = if(afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
             afterNextElementSetupList = ArrayList()
             var toPop = popCount
             popCount = 0
             stackUse(this) {
+                beforeCopy.forEach { it(this) }
                 setup()
+                afterCopy.forEach { it(this) }
             }
-            afterCopy.forEach { it(this) }
             while (toPop > 0) {
                 val item = stack.removeLast()
                 stack.last().appendChild(item)
@@ -145,7 +146,8 @@ actual val NView.onRemove: OnRemoveHandler
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()
     set(value) {
-        style.display = if (value) "flex" else "none"
+//        style.display = if (value) "flex" else "none"
+        hidden = !value
     }
 
 actual var NView.visible: Boolean
@@ -206,7 +208,7 @@ private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
     get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
 
 
-actual fun ViewContext.setTheme(calculate: ReactiveScope.()-> Theme): ViewWrapper {
+actual fun ViewContext.setTheme(calculate: ReactiveScope.()-> Theme?): ViewWrapper {
     val old = themeStack
     themeStack += calculate
     themeJustChanged = true

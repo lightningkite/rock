@@ -15,7 +15,25 @@ fun ViewContext.navigatorView(navigator: RockNavigator) {
         reactiveScope {
             val screen = navigator.currentScreen.current
             this@swapView.swap {
-                with(screen) { fork.render() }
+                if (screen != null)
+                    with(screen) { fork.render() }
+            }
+        }
+    }
+}
+
+fun ViewContext.navigatorViewDialog() {
+    this.swapViewDialog {
+        val fork = split()
+        val navigator = navigator.dialog
+        fork.navigator = navigator
+        reactiveScope {
+            println("RERENDER")
+            val screen = navigator.currentScreen.current
+            println("Screen: $screen")
+            this@swapViewDialog.swap {
+                if (screen != null)
+                    with(screen) { fork.render() }
             }
         }
     }

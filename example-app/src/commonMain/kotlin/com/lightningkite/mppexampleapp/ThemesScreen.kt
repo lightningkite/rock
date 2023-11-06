@@ -28,7 +28,6 @@ object ThemesScreen : RockScreen {
                 } in scrollsHorizontally
                 row {
                     space {} in weight(1f)
-
                     text { content = "Warning" } in warning
                     text { content = "Danger" } in danger
                     text { content = "Affirmitive" } in affirmative

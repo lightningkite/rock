@@ -23,18 +23,19 @@ inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
     var previousThemeClass: String? = null
     val rootTheme = themeStack.size == 1
     val themeGetter = themeStack.lastOrNull()
+    val theme2 = currentTheme
     val themeChanged = themeJustChanged
     themeJustChanged = false
 
     if (themeGetter != null) {
         reactiveScope {
             previousThemeClass?.let { classList.remove(it) }
-            val t = themeGetter()
+            val t = theme2()
             val base = themeToClass(t)
             classList.add(base)
             previousThemeClass = base
 
-            themeLogic(rootTheme, themeChanged)
+            themeLogic(rootTheme, themeChanged && themeGetter() != null)
         }
     }
     setup()

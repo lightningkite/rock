@@ -13,6 +13,9 @@ import org.w3c.dom.url.URLSearchParams
 actual class PlatformNavigator actual constructor(
     override val routes: Routes
 ) : RockNavigator {
+    override val dialog: RockNavigator = LocalNavigator(routes).also {
+        it.stack.set(listOf())
+    }
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0
 
@@ -109,6 +112,10 @@ actual class PlatformNavigator actual constructor(
     }
 
     override fun goBack() {
+        window.history.go(-1)
+    }
+
+    override fun dismiss() {
         window.history.go(-1)
     }
 }

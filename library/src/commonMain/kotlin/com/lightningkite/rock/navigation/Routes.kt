@@ -32,6 +32,10 @@ interface RockScreen {
             space { }
         }
     }
+    open class Direct(title: String = "", val render: ViewContext.()->Unit): RockScreen {
+        override fun ViewContext.render(): Unit = this@Direct.render(this)
+        override val title: Readable<String> = Constant(title)
+    }
 }
 
 private val camelRegex = Regex("([a-z])([A-Z]+)")

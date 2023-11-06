@@ -62,16 +62,26 @@ val ViewContext.appNavFactory by viewContextAddon<Property<ViewContext.(AppNav.(
 )
 
 fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
-    swapView {
+    stack {
         val navigator = PlatformNavigator(routes)
         this@appNav.navigator = navigator
-        val alt = split()
-        reactiveScope {
-            swap {
-                appNavFactory.current.invoke(alt, setup)
+        swapView {
+            val alt = split()
+            reactiveScope {
+                swap {
+                    appNavFactory.current.invoke(alt, setup)
+                }
             }
+        } in marginless
+        stack {
+            val nav = navigator.dialog
+            dismissBackground {
+                onClick { nav.dismiss() }
+            }
+            ::exists { nav.currentScreen.current != null }
+            navigatorViewDialog() in scrolls in card in gravity(Align.Center, Align.Center)
         }
-    } in marginless
+    }
 }
 
 fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
@@ -211,7 +221,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
             setup(appNav)
             button {
                 image {
-                    val currentTheme = themeStack.last()
+                    val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
                     ::visible { navigator.canGoBack.current }
@@ -232,7 +242,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
                         image {
-                            val currentTheme = themeStack.last()
+                            val currentTheme = currentTheme
                             ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                             ::description { it.current.title }
                         }
@@ -241,7 +251,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
-        navigatorView(navigator) in weight(1f)
+        navigatorView(navigator) in marginless in weight(1f)
         //Nav 3 - top and bottom (bottom/tabs)
         row {
             forEachUpdating(appNav.navItemsProperty) {
@@ -249,16 +259,16 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                     ::to { it.current.destination }
                     col {
                         image {
-                            val currentTheme = themeStack.last()
+                            val currentTheme = currentTheme
                             ::source { it.current.icon.toImageSource(currentTheme().foreground) }
                         } in gravity(Align.Center, Align.Center)
                         subtext { ::content { it.current.title } } in gravity(Align.Center, Align.Center)
                     }
                 } in weight(1f) in marginless in themeFromLast { existing ->
                     if (navigator.currentScreen.current == it.current.destination)
-                        existing.bar().down()
+                        (existing.bar() ?: existing).down()
                     else
-                        existing.bar()
+                        existing.bar() ?: existing
                 } in marginless
             }
         } in marginless

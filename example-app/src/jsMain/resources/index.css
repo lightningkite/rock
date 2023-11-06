@@ -17,6 +17,10 @@ body > div {
 
 a {
     text-decoration: none;
+    color: unset;
+}
+a:visited {
+    color: unset;
 }
 
 button, input, textarea, select {
@@ -86,6 +90,16 @@ input:focus textarea:focus {
     max-width: 100%;
     max-height: 100%;
     overflow: hidden;
+}
+
+.rock-swap.dialog {
+    display: flex;
+}
+
+.rock-swap.dialog > * {
+    position: unset;
+    align-items: stretch;
+    justify-items: stretch;
 }
 
 .rock-stack {
@@ -294,6 +308,10 @@ input:focus textarea:focus {
     opacity: 0.25;
     min-width: 1px;
     min-height: 1px;
+}
+
+[hidden] {
+    visibility: hidden !important;
 }
 
 iframe#webpack-dev-server-client-overlay{display:none!important}

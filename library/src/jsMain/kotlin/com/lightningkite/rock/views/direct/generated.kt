@@ -8,6 +8,7 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.dom.addClass
 import org.w3c.dom.*
 import org.w3c.dom.url.URL
@@ -105,13 +106,20 @@ actual inline var Image.description: String?
 @ViewDsl actual fun ViewContext.h4(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
 @ViewDsl actual fun ViewContext.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
 @ViewDsl actual fun ViewContext.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
+@ViewDsl actual fun ViewContext.header(setup: TextView.() -> Unit): Unit = headerElement("p", setup)
 @ViewDsl actual fun ViewContext.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
 @ViewDsl actual fun ViewContext.subtext(setup: TextView.() -> Unit): Unit = textElement("span", setup)
 actual inline var TextView.content: String
     get() = native.innerText
     set(value) { native.innerText = value }
 actual inline var TextView.align: Align
-    get() = TODO()
+    get() = when(window.getComputedStyle(native).textAlign) {
+        "start" -> Align.Start
+        "center" -> Align.Center
+        "end" -> Align.End
+        "justify" -> Align.Stretch
+        else -> Align.Start
+    }
     set(value) {
         native.style.textAlign = when(value) {
             Align.Start -> "start"
@@ -120,6 +128,9 @@ actual inline var TextView.align: Align
             Align.Stretch -> "justify"
         }
     }
+actual inline var TextView.textSize: Dimension
+    get() = Dimension(window.getComputedStyle(native).fontSize)
+    set(value) { native.style.fontSize = value.value }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLabel = HTMLElement
 @ViewDsl actual fun ViewContext.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
@@ -139,13 +150,34 @@ actual inline var Label.content: String
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSpace = HTMLElement
 @ViewDsl actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
-    val getter = themeStack.last()
+    val getter = currentTheme
     reactiveScope {
         style.width = (getter().spacing * 4).value
         style.height = (getter().spacing * 4).value
     }
     setup(Space(this))
 }
+actual fun ViewContext.space(multiplier: Double, setup: Space.() -> Unit): Unit = element<NSpace>("span") {
+    val getter = currentTheme
+    reactiveScope {
+        style.width = (getter().spacing * multiplier).value
+        style.height = (getter().spacing * multiplier).value
+    }
+    setup(Space(this))
+}
+
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NDismissBackground = HTMLDivElement
+@ViewDsl actual fun ViewContext.dismissBackground(setup: DismissBackground.() -> Unit): Unit = themedElementPrivateMeta<NDismissBackground>(
+    name = "span",
+    themeLogic = { _, _ ->
+        classList.add("dismissBackground")
+        classList.add("inclBack")
+    },
+    setup = {
+        setup(DismissBackground(this))
+    }
+)
+actual fun DismissBackground.onClick(action: () -> Unit): Unit { native.onclick = { action() } }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NButton = HTMLButtonElement
 @ViewDsl actual fun ViewContext.button(setup: Button.() -> Unit): Unit = themedElementClickable<NButton>("button") { setup(Button(this))}
@@ -352,8 +384,15 @@ actual inline var AutoCompleteTextField.suggestions: List<String>
     classList.add("rock-swap")
     setup(SwapView(this))
 }
+@ViewDsl actual fun ViewContext.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
+    classList.add("rock-swap")
+    classList.add("dialog")
+    hidden = true
+    setup(SwapView(this))
+}
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ()->Unit): Unit {
     val keyframeName = DynamicCSS.transition(transition)
+    val previousLast = native.lastElementChild
     native.children.let { (0 until it.length).map { i -> it.get(i) } }.filterIsInstance<HTMLElement>().forEach { view ->
         if(view.asDynamic().__ROCK__removing) return@forEach
         view.asDynamic().__ROCK__removing = true
@@ -363,10 +402,11 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ()->Unit):
         })
     }
     createNewView()
-    val newView = native.lastElementChild as? HTMLElement ?: run {
-        println("WARNING: No element created!")
+    val newView = (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast } ?: run {
+        native.hidden = true
         return
     }
+    native.hidden = false
     newView.style.animation = "${keyframeName}-enter 0.25s"
     newView.style.marginLeft = "auto"
     newView.style.marginRight = "auto"
@@ -474,7 +514,6 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
 @ViewModifierDsl3 actual val ViewContext.scrolls: ViewWrapper get() {
     beforeNextElementSetup {
         style.overflowY = "auto"
-//        style.overflowX = "hidden"
     }
     return ViewWrapper
 }
@@ -483,7 +522,6 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
         style.display = "flex"
         style.flexDirection = "row"
         style.overflowX = "auto"
-//        style.overflowY = "hidden"
     }
     return ViewWrapper
 }
@@ -531,41 +569,3 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewConte
     return ViewWrapper
 }
 // End
-
-
-
-//@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NPopOver = HTMLDivElement
-//@ViewDsl actual fun ViewContext.popOver(setup: PopOver.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
-//    this@popOver.stack[stack.size - 1].style.position = "relative"
-//    style.position = "absolute"
-//    style.zIndex = "9999"
-//    val p = PopOver(this)
-//    setup(p)
-//}
-//actual inline var PopOver.preferredDirection: PopoverPreferredDirection
-//    get() = TODO()
-//    set(value) {
-//        if(value.horizontal) {
-//            if(value.after) {
-//                native.style.left = "var(--spacing)"
-//            } else {
-//                native.style.right = "var(--spacing)"
-//            }
-//            when(value.align) {
-//                Align.Start -> native.style.bottom = "var(--spacing)"
-//                Align.End -> native.style.top = "var(--spacing)"
-//                else -> native.style.top = "calc(50% - var(--spacing))"
-//            }
-//        } else {
-//            if(value.after) {
-//                native.style.top = "var(--spacing)"
-//            } else {
-//                native.style.bottom = "var(--spacing)"
-//            }
-//            when(value.align) {
-//                Align.Start -> native.style.right = "var(--spacing)"
-//                Align.End -> native.style.left = "var(--spacing)"
-//                else -> native.style.left = "calc(50% - var(--spacing))"
-//            }
-//        }
-//    }

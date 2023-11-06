@@ -22,7 +22,6 @@ object ControlsScreen : RockScreen {
             h1 { content = "Controls" } in withPadding in hasPopover {
                 text {
                     content = "Pop over!"
-                    ::exists { booleanContent.current }
                 } in card
             }
             col {
@@ -43,10 +42,10 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Toggle Buttons" }
                 row {
                     space {} in weight(1f)
-                    toggleButton { checked bind booleanContent; text { content = "Sample" } }
-                    toggleButton { checked bind booleanContent; text { content = "Card" } } in card
-                    toggleButton { checked bind booleanContent; text { content = "Important" } } in important
-                    toggleButton { checked bind booleanContent; text { content = "Critical" } } in critical
+                    toggleButton { text { content = "Sample" } }
+                    toggleButton { text { content = "Card" } } in card
+                    toggleButton { text { content = "Important" } } in important
+                    toggleButton { text { content = "Critical" } } in critical
                     space {} in weight(1f)
                 } in scrollsHorizontally
             } in card

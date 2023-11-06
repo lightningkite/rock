@@ -77,17 +77,21 @@ object DynamicCSS {
 
     private val themeInteractiveHandled = HashSet<String>()
     fun themeInteractive(theme: Theme): String {
+
         theme(theme.down(), ".theme-${theme.id}.clickable:active", includeBackAlways = true)
         theme(theme.hover(), ".theme-${theme.id}.clickable:hover", includeBackAlways = true)
+        theme(theme.disabled(), ".theme-${theme.id}.clickable:disabled")
+
+        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable", includeBackAlways = true)
+        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover", includeBackAlways = true)
+        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled", includeBackAlways = true)
+
         theme(theme.selected(), ".theme-${theme.id}.clickable:checked", includeBackAlways = true)
         theme(theme.selected().hover(), ".theme-${theme.id}.clickable:checked:hover", includeBackAlways = true)
         theme(theme.selected(), ":checked+.theme-${theme.id}.clickable.checkResponsive", includeBackAlways = true)
-        theme(
-            theme.selected().hover(),
-            ":checked+.theme-${theme.id}.clickable:hover.checkResponsive",
-            includeBackAlways = true
-        )
-        theme(theme.disabled(), ".theme-${theme.id}.clickable:disabled")
+        theme(theme.selected().hover(), ":checked+.theme-${theme.id}.clickable:hover.checkResponsive", includeBackAlways = true )
+        theme(theme.selected().disabled(), ".theme-${theme.id}.clickable:checked:disabled", includeBackAlways = true)
+
         return theme(theme)
     }
 
@@ -100,7 +104,6 @@ object DynamicCSS {
                 "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
                 "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
             )
-
             is RadialGradient -> mapOf(
                 "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
                 "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
@@ -135,6 +138,20 @@ object DynamicCSS {
                 "transition-delay" to "0s",
             ) + (if (includeBackAlways) back + border else mapOf())
         )
+        style("$asSelector.inclMargin", mapOf("margin" to theme.spacing.value))
+        style("$asSelector.addPadding", mapOf("padding" to theme.spacing.value))
+        style(
+            "$asSelector.title", mapOf(
+                "font-family" to font(theme.title.font),
+                "font-weight" to if (theme.title.bold) "bold" else "normal",
+                "font-style" to if (theme.title.italic) "italic" else "normal",
+                "text-transform" to if (theme.title.allCaps) "uppercase" else "none",
+                "line-height" to theme.title.lineSpacingMultiplier.toString(),
+                "letter-spacing" to theme.title.additionalLetterSpacing.toString(),
+            )
+        )
+
+
         style("$asSelector.sameThemeText", mapOf("border-bottom-color" to theme.hover().background.toCss()))
         style(
             "$asSelector.sameThemeText:hover",
@@ -151,18 +168,7 @@ object DynamicCSS {
             style("$asSelector.inclBack", back)
             style("$asSelector.inclBorder", border + mapOf("padding" to theme.spacing.value))
         }
-        style("$asSelector.inclMargin", mapOf("margin" to theme.spacing.value))
-        style("$asSelector.addPadding", mapOf("padding" to theme.spacing.value))
-        style(
-            "$asSelector.title", mapOf(
-                "font-family" to font(theme.title.font),
-                "font-weight" to if (theme.title.bold) "bold" else "normal",
-                "font-style" to if (theme.title.italic) "italic" else "normal",
-                "text-transform" to if (theme.title.allCaps) "uppercase" else "none",
-                "line-height" to theme.title.lineSpacingMultiplier.toString(),
-                "letter-spacing" to theme.title.additionalLetterSpacing.toString(),
-            )
-        )
+        style("$asSelector.dismissBackground", mapOf("border-radius" to "0", "margin" to "0", "outline-width" to "0", "opacity" to "0.5"))
         return "theme-${theme.id}"
     }
 

@@ -121,7 +121,9 @@ expect inline operator fun Dimension.plus(other: Dimension): Dimension
 expect inline operator fun Dimension.minus(other: Dimension): Dimension
 expect inline operator fun Dimension.times(other: Float): Dimension
 inline operator fun Dimension.times(other: Int): Dimension = this * other.toFloat()
+inline operator fun Dimension.times(other: Double): Dimension = this * other.toFloat()
 expect inline operator fun Dimension.div(other: Float): Dimension
 inline operator fun Dimension.div(other: Int): Dimension = this * other.toFloat()
+inline operator fun Dimension.div(other: Double): Dimension = this * other.toFloat()
 
 data class WidgetOption(val key: String, val display: String)

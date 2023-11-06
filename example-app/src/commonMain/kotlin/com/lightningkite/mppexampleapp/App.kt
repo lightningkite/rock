@@ -46,7 +46,7 @@ fun ViewContext.app() {
         ::userLinks {
             listOf(
                 NavItem("Root", Icon.home, RootScreen),
-                NavItem("Login", Icon.home, SampleLogInScreen),
+                NavItem("Log Out", Icon.home, SampleLogInScreen),
             )
         }
         actions = listOf(

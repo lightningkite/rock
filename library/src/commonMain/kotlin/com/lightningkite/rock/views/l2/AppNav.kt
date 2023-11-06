@@ -306,7 +306,7 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         Align.Center,
                         Align.Center
                     )
-                } in withPadding in hasPopover{
+                }  in withPadding in hasPopover{
                     col{
                     forEachUpdating(appNav.userLinksProperty) {
                            link {
@@ -314,18 +314,10 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                                text { ::content { it.current.title } }
                            } in bar
                     }
-//                        forEachUpdating(appNav.navItemsProperty) {
-//                            link {
-//                                ::to { it.current.destination }
-//                                text { ::content { it.current.title } }
-//                            } in bar
-//                        }
                         ::exists { booleanContent.current }
                     }
-                } in bar
-            } in weight (1f)
-
-
+                } in card
+            }  in weight (1f)
             row {
                 label {
                     content = "Search"
@@ -368,4 +360,4 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
 //Nav 1 -
 //Nav 2 -
 //Nav 3 - official tab icons
-//Nav 4 - user dropdown style, dropdown isn't using user links
+//Nav 4 - user dropdown style

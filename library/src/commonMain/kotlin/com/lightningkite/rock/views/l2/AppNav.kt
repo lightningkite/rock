@@ -87,22 +87,18 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
 fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val booleanContent = Property(false)
-
     col {
 // Nav 1 hamburger
         row {
             setup(appNav)
             toggleButton {
-                checked bind booleanContent
-                image {
-                    val currentTheme = currentTheme
-                    ::source { Icon.menu.toImageSource(currentTheme().foreground) }
-                    description = "Open naviagation menu"
-                }
+                checked bind booleanContent; image {
+                val currentTheme = currentTheme
+                ::source { Icon.menu.toImageSource(currentTheme().foreground) }
+                description = "Open naviagation menu"
             }
-
+            }
             h1 { ::content.invoke { appNav.appNameProperty.current } }
-
             button {
                 image {
                     val currentTheme = currentTheme
@@ -123,8 +119,6 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                 }
             }
             row {
-
-
                 forEachUpdating(appNav.actionsProperty) {
                     button {
                         image {
@@ -146,13 +140,15 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                             text { ::content { it.current.title } }
                         } in bar
                     }.toString()
-                    ::exists { booleanContent.current }
+
                 }
+                ::exists { booleanContent.current }
             } in bar in marginless
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
     } in marginless
 }
+
 
 fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
@@ -323,7 +319,6 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         }
                         description = "User icon"
                     }
-
                 }
                 text {
                     content = appNav.currentUser?.currentUser?.name ?: "No user"
@@ -341,7 +336,7 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     }
                     ::exists { booleanContent.current }
                 }
-            }
+            } in card
 
         } in bar in marginless
         row {

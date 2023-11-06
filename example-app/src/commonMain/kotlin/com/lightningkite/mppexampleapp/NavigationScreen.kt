@@ -67,30 +67,7 @@ object NavigationScreen : RockScreen {
             h2 { content = "Table of Contents" }
 
             row {
-                col {
-                    text {
-                        content = "Vertical"
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
-                } in weight(1f)
-                col {
-                    text {
-                        content = "Horizontal"
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
-                } in weight(1f)
-                col {
-                    text {
-                        content = "Multicolumn"
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
-                } in weight(1f)
+
             }
             row {
                 col {

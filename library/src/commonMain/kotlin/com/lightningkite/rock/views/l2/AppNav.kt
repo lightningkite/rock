@@ -23,7 +23,7 @@ data class ProfileInfo(
     val children: List<NavItem>
 )
 
-data class UserInfo(val name: String, val profileImage: ImageVector? = null)
+data class UserInfo(val name: String, val profileImage: ImageVector? = null, val defaultIcon: Icon)
 
 
 interface AppNav {
@@ -33,6 +33,7 @@ interface AppNav {
     var navItems: List<NavItem>
     var currentUser: ProfileInfo?
     var actions: List<Action>
+
 
     class ByProperty : AppNav {
         val appNameProperty = Property("My App")
@@ -281,23 +282,49 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             h2 { ::content.invoke { navigator.currentScreen.current.title.current } } in gravity(
                 Align.Center,
                 Align.Center
-            ) in weight(1f)
-            val first = appNav.currentUser?.currentUser?.name ?: "No user"
-            val userLinks = appNav.navItemsProperty
+            )
             row {
-                toggleButton {
-                    checked bind booleanContent;
-                    image {
-                        val currentTheme = themeStack.last()
-                        ::source {
-                            appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                currentTheme().foreground
-                            )
+                row{
+                    toggleButton {
+                        checked bind booleanContent;
+                        image {
+                            val currentTheme = themeStack.last()
+                            ::source {
+                                appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                                    currentTheme().foreground
+                                )
+                            }
+                            description = "User icon"
                         }
-                        description = "User icon"
-                    }
 
-                }
+                    }
+                    text {
+                        content = appNav.currentUser?.currentUser?.name ?: "No user"
+                    } in gravity(
+                        Align.Center,
+                        Align.Center
+                    )
+                } in withPadding in hasPopover{
+                    col{
+//                    forEachUpdating(appNav.currentUserProperty) {
+//                           link {
+//                               ::to { it.current.destination }
+//                               text { ::content { it.current.title } }
+//                           } in bar
+//                    }
+                        forEachUpdating(appNav.navItemsProperty) {
+                            link {
+                                ::to { it.current.destination }
+                                text { ::content { it.current.title } }
+                            } in bar
+                        }
+                        ::exists { booleanContent.current }
+                    }
+                } in bar
+            } in weight (1f)
+
+
+            row {
                 label {
                     content = "Search"
                     textField {
@@ -316,17 +343,8 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                         }
                     }
                 }
-            }  in withPadding in hasPopover{
-                col{
-                    forEachUpdating(appNav.navItemsProperty) {
-                           link {
-                               ::to { it.current.destination }
-                               text { ::content { it.current.title } }
-                           } in bar
-                    }
-                    ::exists { booleanContent.current }
-                }
-            } in bar
+            }
+
         } in bar in marginless
         row {
             col {
@@ -348,4 +366,4 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
 //Nav 1 -
 //Nav 2 -
 //Nav 3 - official tab icons
-//Nav 4 - user dropdown style
+//Nav 4 - user dropdown style, dropdown isn't using user links

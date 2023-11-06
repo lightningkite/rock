@@ -33,12 +33,13 @@ fun ViewContext.app() {
                 NavItem("Home", Icon.home, RootScreen),
                 NavItem("Themes", Icon.sync, ThemesScreen),
                 NavItem("Controls", Icon.settings, ControlsScreen),
-                NavItem("Navigation", Icon.menu, NavigationScreen)
+                NavItem("Navigation", Icon.menu, NavigationScreen),
+                NavItem("Forms", Icon.done, FormsScreen)
             )
         }
         ::currentUser{
             ProfileInfo(
-                UserInfo("Test User", Icon.person.toImageSource(Color.black)),
+                UserInfo("Test User", null, Icon.person),
                 listOf(
                     NavItem("Root", Icon.home, RootScreen),
                     NavItem("Login", Icon.home, SampleLogInScreen),

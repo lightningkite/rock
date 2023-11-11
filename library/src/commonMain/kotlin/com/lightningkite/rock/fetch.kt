@@ -27,6 +27,7 @@ expect suspend fun fetch(
 
 enum class HttpMethod { GET, POST, PUT, PATCH, DELETE }
 
+fun httpHeaders(vararg entries: Pair<String, String>) = httpHeaders(entries.toList())
 expect inline fun httpHeaders(map: Map<String, String> = mapOf()): HttpHeaders
 expect inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders
 expect inline fun httpHeaders(headers: HttpHeaders): HttpHeaders

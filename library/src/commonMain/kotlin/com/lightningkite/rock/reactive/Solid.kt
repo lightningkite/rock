@@ -10,8 +10,6 @@ import kotlin.reflect.KProperty
 object ListeningLifecycleStack {
     val stack = ArrayList<OnRemoveHandler>()
     fun current() = stack.lastOrNull() ?: throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
-    fun onRemove(action: () -> Unit) =
-        if (stack.isNotEmpty()) stack.last().onRemove(action) else throw IllegalStateException("ListeningLifecycleStack.onRemove called outside of a builder.")
 
     inline fun useIn(handler: OnRemoveHandler, action: () -> Unit) {
         start(handler)
@@ -30,9 +28,14 @@ object ListeningLifecycleStack {
     }
 }
 
-interface Listenable {
+interface ResourceUse {
+    fun start(): ()->Unit
+}
+
+interface Listenable: ResourceUse {
     val debugName: String get() = "Unknown"
     fun addListener(listener: () -> Unit): () -> Unit
+    override fun start(): () -> Unit = addListener {  }
 }
 
 interface Readable<out T> : Listenable {
@@ -47,23 +50,6 @@ interface Writable<T> : Readable<T> {
 
     infix fun set(value: T)
     infix fun modify(update: (T) -> T) = set(update(once))
-}
-
-infix fun <T> Writable<T>.bind(master: Writable<T>) {
-    this.set(master.once)
-    var setting = false
-    master.addListener {
-        if(setting) return@addListener
-        setting = true
-        this.set(master.once)
-        setting = false
-    }.also { ListeningLifecycleStack.onRemove(it) }
-    this.addListener {
-        if(setting) return@addListener
-        setting = true
-        master.set(this.once)
-        setting = false
-    }.also { ListeningLifecycleStack.onRemove(it) }
 }
 
 infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writable<Boolean> {

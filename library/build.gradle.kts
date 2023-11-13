@@ -3,16 +3,18 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
+import com.lightningkite.deployhelpers.*
 
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
 //    kotlin("native.cocoapods")
 //    id("com.android.library")
+    id("maven-publish")
+    id("signing")
 }
 
-group = "com.lightningkite"
-version = "1.0-SNAPSHOT"
+group = "com.lightningkite.rock"
 repositories {
     mavenCentral()
 }
@@ -107,3 +109,26 @@ kotlin {
 //        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 //    }
 //}
+
+standardPublishing {
+    name.set("Rock")
+    description.set("A lightweight, highly opinionated UI framework for Kotlin Multiplatform")
+    github("lightningkite", "rock")
+
+    licenses {
+        mit()
+    }
+
+    developers {
+        developer(
+            id = "LightningKiteJoseph",
+            name = "Joseph Ivie",
+            email = "joseph@lightningkite.com",
+        )
+        developer(
+            id = "bjsvedin",
+            name = "Brady Svedin",
+            email = "brady@lightningkite.com",
+        )
+    }
+}

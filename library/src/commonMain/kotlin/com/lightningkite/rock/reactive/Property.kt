@@ -21,4 +21,3 @@ class Property<T>(startValue: T, private val overrideDebugName: String? = null) 
         }
     }
 }
-

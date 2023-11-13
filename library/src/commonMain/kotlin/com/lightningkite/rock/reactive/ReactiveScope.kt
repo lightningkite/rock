@@ -29,13 +29,40 @@ fun reactiveScope(action: ReactiveScope.() -> Unit) {
             current.onFail()
         }
     }
-    ListeningLifecycleStack.current().onRemove { dm.clearScopeListeners() }
+    current.onRemove { dm.clearScopeListeners() }
+}
+
+@ReactiveB
+infix fun <T> Writable<T>.bind(master: Writable<T>) {
+    this.set(master.once)
+    var setting = false
+    master.addListener {
+        if(setting) return@addListener
+        setting = true
+        this.set(master.once)
+        setting = false
+    }.also { ListeningLifecycleStack.current().onRemove(it) }
+    this.addListener {
+        if(setting) return@addListener
+        setting = true
+        master.set(this.once)
+        setting = false
+    }.also { ListeningLifecycleStack.current().onRemove(it) }
 }
 
 class ReactiveScope(val action: ReactiveScope.() -> Unit) {
-    private val removers: HashMap<Listenable, () -> Unit> = HashMap()
-    private val latestPass: HashSet<Listenable> = HashSet()
+    private val removers: HashMap<ResourceUse, () -> Unit> = HashMap()
+    private val latestPass: HashSet<ResourceUse> = HashSet()
 
+    @ReactiveB
+    fun use(resourceUse: ResourceUse) {
+        if (!removers.containsKey(resourceUse)) {
+            removers[resourceUse] = resourceUse.start()
+        }
+        latestPass.add(resourceUse)
+    }
+
+    @ReactiveB
     fun rerunOn(listenable: Listenable) {
         if (!removers.containsKey(listenable)) {
             removers[listenable] = listenable.addListener { this() }

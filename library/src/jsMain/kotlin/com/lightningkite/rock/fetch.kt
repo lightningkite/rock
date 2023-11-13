@@ -3,6 +3,7 @@ package com.lightningkite.rock
 import kotlinx.browser.window
 import org.w3c.dom.CloseEvent
 import org.w3c.dom.MessageEvent
+import org.w3c.dom.events.Event
 import org.w3c.fetch.Headers
 import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
@@ -64,23 +65,17 @@ actual class RequestResponse(val wraps: Response) {
 actual typealias Blob = org.w3c.files.Blob
 actual typealias FileReference = File
 
-actual fun websocket(
-    url: String,
-    open: ()->Unit,
-    message: (String)->Unit,
-    binaryMessage: (Blob)->Unit,
-    close: (Int)->Unit,
-): WebSocket {
-    return WebSocket(url).apply {
-        onclose = { close((it as CloseEvent).code) }
-        onopen = { open() }
-        onmessage = {
-            when(val d = it.data) {
-                is String -> message(d)
-                is Blob -> binaryMessage(d)
-            }
-        }
-    }
+actual fun websocket(url: String): WebSocket {
+    return WebSocketWrapper(org.w3c.dom.WebSocket(url))
 }
 
-actual typealias WebSocket = org.w3c.dom.WebSocket
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+class WebSocketWrapper(val native: org.w3c.dom.WebSocket): WebSocket {
+    override fun close(code: Short, reason: String) = native.close(code, reason)
+    override fun send(data: String) = native.send(data)
+    override fun send(data: Blob) = native.send(data)
+    override fun onOpen(action: ()->Unit) { native.addEventListener("open", { action() }) }
+    override fun onMessage(action: (String)->Unit) { native.addEventListener("message", { it as MessageEvent; (it.data as? String)?.let { action(it) } }) }
+    override fun onBinaryMessage(action: (Blob)->Unit) { native.addEventListener("message", { it as MessageEvent; (it.data as? Blob)?.let { action(it) } }) }
+    override fun onClose(action: (Short)->Unit) { native.addEventListener("close", { action((it as CloseEvent).code) }) }
+}

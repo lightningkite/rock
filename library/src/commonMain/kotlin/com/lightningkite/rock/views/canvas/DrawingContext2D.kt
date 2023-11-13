@@ -11,7 +11,7 @@ expect abstract class DrawingContext2D {
     abstract fun transform(a: Double, b: Double, c: Double, d: Double, e: Double, f: Double)
 //  abstract   fun getTransform(): DOMMatrix
     abstract fun setTransform(a: Double, b: Double, c: Double, d: Double, e: Double, f: Double)
-    abstract fun setTransform(transform: dynamic)
+//    abstract fun setTransform(transform: dynamic)
     abstract fun resetTransform()
     abstract var globalAlpha: Double
     abstract var globalCompositeOperation: String
@@ -54,8 +54,8 @@ expect abstract class DrawingContext2D {
 //    abstract fun scrollPathIntoView()
 //  abstract   fun scrollPathIntoView(path: Path2D)
 
-    abstract fun fillText(text: String, x: Double, y: Double, maxWidth: Double)
-    abstract fun strokeText(text: String, x: Double, y: Double, maxWidth: Double)
+//    abstract fun fillText(text: String, x: Double, y: Double, maxWidth: Double)
+//    abstract fun strokeText(text: String, x: Double, y: Double, maxWidth: Double)
 
 //  abstract   fun measureText(text: String): TextMetrics
 //    abstract var font: String
@@ -91,8 +91,8 @@ expect abstract class DrawingContext2D {
     abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
     abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radiusX: Double, radiusY: Double, rotation: Double)
     abstract fun rect(x: Double, y: Double, w: Double, h: Double)
-    abstract fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
-    abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
+//    abstract fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
+//    abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
 expect fun DrawingContext2D.fill()

@@ -14,7 +14,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
         classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.8.10")
-        classpath("com.lightningkite:deploy-helpers:0.0.5")
+        classpath("com.lightningkite:deploy-helpers:master-SNAPSHOT")
         classpath("com.android.tools.build:gradle:7.4.1")
     }
 }

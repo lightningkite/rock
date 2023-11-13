@@ -5,7 +5,7 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
 
     @Suppress("UNCHECKED_CAST")
     override val once: T
-        get() = if (!ready) throw IllegalStateException() else currentValue as T
+        get() = if (!ready) throw Loading else currentValue as T
     private var ready: Boolean = false
     private var currentValue: T? = null
         set(value) {
@@ -35,6 +35,8 @@ class SharedReadable<T>(computer: ReactiveScope.() -> T) : Readable<T> {
         if (listeners.isEmpty()) {
             // shutdown
             rs.clearScopeListeners()
+            ready = false
+            currentValue = null
         }
     }
 }

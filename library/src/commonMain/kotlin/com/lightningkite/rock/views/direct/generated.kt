@@ -69,12 +69,12 @@ expect fun ViewContext.space(multiplier: Double, setup: Space.() -> Unit = {})
 expect class NDismissBackground : NView
 value class DismissBackground(override val native: NDismissBackground) : RView<NDismissBackground>
 @ViewDsl expect fun ViewContext.dismissBackground(setup: DismissBackground.() -> Unit = {}): Unit
-expect fun DismissBackground.onClick(action: () -> Unit)
+expect fun DismissBackground.onClick(action: suspend () -> Unit)
 
 expect class NButton : NView
 value class Button(override val native: NButton) : RView<NButton>
 @ViewDsl expect fun ViewContext.button(setup: Button.() -> Unit = {}): Unit
-expect fun Button.onClick(action: () -> Unit)
+expect fun Button.onClick(action: suspend () -> Unit)
 expect var Button.enabled: Boolean
 
 expect class NCheckbox : NView

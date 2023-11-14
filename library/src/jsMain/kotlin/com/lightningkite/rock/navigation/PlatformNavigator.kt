@@ -1,9 +1,6 @@
 package com.lightningkite.rock.navigation
 
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.SharedReadable
-import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.*
 import kotlinx.browser.window
 import org.w3c.dom.MANUAL
 import org.w3c.dom.PopStateEvent
@@ -14,7 +11,7 @@ actual class PlatformNavigator actual constructor(
     override val routes: Routes
 ) : RockNavigator {
     override val dialog: RockNavigator = LocalNavigator(routes).also {
-        it.stack.set(listOf())
+        it.stack.value = listOf()
     }
     private var nextIndex: Int = 1
     private var currentIndex: Int = 0
@@ -51,9 +48,10 @@ actual class PlatformNavigator actual constructor(
         (screen)
     })
     override val currentScreen: Readable<RockScreen>
-        get() = SharedReadable { _currentScreen.current }
+        get() = _currentScreen
     override val canGoBack: Readable<Boolean>
-        get() = SharedReadable {
+        get() = shared {
+            // TODO
             true
         }
 
@@ -76,7 +74,7 @@ actual class PlatformNavigator actual constructor(
         isNavigating = true
         val screen = routes.parse(UrlLikePath(path.asSegments, args)) ?: routes.fallback
         isNavigating = false
-        _currentScreen set screen
+        _currentScreen.value =  screen
     }
     private fun navigate(rockScreen: RockScreen, pushState: Boolean) {
         if (isNavigating)
@@ -94,7 +92,7 @@ actual class PlatformNavigator actual constructor(
         }
         isNavigating = true
         isNavigating = false
-        _currentScreen set rockScreen
+        _currentScreen.value =  rockScreen
     }
 
     override fun navigate(screen: RockScreen) {
@@ -108,7 +106,7 @@ actual class PlatformNavigator actual constructor(
     }
 
     override fun notifyParamUpdate() {
-        window.location.search = routes.render(currentScreen.once)?.parameters?.entries?.joinToString("&") { it.key + "=" + it.value } ?: ""
+        window.location.search = routes.render(_currentScreen.value)?.parameters?.entries?.joinToString("&") { it.key + "=" + it.value } ?: ""
     }
 
     override fun goBack() {

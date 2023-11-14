@@ -3,7 +3,6 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockNavigator
-import com.lightningkite.rock.reactive.ReactiveScope
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -30,10 +29,14 @@ fun <T> viewContextAddonLateInit(): ReadWriteProperty<ViewContext, T> = object :
 var ViewContext.navigator by viewContextAddonLateInit<RockNavigator>()
 //var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
 
-var ViewContext.themeStack by viewContextAddon(listOf<ReactiveScope.() -> Theme?>())
-val ViewContext.currentTheme: ReactiveScope.()->Theme get() {
+var ViewContext.themeStack by viewContextAddon(listOf<suspend () -> Theme?>())
+val ViewContext.currentTheme: suspend ()->Theme get() {
     val currentStack = themeStack
-    return { currentStack.asReversed().asSequence().mapNotNull { it() }.firstOrNull() ?: MaterialLikeTheme() }
+    return label@{
+        for(item in currentStack.asReversed())
+            item()?.let { return@label it }
+        MaterialLikeTheme()
+    }
 }
 @ViewModifierDsl3 inline fun ViewContext.withTheme(theme: Theme, action: () -> Unit) {
     val old = themeStack
@@ -44,10 +47,10 @@ val ViewContext.currentTheme: ReactiveScope.()->Theme get() {
         themeStack = old
     }
 }
-@ViewModifierDsl3 expect fun ViewContext.setTheme(calculate: ReactiveScope.()->Theme?): ViewWrapper
-@ViewModifierDsl3 inline fun ViewContext.themeFromLast(crossinline calculate: ReactiveScope.(Theme)->Theme?): ViewWrapper {
+@ViewModifierDsl3 expect fun ViewContext.setTheme(calculate: suspend ()->Theme?): ViewWrapper
+@ViewModifierDsl3 inline fun ViewContext.themeFromLast(crossinline calculate: suspend (Theme)->Theme?): ViewWrapper {
     val previous = currentTheme
-    return setTheme { calculate(previous() ?: throw IllegalStateException()) }
+    return setTheme { calculate(previous()) }
 }
 @ViewModifierDsl3 val ViewContext.card: ViewWrapper get() = themeFromLast { it }
 @ViewModifierDsl3 val ViewContext.hover: ViewWrapper get() = themeFromLast { it.hover() }

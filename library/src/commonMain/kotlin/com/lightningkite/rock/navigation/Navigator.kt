@@ -22,25 +22,25 @@ class LocalNavigator(override val routes: Routes, dialog: RockNavigator? = null)
         private set
     val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback)))
     override val canGoBack: Readable<Boolean>
-        get() = SharedReadable { stack.current.size > 1 }
+        get() = shared { stack.await().size > 1 }
     override val currentScreen: Readable<RockScreen?>
-        get() = SharedReadable { stack.current.lastOrNull() }
+        get() = shared { stack.await().lastOrNull() }
     override fun goBack() {
         direction = RockNavigator.Direction.Back
-        if(stack.once.size > 1) stack set stack.once.dropLast(1)
+        if(stack.value.size > 1) stack.value = stack.value.dropLast(1)
     }
     override fun dismiss() {
         direction = RockNavigator.Direction.Back
-        if(stack.once.isNotEmpty()) stack set stack.once.dropLast(1)
+        if(stack.value.isNotEmpty()) stack.value = stack.value.dropLast(1)
     }
     override fun notifyParamUpdate() {}
     override fun navigate(screen: RockScreen) {
         direction = RockNavigator.Direction.Forward
-        stack set stack.once.plus(screen)
+        stack.value = stack.value.plus(screen)
     }
     override fun replace(screen: RockScreen) {
         direction = RockNavigator.Direction.Neutral
-        stack set stack.once.dropLast(1).plus(screen)
+        stack.value = stack.value.dropLast(1).plus(screen)
     }
 }
 

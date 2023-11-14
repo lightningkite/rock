@@ -56,7 +56,7 @@ data class RequestBodyFile(val content: FileReference): RequestBody
 
 expect fun websocket(url: String): WebSocket
 
-interface WebSocket {
+interface WebSocket: Cancellable {
     fun close(code: Short, reason: String)
     fun send(data: String)
     fun send(data: Blob)
@@ -64,4 +64,18 @@ interface WebSocket {
     fun onMessage(action: (String)->Unit)
     fun onBinaryMessage(action: (Blob)->Unit)
     fun onClose(action: (Short)->Unit)
+    override fun cancel() { close(1000, "Closed normally") }
 }
+
+/*
+
+retry {
+    val ws = websocket(url)
+    ws.send("asdf")
+    val msg = ws.incoming.receive()
+    ws.close()
+    while(true) {
+        ws.receive()
+    }
+}
+ */

@@ -28,7 +28,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
     themeJustChanged = false
 
     if (themeGetter != null) {
-        reactiveScope {
+        onRemove.reactiveScope {
             previousThemeClass?.let { classList.remove(it) }
             val t = theme2()
             val base = themeToClass(t)
@@ -141,11 +141,10 @@ fun <T : HTMLElement, V> T.vprop(
     set: T.(V) -> Unit
 ): Writable<V> {
     return object : Writable<V> {
-        override fun set(value: V): Unit {
+        override suspend fun awaitRaw(): V = get(this@vprop)
+        override suspend fun set(value: V) {
             set(this@vprop, value)
         }
-
-        override val once: V get() = get()
         private var block = false
 
         override fun addListener(listener: () -> Unit): () -> Unit {
@@ -210,8 +209,7 @@ external interface ResizeObserverEntryBoxSize {
 }
 
 class SizeReader(val native: HTMLElement, val key: String): Readable<Double> {
-    override val once: Double
-        get() = native.asDynamic()[key].unsafeCast<Int>().toDouble()
+    override suspend fun awaitRaw(): Double = native.asDynamic()[key].unsafeCast<Int>().toDouble()
     override fun addListener(listener: () -> Unit): () -> Unit {
         val o = ResizeObserver { _, _ ->
             listener()

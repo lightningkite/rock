@@ -6,14 +6,11 @@ import com.lightningkite.rock.fetch
 import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.AnimationFrame
-import com.lightningkite.rock.reactive.bind
-import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.*
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.clockMillis
+import com.lightningkite.rock.reactive.*
 import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
 
 @Routable("sample/canvas")
@@ -27,36 +24,45 @@ object CanvasSampleScreen : RockScreen {
             val line = Property<ArrayList<Point>?>(null)
             val pointersDown = Property(setOf<Int>())
             onPointerDown { id, x, y, width, height ->
-                pointersDown modify { it + id }
-                val new = ArrayList<Point>()
-                line set new
-                lines modify { it.add(new); it }
+                launch {
+                    pointersDown modify { it + id }
+                    val new = ArrayList<Point>()
+                    line set new
+                    lines modify { it.add(new); it }
+                }
             }
             onPointerUp { id, x, y, width, height ->
-                pointersDown modify { it - id }
-                line set null
+                launch {
+                    pointersDown modify { it - id }
+                    line set null
+                }
             }
             onPointerCancel { id, x, y, width, height ->
-                pointersDown modify { it - id }
-                line set null
+                launch {
+                    pointersDown modify { it - id }
+                    line set null
+                }
             }
             onPointerMove { id, x, y, width, height ->
-                if (id in pointersDown.once) {
-                    line.once?.add(Point(x, y))
-                    line set line.once
+                launch {
+                    if (id in pointersDown.await()) {
+                        line.await()?.add(Point(x, y))
+                        line set line.await()
+                    }
                 }
             }
             var last = clockMillis()
             reactiveScope {
                 rerunOn(width)
                 rerunOn(height)
+                val lines = lines.await()
                 redraw {
                     fillPaint = Color.white
                     clearRect(0.0, 0.0, width, height)
                     strokePaint = Color.black
                     lineWidth = 5.0
 
-                    for (line in lines.current) {
+                    for (line in lines) {
                         beginPath()
                         moveTo(line.firstOrNull()?.x ?: 0.0, line.firstOrNull()?.y ?: 0.0)
                         for (point in line) {

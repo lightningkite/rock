@@ -7,6 +7,7 @@ import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.bind
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
@@ -44,7 +45,7 @@ object SampleLogInScreen : RockScreen {
                         h6 { content = "Log In" }
                         onClick {
                             launch {
-                                fetch("fake-login/${email.once}")
+                                fetch("fake-login/${email.await()}")
                                 navigator.navigate(ControlsScreen)
                             }
                         }

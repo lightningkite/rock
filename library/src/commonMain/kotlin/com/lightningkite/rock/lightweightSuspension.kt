@@ -1,7 +1,7 @@
 package com.lightningkite.rock
 
-import com.lightningkite.rock.views.NView
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.reactive.CalculationContext
+import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.onRemove
 import kotlin.coroutines.*
 
@@ -77,13 +77,13 @@ suspend fun <T> timeoutOrNull(milliseconds: Long, action: suspend () -> T): T? {
     )
 }
 
-private fun CoroutineContext.childCancellation(): CoroutineContext = this + CancellationState(false, this.get(CancellationState.Key))
+fun CoroutineContext.childCancellation(): CoroutineContext = this + CancellationState(false, this.get(CancellationState.Key))
 private class CancellationState(var stop: Boolean, var parent: CancellationState? = null): CoroutineContext.Element {
     override val key: CoroutineContext.Key<CancellationState> = Key
     val shouldStop: Boolean get() = stop || (parent?.stop ?: false)
     object Key: CoroutineContext.Key<CancellationState>
 }
-private fun CoroutineContext.cancel() {
+fun CoroutineContext.cancel() {
     this[CancellationState.Key]!!.stop = true
 }
 suspend fun stopIfCancelled() {
@@ -149,11 +149,15 @@ fun launchGlobal(action: suspend () -> Unit): Cancellable {
     }
 }
 
-fun ViewContext.launch(action: suspend () -> Unit) {
-    val cancel = launchGlobal(action)
-    this.onRemove.onRemove { cancel.cancel() }
-}
-fun NView.launch(action: suspend () -> Unit) {
-    val cancel = launchGlobal(action)
-    this.onRemove.onRemove { cancel.cancel() }
+fun CalculationContext.launch(action: suspend () -> Unit) {
+    val cancel = launchGlobal {
+        this.notifyStart()
+        try {
+            action()
+            notifySuccess()
+        } catch(e: Exception) {
+            notifyFailure()
+        }
+    }
+    this.onRemove { cancel.cancel() }
 }

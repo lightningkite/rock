@@ -37,19 +37,19 @@ interface AppNav {
 
     class ByProperty : AppNav {
         val appNameProperty = Property("My App")
-        override var appName: String by appNameProperty.delegate
+        override var appName: String by appNameProperty
         val appIconProperty = Property<Icon>(Icon.home)
-        override var appIcon: Icon by appIconProperty.delegate
+        override var appIcon: Icon by appIconProperty
         val appLogoProperty = Property<ImageSource>(Icon.home.toImageSource(Color.white))
-        override var appLogo: ImageSource by appLogoProperty.delegate
+        override var appLogo: ImageSource by appLogoProperty
         val navItemsProperty = Property(listOf<NavItem>())
-        override var navItems: List<NavItem> by navItemsProperty.delegate
+        override var navItems: List<NavItem> by navItemsProperty
         val currentUserProperty = Property<ProfileInfo?>(null)
-        override var currentUser: ProfileInfo? by currentUserProperty.delegate
+        override var currentUser: ProfileInfo? by currentUserProperty
         val actionsProperty = Property<List<Action>>(listOf())
-        override var actions: List<Action> by actionsProperty.delegate
+        override var actions: List<Action> by actionsProperty
         val userLinksProperty = Property(listOf<NavItem>())
-        override var userLinks: List<NavItem> by userLinksProperty.delegate
+        override var userLinks: List<NavItem> by userLinksProperty
     }
 }
 
@@ -68,8 +68,9 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             val alt = split()
             reactiveScope {
+                val viewMaker = appNavFactory.await()
                 swap {
-                    appNavFactory.current.invoke(alt, setup)
+                    viewMaker.invoke(alt, setup)
                 }
             }
         } in marginless
@@ -78,7 +79,7 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
             dismissBackground {
                 onClick { nav.dismiss() }
             }
-            ::exists { nav.currentScreen.current != null }
+            ::exists { nav.currentScreen.await() != null }
             navigatorViewDialog() in scrolls in card in gravity(Align.Center, Align.Center)
         }
     } in marginless
@@ -98,17 +99,17 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                 description = "Open naviagation menu"
             }
             }
-            h1 { ::content.invoke { appNav.appNameProperty.current } }
+            h1 { ::content.invoke { appNav.appNameProperty.await() } }
             button {
                 image {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.current }
+                    ::visible { navigator.canGoBack.await() }
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             ) in weight(1f)
@@ -123,10 +124,10 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                     button {
                         image {
                             val currentTheme = currentTheme
-                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.current.title }
+                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.await().title }
                         }
-                        onClick { it.once.onSelect() }
+                        onClick { it.await().onSelect() }
                     }
                 }
             }
@@ -136,13 +137,13 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
                 col {
                     forEachUpdating(appNav.navItemsProperty) {
                         link {
-                            ::to { it.current.destination }
-                            text { ::content { it.current.title } }
+                            ::to { it.await().destination }
+                            text { ::content { it.await().title } }
                         } in bar
                     }.toString()
 
                 }
-                ::exists { booleanContent.current }
+                ::exists { booleanContent.await() }
             } in bar in marginless
             navigatorView(navigator) in weight(1f)
         } in weight(1f)
@@ -161,19 +162,19 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.current }
+                    ::visible { navigator.canGoBack.await() }
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             )
             row {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
-                        ::to { it.current.destination }
-                        text { ::content { it.current.title } }
+                        ::to { it.await().destination }
+                        text { ::content { it.await().title } }
                     } in bar
                 }
 
@@ -192,10 +193,10 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
                         button {
                             image {
                                 val currentTheme = currentTheme
-                                ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                                ::description { it.current.title }
+                                ::source { it.await().icon.toImageSource(currentTheme().foreground) }
+                                ::description { it.await().title }
                             }
-                            onClick { it.once.onSelect() }
+                            onClick { it.await().onSelect() }
                         }
                     }
 
@@ -217,11 +218,11 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.current }
+                    ::visible { navigator.canGoBack.await() }
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             ) in weight(1f)
@@ -236,10 +237,10 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
                     button {
                         image {
                             val currentTheme = currentTheme
-                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.current.title }
+                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.await().title }
                         }
-                        onClick { it.once.onSelect() }
+                        onClick { it.await().onSelect() }
                     }
                 }
             }
@@ -249,16 +250,16 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
         row {
             forEachUpdating(appNav.navItemsProperty) {
                 link {
-                    ::to { it.current.destination }
+                    ::to { it.await().destination }
                     col {
                         image {
                             val currentTheme = currentTheme
-                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
+                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
                         } in gravity(Align.Center, Align.Center)
-                        subtext { ::content { it.current.title } } in gravity(Align.Center, Align.Center)
+                        subtext { ::content { it.await().title } } in gravity(Align.Center, Align.Center)
                     }
                 } in weight(1f) in marginless in themeFromLast { existing ->
-                    if (navigator.currentScreen.current == it.current.destination)
+                    if (navigator.currentScreen.await() == it.await().destination)
                         (existing.bar() ?: existing).down()
                     else
                         existing.bar() ?: existing
@@ -280,11 +281,11 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.current }
+                    ::visible { navigator.canGoBack.await() }
                 }
                 onClick { navigator.goBack() }
             }
-            h2 { ::content.invoke { navigator.currentScreen.current?.title?.current ?: "" } } in gravity(
+            h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
                 Align.Center,
                 Align.Center
             )
@@ -300,10 +301,10 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     button {
                         image {
                             val currentTheme = currentTheme
-                            ::source { it.current.icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.current.title }
+                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
+                            ::description { it.await().title }
                         }
-                        onClick { it.once.onSelect() }
+                        onClick { it.await().onSelect() }
                     }
                 }
             }
@@ -330,11 +331,11 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 col {
                     forEachUpdating(appNav.userLinksProperty) {
                         link {
-                            ::to { it.current.destination }
-                            text { ::content { it.current.title } }
+                            ::to { it.await().destination }
+                            text { ::content { it.await().title } }
                         }
                     }
-                    ::exists { booleanContent.current }
+                    ::exists { booleanContent.await() }
                 }
             } in card
 
@@ -344,8 +345,8 @@ fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 col {
                     forEachUpdating(appNav.navItemsProperty) {
                         link {
-                            ::to { it.current.destination }
-                            text { ::content { it.current.title } }
+                            ::to { it.await().destination }
+                            text { ::content { it.await().title } }
                         }
                     }
                 }

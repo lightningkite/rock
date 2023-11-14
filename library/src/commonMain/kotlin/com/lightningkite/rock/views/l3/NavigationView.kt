@@ -8,8 +8,8 @@ package com.lightningkite.rock.views.l3
 //
 //fun ViewContext.navigationView(
 //    router: Router,
-//    tabs: ReactiveScope.() -> List<NavigationTab>,
-//    showNavigation: ReactiveScope.() -> Boolean
+//    tabs: suspend () -> List<NavigationTab>,
+//    showNavigation: suspend () -> Boolean
 //) {
 //    column {
 //        box {

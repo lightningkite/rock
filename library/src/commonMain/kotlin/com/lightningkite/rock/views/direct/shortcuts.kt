@@ -32,7 +32,7 @@ fun ViewContext.confirmDanger(title: String, body: String, actionName: String = 
                     button {
                         h6(actionName)
                         onClick {
-                            launch(action)
+                            action()
                             navigator.dismiss()
                         }
                     } in danger

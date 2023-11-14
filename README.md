@@ -89,7 +89,7 @@ object SampleLogInScreen : RockScreen {
                         h6 { content = "Log In" }
                         onClick {
                             launch {
-                                fetch("fake-login/${email.once}")
+                                fetch("fake-login/${email.await()}")
                                 navigator.navigate(ControlsScreen)
                             }
                         }

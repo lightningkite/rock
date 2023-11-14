@@ -17,14 +17,14 @@ fun ViewContext.app() {
 //                image { this.source = Icons.arrowBack.color(Color.white); description = "Go Back" }
 //                onClick { navigator.goBack() }
 //            }
-//            h2 { ::content { navigator.currentScreen.current.title.current } } in weight(1f) in gravity(Align.Center, Align.Center)
+//            h2 { ::content { navigator.currentScreen.await().title.await() } } in weight(1f) in gravity(Align.Center, Align.Center)
 //            externalLink {
 //                image { this.source = Icons.search.color(Color.white); description = "See Code on GitHub"; newTab = true }
-//                ::to { "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${navigator.currentScreen.current::class.toString().removePrefix("class ")}.kt" }
+//                ::to { "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${navigator.currentScreen.await()::class.toString().removePrefix("class ")}.kt" }
 //            }
 //        } in important in marginless
 //        navigatorView(navigator) in weight(1f) in marginless
-//    } in setTheme { appTheme.current } in marginless
+//    } in setTheme { appTheme.await() } in marginless
 
     appNav(AutoRoutes) {
         appName = "Rock Sample App"
@@ -59,12 +59,12 @@ fun ViewContext.app() {
                 title = "Open on GitHub",
                 icon = Icon.star,
                 onSelect = {
-                    val className = navigator.currentScreen.once?.let { it::class.toString().removePrefix("class ") } ?: "App"
+                    val className = navigator.currentScreen.await()?.let { it::class.toString().removePrefix("class ") } ?: "App"
                     ExternalServices.openTab(
                         "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/$className.kt"
                     )
                 }
             )
         )
-    } in setTheme { appTheme.current }
+    } in setTheme { appTheme.await() }
 }

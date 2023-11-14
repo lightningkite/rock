@@ -33,7 +33,7 @@ actual object WindowInfo: Readable<WindowInfo> by Property(
     )
 )
 actual object InForeground: Readable<Boolean> {
-    override val once: Boolean get() = (document.asDynamic().visibilityState as? String) != "hidden"
+    override suspend fun awaitRaw(): Boolean = (document.asDynamic().visibilityState as? String) != "hidden"
 
     override fun addListener(listener: () -> Unit): () -> Unit {
         val l = { _: Event -> listener(); Unit }

@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views
 
+import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.*
 
@@ -11,7 +12,7 @@ annotation class ViewModifierDsl3
 
 expect class ViewContext {
     val addons: MutableMap<String, Any?>
-    val onRemove: OnRemoveHandler
+    val calculationContext: CalculationContext
     fun beforeNextElementSetup(action: NView.()->Unit)
     fun afterNextElementSetup(action: NView.()->Unit)
     fun split(): ViewContext
@@ -20,15 +21,17 @@ expect class ViewContext {
 }
 
 expect open class NView
-interface RView<Wraps: NView> { val native: Wraps }
+interface RView<Wraps: NView> {
+    val native: Wraps
+}
 
-expect val NView.onRemove: OnRemoveHandler
+expect val NView.onRemove: CalculationContext
 expect var NView.rotation: Angle
 expect var NView.alpha: Double
 expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 
-val RView<*>.onRemove: OnRemoveHandler get() = native.onRemove
+val RView<*>.onRemove: CalculationContext get() = native.onRemove
 var RView<*>.rotation: Angle
     get() = native.rotation
     set(value) { native.rotation = value }
@@ -43,10 +46,15 @@ var RView<*>.visible: Boolean
     set(value) { native.visible = value }
 
 fun <T> ViewContext.forEach(items: Readable<List<T>>, render: ViewContext.(T)->Unit) = with(split()) {
-    reactiveScope {
+    calculationContext.reactiveScope {
         clearChildren()
-        items.current.forEach {
+        items.await().forEach {
             render(it)
         }
     }
 }
+
+fun RView<*>.reactiveScope(action: suspend ()->Unit) {
+    onRemove.reactiveScope(action)
+}
+fun RView<*>.launch(action: suspend () -> Unit) = onRemove.launch(action)

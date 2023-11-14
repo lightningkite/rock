@@ -4,10 +4,7 @@ import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.SharedReadable
-import com.lightningkite.rock.reactive.bind
-import com.lightningkite.rock.reactive.invoke
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewContext
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
@@ -60,11 +57,11 @@ object LayoutExamplesScreen : RockScreen {
                 val countString = Property("5")
                 row {
                     forEachUpdating(
-                        SharedReadable {
-                            (1..(countString.current.toIntOrNull() ?: 1).coerceAtMost(100)).map { "Item $it" }
+                        shared {
+                            (1..(countString.await().toIntOrNull() ?: 1).coerceAtMost(100)).map { "Item $it" }
                         }
                     ) {
-                        text { ::content.invoke { it.current } }
+                        text { ::content.invoke { it.await() } }
                     }
                 } in scrollsHorizontally
                 label {
@@ -94,6 +91,6 @@ fun ViewContext.componentDemo() {
             label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } in card }
         } in card
 
-    } in scrolls in setTheme { currentTheme.current } in marginless
+    } in scrolls in setTheme { currentTheme.await() } in marginless
 
 }

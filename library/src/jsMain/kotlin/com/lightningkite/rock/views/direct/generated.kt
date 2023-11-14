@@ -216,20 +216,22 @@ actual typealias NSpace = HTMLElement
 @ViewDsl
 actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
     val getter = currentTheme
-    reactiveScope {
+    val s = Space(this)
+    s.reactiveScope {
         style.width = (getter().spacing * 4).value
         style.height = (getter().spacing * 4).value
     }
-    setup(Space(this))
+    setup(s)
 }
 
 actual fun ViewContext.space(multiplier: Double, setup: Space.() -> Unit): Unit = element<NSpace>("span") {
     val getter = currentTheme
-    reactiveScope {
+    val s = Space(this)
+    s.reactiveScope {
         style.width = (getter().spacing * multiplier).value
         style.height = (getter().spacing * multiplier).value
     }
-    setup(Space(this))
+    setup(s)
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -248,8 +250,8 @@ actual fun ViewContext.dismissBackground(setup: DismissBackground.() -> Unit): U
         }
     )
 
-actual fun DismissBackground.onClick(action: () -> Unit): Unit {
-    native.onclick = { action() }
+actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit {
+    native.onclick = { launch { action() } }
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -259,8 +261,8 @@ actual typealias NButton = HTMLButtonElement
 actual fun ViewContext.button(setup: Button.() -> Unit): Unit =
     themedElementClickable<NButton>("button") { setup(Button(this)) }
 
-actual fun Button.onClick(action: () -> Unit): Unit {
-    native.onclick = { action() }
+actual fun Button.onClick(action: suspend () -> Unit): Unit {
+    native.onclick = { launch { action() } }
 }
 
 actual inline var Button.enabled: Boolean

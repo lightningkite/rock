@@ -24,7 +24,7 @@ object FormsScreen : RockScreen {
                 }
             },
             viewer = {
-                h2 { ::content { prop.current } }
+                h2 { ::content { prop.await() } }
             }
         )
     }
@@ -58,6 +58,7 @@ object FormsScreen : RockScreen {
                 FormSection(
                     title = "Requires Legal Paperwork",
                     leaves = {
+                        println("Requires Legal Paperwork section: ${lp.await()}")
                         listOf(
                             FormLeaf(
                                 title = "Requires Legal Paperwork",
@@ -71,7 +72,7 @@ object FormsScreen : RockScreen {
                                 },
                                 viewer = {}
                             )
-                        ) + (if(lp.current) {
+                        ) + (if(lp.await()) {
                             listOf(
                                 leafExample("Paperwork Entry"),
                             )
@@ -95,12 +96,12 @@ fun ViewContext.renderForm(section: FormSection) {
         titleSetup = { content = section.title },
         content = {
             col {
-                forEach(SharedReadable(section.subsections)) {
+                forEach(shared(section.subsections)) {
                     renderForm(it)
                 }
             }
             col {
-                forEach(SharedReadable(section.leaves)) {
+                forEach(shared(section.leaves)) {
                     it.editor(this)
                 }
             }
@@ -113,12 +114,12 @@ fun ViewContext.renderFormReadOnly(section: FormSection) {
         titleSetup = { content = section.title },
         content = {
             col {
-                forEach(SharedReadable(section.subsections)) {
+                forEach(shared(section.subsections)) {
                     renderFormReadOnly(it)
                 }
             }
             col {
-                forEach(SharedReadable(section.leaves)) {
+                forEach(shared(section.leaves)) {
                     it.viewer(this)
                 }
             }
@@ -142,9 +143,9 @@ data class FormSection(
     val title: String,
     val icon: Icon? = null,
     val helperText: String? = null,
-    val directIssues: ReactiveScope.() -> List<FormIssue> = { listOf() },
-    val leaves: ReactiveScope.() -> List<FormLeaf> = { listOf() },
-    val subsections: ReactiveScope.() -> List<FormSection> = { listOf() },
+    val directIssues: suspend CalculationContext.() -> List<FormIssue> = { listOf() },
+    val leaves: suspend CalculationContext.() -> List<FormLeaf> = { listOf() },
+    val subsections: suspend CalculationContext.() -> List<FormSection> = { listOf() },
 )
 
 data class FormLeaf(
@@ -152,7 +153,7 @@ data class FormLeaf(
     val icon: Icon? = null,
     val helperText: String? = null,
     val directWorkSize: Int = 1,
-    val directIssues: ReactiveScope.() -> List<FormIssue> = { listOf() },
+    val directIssues: suspend CalculationContext.() -> List<FormIssue> = { listOf() },
     val editor: ViewContext.() -> Unit,
     val viewer: ViewContext.() -> Unit,
 )

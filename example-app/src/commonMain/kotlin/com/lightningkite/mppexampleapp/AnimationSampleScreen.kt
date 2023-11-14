@@ -3,13 +3,11 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.AnimationFrame
-import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.*
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.clockMillis
+import com.lightningkite.rock.reactive.*
 
 @Routable("sample/animation")
 object AnimationSampleScreen : RockScreen {
@@ -20,18 +18,26 @@ object AnimationSampleScreen : RockScreen {
             val line = Property(ArrayList<Point>())
             val pointersDown = Property(setOf<Int>())
             onPointerDown { id, x, y, width, height ->
-                pointersDown modify { it + id }
+                launch {
+                    pointersDown modify { it + id }
+                }
             }
             onPointerUp { id, x, y, width, height ->
-                pointersDown modify { it - id }
+                launch {
+                    pointersDown modify { it - id }
+                }
             }
             onPointerCancel { id, x, y, width, height ->
-                pointersDown modify { it - id }
+                launch {
+                    pointersDown modify { it - id }
+                }
             }
             onPointerMove { id, x, y, width, height ->
-                if(id in pointersDown.once) {
-                    line.once.add(Point(x, y))
-                    line set line.once
+                launch {
+                    if (id in pointersDown.await()) {
+                        line.await().add(Point(x, y))
+                        line set line.await()
+                    }
                 }
             }
             var last = clockMillis()
@@ -40,6 +46,7 @@ object AnimationSampleScreen : RockScreen {
                 val now = clockMillis()
                 val diff = now - last
                 last = now
+                val line = line.await()
                 redraw {
                     fillPaint = Color.white
                     clearRect(0.0, 0.0, width, height)
@@ -54,7 +61,7 @@ object AnimationSampleScreen : RockScreen {
 
                     beginPath()
                     moveTo(x, 0.0)
-                    for(point in line.current) {
+                    for(point in line) {
                         lineTo(point.x, point.y)
                     }
                     stroke()

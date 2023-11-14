@@ -107,7 +107,7 @@ enum class KeyboardType { Text, Integer, Phone, Decimal, Email }
 data class Action(
     val title: String,
     val icon: Icon,
-    val onSelect: () -> Unit
+    val onSelect: suspend () -> Unit
 )
 
 enum class ImageScaleType { Fit, Crop, Stretch, NoScale }

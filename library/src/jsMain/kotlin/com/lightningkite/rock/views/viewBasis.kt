@@ -23,7 +23,7 @@ actual class ViewContext(
 
     val stack = arrayListOf(parent)
     fun <T : HTMLElement> stackUse(item: T, action: T.() -> Unit) =
-        ListeningLifecycleStack.useIn(item.onRemove) {
+        CalculationContextStack.useIn(item.onRemove) {
             stack.add(item)
             try {
                 action(item)
@@ -33,11 +33,7 @@ actual class ViewContext(
         }
 
     val onRemoveList = ArrayList<() -> Unit>()
-    actual val onRemove: OnRemoveHandler = object: OnRemoveHandler {
-        override fun onRemove(action: () -> Unit) {
-            onRemoveList.add(action)
-        }
-    }
+    actual val calculationContext: CalculationContext = stack.last().onRemove
 
     fun close() {
         onRemoveList.forEach { it() }
@@ -59,7 +55,7 @@ actual class ViewContext(
     inline fun <T : HTMLElement> containsNext(name: String, setup: T.() -> Unit): ViewWrapper {
         val element = (document.createElement(name) as T)
         stack.add(element)
-        ListeningLifecycleStack.useIn(element.onRemove) {
+        CalculationContextStack.useIn(element.onRemove) {
             setup(element)
         }
         popCount++
@@ -100,17 +96,15 @@ actual class ViewContext(
     actual fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewContext.(Readable<T>)->Unit) {
         // TODO: Faster version
         return with(split()) {
-            reactiveScope {
-                try {
-                    clearChildren()
-                    items.current.forEach {
-                        render(Constant(it))
-                    }
-                } catch(_: Loading) {
-                    clearChildren()
-                    repeat(5) {
-                        render(LoadingForever)
-                    }
+            calculationContext.reactiveScope {
+                clearChildren()
+                repeat(5) {
+                    render(Never)
+                }
+                val data = items.await()
+                clearChildren()
+                data.forEach {
+                    render(Constant(it))
                 }
             }
         }
@@ -120,28 +114,25 @@ actual class ViewContext(
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = HTMLElement
 
-data class NViewOnRemoveHandler(val native: NView): OnRemoveHandler {
+data class NViewCalculationContext(val native: NView): CalculationContext {
     override fun onRemove(action: () -> Unit) {
         native.removeListeners.add(action)
     }
 
-    override fun onLoading() {
+    override fun notifyStart() {
         native.classList.add("loading")
     }
 
-    override fun onTry() {
+    override fun notifySuccess() {
         native.classList.remove("loading")
     }
 
-    override fun onFail() {
-
-    }
-
-    override fun onOk() {
+    override fun notifyFailure() {
+        native.classList.remove("loading")
     }
 }
-actual val NView.onRemove: OnRemoveHandler
-    get() = NViewOnRemoveHandler(this)
+actual val NView.onRemove: CalculationContext
+    get() = NViewCalculationContext(this)
 
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()
@@ -208,7 +199,7 @@ private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
     get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
 
 
-actual fun ViewContext.setTheme(calculate: ReactiveScope.()-> Theme?): ViewWrapper {
+actual fun ViewContext.setTheme(calculate: suspend ()-> Theme?): ViewWrapper {
     val old = themeStack
     themeStack += calculate
     themeJustChanged = true

@@ -14,7 +14,7 @@ object ReactivityScreen : RockScreen {
     override fun ViewContext.render() {
         val local = Property("Local")
         val persist = PersistentProperty("persistent-example", "Persistent")
-        val fetching: Fetching<String> = Fetching {
+        val fetching = shared {
             delay(1000)
             "Loaded!"
         }
@@ -37,23 +37,23 @@ object ReactivityScreen : RockScreen {
                 button {
                     text { content = "Reload 'fetching'" }
                     onClick {
-                        fetching.refetch()
+                        // TODO
                     }
                 } in important
             } in card
 
             col {
                 h2 { content = "Using reactiveScope()" }
-                text { reactiveScope { content = local.current } }
-                text { reactiveScope { content = persist.current } }
-                text { reactiveScope { content = fetching.current } }
+                text { reactiveScope { content = local.await() } }
+                text { reactiveScope { content = persist.await() } }
+                text { reactiveScope { content = fetching.await() } }
             } in card
 
             col {
                 h2 { content = "Using ::content {}" }
-                text { ::content{ local.current } }
-                text { ::content{ persist.current } }
-                text { ::content{ fetching.current } }
+                text { ::content{ local.await() } }
+                text { ::content{ persist.await() } }
+                text { ::content{ fetching.await() } }
             } in card
         }
     }

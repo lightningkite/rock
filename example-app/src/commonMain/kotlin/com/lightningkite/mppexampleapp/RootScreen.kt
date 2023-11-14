@@ -34,7 +34,7 @@ object RootScreen : RockScreen {
                 fun ViewContext.linkScreen(screen: RockScreen) = link {
                     to = screen
                     row {
-                        text { ::content{ screen.title.current } } in weight(1f)
+                        text { ::content{ screen.title.await() } } in weight(1f)
                         image { source = Icon.chevronRight.toImageSource(Color.black) }
                     }
                 } in card

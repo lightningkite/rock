@@ -4,14 +4,19 @@ import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.onRemove
 import kotlin.coroutines.*
+import kotlin.coroutines.cancellation.CancellationException
 
 class CancelledException(): Exception()
 suspend fun <T> suspendCoroutineCancellable(start: (Continuation<T>)->()->Unit): T {
     stopIfCancelled()
     var canceller: (()->Unit)? = null
     val result: T = try {
+        val context = coroutineContext
         suspendCoroutine<T> {
-            canceller = start(SingleThreadContinuation(it))
+            context[CancellationState.Key]!!.waitingOn = it
+            canceller = start(SingleThreadContinuation(it) {
+                context[CancellationState.Key]!!.waitingOn = null
+            })
         }
     } catch(e: CancelledException) {
         canceller?.invoke()
@@ -29,11 +34,12 @@ suspend fun delay(milliseconds: Long) = suspendCoroutineCancellable<Unit> {
     }
 }
 
-private class SingleThreadContinuation<T>(val wraps: Continuation<T>): Continuation<T> {
+private class SingleThreadContinuation<T>(val wraps: Continuation<T>, val onDone: ()->Unit): Continuation<T> {
     var done = false
     override fun resumeWith(result: Result<T>) {
         if(done) return
         done = true
+        onDone()
         wraps.resumeWith(result)
     }
 
@@ -78,13 +84,14 @@ suspend fun <T> timeoutOrNull(milliseconds: Long, action: suspend () -> T): T? {
 }
 
 fun CoroutineContext.childCancellation(): CoroutineContext = this + CancellationState(false, this.get(CancellationState.Key))
-private class CancellationState(var stop: Boolean, var parent: CancellationState? = null): CoroutineContext.Element {
+private class CancellationState(var stop: Boolean, var parent: CancellationState? = null, var waitingOn: Continuation<*>? = null): CoroutineContext.Element {
     override val key: CoroutineContext.Key<CancellationState> = Key
     val shouldStop: Boolean get() = stop || (parent?.stop ?: false)
     object Key: CoroutineContext.Key<CancellationState>
 }
 fun CoroutineContext.cancel() {
     this[CancellationState.Key]!!.stop = true
+    this[CancellationState.Key]!!.waitingOn?.resumeWithException(CancelledException())
 }
 suspend fun stopIfCancelled() {
     val state = coroutineContext[CancellationState.Key]!!
@@ -139,7 +146,7 @@ fun launchGlobal(action: suspend () -> Unit): Cancellable {
         override val context: CoroutineContext = context
         // called when a coroutine ends. do nothing.
         override fun resumeWith(result: Result<Unit>) {
-            result.onFailure { ex : Throwable -> println(ex.message) }
+            result.onFailure { ex : Throwable -> println("launchGlobal with ${ex.message}") }
         }
     })
     return object: Cancellable {

@@ -113,7 +113,10 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
 //                }
                 if(result.isSuccess) notifySuccess()
                 else notifyFailure()
-                result.onFailure { ex: Throwable -> println(ex.message) }
+                result.onFailure { ex: Throwable ->
+                    if(ex is CancelledException) return@onFailure
+                    println("Reactive Scope failed with ${ex.message}")
+                }
             }
         })
     }
@@ -194,4 +197,27 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             }
         }
     }
+}
+
+private class WaitForNotNull<T: Any>(val wraps: Readable<T?>): Readable<T> {
+    override suspend fun awaitRaw(): T {
+        val basis = wraps.awaitRaw()
+        if(basis == null) return suspendCoroutineCancellable<T> { {  } }
+        else return basis
+    }
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        return wraps.addListener(listener)
+    }
+
+    override fun hashCode(): Int = wraps.hashCode() + 1
+
+    override fun equals(other: Any?): Boolean = other is WaitForNotNull<*> && this.wraps == other.wraps
+}
+
+val <T: Any> Readable<T?>.waitForNotNull: Readable<T> get() = WaitForNotNull(this)
+suspend fun <T: Any> Readable<T?>.awaitNotNull(): T {
+    val basis = await()
+    if(basis == null) return suspendCoroutineCancellable<T> { {} }
+    else return basis
 }

@@ -1,9 +1,6 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.fetch
-import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.views.*
@@ -11,13 +8,12 @@ import com.lightningkite.rock.views.canvas.*
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.reactive.*
-import kotlin.coroutines.intrinsics.createCoroutineUnintercepted
 
 @Routable("sample/canvas")
 object CanvasSampleScreen : RockScreen {
     data class Point(val x: Double, val y: Double)
 
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         canvas {
             var x: Double = 0.0
             val lines = Property(ArrayList<ArrayList<Point>>())

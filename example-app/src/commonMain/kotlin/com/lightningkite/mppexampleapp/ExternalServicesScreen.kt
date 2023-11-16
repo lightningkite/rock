@@ -11,7 +11,7 @@ object ExternalServicesScreen : RockScreen {
     override val title: Readable<String>
         get() = super.title
 
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             col {
                 h1 { content = "This screen demonstrates various some external access." }

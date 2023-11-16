@@ -2,15 +2,13 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.canvas.*
 import com.lightningkite.rock.views.direct.*
 
 @Routable("sample/dialog")
 object DialogSamplesScreen : RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             h1 { content = "Dialog Samples" }
 
@@ -33,7 +31,7 @@ object DialogSamplesScreen : RockScreen {
 }
 
 @Routable("sample/dialog/1") object DialogSampleScreen1: RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             h2 { content = "Sample Dialog" }
             text { content = "This is a sample dialog." }

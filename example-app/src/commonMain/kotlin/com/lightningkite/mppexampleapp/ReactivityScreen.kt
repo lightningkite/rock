@@ -11,7 +11,7 @@ object ReactivityScreen : RockScreen {
     override val title: Readable<String>
         get() = super.title
 
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         val local = Property("Local")
         val persist = PersistentProperty("persistent-example", "Persistent")
         val fetching = shared {

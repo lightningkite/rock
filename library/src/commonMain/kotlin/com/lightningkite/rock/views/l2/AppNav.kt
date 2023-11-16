@@ -55,13 +55,13 @@ interface AppNav {
 
 val search = Property("")
 
-val ViewContext.appNavFactory by viewContextAddon<Property<ViewContext.(AppNav.() -> Unit) -> Unit>>(
+val ViewWriter.appNavFactory by viewWriterAddon<Property<ViewWriter.(AppNav.() -> Unit) -> Unit>>(
     Property(
-        ViewContext::appNavTopAndLeft
+        ViewWriter::appNavTopAndLeft
     )
 )
 
-fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
+fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
     stack {
         val navigator = PlatformNavigator(routes)
         this@appNav.navigator = navigator
@@ -85,7 +85,7 @@ fun ViewContext.appNav(routes: Routes, setup: AppNav.() -> Unit) {
     } in marginless
 }
 
-fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
+fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val booleanContent = Property(false)
     col {
@@ -151,7 +151,7 @@ fun ViewContext.appNavHamburger(setup: AppNav.() -> Unit) {
 }
 
 
-fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
+fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     // Nav 2 top, horizontal
     col {
@@ -207,7 +207,7 @@ fun ViewContext.appNavTop(setup: AppNav.() -> Unit) {
     } in marginless
 }
 
-fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
+fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     col {
 // Nav 3 top and bottom (top)
@@ -269,7 +269,7 @@ fun ViewContext.appNavBottomTabs(setup: AppNav.() -> Unit) {
     } in marginless
 }
 
-fun ViewContext.appNavTopAndLeft(setup: AppNav.() -> Unit) {
+fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val booleanContent = Property(false)
     col {

@@ -14,7 +14,6 @@ import org.w3c.dom.*
 import org.w3c.dom.url.URL
 import kotlin.random.Random
 import kotlinx.datetime.*
-import kotlinx.datetime.internal.JSJoda.ZonedDateTime
 import kotlin.js.Date
 
 
@@ -22,7 +21,7 @@ import kotlin.js.Date
 actual typealias NSeparator = HTMLElement
 
 @ViewDsl
-actual fun ViewContext.separator(setup: Separator.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
+actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
     classList.add("rock-separator")
     setup(Separator(this))
 }
@@ -31,20 +30,20 @@ actual fun ViewContext.separator(setup: Separator.() -> Unit): Unit = themedElem
 actual typealias NContainingView = HTMLElement
 
 @ViewDsl
-actual fun ViewContext.stack(setup: ContainingView.() -> Unit): Unit =
+actual fun ViewWriter.stack(setup: ContainingView.() -> Unit): Unit =
     themedElementBackIfChanged<HTMLDivElement>("div") {
         classList.add("rock-stack")
         setup(ContainingView(this))
     }
 
 @ViewDsl
-actual fun ViewContext.col(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
+actual fun ViewWriter.col(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-col")
     setup(ContainingView(this))
 }
 
 @ViewDsl
-actual fun ViewContext.row(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
+actual fun ViewWriter.row(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-row")
     setup(ContainingView(this))
 }
@@ -53,7 +52,7 @@ actual fun ViewContext.row(setup: ContainingView.() -> Unit): Unit = themedEleme
 actual typealias NLink = HTMLAnchorElement
 
 @ViewDsl
-actual fun ViewContext.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
+actual fun ViewWriter.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
     this.asDynamic().__ROCK__navigator = navigator
     setup(Link(this))
 }
@@ -83,7 +82,7 @@ actual inline var Link.newTab: Boolean
 actual typealias NExternalLink = HTMLAnchorElement
 
 @ViewDsl
-actual fun ViewContext.externalLink(setup: ExternalLink.() -> Unit): Unit =
+actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit): Unit =
     themedElementClickable<NExternalLink>("a") { setup(ExternalLink(this)) }
 
 actual inline var ExternalLink.to: String
@@ -101,7 +100,7 @@ actual inline var ExternalLink.newTab: Boolean
 actual typealias NImage = HTMLImageElement
 
 @ViewDsl
-actual fun ViewContext.image(setup: Image.() -> Unit): Unit =
+actual fun ViewWriter.image(setup: Image.() -> Unit): Unit =
     themedElement<NImage>("img") { classList.add("tooltip"); setup(Image(this)) }
 
 actual inline var Image.source: ImageSource
@@ -140,23 +139,23 @@ actual inline var Image.description: String?
 actual typealias NTextView = HTMLElement
 
 @ViewDsl
-actual fun ViewContext.h1(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
+actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
 @ViewDsl
-actual fun ViewContext.h2(setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
+actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
 @ViewDsl
-actual fun ViewContext.h3(setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
+actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
 @ViewDsl
-actual fun ViewContext.h4(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
+actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
 @ViewDsl
-actual fun ViewContext.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
+actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
 @ViewDsl
-actual fun ViewContext.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
+actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
 @ViewDsl
-actual fun ViewContext.header(setup: TextView.() -> Unit): Unit = headerElement("p", setup)
+actual fun ViewWriter.header(setup: TextView.() -> Unit): Unit = headerElement("p", setup)
 @ViewDsl
-actual fun ViewContext.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
+actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
 @ViewDsl
-actual fun ViewContext.subtext(setup: TextView.() -> Unit): Unit = textElement("span", setup)
+actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement("span", setup)
 actual inline var TextView.content: String
     get() = native.innerText
     set(value) {
@@ -188,7 +187,7 @@ actual inline var TextView.textSize: Dimension
 actual typealias NLabel = HTMLElement
 
 @ViewDsl
-actual fun ViewContext.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
+actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
     textElement("span") {
         classList.add("rock-label")
     }
@@ -205,7 +204,7 @@ actual inline var Label.content: String
 actual typealias NActivityIndicator = HTMLSpanElement
 
 @ViewDsl
-actual fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
+actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
     themedElement<HTMLSpanElement>("span") {
         addClass("spinner")
     }
@@ -214,7 +213,7 @@ actual fun ViewContext.activityIndicator(setup: ActivityIndicator.() -> Unit): U
 actual typealias NSpace = HTMLElement
 
 @ViewDsl
-actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
+actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
     val getter = currentTheme
     val s = Space(this)
     s.reactiveScope {
@@ -224,7 +223,7 @@ actual fun ViewContext.space(setup: Space.() -> Unit): Unit = element<NSpace>("s
     setup(s)
 }
 
-actual fun ViewContext.space(multiplier: Double, setup: Space.() -> Unit): Unit = element<NSpace>("span") {
+actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit = element<NSpace>("span") {
     val getter = currentTheme
     val s = Space(this)
     s.reactiveScope {
@@ -238,7 +237,7 @@ actual fun ViewContext.space(multiplier: Double, setup: Space.() -> Unit): Unit 
 actual typealias NDismissBackground = HTMLDivElement
 
 @ViewDsl
-actual fun ViewContext.dismissBackground(setup: DismissBackground.() -> Unit): Unit =
+actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit =
     themedElementPrivateMeta<NDismissBackground>(
         name = "span",
         themeLogic = { _, _ ->
@@ -258,7 +257,7 @@ actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit {
 actual typealias NButton = HTMLButtonElement
 
 @ViewDsl
-actual fun ViewContext.button(setup: Button.() -> Unit): Unit =
+actual fun ViewWriter.button(setup: Button.() -> Unit): Unit =
     themedElementClickable<NButton>("button") { setup(Button(this)) }
 
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
@@ -275,7 +274,7 @@ actual inline var Button.enabled: Boolean
 actual typealias NCheckbox = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.checkbox(setup: Checkbox.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
+actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "checkbox"
     setup(Checkbox(this))
 }
@@ -291,7 +290,7 @@ actual val Checkbox.checked: Writable<Boolean> get() = native.vprop("input", { c
 actual typealias NRadioButton = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.radioButton(setup: RadioButton.() -> Unit): Unit =
+actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit =
     themedElementClickable<HTMLInputElement>("input") {
         this.type = "radio"
         setup(RadioButton(this))
@@ -308,7 +307,7 @@ actual val RadioButton.checked: Writable<Boolean> get() = native.vprop("input", 
 actual typealias NSwitch = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.switch(setup: Switch.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
+actual fun ViewWriter.switch(setup: Switch.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "checkbox"
     this.classList.add("switch")
     setup(Switch(this))
@@ -325,7 +324,7 @@ actual val Switch.checked: Writable<Boolean> get() = native.vprop("input", { che
 actual typealias NToggleButton = HTMLSpanElement
 
 @ViewDsl
-actual fun ViewContext.toggleButton(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
     classList.add("toggle-button")
     element<HTMLInputElement>("input") {
         this.type = "checkbox"
@@ -352,7 +351,7 @@ actual val ToggleButton.checked: Writable<Boolean>
 actual typealias NRadioToggleButton = HTMLSpanElement
 
 @ViewDsl
-actual fun ViewContext.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit =
+actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit =
     element<HTMLLabelElement>("label") {
         classList.add("toggle-button")
         element<HTMLInputElement>("input") {
@@ -380,7 +379,7 @@ actual val RadioToggleButton.checked: Writable<Boolean>
 actual typealias NLocalDateField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.localDateField(setup: LocalDateField.() -> Unit): Unit =
+actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         type = "date"
         setup(LocalDateField(this))
@@ -413,7 +412,7 @@ actual inline var LocalDateField.range: ClosedRange<LocalDate>?
 actual typealias NLocalTimeField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.localTimeField(setup: LocalTimeField.() -> Unit): Unit =
+actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         type = "time"
         setup(LocalTimeField(this))
@@ -446,7 +445,7 @@ actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
 actual typealias NLocalDateTimeField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.localDateTimeField(setup: LocalDateTimeField.() -> Unit): Unit =
+actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         type = "datetime-local"
         setup(LocalDateTimeField(this))
@@ -480,7 +479,7 @@ actual inline var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
 actual typealias NTextField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.textField(setup: TextField.() -> Unit): Unit =
+actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         setup(TextField(this))
     }
@@ -554,7 +553,7 @@ actual inline var TextField.range: ClosedRange<Double>?
 actual typealias NTextArea = HTMLTextAreaElement
 
 @ViewDsl
-actual fun ViewContext.textArea(setup: TextArea.() -> Unit): Unit =
+actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit =
     themedElementEditable<NTextArea>("textarea") { setup(TextArea(this)) }
 
 actual val TextArea.content: Writable<String> get() = native.vprop("input", { value }, { value = it })
@@ -591,7 +590,7 @@ actual inline var TextArea.hint: String
 actual typealias NSelect = HTMLSelectElement
 
 @ViewDsl
-actual fun ViewContext.select(setup: Select.() -> Unit): Unit =
+actual fun ViewWriter.select(setup: Select.() -> Unit): Unit =
     themedElementClickable<NSelect>("select") { setup(Select(this)) }
 
 actual val Select.selected: Writable<String?> get() = native.vprop("change", { value }, { value = it ?: "" })
@@ -606,7 +605,7 @@ actual inline var Select.options: List<WidgetOption>
 actual typealias NAutoCompleteTextField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewContext.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit =
+actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit =
     themedElementEditable<NAutoCompleteTextField>("input") { setup(AutoCompleteTextField(this)) }
 
 actual val AutoCompleteTextField.content: Writable<String>
@@ -633,13 +632,13 @@ actual inline var AutoCompleteTextField.suggestions: List<String>
 actual typealias NSwapView = HTMLDivElement
 
 @ViewDsl
-actual fun ViewContext.swapView(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
+actual fun ViewWriter.swapView(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
     classList.add("rock-swap")
     setup(SwapView(this))
 }
 
 @ViewDsl
-actual fun ViewContext.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
+actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
     classList.add("rock-swap")
     classList.add("dialog")
     hidden = true
@@ -673,7 +672,7 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
 actual typealias NWebView = HTMLIFrameElement
 
 @ViewDsl
-actual fun ViewContext.webView(setup: WebView.() -> Unit): Unit =
+actual fun ViewWriter.webView(setup: WebView.() -> Unit): Unit =
     themedElement<NWebView>("iframe") { setup(WebView(this)) }
 
 actual inline var WebView.url: String
@@ -696,7 +695,7 @@ actual inline var WebView.content: String
 actual typealias NCanvas = HTMLCanvasElement
 
 @ViewDsl
-actual fun ViewContext.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
+actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
     style.width = "100%"
     style.height = "100%"
     setup(Canvas(this))
@@ -739,26 +738,26 @@ actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Dou
 actual typealias NRecyclerView = HTMLDivElement
 
 @ViewDsl
-actual fun ViewContext.recyclerView(setup: RecyclerView.() -> Unit): Unit =
+actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit =
     themedElement<NRecyclerView>("div") { setup(RecyclerView(this)) }
 
 @ViewDsl
-actual fun ViewContext.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit =
+actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit =
     themedElement<NRecyclerView>("div") { setup(RecyclerView(this)) }
 
 @ViewDsl
-actual fun ViewContext.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit =
+actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit =
     themedElement<NRecyclerView>("div") { setup(RecyclerView(this)) }
 
 actual fun <T> RecyclerView.children(
     items: Readable<List<T>>,
-    render: ViewContext.(value: Readable<T>) -> Unit
+    render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit = TODO()
 
 @ViewModifierDsl3
-actual fun ViewContext.hasPopover(
+actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
-    setup: ViewContext.() -> Unit
+    setup: ViewWriter.() -> Unit
 ): ViewWrapper {
     containsNext<HTMLDivElement>("div") {
         style.position = "relative"
@@ -795,7 +794,7 @@ actual fun ViewContext.hasPopover(
 }
 
 @ViewModifierDsl3
-actual fun ViewContext.weight(amount: Float): ViewWrapper {
+actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         style.flexGrow = "$amount"
         style.flexShrink = "$amount"
@@ -804,7 +803,7 @@ actual fun ViewContext.weight(amount: Float): ViewWrapper {
 }
 
 @ViewModifierDsl3
-actual fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper {
+actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     beforeNextElementSetup {
         classList.add("h${horizontal}", "v${vertical}")
     }
@@ -812,7 +811,7 @@ actual fun ViewContext.gravity(horizontal: Align, vertical: Align): ViewWrapper 
 }
 
 @ViewModifierDsl3
-actual val ViewContext.scrolls: ViewWrapper
+actual val ViewWriter.scrolls: ViewWrapper
     get() {
         beforeNextElementSetup {
             style.overflowY = "auto"
@@ -820,7 +819,7 @@ actual val ViewContext.scrolls: ViewWrapper
         return ViewWrapper
     }
 @ViewModifierDsl3
-actual val ViewContext.scrollsHorizontally: ViewWrapper
+actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         beforeNextElementSetup {
             style.display = "flex"
@@ -831,7 +830,7 @@ actual val ViewContext.scrollsHorizontally: ViewWrapper
     }
 
 @ViewModifierDsl3
-actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
+actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
     beforeNextElementSetup {
 
         if (constraints.minHeight == null) style.removeProperty("minHeight")
@@ -862,7 +861,7 @@ actual fun ViewContext.sizedBox(constraints: SizeConstraints): ViewWrapper {
 }
 
 @ViewModifierDsl3
-actual val ViewContext.marginless: ViewWrapper
+actual val ViewWriter.marginless: ViewWrapper
     get() {
         beforeNextElementSetup {
             style.margin = 0.px.value
@@ -872,7 +871,7 @@ actual val ViewContext.marginless: ViewWrapper
         return ViewWrapper
     }
 @ViewModifierDsl3
-actual val ViewContext.withPadding: ViewWrapper
+actual val ViewWriter.withPadding: ViewWrapper
     get() {
         beforeNextElementSetup {
             classList.add("addPadding")

@@ -1,20 +1,20 @@
 package com.lightningkite.rock.views.l2
 
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.viewContextAddon
+import com.lightningkite.rock.views.viewWriterAddon
 
-var ViewContext.titleDepth: Int by viewContextAddon(0)
+var ViewWriter.titleDepth: Int by viewWriterAddon(0)
 
 @ViewDsl
-fun ViewContext.titledSection(
+fun ViewWriter.titledSection(
     title: String,
     content: () -> Unit,
 ) = titledSection({ this.content = title }, content)
 
 @ViewDsl
-fun ViewContext.titledSection(
+fun ViewWriter.titledSection(
     titleSetup: TextView.() -> Unit = {},
     content: () -> Unit,
 ) {

@@ -83,7 +83,7 @@ object FormsScreen : RockScreen {
         }
     )
 
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         titledSection("Form Testing") {
             renderForm(form)
             renderFormReadOnly(form)
@@ -91,7 +91,7 @@ object FormsScreen : RockScreen {
     }
 }
 
-fun ViewContext.renderForm(section: FormSection) {
+fun ViewWriter.renderForm(section: FormSection) {
     titledSection(
         titleSetup = { content = section.title },
         content = {
@@ -109,7 +109,7 @@ fun ViewContext.renderForm(section: FormSection) {
     )
 }
 
-fun ViewContext.renderFormReadOnly(section: FormSection) {
+fun ViewWriter.renderFormReadOnly(section: FormSection) {
     titledSection(
         titleSetup = { content = section.title },
         content = {
@@ -154,6 +154,6 @@ data class FormLeaf(
     val helperText: String? = null,
     val directWorkSize: Int = 1,
     val directIssues: suspend CalculationContext.() -> List<FormIssue> = { listOf() },
-    val editor: ViewContext.() -> Unit,
-    val viewer: ViewContext.() -> Unit,
+    val editor: ViewWriter.() -> Unit,
+    val viewer: ViewWriter.() -> Unit,
 )

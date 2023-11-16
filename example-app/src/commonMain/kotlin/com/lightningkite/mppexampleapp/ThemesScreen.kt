@@ -9,11 +9,10 @@ import com.lightningkite.rock.models.randomTitleFontSettings
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.l2.*
 
 @Routable("themes")
 object ThemesScreen : RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             h1 { content = "Theme Control" }
             col {

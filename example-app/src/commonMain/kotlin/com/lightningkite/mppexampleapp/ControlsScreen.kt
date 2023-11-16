@@ -15,7 +15,7 @@ import com.lightningkite.rock.views.direct.*
 object ControlsScreen : RockScreen {
 
 
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         val booleanContent = Property(false)
         col {
 

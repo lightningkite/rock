@@ -6,13 +6,13 @@ import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
 
 @Routable("/")
 object RootScreen : RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             col {
                 h1 { content = "Beautiful by default." }
@@ -31,7 +31,7 @@ object RootScreen : RockScreen {
             } in withPadding
             col {
 
-                fun ViewContext.linkScreen(screen: RockScreen) = link {
+                fun ViewWriter.linkScreen(screen: RockScreen) = link {
                     to = screen
                     row {
                         text { ::content{ screen.title.await() } } in weight(1f)

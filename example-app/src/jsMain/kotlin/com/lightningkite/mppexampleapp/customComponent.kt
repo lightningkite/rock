@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.element
 import org.w3c.dom.HTMLVideoElement
 
 actual class CustomComponent(val native: HTMLVideoElement) {
@@ -10,7 +11,7 @@ actual class CustomComponent(val native: HTMLVideoElement) {
             native.src = value
         }
 }
-actual fun ViewContext.customComponent(setup: CustomComponent.()->Unit) {
+actual fun ViewWriter.customComponent(setup: CustomComponent.()->Unit) {
     element<HTMLVideoElement>("video") {
         setup(CustomComponent(this))
     }

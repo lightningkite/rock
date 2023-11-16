@@ -4,7 +4,7 @@ import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.*
@@ -12,10 +12,10 @@ import com.lightningkite.rock.views.l2.*
 
 @Routable("navigation")
 object NavigationScreen : RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             h1 { content = "Navigation" }
-            fun navSelector(label: String, value: ViewContext.(AppNav.() -> Unit) -> Unit) {
+            fun navSelector(label: String, value: ViewWriter.(AppNav.() -> Unit) -> Unit) {
                 button {
                     text { content = label }
                     onClick {
@@ -26,7 +26,7 @@ object NavigationScreen : RockScreen {
             h2 { content = "Layouts" }
             row {
                 col {
-                    navSelector("Hamburger Menu", ViewContext::appNavHamburger)
+                    navSelector("Hamburger Menu", ViewWriter::appNavHamburger)
                     text {
                         content = "Caption test."
                     } in gravity(
@@ -35,7 +35,7 @@ object NavigationScreen : RockScreen {
                     )
                 } in weight(1f)
                 col {
-                    navSelector("Top Navigation", ViewContext::appNavTop)
+                    navSelector("Top Navigation", ViewWriter::appNavTop)
                     text {
                         content = "Caption test."
                     } in gravity(
@@ -46,7 +46,7 @@ object NavigationScreen : RockScreen {
             }
             row {
                 col {
-                    navSelector("Bottom Tab Navigation", ViewContext::appNavBottomTabs)
+                    navSelector("Bottom Tab Navigation", ViewWriter::appNavBottomTabs)
                     text {
                         content = "Caption test."
                     } in gravity(
@@ -55,7 +55,7 @@ object NavigationScreen : RockScreen {
                     )
                 } in weight(1f)
                 col {
-                    navSelector("Top and Left Navigation", ViewContext::appNavTopAndLeft)
+                    navSelector("Top and Left Navigation", ViewWriter::appNavTopAndLeft)
                     text {
                         content = "Caption test."
                     } in gravity(

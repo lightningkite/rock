@@ -1,10 +1,7 @@
 package com.lightningkite.rock
 
 import com.lightningkite.rock.reactive.CalculationContext
-import com.lightningkite.rock.views.RView
-import com.lightningkite.rock.views.onRemove
 import kotlin.coroutines.*
-import kotlin.coroutines.cancellation.CancellationException
 
 class CancelledException(): Exception()
 suspend fun <T> suspendCoroutineCancellable(start: (Continuation<T>)->()->Unit): T {

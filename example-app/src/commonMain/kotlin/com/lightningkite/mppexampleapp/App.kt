@@ -9,7 +9,7 @@ import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.*
 
 val appTheme = Property<Theme>(MaterialLikeTheme())
-fun ViewContext.app() {
+fun ViewWriter.app() {
 
 //    col {
 //        row {

@@ -1,15 +1,11 @@
 package com.lightningkite.rock.views.l2
 
-import com.lightningkite.rock.models.ScreenTransition
-import com.lightningkite.rock.models.ScreenTransitions
 import com.lightningkite.rock.navigation.RockNavigator
-import com.lightningkite.rock.navigation.Routes
 import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
-fun ViewContext.navigatorView(navigator: RockNavigator) {
+fun ViewWriter.navigatorView(navigator: RockNavigator) {
     this.swapView {
         val fork = split()
         fork.navigator = navigator
@@ -23,7 +19,7 @@ fun ViewContext.navigatorView(navigator: RockNavigator) {
     }
 }
 
-fun ViewContext.navigatorViewDialog() {
+fun ViewWriter.navigatorViewDialog() {
     this.swapViewDialog {
         val fork = split()
         val navigator = navigator.dialog

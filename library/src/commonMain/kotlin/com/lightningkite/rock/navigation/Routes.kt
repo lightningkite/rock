@@ -2,7 +2,7 @@ package com.lightningkite.rock.navigation
 
 import com.lightningkite.rock.reactive.Constant
 import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.direct.space
 import kotlin.reflect.KClass
 
@@ -26,14 +26,14 @@ data class UrlLikePath(
 
 interface RockScreen {
     val title: Readable<String> get() = Constant(this::class.toString().removePrefix("class ").removeSuffix("Screen").camelToHuman())
-    fun ViewContext.render()
+    fun ViewWriter.render()
     object Empty: RockScreen {
-        override fun ViewContext.render() {
+        override fun ViewWriter.render() {
             space { }
         }
     }
-    open class Direct(title: String = "", val render: ViewContext.()->Unit): RockScreen {
-        override fun ViewContext.render(): Unit = this@Direct.render(this)
+    open class Direct(title: String = "", val render: ViewWriter.()->Unit): RockScreen {
+        override fun ViewWriter.render(): Unit = this@Direct.render(this)
         override val title: Readable<String> = Constant(title)
     }
 }

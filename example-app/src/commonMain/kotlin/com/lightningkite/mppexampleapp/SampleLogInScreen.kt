@@ -3,7 +3,6 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.fetch
-import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.Property
@@ -14,7 +13,7 @@ import com.lightningkite.rock.views.direct.*
 
 @Routable("sample/login")
 object SampleLogInScreen : RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         val email = Property("")
         val password = Property("")
         stack {

@@ -5,14 +5,14 @@ import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.setTheme
 
 @Routable("layout-examples")
 object LayoutExamplesScreen : RockScreen {
-    override fun ViewContext.render() {
+    override fun ViewWriter.render() {
         col {
             h1 { content = "Sampling" }
 
@@ -73,7 +73,7 @@ object LayoutExamplesScreen : RockScreen {
     }
 }
 
-fun ViewContext.componentDemo() {
+fun ViewWriter.componentDemo() {
     val currentTheme = Property<Theme>(MaterialLikeTheme())
 
     col {

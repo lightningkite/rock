@@ -1,9 +1,9 @@
 package com.lightningkite.rock
 
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 import kotlinx.browser.window
 
-actual fun ViewContext.geolocate(onFixed: (GeolocationResult) -> Unit) {
+actual fun ViewWriter.geolocate(onFixed: (GeolocationResult) -> Unit) {
     window.navigator.asDynamic().geolocation.getCurrentPosition { position: GeolocationPosition ->
         onFixed(
             GeolocationResult(
@@ -15,7 +15,7 @@ actual fun ViewContext.geolocate(onFixed: (GeolocationResult) -> Unit) {
     }
 }
 
-actual fun ViewContext.watchGeolocation(onUpdated: (GeolocationResult) -> Unit) {
+actual fun ViewWriter.watchGeolocation(onUpdated: (GeolocationResult) -> Unit) {
     window.navigator.asDynamic().geolocation.watchPosition { position: GeolocationPosition ->
         onUpdated(
             GeolocationResult(

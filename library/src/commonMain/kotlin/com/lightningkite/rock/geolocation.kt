@@ -1,6 +1,6 @@
 package com.lightningkite.rock
 
-import com.lightningkite.rock.views.ViewContext
+import com.lightningkite.rock.views.ViewWriter
 
 data class GeolocationResult(
     val latitude: Double,
@@ -8,5 +8,5 @@ data class GeolocationResult(
     val accuracy: Double,
 )
 
-expect fun ViewContext.geolocate(onFixed: (GeolocationResult) -> Unit)
-expect fun ViewContext.watchGeolocation(onUpdated: (GeolocationResult) -> Unit)
+expect fun ViewWriter.geolocate(onFixed: (GeolocationResult) -> Unit)
+expect fun ViewWriter.watchGeolocation(onUpdated: (GeolocationResult) -> Unit)

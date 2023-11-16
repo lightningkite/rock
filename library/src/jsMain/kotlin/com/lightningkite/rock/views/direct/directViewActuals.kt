@@ -10,11 +10,11 @@ import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.pointerevents.PointerEvent
 
-fun ViewContext.todo(name: String) = element<HTMLSpanElement>("span") {
+fun ViewWriter.todo(name: String) = element<HTMLSpanElement>("span") {
     innerText = name
 }
 
-inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
+internal inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
     name: String,
     crossinline themeToClass: (Theme) -> String = { DynamicCSS.theme(it) },
     crossinline themeLogic: T.(rootTheme: Boolean, themeChanged: Boolean) -> Unit,
@@ -28,7 +28,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
     themeJustChanged = false
 
     if (themeGetter != null) {
-        onRemove.reactiveScope {
+        calculationContext.reactiveScope {
             previousThemeClass?.let { classList.remove(it) }
             val t = theme2()
             val base = themeToClass(t)
@@ -41,7 +41,7 @@ inline fun <T : HTMLElement> ViewContext.themedElementPrivateMeta(
     setup()
 }
 
-fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, setup: T.() -> Unit) =
+fun <T : HTMLElement> ViewWriter.themedElementEditable(name: String, setup: T.() -> Unit) =
     themedElementPrivateMeta<T>(
         name = name,
         themeToClass = { DynamicCSS.themeInteractive(it) },
@@ -67,7 +67,7 @@ fun <T : HTMLElement> ViewContext.themedElementEditable(name: String, setup: T.(
         setup()
     }
 
-fun <T : HTMLElement> ViewContext.themedElementClickable(name: String, setup: T.() -> Unit) =
+fun <T : HTMLElement> ViewWriter.themedElementClickable(name: String, setup: T.() -> Unit) =
     themedElementPrivateMeta<T>(
         name = name,
         themeToClass = { DynamicCSS.themeInteractive(it) },
@@ -91,7 +91,7 @@ fun <T : HTMLElement> ViewContext.themedElementClickable(name: String, setup: T.
         setup()
     }
 
-fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+fun <T : HTMLElement> ViewWriter.themedElement(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
     name = name,
     themeToClass = { DynamicCSS.theme(it) },
     themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
@@ -112,7 +112,7 @@ fun <T : HTMLElement> ViewContext.themedElement(name: String, setup: T.() -> Uni
     setup()
 }
 
-fun <T : HTMLElement> ViewContext.themedElementBackIfChanged(name: String, setup: T.() -> Unit) =
+fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, setup: T.() -> Unit) =
     themedElementPrivateMeta<T>(
         name = name,
         themeToClass = { DynamicCSS.theme(it) },
@@ -157,7 +157,7 @@ fun <T : HTMLElement, V> T.vprop(
 }
 
 @ViewDsl
-internal fun ViewContext.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =
+internal fun ViewWriter.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =
     themedElement<HTMLDivElement>(elementBase) {
         setup(TextView(this))
         style.whiteSpace = "pre-wrap"
@@ -165,7 +165,7 @@ internal fun ViewContext.textElement(elementBase: String, setup: TextView.() -> 
 
 @ViewDsl
 
-internal fun ViewContext.headerElement(elementBase: String, setup: TextView.() -> Unit): Unit =
+internal fun ViewWriter.headerElement(elementBase: String, setup: TextView.() -> Unit): Unit =
     themedElement<HTMLDivElement>(elementBase) {
         setup(TextView(this))
         style.whiteSpace = "pre-wrap"

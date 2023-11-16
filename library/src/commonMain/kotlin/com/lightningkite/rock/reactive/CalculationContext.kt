@@ -4,22 +4,16 @@ import com.lightningkite.rock.Cancellable
 import kotlin.reflect.KMutableProperty0
 
 interface CalculationContext {
-    fun notifyStart()
-    fun notifySuccess()
-    fun notifyFailure()
+    fun notifyStart() {}
+    fun notifySuccess() {}
+    fun notifyFailure() {}
     fun onRemove(action: () -> Unit)
     companion object {
     }
     object NeverEnds: CalculationContext {
-        override fun notifyStart() {}
-        override fun notifySuccess() {}
-        override fun notifyFailure() {}
         override fun onRemove(action: () -> Unit) {}
     }
     class Test: CalculationContext, Cancellable {
-        override fun notifyStart() {}
-        override fun notifySuccess() {}
-        override fun notifyFailure() {}
         val onRemoveSet = HashSet<()->Unit>()
         override fun onRemove(action: () -> Unit) {
             onRemoveSet.add(action)

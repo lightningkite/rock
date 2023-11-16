@@ -137,8 +137,8 @@ interface RView<Wraps: NView> {
 }
 
 expect val NView.calculationContext: CalculationContext
-expect var NView.rotation: Angle
-expect var NView.alpha: Double
+expect var NView.nativeRotation: Angle
+expect var NView.opacity: Double
 expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 expect fun NView.clearChildren()
@@ -146,11 +146,11 @@ expect fun NView.addChild(child: NView)
 
 val RView<*>.calculationContext: CalculationContext get() = native.calculationContext
 var RView<*>.rotation: Angle
-    get() = native.rotation
-    set(value) { native.rotation = value }
+    get() = native.nativeRotation
+    set(value) { native.nativeRotation = value }
 var RView<*>.opacity: Double
-    get() = native.alpha
-    set(value) { native.alpha = value }
+    get() = native.opacity
+    set(value) { native.opacity = value }
 var RView<*>.exists: Boolean
     get() = native.exists
     set(value) { native.exists = value }

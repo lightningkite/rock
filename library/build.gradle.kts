@@ -9,7 +9,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
 //    kotlin("native.cocoapods")
-//    id("com.android.library")
+    id("com.android.library")
     id("maven-publish")
     id("signing")
 }
@@ -22,6 +22,13 @@ repositories {
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "1.8"
+            }
+        }
+    }
 //    jvm()
 //    android()
 //    ios()
@@ -50,6 +57,7 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val androidMain by getting
 //        val commonJvmMain by creating {
 //            dependsOn(commonMain)
 //        }
@@ -96,24 +104,13 @@ kotlin {
 //    }
 }
 
-//android {
-//    namespace = "$group.mppexample"
-//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-//    compileSdk = 31
-//
-//    defaultConfig {
-//        minSdk = 21
-//    }
-//    compileOptions {
-//        // Flag to enable support for the new language APIs
-//        isCoreLibraryDesugaringEnabled = true
-//        sourceCompatibility = JavaVersion.VERSION_1_8
-//        targetCompatibility = JavaVersion.VERSION_1_8
-//    }
-//    dependencies {
-//        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-//    }
-//}
+android {
+    namespace = "com.lightningkite.rock"
+    compileSdk = 34
+    defaultConfig {
+        minSdk = 24
+    }
+}
 
 standardPublishing {
     name.set("Rock")

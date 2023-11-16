@@ -1,7 +1,5 @@
 package com.lightningkite.rock
 
-import kotlinx.browser.window
-
 external fun decodeURIComponent(content: String): String
 external fun encodeURIComponent(content: String): String
 external fun decodeURI(content: String): String

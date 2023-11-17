@@ -8,6 +8,7 @@ import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.NView
 import com.lightningkite.rock.views.ViewDsl
+import com.lightningkite.rock.views.ViewModifierDsl3
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.datetime.LocalDate
@@ -31,7 +32,6 @@ actual var Link.newTab: Boolean
     set(value) {}
 
 actual class NExternalLink(context: Context) : NView(context)
-fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) = {TODO("Implement")}
 actual var ExternalLink.to: String
     get() {
         TODO()
@@ -340,4 +340,135 @@ actual fun ViewWriter.label(setup: Label.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.link(setup: Link.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.image(setup: Image.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.space(setup: Space.() -> Unit) {
+}
+
+actual fun ViewWriter.space(
+    multiplier: Double,
+    setup: Space.() -> Unit,
+) {
+}
+
+actual class NDismissBackground(c: Context) : NView(c)
+
+@ViewDsl
+actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.button(setup: Button.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.switch(setup: Switch.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.textField(setup: TextField.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.textArea(setup: TextArea.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.select(setup: Select.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit) {
+}
+
+actual fun SwapView.swap(
+    transition: ScreenTransition,
+    createNewView: () -> Unit,
+) {
+}
+
+@ViewDsl
+actual fun ViewWriter.webView(setup: WebView.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.canvas(setup: Canvas.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
+}
+
+@ViewDsl
+actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
+}
+
+@ViewModifierDsl3
+actual fun ViewWriter.hasPopover(
+    preferredDirection: PopoverPreferredDirection,
+    setup: ViewWriter.() -> Unit,
+): ViewWrapper {
+    TODO("Not yet implemented")
+}
+
+@ViewDsl
+actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) {
+    TODO("Implement")
 }

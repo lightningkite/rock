@@ -31,7 +31,7 @@ expect var Link.newTab: Boolean
 expect class NExternalLink : NView
 @JvmInline
 value class ExternalLink(override val native: NExternalLink) : RView<NExternalLink>
-@ViewDsl expect fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit = {}): Unit
+@ViewDsl expect fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit = {})
 expect var ExternalLink.to: String
 expect var ExternalLink.newTab: Boolean
 

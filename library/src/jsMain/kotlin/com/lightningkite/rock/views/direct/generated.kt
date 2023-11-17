@@ -82,7 +82,7 @@ actual inline var Link.newTab: Boolean
 actual typealias NExternalLink = HTMLAnchorElement
 
 @ViewDsl
-actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit): Unit =
+actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) =
     themedElementClickable<NExternalLink>("a") { setup(ExternalLink(this)) }
 
 actual inline var ExternalLink.to: String

@@ -109,15 +109,3 @@ private val HTMLElement.removeListeners: MutableList<() -> Unit>
     }
 private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
     get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
-
-
-actual fun ViewWriter.setTheme(calculate: suspend ()-> Theme?): ViewWrapper {
-    val old = themeStack
-    themeStack += calculate
-    themeJustChanged = true
-    this.afterNextElementSetup {
-        themeStack = old
-        themeJustChanged = false
-    }
-    return ViewWrapper
-}

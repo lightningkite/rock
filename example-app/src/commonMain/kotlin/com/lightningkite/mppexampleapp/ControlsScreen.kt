@@ -13,8 +13,6 @@ import com.lightningkite.rock.views.direct.*
 
 @Routable("controls")
 object ControlsScreen : RockScreen {
-
-
     override fun ViewWriter.render() {
         val booleanContent = Property(false)
         col {
@@ -31,7 +29,7 @@ object ControlsScreen : RockScreen {
                     button { text { content = "Sample" } }
                     button { text { content = "Card" } } in card
                     button { text { content = "Important" } } in important
-                    button { text { content = "Critical" } } in critical
+
                     button { text { content = "Warning" } } in warning
                     button { text { content = "Danger" } } in danger
                     space {} in weight(1f)

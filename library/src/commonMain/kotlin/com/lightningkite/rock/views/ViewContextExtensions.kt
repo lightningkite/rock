@@ -47,7 +47,16 @@ val ViewWriter.currentTheme: suspend ()->Theme get() {
         themeStack = old
     }
 }
-@ViewModifierDsl3 expect fun ViewWriter.setTheme(calculate: suspend ()->Theme?): ViewWrapper
+@ViewModifierDsl3 fun ViewWriter.setTheme(calculate: suspend ()-> Theme?): ViewWrapper {
+    val old = themeStack
+    themeStack += calculate
+    themeJustChanged = true
+    this.afterNextElementSetup {
+        themeStack = old
+        themeJustChanged = false
+    }
+    return ViewWrapper
+}
 @ViewModifierDsl3 inline fun ViewWriter.themeFromLast(crossinline calculate: suspend (Theme)->Theme?): ViewWrapper {
     val previous = currentTheme
     return setTheme { calculate(previous()) }

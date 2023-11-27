@@ -51,6 +51,10 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
+            dependencies {
+                implementation("androidx.appcompat:appcompat:1.6.1")
+                implementation("androidx.recyclerview:recyclerview:1.3.2")
+            }
         }
         val commonTest by getting {
             dependencies {

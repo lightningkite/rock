@@ -15,7 +15,7 @@ actual typealias NView = View
 private val View.removeListeners: HashMap<Int, () -> Unit>
     get() = HashMap()
 
-data class NViewCalculationContext(val native: FrameLayout): CalculationContext {
+data class NViewCalculationContext(val native: View): CalculationContext {
     override fun onRemove(action: () -> Unit) {
         native.removeListeners[action.hashCode()] = action
     }
@@ -26,7 +26,7 @@ data class NViewCalculationContext(val native: FrameLayout): CalculationContext 
 }
 
 actual val NView.calculationContext: CalculationContext
-    get() = NViewCalculationContext(this as FrameLayout)
+    get() = NViewCalculationContext(this)
 
 actual var NView.nativeRotation: Angle
     get() = Angle(rotation / Angle.DEGREES_PER_CIRCLE)

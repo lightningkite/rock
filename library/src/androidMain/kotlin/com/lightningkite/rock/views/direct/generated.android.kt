@@ -1,25 +1,150 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
+import android.graphics.Typeface
+import android.view.ViewGroup
+import android.widget.CalendarView
+import android.widget.DatePicker
+import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.Spinner
+import android.widget.TimePicker
+import android.widget.Button as AndroidButton
+import android.widget.TextView as AndroidTextView
+import androidx.appcompat.widget.SwitchCompat
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
-import com.lightningkite.rock.views.NView
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewModifierDsl3
-import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime
 
-actual class NSeparator(context: Context) : NView(context)
+
 actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {}
-actual class NContainingView(context: Context) : NView(context)
-actual fun ViewWriter.stack(setup: ContainingView.() -> Unit): Unit { TODO("") }
-actual class NLink(context: Context) : NView(context)
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NContainingView = ViewGroup
+
+actual typealias NTextView = android.widget.TextView
+actual typealias NLabel = android.widget.TextView
+actual typealias NLink = android.widget.TextView
+actual typealias NExternalLink = android.widget.TextView
+actual typealias NImage = ImageView
+actual typealias NActivityIndicator = ProgressBar
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NSpace = android.view.View
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NButton = android.widget.Button
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NCheckbox = android.widget.CheckBox
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NRadioButton = android.widget.RadioButton
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NSwitch = SwitchCompat
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NToggleButton = android.view.View
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NRadioToggleButton = android.view.View
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NLocalDateField = DatePicker
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NLocalTimeField = TimePicker
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NLocalDateTimeField = CalendarView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NTextField = EditText
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NTextArea = android.widget.TextView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NSelect = Spinner
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NAutoCompleteTextField = EditText
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NSwapView = AndroidSwapView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NWebView = android.webkit.WebView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NCanvas = android.view.View
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NRecyclerView = androidx.recyclerview.widget.RecyclerView
+actual class NDismissBackground(c: Context) : NView(c)
+
+actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) =  element(::FrameLayout, ::ContainingView, setup)
+@ViewDsl
+actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
+    element(::LinearLayout, ::ContainingView) {
+        val l = this.native as LinearLayout
+        l.orientation = LinearLayout.VERTICAL
+        setup(ContainingView(l))
+    }
+
+}
+
+@ViewDsl
+actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
+    element(::LinearLayout, ::ContainingView) {
+        val l = this.native as LinearLayout
+        l.orientation = LinearLayout.HORIZONTAL
+        setup(ContainingView(l))
+    }
+}
+
+@ViewDsl
+actual fun ViewWriter.button(setup: Button.() -> Unit) = element(::AndroidButton, ::Button, setup)
+
+fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
+    val androidText = this.native as AndroidTextView
+    androidText.textSize = textSize
+    setup(TextView(androidText))
+}
+fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
+    val androidText = this.native as AndroidTextView
+    androidText.textSize = textSize
+    androidText.setTypeface(androidText.typeface, Typeface.BOLD)
+    setup(TextView(androidText))
+}
+
+object TextSizes {
+    var h1 = 26f
+    var h2 = 24f
+    var h3 = 22f
+    var h4 = 20f
+    var h5 = 18f
+    var h6 = 16f
+    var defaultHeader = 20f
+    var body = 16f
+    var subtext = 14f
+}
+
+
+@ViewDsl
+actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = header(TextSizes.h1, setup)
+@ViewDsl
+actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = header(TextSizes.h2, setup)
+@ViewDsl
+actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = header(TextSizes.h3, setup)
+@ViewDsl
+actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = header(TextSizes.h4, setup)
+@ViewDsl
+actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = header(TextSizes.h5, setup)
+@ViewDsl
+actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = header(TextSizes.h6, setup)
+@ViewDsl
+actual fun ViewWriter.header(setup: TextView.() -> Unit): Unit = header(TextSizes.defaultHeader, setup)
+@ViewDsl
+actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement(TextSizes.body, setup)
+
+@ViewDsl
+actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement(TextSizes.subtext, setup)
+
+
 actual var Link.to: RockScreen
     get() {
         TODO()
@@ -31,7 +156,7 @@ actual var Link.newTab: Boolean
     }
     set(value) {}
 
-actual class NExternalLink(context: Context) : NView(context)
+
 actual var ExternalLink.to: String
     get() {
         TODO()
@@ -43,7 +168,7 @@ actual var ExternalLink.newTab: Boolean
     }
     set(value) {}
 
-actual class NImage(context: Context) : NView(context)
+
 actual var Image.source: ImageSource
     get() {
         TODO()
@@ -59,8 +184,6 @@ actual var Image.description: String?
         TODO()
     }
     set(value) {}
-
-actual class NTextView(context: Context) : NView(context)
 actual var TextView.content: String
     get() {
         TODO()
@@ -76,18 +199,16 @@ actual var TextView.textSize: Dimension
         TODO()
     }
     set(value) {}
-
-actual class NLabel(context: Context) : NView(context)
 actual var Label.content: String
     get() {
         TODO()
     }
     set(value) {}
 
-actual class NActivityIndicator(context: Context) : NView(context)
-actual class NSpace(context: Context) : NView(context)
+
+
 actual fun DismissBackground.onClick(action: suspend () -> Unit) {}
-actual class NButton(context: Context) : NView(context)
+
 actual fun Button.onClick(action: suspend () -> Unit) {}
 actual var Button.enabled: Boolean
     get() {
@@ -95,7 +216,7 @@ actual var Button.enabled: Boolean
     }
     set(value) {}
 
-actual class NCheckbox(context: Context) : NView(context)
+
 actual var Checkbox.enabled: Boolean
     get() {
         TODO()
@@ -106,7 +227,7 @@ actual val Checkbox.checked: Writable<Boolean>
         TODO()
     }
 
-actual class NRadioButton(context: Context) : NView(context)
+
 actual var RadioButton.enabled: Boolean
     get() {
         TODO()
@@ -117,7 +238,7 @@ actual val RadioButton.checked: Writable<Boolean>
         TODO()
     }
 
-actual class NSwitch(context: Context) : NView(context)
+
 actual var Switch.enabled: Boolean
     get() {
         TODO()
@@ -128,7 +249,7 @@ actual val Switch.checked: Writable<Boolean>
         TODO()
     }
 
-actual class NToggleButton(context: Context) : NView(context)
+
 actual var ToggleButton.enabled: Boolean
     get() {
         TODO()
@@ -139,7 +260,7 @@ actual val ToggleButton.checked: Writable<Boolean>
         TODO()
     }
 
-actual class NRadioToggleButton(context: Context) : NView(context)
+
 actual var RadioToggleButton.enabled: Boolean
     get() {
         TODO()
@@ -150,7 +271,7 @@ actual val RadioToggleButton.checked: Writable<Boolean>
         TODO()
     }
 
-actual class NLocalDateField(context: Context) : NView(context)
+
 actual val LocalDateField.content: Writable<LocalDate?>
     get() {
         TODO()
@@ -161,7 +282,7 @@ actual var LocalDateField.range: ClosedRange<LocalDate>?
     }
     set(value) {}
 
-actual class NLocalTimeField(context: Context) : NView(context)
+
 actual val LocalTimeField.content: Writable<LocalTime?>
     get() {
         TODO()
@@ -172,7 +293,7 @@ actual var LocalTimeField.range: ClosedRange<LocalTime>?
     }
     set(value) {}
 
-actual class NLocalDateTimeField(context: Context) : NView(context)
+
 actual val LocalDateTimeField.content: Writable<LocalDateTime?>
     get() {
         TODO()
@@ -183,7 +304,7 @@ actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     }
     set(value) {}
 
-actual class NTextField(context: Context) : NView(context)
+
 actual val TextField.content: Writable<String>
     get() {
         TODO()
@@ -204,7 +325,7 @@ actual var TextField.range: ClosedRange<Double>?
     }
     set(value) {}
 
-actual class NTextArea(context: Context) : NView(context)
+
 actual val TextArea.content: Writable<String>
     get() {
         TODO()
@@ -220,7 +341,7 @@ actual var TextArea.hint: String
     }
     set(value) {}
 
-actual class NSelect(context: Context) : NView(context)
+
 actual val Select.selected: Writable<String?>
     get() {
         TODO()
@@ -231,7 +352,7 @@ actual var Select.options: List<WidgetOption>
     }
     set(value) {}
 
-actual class NAutoCompleteTextField(context: Context) : NView(context)
+
 actual val AutoCompleteTextField.content: Writable<String>
     get() {
         TODO()
@@ -242,8 +363,8 @@ actual var AutoCompleteTextField.suggestions: List<String>
     }
     set(value) {}
 
-actual class NSwapView(context: Context) : NView(context)
-actual class NWebView(context: Context) : NView(context)
+
+
 actual var WebView.url: String
     get() {
         TODO()
@@ -260,7 +381,7 @@ actual var WebView.content: String
     }
     set(value) {}
 
-actual class NCanvas(context: Context) : NView(context)
+
 actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {}
 actual val Canvas.width: Readable<Double>
     get() {
@@ -275,7 +396,7 @@ actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: D
 actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {}
 actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {}
 actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {}
-actual class NRecyclerView(context: Context) : NView(context)
+
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit {}
 actual fun ViewWriter.weight(amount: Float): ViewWrapper { TODO("Implement") }
 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper { TODO("Implement") }
@@ -297,57 +418,8 @@ actual val ViewWriter.withPadding: ViewWrapper
     get() {
         TODO()
     }
-
-@ViewDsl
-actual fun ViewWriter.h1(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.subtext(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.h2(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.h3(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.h4(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.h5(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.h6(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.text(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.header(setup: TextView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.label(setup: Label.() -> Unit) {
-}
-
 @ViewDsl
 actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
 }
 
 @ViewDsl
@@ -368,14 +440,10 @@ actual fun ViewWriter.space(
 ) {
 }
 
-actual class NDismissBackground(c: Context) : NView(c)
+
 
 @ViewDsl
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
-}
-
-@ViewDsl
-actual fun ViewWriter.button(setup: Button.() -> Unit) {
 }
 
 @ViewDsl
@@ -428,10 +496,12 @@ actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> U
 
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
+
 }
 
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit) {
+
 }
 
 actual fun SwapView.swap(
@@ -441,8 +511,7 @@ actual fun SwapView.swap(
 }
 
 @ViewDsl
-actual fun ViewWriter.webView(setup: WebView.() -> Unit) {
-}
+actual fun ViewWriter.webView(setup: WebView.() -> Unit) {}
 
 @ViewDsl
 actual fun ViewWriter.canvas(setup: Canvas.() -> Unit) {
@@ -472,3 +541,9 @@ actual fun ViewWriter.hasPopover(
 actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) {
     TODO("Implement")
 }
+
+@ViewDsl
+actual fun ViewWriter.label(setup: Label.() -> Unit) {
+}
+
+actual class NSeparator(c: Context) : NView(c)

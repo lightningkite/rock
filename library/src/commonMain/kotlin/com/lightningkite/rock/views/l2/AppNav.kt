@@ -271,7 +271,6 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
 
 fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
-    val booleanContent = Property(false)
     col {
 // Nav 4 left and top - add dropdown for user info
         row {
@@ -309,17 +308,14 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 }
             }
             row {
-                toggleButton {
-                    checked bind booleanContent
-                    image {
-                        val currentTheme = currentTheme
-                        ::source {
-                            appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                currentTheme().foreground
-                            )
-                        }
-                        description = "User icon"
+                image {
+                    val currentTheme = currentTheme
+                    ::source {
+                        appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                            currentTheme().foreground
+                        )
                     }
+                    description = "User icon"
                 }
                 text {
                     content = appNav.currentUser?.currentUser?.name ?: "No user"
@@ -335,9 +331,8 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                             text { ::content { it.await().title } }
                         }
                     }
-                    ::exists { booleanContent.await() }
-                }
-            } in card
+                } in card
+            }
 
         } in bar in marginless
         row {

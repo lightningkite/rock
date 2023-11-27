@@ -754,14 +754,18 @@ actual fun <T> RecyclerView.children(
     render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit = TODO()
 
-@ViewModifierDsl3
-actual fun ViewWriter.hasPopover(
+@ViewModifierDsl3 actual fun ViewWriter.hasPopover(
+    requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit
 ): ViewWrapper {
     containsNext<HTMLDivElement>("div") {
+        onclick = {
+            // TODO
+        }
         style.position = "relative"
-        beforeNextElementSetup {
+        element<HTMLDivElement>("div") {
+            if(!requireClick) classList.add("visibleOnParentHover")
             style.position = "absolute"
             style.zIndex = "9999"
             if (preferredDirection.horizontal) {
@@ -787,8 +791,8 @@ actual fun ViewWriter.hasPopover(
                     else -> style.left = "calc(50% - 0)"
                 }
             }
+            setup()
         }
-        setup()
     }
     return ViewWrapper
 }

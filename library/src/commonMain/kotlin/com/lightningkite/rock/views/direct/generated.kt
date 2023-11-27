@@ -182,7 +182,7 @@ value class RecyclerView(override val native: NRecyclerView) : RView<NRecyclerVi
 @ViewDsl expect fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit
-@ViewModifierDsl3 expect fun ViewWriter.hasPopover(preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewWriter.()->Unit): ViewWrapper
+@ViewModifierDsl3 expect fun ViewWriter.hasPopover(requireClick: Boolean = false, preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewWriter.()->Unit): ViewWrapper
 @ViewModifierDsl3 expect fun ViewWriter.weight(amount: Float): ViewWrapper
 @ViewModifierDsl3 expect fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper
 @ViewModifierDsl3 expect val ViewWriter.scrolls: ViewWrapper

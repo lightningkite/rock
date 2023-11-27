@@ -9,7 +9,7 @@ class ReactivityTests {
     fun wait() {
         val property = Property<Int?>(null)
         val emissions = ArrayList<Int>()
-        with(CalculationContext.Test()) {
+        with(CalculationContext.Standard()) {
             reactiveScope {
                 emissions.add(property.waitForNotNull.await())
             }

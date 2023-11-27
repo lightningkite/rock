@@ -1,5 +1,7 @@
 package com.lightningkite.rock.models
 
+import kotlin.js.JsName
+
 data class Theme(
     val id: String,
     val title: FontAndStyle = FontAndStyle(systemDefaultFont),

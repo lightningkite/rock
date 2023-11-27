@@ -1,8 +1,10 @@
 package com.lightningkite.rock.models
 
+import kotlin.jvm.JvmInline
 import kotlin.math.PI
 import kotlin.math.absoluteValue
 
+@JvmInline
 value class Angle(val turns: Float) {
     companion object {
         const val RADIANS_PER_CIRCLE = (PI * 2).toFloat()

@@ -22,7 +22,7 @@ repositories {
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
-//    jvm()
+    jvm()
 //    android()
 //    ios()
 //    listOf(
@@ -50,15 +50,24 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val commonHtmlMain by creating {
+            dependsOn(commonMain)
+        }
 //        val commonJvmMain by creating {
 //            dependsOn(commonMain)
 //        }
 //        val androidMain by getting {
 //            dependsOn(commonJvmMain)
 //        }
-//        val jvmMain by getting {
-//            dependsOn(commonJvmMain)
-//        }
+        val jvmMain by getting {
+            dependsOn(commonHtmlMain)
+            dependencies {
+                api("org.apache.commons:commons-lang3:3.12.0")
+            }
+        }
+        val jsMain by getting {
+            dependsOn(commonHtmlMain)
+        }
     }
 
 //    cocoapods {

@@ -1,6 +1,7 @@
 package com.lightningkite.rock.models
 
 import com.lightningkite.rock.navigation.RockScreen
+import kotlin.jvm.JvmInline
 
 class AnimationId
 
@@ -113,6 +114,7 @@ data class Action(
 enum class ImageScaleType { Fit, Crop, Stretch, NoScale }
 
 expect class DimensionRaw
+@JvmInline
 value class Dimension(val value: DimensionRaw)
 expect val Int.px: Dimension
 expect val Int.rem: Dimension

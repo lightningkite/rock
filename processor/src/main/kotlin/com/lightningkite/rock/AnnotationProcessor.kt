@@ -16,11 +16,7 @@ class RouterGeneration(
         if (invoked) return listOf()
         invoked = true
         val deferredSymbols = ArrayList<KSClassDeclaration>()
-//        val examplePath = resolver.getAllFiles()
-//            .map { it.filePath.replace('\\', '/') }
-//            .filter { it.matches(Regex("src/[a-zA-Z]+/kotlin")) }
-//            .first()
-//        val srcFolder = examplePath.substringBeforeLast("/src/")
+//        throw Exception("resolver.getAllFiles(): ${resolver.getAllFiles().joinToString { it.filePath }}")
         val allRoutables = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()

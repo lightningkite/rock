@@ -37,7 +37,6 @@ class PersistentProperty<T>(
 
     init {
         val stored = PlatformStorage.get(key)
-        println("PersistentProperty $key stored as $stored")
         initialized = true
         if (stored != null)
             once = Json.decodeFromString(serializer, stored)

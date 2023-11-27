@@ -158,7 +158,9 @@ CodeEmitter.common(
 )
 
 "Separator" {}
-"ContainingView"("stack", "col", "row")
+"ContainingView"("stack", "col", "row") {
+    specialConstructor("grid", "columns" ofType "Int")
+}
 "Link" {
     prop("to", "RockScreen")
     prop("newTab", "Boolean")

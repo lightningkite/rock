@@ -3,6 +3,7 @@ package com.lightningkite.rock.reactive
 import com.lightningkite.rock.*
 import kotlin.coroutines.*
 import kotlin.properties.ReadWriteProperty
+import kotlin.random.Random
 import kotlin.reflect.KProperty
 
 interface ResourceUse {
@@ -153,6 +154,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             removers.clear()
         }
     }
+    val id = Random.nextInt(100, 999)
     return object: Readable<T> {
         var value: T? = null
         var ready: Boolean = false
@@ -179,11 +181,12 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                         ready = true
                     }
                     listeners.forEach { it() }
-                    listeners.clear()
                 }
             }
             listeners.add(listener)
-            return { removeListener(listener) }
+            return {
+                removeListener(listener)
+            }
         }
         private fun removeListener(listener: () -> Unit) {
             listeners.remove(listener)

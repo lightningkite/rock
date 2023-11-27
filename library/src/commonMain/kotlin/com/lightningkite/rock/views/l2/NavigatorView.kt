@@ -25,11 +25,8 @@ fun ViewWriter.navigatorViewDialog() {
         val navigator = navigator.dialog
         fork.navigator = navigator
         reactiveScope {
-            println("Getting current screen")
             val screen = navigator.currentScreen.await()
-            println("Current screen is $screen")
             this@swapViewDialog.swap {
-                println("Swapping in $screen")
                 if (screen != null)
                     with(screen) { fork.render() }
             }

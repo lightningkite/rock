@@ -2,11 +2,12 @@ package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.ViewWrapper
+import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NView = Unit
+actual typealias NView = HTMLElement
 
 actual val NView.calculationContext: CalculationContext
     get() = TODO()

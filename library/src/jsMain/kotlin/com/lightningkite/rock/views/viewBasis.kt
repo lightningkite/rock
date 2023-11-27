@@ -42,7 +42,6 @@ actual val NView.calculationContext: CalculationContext
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()
     set(value) {
-//        style.display = if (value) "flex" else "none"
         hidden = !value
     }
 

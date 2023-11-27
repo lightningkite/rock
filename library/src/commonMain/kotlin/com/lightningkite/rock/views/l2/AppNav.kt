@@ -145,7 +145,7 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 }
                 ::exists { booleanContent.await() }
             } in bar in marginless
-            navigatorView(navigator) in weight(1f)
+            navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless
 }
@@ -203,7 +203,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
-        navigatorView(navigator) in weight(1f)
+        navigatorView(navigator) in weight(1f) in marginless
     } in marginless
 }
 
@@ -245,7 +245,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
-        navigatorView(navigator) in marginless in weight(1f)
+        navigatorView(navigator) in weight(1f) in marginless
         //Nav 3 - top and bottom (bottom/tabs)
         row {
             forEachUpdating(appNav.navItemsProperty) {
@@ -337,16 +337,16 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
         } in bar in marginless
         row {
             col {
-                col {
-                    forEachUpdating(appNav.navItemsProperty) {
-                        link {
-                            ::to { it.await().destination }
-                            text { ::content { it.await().title } }
-                        }
+                forEachUpdating(appNav.navItemsProperty) {
+                    link {
+                        ::to { it.await().destination }
+                        text { ::content { it.await().title } }
                     }
                 }
+
+                ::exists { appNav.navItemsProperty.await().size > 1 }
             } in marginless
-            navigatorView(navigator) in weight(1f)
+            navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless
 }

@@ -1,8 +1,6 @@
 package com.lightningkite.rock
 
 import java.io.File
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE", "UnsafeCastFromDynamic")
 actual suspend fun fetch(

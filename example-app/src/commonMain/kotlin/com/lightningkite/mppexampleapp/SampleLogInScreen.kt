@@ -38,14 +38,20 @@ object SampleLogInScreen : RockScreen {
                         textField {
                             keyboardHints = KeyboardHints.password
                             content bind password
+                            action = Action(
+                                title = "Log In",
+                                icon = Icon.login,
+                                onSelect = {
+                                    fakeLogin(email)
+                                }
+                            )
                         }
                     }
                     button {
                         h6 { content = "Log In" }
                         onClick {
                             launch {
-                                fetch("fake-login/${email.await()}")
-                                navigator.navigate(ControlsScreen)
+                                fakeLogin(email)
                             }
                         }
                     } in important
@@ -53,5 +59,10 @@ object SampleLogInScreen : RockScreen {
                 space {} in weight(1f)
             } in scrolls in withPadding
         } in marginless
+    }
+
+    private suspend fun ViewWriter.fakeLogin(email: Property<String>) {
+        fetch("fake-login/${email.await()}")
+        navigator.navigate(ControlsScreen)
     }
 }

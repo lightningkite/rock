@@ -128,6 +128,7 @@ expect class NLocalDateField : NView
 value class LocalDateField(override val native: NLocalDateField) : RView<NLocalDateField>
 @ViewDsl expect fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit = {}): Unit
 expect val LocalDateField.content: Writable<LocalDate?>
+expect var LocalDateField.action: Action?
 expect var LocalDateField.range: ClosedRange<LocalDate>?
 
 expect class NLocalTimeField : NView
@@ -135,6 +136,7 @@ expect class NLocalTimeField : NView
 value class LocalTimeField(override val native: NLocalTimeField) : RView<NLocalTimeField>
 @ViewDsl expect fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit = {}): Unit
 expect val LocalTimeField.content: Writable<LocalTime?>
+expect var LocalTimeField.action: Action?
 expect var LocalTimeField.range: ClosedRange<LocalTime>?
 
 expect class NLocalDateTimeField : NView
@@ -142,6 +144,7 @@ expect class NLocalDateTimeField : NView
 value class LocalDateTimeField(override val native: NLocalDateTimeField) : RView<NLocalDateTimeField>
 @ViewDsl expect fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit = {}): Unit
 expect val LocalDateTimeField.content: Writable<LocalDateTime?>
+expect var LocalDateTimeField.action: Action?
 expect var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
 
 expect class NTextField : NView
@@ -150,6 +153,7 @@ value class TextField(override val native: NTextField) : RView<NTextField>
 @ViewDsl expect fun ViewWriter.textField(setup: TextField.() -> Unit = {}): Unit
 expect val TextField.content: Writable<String>
 expect var TextField.keyboardHints: KeyboardHints
+expect var TextField.action: Action?
 expect var TextField.hint: String
 expect var TextField.range: ClosedRange<Double>?
 
@@ -173,6 +177,8 @@ expect class NAutoCompleteTextField : NView
 value class AutoCompleteTextField(override val native: NAutoCompleteTextField) : RView<NAutoCompleteTextField>
 @ViewDsl expect fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit = {}): Unit
 expect val AutoCompleteTextField.content: Writable<String>
+expect var AutoCompleteTextField.keyboardHints: KeyboardHints
+expect var AutoCompleteTextField.action: Action?
 expect var AutoCompleteTextField.suggestions: List<String>
 
 expect class NSwapView : NView

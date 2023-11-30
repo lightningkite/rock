@@ -417,6 +417,17 @@ actual val LocalDateField.content: Writable<LocalDate?>
             valueAsDate = it?.let { LocalDateTime(it, LocalTime(12, 0, 0)).toInstant(TimeZone.currentSystemDefault()) }
         }
     )
+actual var LocalDateField.action: Action?
+    get() = TODO()
+    set(value) {
+        native.onkeyup = if(value == null) null else { ev ->
+            if(ev.keyCode == 13) {
+                launch {
+                    value.onSelect()
+                }
+            }
+        }
+    }
 actual inline var LocalDateField.range: ClosedRange<LocalDate>?
     get() = TODO()
     set(value) {
@@ -450,6 +461,17 @@ actual val LocalTimeField.content: Writable<LocalTime?>
             valueAsDate = it?.let { LocalDateTime(LocalDate(1970, 1, 1), it).toInstant(TimeZone.currentSystemDefault()) }
         }
     )
+actual var LocalTimeField.action: Action?
+    get() = TODO()
+    set(value) {
+        native.onkeyup = if(value == null) null else { ev ->
+            if(ev.keyCode == 13) {
+                launch {
+                    value.onSelect()
+                }
+            }
+        }
+    }
 actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
     get() = TODO()
     set(value) {
@@ -483,6 +505,17 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
             valueAsDate = it?.let { it.toInstant(TimeZone.currentSystemDefault()) }
         }
     )
+actual var LocalDateTimeField.action: Action?
+    get() = TODO()
+    set(value) {
+        native.onkeyup = if(value == null) null else { ev ->
+            if(ev.keyCode == 13) {
+                launch {
+                    value.onSelect()
+                }
+            }
+        }
+    }
 actual inline var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() = TODO()
     set(value) {
@@ -546,6 +579,17 @@ actual inline var TextField.keyboardHints: KeyboardHints
 
             null -> {
                 native.autocomplete = "off"
+            }
+        }
+    }
+actual var TextField.action: Action?
+    get() = TODO()
+    set(value) {
+        native.onkeyup = if(value == null) null else { ev ->
+            if(ev.keyCode == 13) {
+                launch {
+                    value.onSelect()
+                }
             }
         }
     }
@@ -646,6 +690,60 @@ actual inline var AutoCompleteTextField.suggestions: List<String>
         }
         document.getElementById(listId)?.let { it as? HTMLElement }?.apply {
             __resetContentToOptionList(value.map { WidgetOption(it, it) }, this@suggestions.native.value)
+        }
+    }
+actual inline var AutoCompleteTextField.keyboardHints: KeyboardHints
+    get() = TODO()
+    set(value) {
+        native.type = when (value.type) {
+            KeyboardType.Text -> "text"
+            KeyboardType.Decimal -> "number"
+            KeyboardType.Integer -> "number"
+            KeyboardType.Phone -> "tel"
+            KeyboardType.Email -> "text"
+        }
+        native.inputMode = when (value.type) {
+            KeyboardType.Text -> "text"
+            KeyboardType.Decimal -> "decimal"
+            KeyboardType.Integer -> "numeric"
+            KeyboardType.Phone -> "tel"
+            KeyboardType.Email -> "email"
+        }
+
+        when (value.autocomplete) {
+            AutoComplete.Email -> {
+                native.type = "email"
+                native.autocomplete = "email"
+            }
+
+            AutoComplete.Password -> {
+                native.type = "password"
+                native.autocomplete = "current-password"
+            }
+
+            AutoComplete.NewPassword -> {
+                native.type = "password"
+                native.autocomplete = "new-password"
+            }
+
+            AutoComplete.Phone -> {
+                native.autocomplete = "tel"
+            }
+
+            null -> {
+                native.autocomplete = "off"
+            }
+        }
+    }
+actual var AutoCompleteTextField.action: Action?
+    get() = TODO()
+    set(value) {
+        native.onkeyup = if(value == null) null else { ev ->
+            if(ev.keyCode == 13) {
+                launch {
+                    value.onSelect()
+                }
+            }
         }
     }
 

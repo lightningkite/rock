@@ -87,8 +87,7 @@ data class PopoverPreferredDirection(
 data class KeyboardHints(
     val case: KeyboardCase = KeyboardCase.None,
     val type: KeyboardType = KeyboardType.Text,
-    val autocomplete: AutoComplete? = null,
-    val action: Action? = null
+    val autocomplete: AutoComplete? = null
 ) {
     companion object {
         val paragraph = KeyboardHints(KeyboardCase.Sentences, KeyboardType.Text)

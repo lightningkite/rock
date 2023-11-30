@@ -128,6 +128,9 @@ actual val RadioToggleButton.checked: Writable<Boolean> get() = Property(false)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLocalDateField = HTMLElement
 @ViewDsl actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit = todo("localDateField")
+actual var LocalDateField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual val LocalDateField.content: Writable<LocalDate?> get() = Property(null)
 actual inline var LocalDateField.range: ClosedRange<LocalDate>?
     get() = TODO()
@@ -135,6 +138,9 @@ actual inline var LocalDateField.range: ClosedRange<LocalDate>?
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLocalTimeField = HTMLElement
 @ViewDsl actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = todo("localTimeField")
+actual var LocalTimeField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual val LocalTimeField.content: Writable<LocalTime?> get() = Property(null)
 actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
     get() = TODO()
@@ -142,6 +148,9 @@ actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLocalDateTimeField = HTMLElement
 @ViewDsl actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): Unit = todo("localDateTimeField")
+actual var LocalDateTimeField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual val LocalDateTimeField.content: Writable<LocalDateTime?> get() = Property(null)
 actual inline var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() = TODO()
@@ -153,6 +162,9 @@ actual val TextField.content: Writable<String> get() = Property("")
 actual inline var TextField.keyboardHints: KeyboardHints
     get() = TODO()
     set(value) { }
+actual var TextField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual inline var TextField.hint: String
     get() = TODO()
     set(value) { }
@@ -180,6 +192,12 @@ actual inline var Select.options: List<WidgetOption>
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NAutoCompleteTextField = HTMLElement
 @ViewDsl actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = todo("autoCompleteTextField")
 actual val AutoCompleteTextField.content: Writable<String> get() = Property("")
+actual inline var AutoCompleteTextField.keyboardHints: KeyboardHints
+    get() = TODO()
+    set(value) { }
+actual var AutoCompleteTextField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual inline var AutoCompleteTextField.suggestions: List<String>
     get() = TODO()
     set(value) { }

@@ -370,6 +370,9 @@ actual val LocalDateField.content: Writable<LocalDate?>
     get() {
         TODO()
     }
+actual var LocalDateField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual var LocalDateField.range: ClosedRange<LocalDate>?
     get() {
         TODO()
@@ -381,6 +384,9 @@ actual val LocalTimeField.content: Writable<LocalTime?>
     get() {
         TODO()
     }
+actual var LocalTimeField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual var LocalTimeField.range: ClosedRange<LocalTime>?
     get() {
         TODO()
@@ -392,6 +398,9 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
     get() {
         TODO()
     }
+actual var LocalDateTimeField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() {
         TODO()
@@ -407,6 +416,9 @@ actual var TextField.keyboardHints: KeyboardHints
     get() {
         TODO()
     }
+    set(value) {}
+actual var TextField.action: Action?
+    get() = TODO()
     set(value) {}
 actual var TextField.hint: String
     get() {
@@ -451,6 +463,14 @@ actual val AutoCompleteTextField.content: Writable<String>
     get() {
         TODO()
     }
+actual var AutoCompleteTextField.keyboardHints: KeyboardHints
+    get() {
+        TODO()
+    }
+    set(value) {}
+actual var AutoCompleteTextField.action: Action?
+    get() = TODO()
+    set(value) {}
 actual var AutoCompleteTextField.suggestions: List<String>
     get() {
         TODO()

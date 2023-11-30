@@ -24,7 +24,14 @@ object FormsScreen : RockScreen {
                 }
             },
             viewer = {
-                h2 { ::content { prop.await() } }
+                row {
+                    text {
+                        content = propName
+                    }
+                    text {
+                        ::content { prop.await() }
+                    }
+                }
             }
         )
     }
@@ -58,8 +65,7 @@ object FormsScreen : RockScreen {
                 FormSection(
                     title = "Requires Legal Paperwork",
                     leaves = {
-                        println("Requires Legal Paperwork section: ${lp.await()}")
-                        listOf(
+                        (listOf(
                             FormLeaf(
                                 title = "Requires Legal Paperwork",
                                 editor = {
@@ -76,7 +82,7 @@ object FormsScreen : RockScreen {
                             listOf(
                                 leafExample("Paperwork Entry"),
                             )
-                        } else listOf())
+                        } else listOf()))
                     }
                 )
             )
@@ -146,7 +152,9 @@ data class FormSection(
     val directIssues: suspend CalculationContext.() -> List<FormIssue> = { listOf() },
     val leaves: suspend CalculationContext.() -> List<FormLeaf> = { listOf() },
     val subsections: suspend CalculationContext.() -> List<FormSection> = { listOf() },
-)
+) {
+    override fun toString(): String = title
+}
 
 data class FormLeaf(
     val title: String,
@@ -156,4 +164,6 @@ data class FormLeaf(
     val directIssues: suspend CalculationContext.() -> List<FormIssue> = { listOf() },
     val editor: ViewWriter.() -> Unit,
     val viewer: ViewWriter.() -> Unit,
-)
+) {
+    override fun toString(): String = title
+}

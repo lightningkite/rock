@@ -13,7 +13,7 @@ interface CalculationContext {
     object NeverEnds: CalculationContext {
         override fun onRemove(action: () -> Unit) {}
     }
-    class Test: CalculationContext, Cancellable {
+    class Standard: CalculationContext, Cancellable {
         val onRemoveSet = HashSet<()->Unit>()
         override fun onRemove(action: () -> Unit) {
             onRemoveSet.add(action)

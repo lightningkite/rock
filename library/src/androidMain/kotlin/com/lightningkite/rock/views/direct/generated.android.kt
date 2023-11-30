@@ -2,8 +2,10 @@ package com.lightningkite.rock.views.direct
 
 import android.content.Context
 import android.graphics.Typeface
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.CalendarView
+import android.widget.CompoundButton
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -15,8 +17,10 @@ import android.widget.TimePicker
 import android.widget.Button as AndroidButton
 import android.widget.TextView as AndroidTextView
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.view.updateLayoutParams
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
@@ -100,12 +104,12 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
 actual fun ViewWriter.button(setup: Button.() -> Unit) = element(::AndroidButton, ::Button, setup)
 
 fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
-    val androidText = this.native as AndroidTextView
+    val androidText = this.native
     androidText.textSize = textSize
     setup(TextView(androidText))
 }
 fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
-    val androidText = this.native as AndroidTextView
+    val androidText = this.native
     androidText.textSize = textSize
     androidText.setTypeface(androidText.typeface, Typeface.BOLD)
     setup(TextView(androidText))
@@ -137,8 +141,6 @@ actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = header(TextSizes.h5
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = header(TextSizes.h6, setup)
 @ViewDsl
-actual fun ViewWriter.header(setup: TextView.() -> Unit): Unit = header(TextSizes.defaultHeader, setup)
-@ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement(TextSizes.body, setup)
 
 @ViewDsl
@@ -146,10 +148,8 @@ actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement(Te
 
 
 actual var Link.to: RockScreen
-    get() {
-        TODO()
-    }
-    set(value) {}
+    get() = TODO("Implement")
+    set(value) { TODO("Implement") }
 actual var Link.newTab: Boolean
     get() {
         TODO()
@@ -171,7 +171,7 @@ actual var ExternalLink.newTab: Boolean
 
 actual var Image.source: ImageSource
     get() {
-        TODO()
+        return this.source
     }
     set(value) {}
 actual var Image.scaleType: ImageScaleType
@@ -186,89 +186,183 @@ actual var Image.description: String?
     set(value) {}
 actual var TextView.content: String
     get() {
-        TODO()
+        return this.native.text.toString()
     }
-    set(value) {}
+    set(value) {
+        this.native.text = value
+    }
 actual var TextView.align: Align
     get() {
-        TODO()
+        return when(this.native.gravity) {
+            Gravity.START -> Align.Start
+            Gravity.END -> Align.End
+            Gravity.CENTER -> Align.Center
+            Gravity.CENTER_VERTICAL -> Align.Start
+            Gravity.CENTER_HORIZONTAL -> Align.Center
+            else -> Align.Start
+        }
     }
-    set(value) {}
+    set(value) {
+        when (value) {
+            Align.Start -> this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_START
+            Align.End -> this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_END
+            Align.Center -> this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_CENTER
+            Align.Stretch -> {
+                this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_START
+                this.native.updateLayoutParams<ViewGroup.LayoutParams> {
+                    this.width = ViewGroup.LayoutParams.MATCH_PARENT
+                }
+            }
+        }
+    }
 actual var TextView.textSize: Dimension
     get() {
-        TODO()
+        return Dimension(this.native.textSize.toInt())
     }
-    set(value) {}
+    set(value) {
+        this.native.textSize = value.value.toFloat()
+    }
 actual var Label.content: String
     get() {
-        TODO()
+        return this.native.text.toString()
     }
-    set(value) {}
-
-
+    set(value) {
+        this.native.text = value
+    }
 
 actual fun DismissBackground.onClick(action: suspend () -> Unit) {}
 
-actual fun Button.onClick(action: suspend () -> Unit) {}
+actual fun Button.onClick(action: suspend () -> Unit) {
+    this.native.setOnClickListener({ view ->
+        launch { action() }
+    })
+}
 actual var Button.enabled: Boolean
     get() {
-        TODO()
+        return this.native.isEnabled
     }
-    set(value) {}
+    set(value) {
+        this.native.isEnabled = value
+    }
 
+
+//fun View.doggy() {
+//    setOnTouchListener { v, event ->
+//        event.action
+//    }
+//}
+
+//fun <T : View, V> T.vprop(
+//    eventName: String,
+//    get: T.() -> V,
+//    set: T.(V) -> Unit
+//): Writable<V> {
+//    return object : Writable<V> {
+//        override suspend fun awaitRaw(): V = get(this@vprop)
+//        override suspend fun set(value: V) {
+//            set(this@vprop, value)
+//        }
+//        private var block = false
+//
+//        override fun addListener(listener: () -> Unit): () -> Unit {
+//
+//        }
+//    }
+//}
 
 actual var Checkbox.enabled: Boolean
     get() {
-        TODO()
+        return this.native.isEnabled
     }
-    set(value) {}
-actual val Checkbox.checked: Writable<Boolean>
-    get() {
-        TODO()
+    set(value) {
+        this.native.isEnabled = value
     }
 
+object NativeListeners {
+    val listeners = ViewListeners<NView>()
+}
+
+fun NView.removeListener(listener: () -> Unit): () -> Unit = {
+    val key = this
+    NativeListeners.listeners.removeListener(key, listener)
+    if (NativeListeners.listeners.get(key)?.isEmpty() == true) {
+        NativeListeners.listeners.removeKey(key)
+    }
+}
+
+val CompoundButton.checked: Writable<Boolean>
+    get() {
+        return object : Writable<Boolean> {
+            override fun addListener(listener: () -> Unit): () -> Unit {
+                this@checked.setOnCheckedChangeListener { _, _ ->
+                    NativeListeners.listeners.get(this@checked)?.forEach { action -> action() }
+                }
+                return this@checked.removeListener(listener)
+            }
+
+            override suspend fun awaitRaw(): Boolean {
+                return this@checked.isChecked
+            }
+
+            override suspend fun set(value: Boolean) {
+                this@checked.isChecked = value
+            }
+        }
+    }
+actual val Checkbox.checked: Writable<Boolean>
+    get() {
+        return this.native.checked
+    }
 
 actual var RadioButton.enabled: Boolean
     get() {
-        TODO()
+        return this.native.isEnabled
     }
-    set(value) {}
+    set(value) {
+        this.native.isEnabled = value
+    }
 actual val RadioButton.checked: Writable<Boolean>
     get() {
-        TODO()
+        return this.native.checked
     }
 
 
 actual var Switch.enabled: Boolean
     get() {
-        TODO()
+        return this.native.isEnabled
     }
-    set(value) {}
+    set(value) {
+        this.native.isEnabled = value
+    }
 actual val Switch.checked: Writable<Boolean>
     get() {
-        TODO()
+        return this.native.checked
     }
 
 
 actual var ToggleButton.enabled: Boolean
     get() {
-        TODO()
+        return this.native.isEnabled
     }
-    set(value) {}
+    set(value) {
+        this.native.isEnabled = value
+    }
 actual val ToggleButton.checked: Writable<Boolean>
     get() {
-        TODO()
+        TODO("IMPLEMENT TOGGLE BUTTON")
     }
 
 
 actual var RadioToggleButton.enabled: Boolean
     get() {
-        TODO()
+        return this.native.isEnabled
     }
-    set(value) {}
+    set(value) {
+        this.native.isEnabled = value
+    }
 actual val RadioToggleButton.checked: Writable<Boolean>
     get() {
-        TODO()
+        TODO("IMPLEMENT RADIO TOGGLE BUTTON")
     }
 
 
@@ -531,6 +625,7 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
 
 @ViewModifierDsl3
 actual fun ViewWriter.hasPopover(
+    requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit,
 ): ViewWrapper {

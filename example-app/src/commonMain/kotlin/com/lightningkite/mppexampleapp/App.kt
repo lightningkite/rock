@@ -11,21 +11,6 @@ import com.lightningkite.rock.views.l2.*
 val appTheme = Property<Theme>(MaterialLikeTheme())
 fun ViewWriter.app() {
 
-//    col {
-//        row {
-//            button {
-//                image { this.source = Icons.arrowBack.color(Color.white); description = "Go Back" }
-//                onClick { navigator.goBack() }
-//            }
-//            h2 { ::content { navigator.currentScreen.await().title.await() } } in weight(1f) in gravity(Align.Center, Align.Center)
-//            externalLink {
-//                image { this.source = Icons.search.color(Color.white); description = "See Code on GitHub"; newTab = true }
-//                ::to { "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/${navigator.currentScreen.await()::class.toString().removePrefix("class ")}.kt" }
-//            }
-//        } in important in marginless
-//        navigatorView(navigator) in weight(1f) in marginless
-//    } in setTheme { appTheme.await() } in marginless
-
     appNav(AutoRoutes) {
         appName = "Rock Sample App"
         ::navItems{

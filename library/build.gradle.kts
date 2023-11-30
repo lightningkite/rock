@@ -29,7 +29,7 @@ kotlin {
             }
         }
     }
-//    jvm()
+    jvm()
 //    android()
 //    ios()
 //    listOf(
@@ -51,26 +51,37 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
                 api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
-            dependencies {
-                implementation("androidx.appcompat:appcompat:1.6.1")
-                implementation("androidx.recyclerview:recyclerview:1.3.2")
-            }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                implementation("androidx.appcompat:appcompat:1.6.1")
+                implementation("androidx.recyclerview:recyclerview:1.3.2")
+            }
+        }
+
+        val commonHtmlMain by creating {
+            dependsOn(commonMain)
+        }
 //        val commonJvmMain by creating {
 //            dependsOn(commonMain)
 //        }
 //        val androidMain by getting {
 //            dependsOn(commonJvmMain)
 //        }
-//        val jvmMain by getting {
-//            dependsOn(commonJvmMain)
-//        }
+        val jvmMain by getting {
+            dependsOn(commonHtmlMain)
+            dependencies {
+                api("org.apache.commons:commons-lang3:3.12.0")
+            }
+        }
+        val jsMain by getting {
+            dependsOn(commonHtmlMain)
+        }
     }
 
 //    cocoapods {

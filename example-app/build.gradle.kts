@@ -21,7 +21,7 @@ repositories {
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
-//    jvm()
+    jvm()
 //    android()
 //    ios()
 //    listOf(

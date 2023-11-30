@@ -145,7 +145,7 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 }
                 ::exists { booleanContent.await() }
             } in bar in marginless
-            navigatorView(navigator) in weight(1f)
+            navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless
 }
@@ -203,7 +203,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
-        navigatorView(navigator) in weight(1f)
+        navigatorView(navigator) in weight(1f) in marginless
     } in marginless
 }
 
@@ -245,7 +245,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 }
             }
         } in bar in marginless
-        navigatorView(navigator) in marginless in weight(1f)
+        navigatorView(navigator) in weight(1f) in marginless
         //Nav 3 - top and bottom (bottom/tabs)
         row {
             forEachUpdating(appNav.navItemsProperty) {
@@ -271,7 +271,6 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
 
 fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
-    val booleanContent = Property(false)
     col {
 // Nav 4 left and top - add dropdown for user info
         row {
@@ -309,17 +308,14 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 }
             }
             row {
-                toggleButton {
-                    checked bind booleanContent
-                    image {
-                        val currentTheme = currentTheme
-                        ::source {
-                            appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
-                                currentTheme().foreground
-                            )
-                        }
-                        description = "User icon"
+                image {
+                    val currentTheme = currentTheme
+                    ::source {
+                        appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                            currentTheme().foreground
+                        )
                     }
+                    description = "User icon"
                 }
                 text {
                     content = appNav.currentUser?.currentUser?.name ?: "No user"
@@ -335,23 +331,22 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                             text { ::content { it.await().title } }
                         }
                     }
-                    ::exists { booleanContent.await() }
-                }
-            } in card
+                } in card
+            }
 
         } in bar in marginless
         row {
             col {
-                col {
-                    forEachUpdating(appNav.navItemsProperty) {
-                        link {
-                            ::to { it.await().destination }
-                            text { ::content { it.await().title } }
-                        }
+                forEachUpdating(appNav.navItemsProperty) {
+                    link {
+                        ::to { it.await().destination }
+                        text { ::content { it.await().title } }
                     }
                 }
+
+                ::exists { appNav.navItemsProperty.await().size > 1 }
             } in marginless
-            navigatorView(navigator) in weight(1f)
+            navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless
 }

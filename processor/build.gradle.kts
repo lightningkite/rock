@@ -11,6 +11,7 @@ plugins {
     `maven-publish`
 }
 
+group = "com.lightningkite.rock"
 
 val kotlinVersion:String by project
 val kspVersion:String by project
@@ -19,26 +20,26 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion")
 }
 
-//standardPublishing {
-//    name.set("Rock-Processor")
-//    description.set("Automatically create your routers")
-//    github("lightningkite", "rock")
-//
-//    licenses {
-//        mit()
-//    }
-//
-//    developers {
-//        developer(
-//            id = "LightningKiteJoseph",
-//            name = "Joseph Ivie",
-//            email = "joseph@lightningkite.com",
-//        )
-//        developer(
-//            id = "bjsvedin",
-//            name = "Brady Svedin",
-//            email = "brady@lightningkite.com",
-//        )
-//    }
-//}
+standardPublishing {
+    name.set("Rock-Processor")
+    description.set("Automatically create your routers")
+    github("lightningkite", "rock")
+
+    licenses {
+        mit()
+    }
+
+    developers {
+        developer(
+            id = "LightningKiteJoseph",
+            name = "Joseph Ivie",
+            email = "joseph@lightningkite.com",
+        )
+        developer(
+            id = "bjsvedin",
+            name = "Brady Svedin",
+            email = "brady@lightningkite.com",
+        )
+    }
+}
 

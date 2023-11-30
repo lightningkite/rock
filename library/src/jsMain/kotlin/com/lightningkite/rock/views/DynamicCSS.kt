@@ -30,6 +30,10 @@ object DynamicCSS {
         style("h4", mapOf("font-size" to "1.3rem"))
         style("h5", mapOf("font-size" to "1.2rem"))
         style("h6", mapOf("font-size" to "1.1rem"))
+//        style.visibility = if (value) "visible" else "hidden"
+        style(".visibleOnParentHover", mapOf("visibility" to "hidden"))
+        style(":hover>.visibleOnParentHover", mapOf("visibility" to "visible"))
+        style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
     }
 
     fun rule(rule: String, index: Int = 0) = customStyleSheet.insertRule(rule, index)

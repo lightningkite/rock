@@ -14,6 +14,7 @@ import org.w3c.dom.*
 import org.w3c.dom.url.URL
 import kotlin.random.Random
 import kotlinx.datetime.*
+import org.w3c.dom.events.Event
 import kotlin.js.Date
 
 
@@ -150,8 +151,7 @@ actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = headerElement("h4",
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
-@ViewDsl
-actual fun ViewWriter.header(setup: TextView.() -> Unit): Unit = headerElement("p", setup)
+
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
 @ViewDsl
@@ -288,6 +288,27 @@ actual val Checkbox.checked: Writable<Boolean> get() = native.vprop("input", { c
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRadioButton = HTMLInputElement
+
+fun <T : HTMLElement, V> T.vprop(
+    eventName: String,
+    get: T.() -> V,
+    set: T.(V) -> Unit
+): Writable<V> {
+    return object : Writable<V> {
+        override suspend fun awaitRaw(): V = get(this@vprop)
+        override suspend fun set(value: V) {
+            set(this@vprop, value)
+        }
+        private var block = false
+
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            val callback: (Event) -> Unit = { listener() }
+            this@vprop.addEventListener(eventName, callback)
+            return { this@vprop.removeEventListener(eventName, callback) }
+        }
+
+    }
+}
 
 @ViewDsl
 actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit =
@@ -754,14 +775,18 @@ actual fun <T> RecyclerView.children(
     render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit = TODO()
 
-@ViewModifierDsl3
-actual fun ViewWriter.hasPopover(
+@ViewModifierDsl3 actual fun ViewWriter.hasPopover(
+    requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit
 ): ViewWrapper {
     containsNext<HTMLDivElement>("div") {
+        onclick = {
+            // TODO
+        }
         style.position = "relative"
-        beforeNextElementSetup {
+        element<HTMLDivElement>("div") {
+            if(!requireClick) classList.add("visibleOnParentHover")
             style.position = "absolute"
             style.zIndex = "9999"
             if (preferredDirection.horizontal) {
@@ -787,8 +812,8 @@ actual fun ViewWriter.hasPopover(
                     else -> style.left = "calc(50% - 0)"
                 }
             }
+            setup()
         }
-        setup()
     }
     return ViewWrapper
 }

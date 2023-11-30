@@ -1,5 +1,7 @@
 package com.lightningkite.rock.views
 
+import android.content.Context
+import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -11,6 +13,13 @@ import java.lang.RuntimeException
  * A native view in the underlying view system.
  */
 actual typealias NView = View
+
+object AndroidAppContext {
+    lateinit var applicationCtx: Context
+    val res: Resources by lazy { applicationCtx.resources }
+    val density: Float by lazy { res.displayMetrics.density }
+    val oneRem: Float by lazy { density * 16 }
+}
 
 private val View.removeListeners: HashMap<Int, () -> Unit>
     get() = HashMap()

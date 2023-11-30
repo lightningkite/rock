@@ -3,6 +3,7 @@ package com.lightningkite.rock.reactive
 import com.lightningkite.rock.*
 import kotlin.coroutines.*
 import kotlin.properties.ReadWriteProperty
+import kotlin.random.Random
 import kotlin.reflect.KProperty
 
 interface ResourceUse {
@@ -10,6 +11,10 @@ interface ResourceUse {
 }
 
 interface Listenable : ResourceUse {
+    /**
+     * Adds the [listener] to be called every time this event fires.
+     * @return a function to remove the [listener] that was added.  Removing multiple times should not cause issues.
+     */
     fun addListener(listener: () -> Unit): () -> Unit
     override fun start(): () -> Unit = addListener { }
 }
@@ -153,6 +158,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             removers.clear()
         }
     }
+    val id = Random.nextInt(100, 999)
     return object: Readable<T> {
         var value: T? = null
         var ready: Boolean = false
@@ -179,11 +185,12 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                         ready = true
                     }
                     listeners.forEach { it() }
-                    listeners.clear()
                 }
             }
             listeners.add(listener)
-            return { removeListener(listener) }
+            return {
+                removeListener(listener)
+            }
         }
         private fun removeListener(listener: () -> Unit) {
             listeners.remove(listener)

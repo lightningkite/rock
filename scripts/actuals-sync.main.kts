@@ -93,8 +93,8 @@ class Type(val typeName: String, val constructors: List<String> = listOf(typeNam
         common("value class $typeName(override val native: N$typeName) : RView<N$typeName>")
         impl("@Suppress(\"ACTUAL_WITHOUT_EXPECT\") actual typealias N$typeName = ", "ToDoElement")
         constructors.forEach {
-            common("@ViewDsl expect fun ViewContext.$it(setup: $typeName.() -> Unit = {}): Unit")
-            impl("@ViewDsl actual fun ViewContext.$it(setup: $typeName.() -> Unit): Unit", " = todo(\"$it\")")
+            common("@ViewDsl expect fun ViewWriter.$it(setup: $typeName.() -> Unit = {}): Unit")
+            impl("@ViewDsl actual fun ViewWriter.$it(setup: $typeName.() -> Unit): Unit", " = todo(\"$it\")")
         }
     }
 
@@ -116,13 +116,13 @@ class Type(val typeName: String, val constructors: List<String> = listOf(typeNam
     }
 
     fun action(name: String) {
-        common("expect fun $typeName.$name(action: () -> Unit)")
-        impl("actual fun $typeName.$name(action: () -> Unit): Unit", " = TODO()")
+        common("expect fun $typeName.$name(action: suspend () -> Unit)")
+        impl("actual fun $typeName.$name(action: suspend () -> Unit): Unit", " = TODO()")
     }
 
     fun specialConstructor(name: String, vararg arguments: Argument) {
-        common("expect fun ViewContext.$name(${arguments.joinToString() { "${it.name}: ${it.type}" + (it.default?.let { " = $it" } ?: "") }}, setup: $typeName.() -> Unit = {})")
-        impl("actual fun ViewContext.$name(${arguments.joinToString() { "${it.name}: ${it.type}" }}, setup: $typeName.() -> Unit): Unit", " = TODO()")
+        common("expect fun ViewWriter.$name(${arguments.joinToString() { "${it.name}: ${it.type}" + (it.default?.let { " = $it" } ?: "") }}, setup: $typeName.() -> Unit = {})")
+        impl("actual fun ViewWriter.$name(${arguments.joinToString() { "${it.name}: ${it.type}" }}, setup: $typeName.() -> Unit): Unit", " = TODO()")
     }
 }
 
@@ -135,12 +135,12 @@ infix fun String.ofType(other: String) = Argument(this, other)
 infix fun Argument.default(other: String) = copy(default = other)
 
 fun modifier(name: String, vararg arguments: Argument) {
-    CodeEmitter.common("@ViewModifierDsl3 expect fun ViewContext.$name(${arguments.joinToString() { "${it.name}: ${it.type}" + (it.default?.let { " = $it" } ?: "") }}): ViewWrapper")
-    CodeEmitter.impl("@ViewModifierDsl3 actual fun ViewContext.$name(${arguments.joinToString() { "${it.name}: ${it.type}" }}): ViewWrapper", " = TODO()")
+    CodeEmitter.common("@ViewModifierDsl3 expect fun ViewWriter.$name(${arguments.joinToString() { "${it.name}: ${it.type}" + (it.default?.let { " = $it" } ?: "") }}): ViewWrapper")
+    CodeEmitter.impl("@ViewModifierDsl3 actual fun ViewWriter.$name(${arguments.joinToString() { "${it.name}: ${it.type}" }}): ViewWrapper", " = TODO()")
 }
 fun modifierVal(name: String) {
-    CodeEmitter.common("@ViewModifierDsl3 expect val ViewContext.$name: ViewWrapper")
-    CodeEmitter.impl("@ViewModifierDsl3 actual val ViewContext.$name: ViewWrapper", " = TODO()")
+    CodeEmitter.common("@ViewModifierDsl3 expect val ViewWriter.$name: ViewWrapper")
+    CodeEmitter.impl("@ViewModifierDsl3 actual val ViewWriter.$name: ViewWrapper", " = TODO()")
 }
 
 CodeEmitter.common(
@@ -158,7 +158,9 @@ CodeEmitter.common(
 )
 
 "Separator" {}
-"ContainingView"("stack", "col", "row")
+"ContainingView"("stack", "col", "row") {
+    specialConstructor("grid", "columns" ofType "Int")
+}
 "Link" {
     prop("to", "RockScreen")
     prop("newTab", "Boolean")
@@ -207,15 +209,15 @@ listOf(
 }
 
 "LocalDateField" {
-    writable("content", "LocalDate", "\"\"")
+    writable("content", "LocalDate?", "\"\"")
     prop("range", "ClosedRange<LocalDate>?")
 }
 "LocalTimeField" {
-    writable("content", "LocalTime", "\"\"")
+    writable("content", "LocalTime?", "\"\"")
     prop("range", "ClosedRange<LocalTime>?")
 }
 "LocalDateTimeField" {
-    writable("content", "LocalDateTime", "\"\"")
+    writable("content", "LocalDateTime?", "\"\"")
     prop("range", "ClosedRange<LocalDateTime>?")
 }
 "TextField" {
@@ -271,11 +273,11 @@ listOf(
     "horizontalRecyclerView",
     "gridRecyclerView",
 ) {
-    common("expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit")
-    impl("actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewContext.(value: Readable<T>)->Unit): Unit", " = TODO()")
+    common("expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit")
+    impl("actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit", " = TODO()")
 }
 
-modifier("hasPopover", "preferredDirection" ofType "PopoverPreferredDirection" default "PopoverPreferredDirection.belowRight",  "setup" ofType "ViewContext.()->Unit")
+modifier("hasPopover", "requireClick" ofType "Boolean" default "false", "preferredDirection" ofType "PopoverPreferredDirection" default "PopoverPreferredDirection.belowRight", "setup" ofType "ViewWriter.()->Unit")
 modifier("weight", "amount" ofType "Float")
 modifier("gravity", "horizontal" ofType "Align", "vertical" ofType "Align")
 modifierVal("scrolls", )

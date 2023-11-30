@@ -135,27 +135,6 @@ fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, setup:
         setup()
     }
 
-fun <T : HTMLElement, V> T.vprop(
-    eventName: String,
-    get: T.() -> V,
-    set: T.(V) -> Unit
-): Writable<V> {
-    return object : Writable<V> {
-        override suspend fun awaitRaw(): V = get(this@vprop)
-        override suspend fun set(value: V) {
-            set(this@vprop, value)
-        }
-        private var block = false
-
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            val callback: (Event) -> Unit = { listener() }
-            this@vprop.addEventListener(eventName, callback)
-            return { this@vprop.removeEventListener(eventName, callback) }
-        }
-
-    }
-}
-
 @ViewDsl
 internal fun ViewWriter.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =
     themedElement<HTMLDivElement>(elementBase) {

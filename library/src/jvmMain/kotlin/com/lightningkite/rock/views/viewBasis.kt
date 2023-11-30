@@ -28,13 +28,7 @@ actual var NView.visible: Boolean
         TODO()
     }
 
-actual var NView.alpha: Double
-    get() = throw NotImplementedError()
-    set(value) {
-        TODO()
-    }
-
-actual var NView.rotation: Angle
+actual var NView.nativeRotation: Angle
     get() = throw NotImplementedError()
     set(value) {
         TODO()
@@ -44,9 +38,5 @@ actual fun NView.clearChildren() {
     TODO()
 }
 actual fun NView.addChild(child: NView) {
-    TODO()
-}
-
-actual fun ViewWriter.setTheme(calculate: suspend ()-> Theme?): ViewWrapper {
     TODO()
 }

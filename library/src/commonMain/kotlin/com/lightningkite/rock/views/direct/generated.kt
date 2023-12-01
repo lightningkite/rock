@@ -127,7 +127,7 @@ expect class NLocalDateField : NView
 @JvmInline
 value class LocalDateField(override val native: NLocalDateField) : RView<NLocalDateField>
 @ViewDsl expect fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit = {}): Unit
-expect val LocalDateField.content: Writable<LocalDate?>
+//expect val LocalDateField.content: Writable<LocalDate?>
 expect var LocalDateField.range: ClosedRange<LocalDate>?
 
 expect class NLocalTimeField : NView

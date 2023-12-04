@@ -1,8 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
 import com.lightningkite.deployhelpers.*
 
 plugins {
@@ -29,7 +25,7 @@ kotlin {
             }
         }
     }
-    jvm()
+//    jvm()
 //    android()
 //    ios()
 //    listOf(
@@ -67,18 +63,13 @@ kotlin {
         val commonHtmlMain by creating {
             dependsOn(commonMain)
         }
-//        val commonJvmMain by creating {
-//            dependsOn(commonMain)
+
+//        val jvmMain by getting {
+//            dependsOn(commonHtmlMain)
+//            dependencies {
+//                api("org.apache.commons:commons-lang3:3.12.0")
+//            }
 //        }
-//        val androidMain by getting {
-//            dependsOn(commonJvmMain)
-//        }
-        val jvmMain by getting {
-            dependsOn(commonHtmlMain)
-            dependencies {
-                api("org.apache.commons:commons-lang3:3.12.0")
-            }
-        }
         val jsMain by getting {
             dependsOn(commonHtmlMain)
         }
@@ -124,6 +115,14 @@ android {
     compileSdk = 34
     defaultConfig {
         minSdk = 24
+    }
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    dependencies {
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     }
 }
 

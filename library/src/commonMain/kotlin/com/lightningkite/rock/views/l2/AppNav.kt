@@ -22,7 +22,8 @@ data class ProfileInfo(
     val currentUser: UserInfo?,
 )
 
-data class UserInfo(val name: String, val profileImage: ImageVector? = null, val defaultIcon: Icon)
+data class UserInfo(val name: String, val profileImage:
+ImageVector? = null, val defaultIcon: Icon)
 
 
 interface AppNav {
@@ -53,7 +54,6 @@ interface AppNav {
     }
 }
 
-val search = Property("")
 
 val ViewWriter.appNavFactory by viewWriterAddon<Property<ViewWriter.(AppNav.() -> Unit) -> Unit>>(
     Property(
@@ -226,12 +226,6 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
-            label {
-                content = "Search"
-                textField {
-                    content bind search
-                }
-            }
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
@@ -350,9 +344,3 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
         } in weight(1f)
     } in marginless
 }
-///TO DO
-//search, jump to
-//Nav 1 -
-//Nav 2 -
-//Nav 3 - official tab icons
-//Nav 4 - user dropdown style

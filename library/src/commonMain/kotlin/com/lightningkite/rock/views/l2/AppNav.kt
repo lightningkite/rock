@@ -113,12 +113,6 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
-            label {
-                content = "Search"
-                textField {
-                    content bind search
-                }
-            }
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     button {
@@ -180,14 +174,6 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
 
             } in weight(1f)
             row {
-                row {
-                    label {
-                        content = "Search"
-                        textField {
-                            content bind search
-                        }
-                    }
-                }
                 row {
                     forEachUpdating(appNav.actionsProperty) {
                         button {
@@ -283,12 +269,6 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 Align.Center
             )
             space {} in weight(1f)
-            label {
-                content = "Search"
-                textField {
-                    content bind search
-                }
-            }
             row {
                 forEachUpdating(appNav.actionsProperty) {
                     button {

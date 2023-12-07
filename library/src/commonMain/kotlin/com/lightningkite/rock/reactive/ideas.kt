@@ -120,7 +120,7 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
                 else notifyFailure()
                 result.onFailure { ex: Throwable ->
                     if(ex is CancelledException) return@onFailure
-                    println("Reactive Scope failed with ${ex.message}")
+                    ex.printStackTrace()
                 }
             }
         })

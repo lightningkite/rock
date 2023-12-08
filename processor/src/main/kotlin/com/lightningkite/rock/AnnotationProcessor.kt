@@ -31,8 +31,11 @@ class RouterGeneration(
             .singleOrNull()
             ?: resolver.getClassDeclarationByName("com.lightningkite.rock.navigation.RockScreen.Empty")!!
 
-        val topPackage = allRoutables.map { it.source.packageName.asString() }
-            .reduce { a, b -> a.commonPrefixWith(b) }
+        val topPackage = allRoutables
+            .takeIf { it.isNotEmpty() }
+            ?.map { it.source.packageName.asString() }
+            ?.reduce { a, b -> a.commonPrefixWith(b) }
+            ?: ""
 
         codeGenerator.createNewFile(
 //        codeGenerator.createNewFileByPath(
@@ -53,6 +56,7 @@ class RouterGeneration(
                     appendLine("import com.lightningkite.rock.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
+                    appendLine("import com.lightningkite.uuid")
                     appendLine("")
                     appendLine("")
                     appendLine("val AutoRoutes = Routes(")
@@ -83,6 +87,7 @@ class RouterGeneration(
                                                         is ParsedRoutable.Segment.Variable -> {
                                                             when (part.type.declaration.simpleName?.asString()) {
                                                                 "kotlin.String" -> appendLine("${part.name} = it.segments[$index],")
+                                                                "UUID" -> appendLine("${part.name} = uuid(it.segments[$index]),")
                                                                 else -> appendLine("${part.name} = it.segments[$index].to${part.type.declaration.simpleName!!.asString()}(),")
                                                             }
                                                         }
@@ -107,7 +112,7 @@ class RouterGeneration(
                                 val rendered = route.joinToString(", ") {
                                     when (it) {
                                         is ParsedRoutable.Segment.Constant -> "\"${it.value}\""
-                                        is ParsedRoutable.Segment.Variable -> "it.${it.name}"
+                                        is ParsedRoutable.Segment.Variable -> "it.${it.name}.toString()"
                                     }
                                 }
                                 appendLine("${routable.source.simpleName!!.asString()}::class to label@{")

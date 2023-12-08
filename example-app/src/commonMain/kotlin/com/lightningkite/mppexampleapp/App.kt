@@ -8,7 +8,7 @@ import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.*
 
-val appTheme = Property<Theme>(MaterialLikeTheme())
+val appTheme = Property<Theme>(MaterialLikeTheme(title = FontAndStyle(font = Resources.fontsMontserrat)))
 fun ViewWriter.app() {
 
     appNav(AutoRoutes) {

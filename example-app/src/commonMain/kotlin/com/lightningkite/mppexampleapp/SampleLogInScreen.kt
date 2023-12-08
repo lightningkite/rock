@@ -18,7 +18,7 @@ object SampleLogInScreen : RockScreen {
         val password = Property("")
         stack {
             image {
-                source = ImageRemote("https://picsum.photos/seed/login/1080/1920")
+                source = Resources.imagesMammoth
                 scaleType = ImageScaleType.Crop
                 opacity = 0.5
             } in marginless

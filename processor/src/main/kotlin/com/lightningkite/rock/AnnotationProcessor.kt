@@ -56,6 +56,7 @@ class RouterGeneration(
                     appendLine("import com.lightningkite.rock.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
+                    if(allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } })
                     appendLine("import com.lightningkite.uuid")
                     appendLine("")
                     appendLine("")
@@ -85,9 +86,9 @@ class RouterGeneration(
                                                 for ((index, part) in route.withIndex()) {
                                                     when (part) {
                                                         is ParsedRoutable.Segment.Variable -> {
-                                                            when (part.type.declaration.simpleName?.asString()) {
+                                                            when (part.type.declaration.qualifiedName?.asString()) {
                                                                 "kotlin.String" -> appendLine("${part.name} = it.segments[$index],")
-                                                                "UUID" -> appendLine("${part.name} = uuid(it.segments[$index]),")
+                                                                "com.lightningkite.UUID", "java.util.UUID" -> appendLine("${part.name} = uuid(it.segments[$index]),")
                                                                 else -> appendLine("${part.name} = it.segments[$index].to${part.type.declaration.simpleName!!.asString()}(),")
                                                             }
                                                         }

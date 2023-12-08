@@ -18,7 +18,14 @@ actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimens
 actual inline operator fun Dimension.times(other: Float): Dimension = Dimension("calc(${this.value} * ${other})")
 actual inline operator fun Dimension.div(other: Float): Dimension = Dimension("calc(${this.value} / ${other})")
 
-actual data class Font(val cssFontFamilyName: String, val url: String? = null, val fallback: String = "Helvetica")
+actual data class Font(
+    val cssFontFamilyName: String,
+    val url: String? = null,
+    val fallback: String = "Helvetica",
+    val direct: FontDirect? = null,
+)
+
+data class FontDirect(val normal: String, val bold: String? = null, val italic: String? = null, val boldItalic: String? = null)
 
 actual val systemDefaultFont: Font get() = Font("'Montserrat'", "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap", "Helvetica")
 

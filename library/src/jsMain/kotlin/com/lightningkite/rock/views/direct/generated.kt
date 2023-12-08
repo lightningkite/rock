@@ -110,7 +110,7 @@ actual inline var Image.source: ImageSource
         when (value) {
             is ImageRemote -> native.src = value.url
             is ImageRaw -> native.src = URL.Companion.createObjectURL(Blob(arrayOf(value.data)))
-            is ImageResource -> throw NotImplementedError()
+            is ImageResource -> native.src = value.relativeUrl
             is ImageVector -> {
                 native.src = value.toWeb()
                 native.style.width = value.width.value

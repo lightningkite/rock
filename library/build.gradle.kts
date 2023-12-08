@@ -25,8 +25,8 @@ kotlin {
             }
         }
     }
-//    jvm()
-//    android()
+    jvm()
+    android()
 //    ios()
 //    listOf(
 //        iosX64(),

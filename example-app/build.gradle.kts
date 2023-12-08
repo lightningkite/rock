@@ -1,7 +1,9 @@
+import com.lightningkite.rock.RockPluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import java.util.*
 
 plugins {
     kotlin("multiplatform")
@@ -9,6 +11,7 @@ plugins {
     id("com.google.devtools.ksp")
 //    kotlin("native.cocoapods")
 //    id("com.android.library")
+    id("com.lightningkite.rock")
 }
 
 group = "com.lightningkite"
@@ -98,6 +101,10 @@ dependencies {
     configurations.filter { it.name.startsWith("ksp") && it.name != "ksp" }.forEach {
         add(it.name, project(":processor"))
     }
+}
+
+configure<RockPluginExtension> {
+    this.packageName = "com.lightningkite.mppexampleapp"
 }
 
 //android {

@@ -3,6 +3,10 @@ package com.lightningkite.rock
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.*
+import java.io.BufferedWriter
+import java.io.File
+import java.util.*
+import kotlin.collections.ArrayList
 
 lateinit var comparable: KSClassDeclaration
 var khrysalisUsed = false
@@ -16,13 +20,45 @@ class RouterGeneration(
         if (invoked) return listOf()
         invoked = true
         val deferredSymbols = ArrayList<KSClassDeclaration>()
-//        throw Exception("resolver.getAllFiles(): ${resolver.getAllFiles().joinToString { it.filePath }}")
+
+        val stub = codeGenerator.createNewFile(
+            Dependencies(false),
+            fileName = UUID.randomUUID().toString(),
+            extensionName = "txt",
+            packageName = "com.lightningkite.rock"
+        ).writer().use { println("Will generate in common folder") }
+        val outSample = codeGenerator.generatedFile.first().absoluteFile
+        val projectFolder = generateSequence(outSample) { it.parentFile!! }
+            .first { it.name == "build" }
+            .parentFile!!
+        val flavor = outSample.path.split(File.separatorChar)
+            .dropWhile { it != "ksp" }
+            .drop(2)
+            .first()
+            .dropWhile { it.isLowerCase() }
+        val outFolder = projectFolder.resolve("build/generated/ksp/common/common$flavor/kotlin")
+        outFolder.mkdirs()
+        val manifest = outFolder.parentFile!!.resolve("rock-manifest.txt")
+        manifest.takeIf { it.exists() }?.readLines()
+            ?.forEach { outFolder.resolve(it).takeIf { it.exists() }?.delete() }
+        manifest.writeText("")
+        val common = resolver.getAllFiles().any { it.filePath?.contains("/src/common", true) == true }
+        fun createNewFile(dependencies: Dependencies, packageName: String, fileName: String, extensionName: String = "kt"): BufferedWriter {
+            if(!common) return codeGenerator.createNewFile(dependencies, packageName, fileName, extensionName).bufferedWriter()
+            val packagePath = packageName.split('.').filter { it.isNotBlank() }.joinToString(""){ "$it/" }
+            return outFolder.resolve("${packagePath}$fileName.$extensionName")
+                .also { it.parentFile.mkdirs() }
+                .also { manifest.appendText("${packagePath}$fileName.$extensionName\n") }
+                .bufferedWriter()
+        }
+
         val allRoutables = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()
             .filter { it.annotation("Routable") != null }
             .toList()
             .map { ParsedRoutable(it) }
+        if(allRoutables.isEmpty()) return deferredSymbols
         val fallbackRoute = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()
@@ -37,18 +73,11 @@ class RouterGeneration(
             ?.reduce { a, b -> a.commonPrefixWith(b) }
             ?: ""
 
-        codeGenerator.createNewFile(
-//        codeGenerator.createNewFileByPath(
-//            dependencies = Dependencies(
-//                aggregating = true,
-//                sources = *allRoutables.mapNotNull { it.source.containingFile }.toTypedArray()
-//            ),
+        createNewFile(
             dependencies = Dependencies.ALL_FILES,
             packageName = topPackage,
             fileName = "AutoRoutes",
-//            path = allRoutables.first().source.containingFile?.filePath
         )
-            .bufferedWriter()
             .use {
                 with(TabAppendable(it)) {
                     appendLine("package $topPackage")

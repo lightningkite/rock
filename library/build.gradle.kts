@@ -26,7 +26,7 @@ kotlin {
         }
     }
     jvm()
-    android()
+//    android()
 //    ios()
 //    listOf(
 //        iosX64(),
@@ -64,12 +64,12 @@ kotlin {
             dependsOn(commonMain)
         }
 
-//        val jvmMain by getting {
-//            dependsOn(commonHtmlMain)
-//            dependencies {
-//                api("org.apache.commons:commons-lang3:3.12.0")
-//            }
-//        }
+        val jvmMain by getting {
+            dependsOn(commonHtmlMain)
+            dependencies {
+                api("org.apache.commons:commons-lang3:3.12.0")
+            }
+        }
         val jsMain by getting {
             dependsOn(commonHtmlMain)
         }

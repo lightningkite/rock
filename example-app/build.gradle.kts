@@ -25,7 +25,7 @@ repositories {
 kotlin {
     targetHierarchy.default()
     jvm()
-//    android()
+//    androidTarget()
 //    ios()
 //    listOf(
 //        iosX64(),
@@ -51,6 +51,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":library"))
+            }
+            kotlin {
+                srcDir(file("build/generated/ksp/common/commonMain/kotlin"))
             }
         }
 //        val commonJvmMain by creating {

@@ -35,7 +35,9 @@ class RouterGeneration(
             .dropWhile { it != "ksp" }
             .drop(2)
             .first()
-            .dropWhile { it.isLowerCase() }
+            .let {
+                it.substring(it.indexOfLast { it.isUpperCase() }.coerceAtLeast(0))
+            }
         val outFolder = projectFolder.resolve("build/generated/ksp/common/common$flavor/kotlin")
         outFolder.mkdirs()
         val manifest = outFolder.parentFile!!.resolve("rock-manifest.txt")

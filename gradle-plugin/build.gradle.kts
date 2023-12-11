@@ -63,3 +63,8 @@ standardPublishing {
         )
     }
 }
+
+tasks.create("publishLocally", Copy::class.java) {
+    from(file("src/main/kotlin/RockPlugin.kt"))
+    into(rootProject.file("buildSrc/src/main/kotlin"))
+}

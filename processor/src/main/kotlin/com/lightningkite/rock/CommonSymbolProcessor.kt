@@ -52,7 +52,7 @@ abstract class CommonSymbolProcessor(
             ?.map { File(it) }
             ?.toSet()
             ?.minus(createdFiles)
-            ?.forEach { outFolder.resolve(it).takeIf { it.exists() }?.delete() }
+//            ?.forEach { outFolder.resolve(it).takeIf { it.exists() }?.delete() }
         manifest.writeText(createdFiles.joinToString("\n") + "\n")
         return listOf()
     }

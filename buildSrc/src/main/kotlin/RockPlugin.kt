@@ -17,7 +17,7 @@ interface RockPluginExtension {
 class RockPlugin: Plugin<Project> {
     override fun apply(project: Project) = with(project) {
         val ext = extensions.create("rock", RockPluginExtension::class.java)
-        tasks.create("commonResources", Task::class.java) {
+        tasks.create("commonResources", Task::class.java).apply {
             group = "build"
             val out = project.file("src/commonMain/kotlin/ResourcesExpect.kt")
             outputs.file(out)
@@ -49,7 +49,7 @@ expect object Resources {
             }
         }
 
-        tasks.create("jsResources", Copy::class.java) {
+        tasks.create("jsResources", Copy::class.java).apply {
             dependsOn("commonResources")
             group = "build"
             from("src/commonMain/resources")

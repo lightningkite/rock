@@ -7,7 +7,7 @@ plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
     `maven-publish`
-    id("org.jetbrains.dokka") version "1.8.10"
+    id("org.jetbrains.dokka")
 }
 
 group = "com.lightningkite.rock"

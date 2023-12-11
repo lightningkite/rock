@@ -1,3 +1,4 @@
+import com.lightningkite.rock.RockPlugin
 import com.lightningkite.rock.RockPluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
@@ -11,8 +12,8 @@ plugins {
     id("com.google.devtools.ksp")
 //    kotlin("native.cocoapods")
 //    id("com.android.library")
-    id("com.lightningkite.rock")
 }
+apply<RockPlugin>()
 
 group = "com.lightningkite"
 version = "1.0-SNAPSHOT"

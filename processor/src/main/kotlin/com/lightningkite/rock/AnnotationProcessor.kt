@@ -14,53 +14,15 @@ var khrysalisUsed = false
 class RouterGeneration(
     val codeGenerator: CodeGenerator,
     val logger: KSPLogger,
-) : SymbolProcessor {
-    var invoked = false
-    override fun process(resolver: Resolver): List<KSAnnotated> {
-        if (invoked) return listOf()
-        invoked = true
-        val deferredSymbols = ArrayList<KSClassDeclaration>()
-
-        val stub = codeGenerator.createNewFile(
-            Dependencies(false),
-            fileName = UUID.randomUUID().toString(),
-            extensionName = "txt",
-            packageName = "com.lightningkite.rock"
-        ).writer().use { println("Will generate in common folder") }
-        val outSample = codeGenerator.generatedFile.first().absoluteFile
-        val projectFolder = generateSequence(outSample) { it.parentFile!! }
-            .first { it.name == "build" }
-            .parentFile!!
-        val flavor = outSample.path.split(File.separatorChar)
-            .dropWhile { it != "ksp" }
-            .drop(2)
-            .first()
-            .let {
-                it.substring(it.indexOfLast { it.isUpperCase() }.coerceAtLeast(0))
-            }
-        val outFolder = projectFolder.resolve("build/generated/ksp/common/common$flavor/kotlin")
-        outFolder.mkdirs()
-        val manifest = outFolder.parentFile!!.resolve("rock-manifest.txt")
-        manifest.takeIf { it.exists() }?.readLines()
-            ?.forEach { outFolder.resolve(it).takeIf { it.exists() }?.delete() }
-        manifest.writeText("")
-        val common = resolver.getAllFiles().any { it.filePath?.contains("/src/common", true) == true }
-        fun createNewFile(dependencies: Dependencies, packageName: String, fileName: String, extensionName: String = "kt"): BufferedWriter {
-            if(!common) return codeGenerator.createNewFile(dependencies, packageName, fileName, extensionName).bufferedWriter()
-            val packagePath = packageName.split('.').filter { it.isNotBlank() }.joinToString(""){ "$it/" }
-            return outFolder.resolve("${packagePath}$fileName.$extensionName")
-                .also { it.parentFile.mkdirs() }
-                .also { manifest.appendText("${packagePath}$fileName.$extensionName\n") }
-                .bufferedWriter()
-        }
-
+) : CommonSymbolProcessor(codeGenerator) {
+    override fun process2(resolver: Resolver) {
         val allRoutables = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()
             .filter { it.annotation("Routable") != null }
             .toList()
             .map { ParsedRoutable(it) }
-        if(allRoutables.isEmpty()) return deferredSymbols
+        if(allRoutables.isEmpty()) return
         val fallbackRoute = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()
@@ -87,8 +49,9 @@ class RouterGeneration(
                     appendLine("import com.lightningkite.rock.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
-                    if(allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } })
-                    appendLine("import com.lightningkite.uuid")
+                    if(allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } }) {
+                        appendLine("import com.lightningkite.uuid")
+                    }
                     appendLine("")
                     appendLine("")
                     appendLine("val AutoRoutes = Routes(")
@@ -171,7 +134,6 @@ class RouterGeneration(
             }
 
         logger.info("Complete.")
-        return deferredSymbols
     }
 }
 

@@ -21,5 +21,5 @@ rootProject.name = "rock"
 include(":library")
 include(":example-app")
 include(":processor")
-includeBuild("gradle-plugin")
+include(":gradle-plugin")
 include(":example-app-android")

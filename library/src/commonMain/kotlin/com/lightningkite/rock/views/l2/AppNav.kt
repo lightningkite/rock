@@ -105,8 +105,8 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.await() }
                 }
+                ::visible { navigator.canGoBack.await() }
                 onClick { navigator.goBack() }
             }
             h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
@@ -135,7 +135,6 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                             text { ::content { it.await().title } }
                         } in bar
                     }.toString()
-
                 }
                 ::exists { booleanContent.await() }
             } in bar in marginless
@@ -156,8 +155,8 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.await() }
                 }
+                ::visible { navigator.canGoBack.await() }
                 onClick { navigator.goBack() }
             }
             h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
@@ -204,8 +203,8 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.await() }
                 }
+                ::visible { navigator.canGoBack.await() }
                 onClick { navigator.goBack() }
             }
             h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(
@@ -260,8 +259,8 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
                     description = "Go Back"
-                    ::visible { navigator.canGoBack.await() }
                 }
+                ::visible { navigator.canGoBack.await() }
                 onClick { navigator.goBack() }
             }
             h2 { ::content.invoke { navigator.currentScreen.await()?.title?.await() ?: "" } } in gravity(

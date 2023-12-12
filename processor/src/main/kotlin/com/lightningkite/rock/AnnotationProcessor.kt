@@ -22,7 +22,7 @@ class RouterGeneration(
             .filter { it.annotation("Routable") != null }
             .toList()
             .map { ParsedRoutable(it) }
-        if(allRoutables.isEmpty()) return
+        if (allRoutables.isEmpty()) return
         val fallbackRoute = resolver.getAllFiles()
             .flatMap { it.declarations }
             .filterIsInstance<KSClassDeclaration>()
@@ -49,7 +49,7 @@ class RouterGeneration(
                     appendLine("import com.lightningkite.rock.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
-                    if(allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } }) {
+                    if (allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } }) {
                         appendLine("import com.lightningkite.uuid")
                     }
                     appendLine("")
@@ -72,7 +72,7 @@ class RouterGeneration(
                                                 else -> {}
                                             }
                                         }
-                                        if(routable.source.classKind == ClassKind.OBJECT)
+                                        if (routable.source.classKind == ClassKind.OBJECT)
                                             appendLine("${routable.source.simpleName!!.asString()}")
                                         else {
                                             appendLine("${routable.source.simpleName!!.asString()}(")
@@ -80,20 +80,21 @@ class RouterGeneration(
                                                 for ((index, part) in route.withIndex()) {
                                                     when (part) {
                                                         is ParsedRoutable.Segment.Variable -> {
-                                                            when (part.type.declaration.qualifiedName?.asString()) {
-                                                                "kotlin.String" -> appendLine("${part.name} = it.segments[$index],")
-                                                                "com.lightningkite.UUID", "java.util.UUID" -> appendLine("${part.name} = uuid(it.segments[$index]),")
-                                                                else -> appendLine("${part.name} = it.segments[$index].to${part.type.declaration.simpleName!!.asString()}(),")
-                                                            }
+                                                            appendLine("${part.name} = UrlProperties.decodeFromString(it.segments[$index]),")
                                                         }
 
                                                         else -> {}
                                                     }
                                                 }
                                             }
-                                            appendLine(")")
+                                            appendLine(").apply {")
+                                            tab {
+                                                for (qp in routable.queryParameters) {
+                                                    appendLine("UrlProperties.decodeFromStringMap<${qp.type}>(\"${qp.qpName}\", it.parameters)?.let { this.${qp.name}.value = it }")
+                                                }
+                                            }
+                                            appendLine("}")
                                         }
-                                        // TODO: Handle parameters
                                     }
                                     appendLine("},")
                                 }
@@ -107,18 +108,22 @@ class RouterGeneration(
                                 val rendered = route.joinToString(", ") {
                                     when (it) {
                                         is ParsedRoutable.Segment.Constant -> "\"${it.value}\""
-                                        is ParsedRoutable.Segment.Variable -> "it.${it.name}.toString()"
+                                        is ParsedRoutable.Segment.Variable -> "UrlProperties.encodeToString(it.${it.name})"
                                     }
                                 }
                                 appendLine("${routable.source.simpleName!!.asString()}::class to label@{")
                                 tab {
                                     appendLine("if (it !is ${routable.source.simpleName!!.asString()}) return@label null")
-                                    appendLine("UrlLikePath(")
+                                    appendLine("val p = HashMap<String, String>()")
+                                    routable.queryParameters.forEach {
+                                        appendLine("UrlProperties.encodeToStringMap(it.${it.name}.value, \"${it.qpName}\", p)")
+                                    }
+                                    appendLine("RouteRendered(UrlLikePath(")
                                     tab {
                                         appendLine("segments = listOf($rendered),")
-                                        appendLine("parameters = mapOf()")  // TODO Handle parameters
+                                        appendLine("parameters = p")
                                     }
-                                    appendLine(")")
+                                    appendLine("), listOf(${routable.queryParameters.joinToString { "it.${it.name}" }}))")
                                 }
                                 appendLine("},")
                             }
@@ -172,4 +177,21 @@ class ParsedRoutable(
                 } else Segment.Constant(it)
             }
     }
+
+    data class QueryParam(val name: String, val type: KSType, val qpName: String)
+
+    val queryParameters = source.getAllProperties()
+        .flatMap {
+            it.annotations("QueryParameter").map { a ->
+                it to ((a.arguments[0].value as? String)?.takeUnless { it.isBlank() } ?: it.simpleName.asString())
+            }
+        }
+        .map {
+            QueryParam(
+                it.first.simpleName.asString(),
+                it.first.type.resolve().arguments.first().type!!.resolve(),
+                it.second
+            )
+        }
+        .sortedBy { it.qpName }
 }

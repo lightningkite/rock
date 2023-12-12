@@ -64,9 +64,7 @@ actual inline var Link.to: RockScreen
         this.native.asDynamic().__ROCK__screen = value
         val navigator = (this.native.asDynamic().__ROCK__navigator as RockNavigator)
         navigator.routes.render(value)?.let {
-            native.href = "/" + it.segments.joinToString("/") + (it.parameters.takeUnless { it.isEmpty() }?.let {
-                "?" + it.entries.joinToString("&") { "${it.key}=${it.value}" }
-            } ?: "")
+            native.href = it.urlLikePath.render()
         }
         native.onclick = {
             it.preventDefault()

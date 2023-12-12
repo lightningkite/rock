@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class ReactivityTests {
     @Test
-    fun wait() {
+    fun waitingTest() {
         val property = Property<Int?>(null)
         val emissions = ArrayList<Int>()
         with(CalculationContext.Standard()) {

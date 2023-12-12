@@ -8,7 +8,7 @@ annotation class Routable(val path: String)
 annotation class FallbackRoute
 
 @Target(AnnotationTarget.PROPERTY)
-annotation class QueryParameter(val name: String)
+annotation class QueryParameter(val name: String = "")
 
 @Target(AnnotationTarget.PROPERTY)
 annotation class Hash

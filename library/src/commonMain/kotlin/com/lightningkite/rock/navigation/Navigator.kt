@@ -11,7 +11,6 @@ interface RockNavigator {
     fun replace(screen: RockScreen)
     fun goBack()
     fun dismiss()
-    fun notifyParamUpdate()
     val direction: Direction?
     enum class Direction { Back, Neutral, Forward }
 }
@@ -33,7 +32,6 @@ class LocalNavigator(override val routes: Routes, dialog: RockNavigator? = null)
         direction = RockNavigator.Direction.Back
         if(stack.value.isNotEmpty()) stack.value = stack.value.dropLast(1)
     }
-    override fun notifyParamUpdate() {}
     override fun navigate(screen: RockScreen) {
         direction = RockNavigator.Direction.Forward
         stack.value = stack.value.plus(screen)

@@ -51,7 +51,7 @@ object RootScreen : RockScreen {
                 linkScreen(ReactivityScreen)
                 linkScreen(DialogSamplesScreen)
                 linkScreen(ExternalServicesScreen)
-                linkScreen(ArgumentsExampleScreen("test-id"))
+                linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })
 
             } in withPadding
         } in scrolls

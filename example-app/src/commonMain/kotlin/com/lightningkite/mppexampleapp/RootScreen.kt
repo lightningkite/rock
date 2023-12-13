@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.FullExampleScreen
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.RecyclerViewScreen
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Color
@@ -53,6 +54,7 @@ object RootScreen : RockScreen {
                 linkScreen(DialogSamplesScreen)
                 linkScreen(ExternalServicesScreen)
                 linkScreen(FullExampleScreen())
+                linkScreen(RecyclerViewScreen)
                 linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })
 
             } in withPadding

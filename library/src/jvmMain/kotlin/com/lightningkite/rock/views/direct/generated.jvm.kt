@@ -233,6 +233,9 @@ actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Dou
 @ViewDsl actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
 @ViewDsl actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")
 @ViewDsl actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("gridRecyclerView")
+actual var RecyclerView.columns: Int
+    get() = 1
+    set(value) { TODO() }
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit = TODO()
 @ViewModifierDsl3 actual fun ViewWriter.hasPopover(requireClick: Boolean, preferredDirection: PopoverPreferredDirection, setup: ViewWriter.()->Unit): ViewWrapper = TODO()
 @ViewModifierDsl3 actual fun ViewWriter.weight(amount: Float): ViewWrapper = TODO()

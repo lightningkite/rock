@@ -28,10 +28,6 @@ actual class PlatformNavigator actual constructor(routes: Routes) : RockNavigato
         TODO("Not yet implemented")
     }
 
-    override fun notifyParamUpdate() {
-        TODO("Not yet implemented")
-    }
-
     override val direction: RockNavigator.Direction?
         get() = TODO("Not yet implemented")
 

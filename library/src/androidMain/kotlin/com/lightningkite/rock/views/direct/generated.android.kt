@@ -18,11 +18,9 @@ import androidx.appcompat.widget.AppCompatToggleButton
 import android.widget.Button as AndroidButton
 import android.widget.TextView as AndroidTextView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.text.set
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lightningkite.rock.ViewWrapper
@@ -35,9 +33,6 @@ import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.datetime.*
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 import java.lang.Exception
-import java.text.NumberFormat
-import java.text.ParseException
-import java.util.Objects
 
 
 actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {}
@@ -370,9 +365,27 @@ actual val RadioToggleButton.checked: Writable<Boolean>
     get() {
         return this@checked.native.selected
     }
+
+private object ViewActions {
+    val actions: MutableMap<Int, Action> = mutableMapOf()
+}
+
+private val View.getAction: Action? get() = ViewActions.actions[hashCode()]
+private fun View.setAction(action: Action?) {
+    if(action != null) {
+        ViewActions.actions[hashCode()] = action
+    } else {
+        ViewActions.actions.remove(hashCode())
+    }
+}
+
 actual var LocalDateField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
 actual var LocalDateField.range: ClosedRange<LocalDate>?
     get() {
         return native.minDate.toKotlinDate().rangeTo(native.maxDate.toKotlinDate())
@@ -410,16 +423,27 @@ actual val LocalTimeField.content: Writable<LocalTime?>
         }
     }
 actual var LocalTimeField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
+
+//Not certain what to do here.  my first thought is to use a tag to hold the range for the time picker
+//however unlikely someone could decide to set a custom tag on the native
+// view which would then mess up the functionality.
+
 actual var LocalTimeField.range: ClosedRange<LocalTime>?
     get() {
         return LocalTime(0, 0, 0, 0)
             .rangeTo(LocalTime(23, 59, 59, 0))
     }
     set(value) {
-        //Ignore for now.  If we want to make this work will have to do a fair amount of custom stuff, also seems less
-        //than useful.
+        val timePicker = TimePicker(native.context)
+        timePicker.setOnTimeChangedListener { view, hourOfDay, minute ->
+
+        }
     }
 
 
@@ -457,8 +481,12 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
         }
     }
 actual var LocalDateTimeField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
 actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() {
         val minDate: java.time.LocalDateTime = this@range.native.minDate
@@ -595,9 +623,15 @@ actual var TextField.keyboardHints: KeyboardHints
     set(value) {
         native.keyboardHints = value
     }
+
+
 actual var TextField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
 actual var TextField.hint: String
     get() {
         return this@hint.native.hint.toString()
@@ -605,8 +639,6 @@ actual var TextField.hint: String
     set(value) {
         this@hint.native.hint = value
     }
-
-val numberFormat = NumberFormat.getNumberInstance()
 actual var TextField.range: ClosedRange<Double>?
     get() {
         return native.tag as? ClosedRange<Double>
@@ -710,13 +742,19 @@ actual var AutoCompleteTextField.keyboardHints: KeyboardHints
     }
     set(value) {}
 actual var AutoCompleteTextField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.tag as? Action
+    }
+    set(value) {
+        native.tag = value
+    }
 actual var AutoCompleteTextField.suggestions: List<String>
     get() {
         TODO()
     }
-    set(value) {}
+    set(value) {
+
+    }
 
 
 
@@ -735,11 +773,10 @@ actual var WebView.permitJs: Boolean
         native.settings.javaScriptEnabled = value
     }
 actual var WebView.content: String
-    get() {
-        TODO("NOT IMPLEMENTED")
-    }
+    get() { return native.tag as? String ?: "" }
 
     set(value) {
+        native.tag = value
         native.loadData(value, null, "utf8")
     }
 
@@ -863,7 +900,7 @@ actual class NDismissBackground(c: Context) : NView(c)
 
 @ViewDsl
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
-    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.")
+    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.  Probably will understand better or know how to implement after I implement themes.")
 }
 
 @ViewDsl

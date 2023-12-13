@@ -13,7 +13,7 @@ import com.lightningkite.rock.reactive.*
 object CanvasSampleScreen : RockScreen {
     data class Point(val x: Double, val y: Double)
 
-    override fun ViewWriter.render() {
+    override fun ViewWriter.render() = stack {
         canvas {
             var x: Double = 0.0
             val lines = Property(ArrayList<ArrayList<Point>>())

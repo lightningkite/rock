@@ -1,12 +1,17 @@
 package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.Cancellable
+import com.lightningkite.rock.CancelledException
+import com.lightningkite.rock.debugger
 import kotlin.reflect.KMutableProperty0
 
 interface CalculationContext {
     fun notifyStart() {}
     fun notifySuccess() {}
-    fun notifyFailure() {}
+    fun notifyFailure(t: Throwable) {
+        t.printStackTrace()
+        debugger()
+    }
     fun onRemove(action: () -> Unit)
     companion object {
     }

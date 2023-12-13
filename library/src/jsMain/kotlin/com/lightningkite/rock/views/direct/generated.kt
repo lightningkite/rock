@@ -770,9 +770,12 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
             view.style.animation = "${keyframeName}-exit 0.25s"
-            view.addEventListener("animationend", {
-                native.removeChild(view)
-            })
+            val parent = view.parentElement
+            window.setTimeout({
+                if(view.parentElement == parent) {
+                    native.removeChild(view)
+                }
+            }, 250)
         }
     createNewView()
     val newView = (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast } ?: run {

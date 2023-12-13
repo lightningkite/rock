@@ -32,8 +32,9 @@ data class NViewCalculationContext(val native: NView): CalculationContext {
         native.classList.remove("loading")
     }
 
-    override fun notifyFailure() {
+    override fun notifyFailure(t: Throwable) {
         native.classList.remove("loading")
+        super.notifyFailure(t)
     }
 }
 actual val NView.calculationContext: CalculationContext

@@ -1,5 +1,6 @@
 package com.lightningkite.mppexampleapp
 
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.UseFullScreen
 import com.lightningkite.rock.ExternalServices
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
@@ -34,6 +35,11 @@ fun ViewWriter.app() {
                 NavItem("Log Out", Icon.home, SampleLogInScreen),
             )
         }
+
+        ::exists {
+            navigator.currentScreen.await() !is UseFullScreen
+        }
+
         actions = listOf(
             Action(
                 title = "Search",

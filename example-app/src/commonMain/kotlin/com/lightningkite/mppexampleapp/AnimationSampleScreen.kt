@@ -12,7 +12,7 @@ import com.lightningkite.rock.reactive.*
 @Routable("sample/animation")
 object AnimationSampleScreen : RockScreen {
     data class Point(val x: Double, val y: Double)
-    override fun ViewWriter.render() {
+    override fun ViewWriter.render() = stack {
         canvas {
             var x: Double = 0.0
             val line = Property(ArrayList<Point>())

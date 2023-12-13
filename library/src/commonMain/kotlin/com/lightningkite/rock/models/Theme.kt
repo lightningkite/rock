@@ -30,7 +30,7 @@ data class Theme(
             elevation = this.elevation / 2f,
         )
     },
-    val unselected: (Theme.() -> Theme) = { this.important(this).let { it.copy(id = it.id + "-outline", background = Color.transparent, outline = it.background, outlineWidth = 4.px, foreground = it.background)} },
+    val unselected: (Theme.() -> Theme) = { this },
     val selected: (Theme.() -> Theme) = { this.important(this) },
     val disabled: (Theme.() -> Theme) = {
         copy(

@@ -32,3 +32,14 @@ infix fun <T> Writable<T>.bind(master: Writable<T>) {
         }.also { onRemove(it) }
     }
 }
+
+infix fun <T> Writable<Set<T>>.contains(value: T): Writable<Boolean> = shared { value in await() }.withWrite { on ->
+    if (on) this@contains.set(this@contains.await() + value)
+    else this@contains.set(this@contains.await() - value)
+}
+
+fun <T> Readable<T>.withWrite(action: suspend Readable<T>.(T)->Unit): Writable<T> = object: Writable<T>, Readable<T> by this {
+    override suspend fun set(value: T) {
+        action(this@withWrite, value)
+    }
+}

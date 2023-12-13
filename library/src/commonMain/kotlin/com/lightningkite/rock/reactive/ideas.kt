@@ -160,7 +160,6 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             removers.clear()
         }
     }
-    val id = Random.nextInt(100, 999)
     return object: Readable<T> {
         var value: T? = null
         var ready: Boolean = false
@@ -186,7 +185,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                     } finally {
                         ready = true
                     }
-                    listeners.forEach { it() }
+                    listeners.toList().forEach { it() }
                 }
             }
             listeners.add(listener)

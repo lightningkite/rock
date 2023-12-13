@@ -92,7 +92,7 @@ actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) =  element(::Frame
 @ViewDsl
 actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
     element(::LinearLayout, ::ContainingView) {
-        val l = this.native as LinearLayout
+        val l = native as LinearLayout
         l.orientation = LinearLayout.VERTICAL
         setup(ContainingView(l))
     }
@@ -102,7 +102,7 @@ actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
     element(::LinearLayout, ::ContainingView) {
-        val l = this.native as LinearLayout
+        val l = native as LinearLayout
         l.orientation = LinearLayout.HORIZONTAL
         setup(ContainingView(l))
     }
@@ -112,12 +112,12 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
 actual fun ViewWriter.button(setup: Button.() -> Unit) = element(::AndroidButton, ::Button, setup)
 
 fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
-    val androidText = this.native
+    val androidText = native
     androidText.textSize = textSize
     setup(TextView(androidText))
 }
 fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
-    val androidText = this.native
+    val androidText = native
     androidText.textSize = textSize
     androidText.setTypeface(androidText.typeface, Typeface.BOLD)
     setup(TextView(androidText))
@@ -195,14 +195,14 @@ actual var Image.description: String?
     set(value) {}
 actual var TextView.content: String
     get() {
-        return this.native.text.toString()
+        return native.text.toString()
     }
     set(value) {
-        this.native.text = value
+        native.text = value
     }
 actual var TextView.align: Align
     get() {
-        return when(this.native.gravity) {
+        return when(native.gravity) {
             Gravity.START -> Align.Start
             Gravity.END -> Align.End
             Gravity.CENTER -> Align.Center
@@ -213,12 +213,12 @@ actual var TextView.align: Align
     }
     set(value) {
         when (value) {
-            Align.Start -> this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_START
-            Align.End -> this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_END
-            Align.Center -> this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_CENTER
+            Align.Start -> native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_START
+            Align.End -> native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_END
+            Align.Center -> native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_CENTER
             Align.Stretch -> {
-                this.native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_START
-                this.native.updateLayoutParams<ViewGroup.LayoutParams> {
+                native.textAlignment = android.widget.TextView.TEXT_ALIGNMENT_TEXT_START
+                native.updateLayoutParams<ViewGroup.LayoutParams> {
                     this.width = ViewGroup.LayoutParams.MATCH_PARENT
                 }
             }
@@ -226,40 +226,40 @@ actual var TextView.align: Align
     }
 actual var TextView.textSize: Dimension
     get() {
-        return Dimension(this.native.textSize.toInt())
+        return Dimension(native.textSize.toInt())
     }
     set(value) {
-        this.native.textSize = value.value.toFloat()
+        native.textSize = value.value.toFloat()
     }
 actual var Label.content: String
     get() {
-        return this.native.text.toString()
+        return native.text.toString()
     }
     set(value) {
-        this.native.text = value
+        native.text = value
     }
 
 actual fun DismissBackground.onClick(action: suspend () -> Unit) {}
 
 actual fun Button.onClick(action: suspend () -> Unit) {
-    this.native.setOnClickListener { view ->
+    native.setOnClickListener { view ->
         launch { action() }
     }
 }
 actual var Button.enabled: Boolean
     get() {
-        return this.native.isEnabled
+        return native.isEnabled
     }
     set(value) {
-        this.native.isEnabled = value
+        native.isEnabled = value
     }
 
 actual var Checkbox.enabled: Boolean
     get() {
-        return this.native.isEnabled
+        return native.isEnabled
     }
     set(value) {
-        this.native.isEnabled = value
+        native.isEnabled = value
     }
 
 object NativeListeners {
@@ -297,32 +297,32 @@ val CompoundButton.checked: Writable<Boolean>
     }
 actual val Checkbox.checked: Writable<Boolean>
     get() {
-        return this.native.checked
+        return native.checked
     }
 
 actual var RadioButton.enabled: Boolean
     get() {
-        return this.native.isEnabled
+        return native.isEnabled
     }
     set(value) {
-        this.native.isEnabled = value
+        native.isEnabled = value
     }
 actual val RadioButton.checked: Writable<Boolean>
     get() {
-        return this.native.checked
+        return native.checked
     }
 
 
 actual var Switch.enabled: Boolean
     get() {
-        return this.native.isEnabled
+        return native.isEnabled
     }
     set(value) {
-        this.native.isEnabled = value
+        native.isEnabled = value
     }
 actual val Switch.checked: Writable<Boolean>
     get() {
-        return this.native.checked
+        return native.checked
     }
 
 val NView.selected: Writable<Boolean>
@@ -348,10 +348,10 @@ val NView.selected: Writable<Boolean>
 
 actual var ToggleButton.enabled: Boolean
     get() {
-        return this.native.isEnabled
+        return native.isEnabled
     }
     set(value) {
-        this.native.isEnabled = value
+        native.isEnabled = value
     }
 actual val ToggleButton.checked: Writable<Boolean>
     get() {
@@ -361,10 +361,10 @@ actual val ToggleButton.checked: Writable<Boolean>
 
 actual var RadioToggleButton.enabled: Boolean
     get() {
-        return this.native.isEnabled
+        return native.isEnabled
     }
     set(value) {
-        this.native.isEnabled = value
+        native.isEnabled = value
     }
 actual val RadioToggleButton.checked: Writable<Boolean>
     get() {
@@ -375,14 +375,14 @@ actual var LocalDateField.action: Action?
     set(value) {}
 actual var LocalDateField.range: ClosedRange<LocalDate>?
     get() {
-        return this.native.minDate.toKotlinDate().rangeTo(this.native.maxDate.toKotlinDate())
+        return native.minDate.toKotlinDate().rangeTo(native.maxDate.toKotlinDate())
     }
     set(value) {
         if (value == null) {
-            this.native.defaultRange()
+            native.defaultRange()
         } else {
-            this.native.minDate = value.start.toJavaLocalDate()
-            this.native.maxDate = value.endInclusive.toJavaLocalDate()
+            native.minDate = value.start.toJavaLocalDate()
+            native.maxDate = value.endInclusive.toJavaLocalDate()
         }
     }
 actual val LocalTimeField.content: Writable<LocalTime?>
@@ -590,10 +590,10 @@ var EditText.keyboardHints: KeyboardHints
 
 actual var TextField.keyboardHints: KeyboardHints
     get() {
-        return this.native.keyboardHints
+        return native.keyboardHints
     }
     set(value) {
-        this.native.keyboardHints = value
+        native.keyboardHints = value
     }
 actual var TextField.action: Action?
     get() = TODO()
@@ -609,13 +609,13 @@ actual var TextField.hint: String
 val numberFormat = NumberFormat.getNumberInstance()
 actual var TextField.range: ClosedRange<Double>?
     get() {
-        return this.native.tag as? ClosedRange<Double>
+        return native.tag as? ClosedRange<Double>
     }
     set(value) {
         if (value == null) return
 
-        this.native.tag = value
-        this.native.doAfterTextChanged {
+        native.tag = value
+        native.doAfterTextChanged {
             try {
                 if (it == null) return@doAfterTextChanged
 
@@ -637,10 +637,10 @@ actual val TextArea.content: Writable<String>
     }
 actual var TextArea.keyboardHints: KeyboardHints
     get() {
-        return this.native.keyboardHints
+        return native.keyboardHints
     }
     set(value) {
-        this.native.keyboardHints = value
+        native.keyboardHints = value
     }
 actual var TextArea.hint: String
     get() {
@@ -685,7 +685,7 @@ actual val Select.selected: Writable<String?>
     }
 actual var Select.options: List<WidgetOption>
     get() {
-        val adapter = this.native.adapter
+        val adapter = native.adapter
         val options = mutableListOf<WidgetOption>()
         val count = adapter.count
         var counter = 0
@@ -702,7 +702,7 @@ actual var Select.options: List<WidgetOption>
 
 actual val AutoCompleteTextField.content: Writable<String>
     get() {
-        return this.native.content
+        return native.content
     }
 actual var AutoCompleteTextField.keyboardHints: KeyboardHints
     get() {
@@ -722,17 +722,17 @@ actual var AutoCompleteTextField.suggestions: List<String>
 
 actual var WebView.url: String
     get() {
-        return this.native.url ?: ""
+        return native.url ?: ""
     }
     set(value) {
-        this.native.loadUrl(value)
+        native.loadUrl(value)
     }
 actual var WebView.permitJs: Boolean
     get() {
-        return this.native.settings.javaScriptEnabled
+        return native.settings.javaScriptEnabled
     }
     set(value) {
-        this.native.settings.javaScriptEnabled = value
+        native.settings.javaScriptEnabled = value
     }
 actual var WebView.content: String
     get() {
@@ -740,7 +740,7 @@ actual var WebView.content: String
     }
 
     set(value) {
-        this.native.loadData(value, null, "utf8")
+        native.loadData(value, null, "utf8")
     }
 
 
@@ -959,7 +959,7 @@ actual fun ViewWriter.canvas(setup: Canvas.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
     element(::AndroidRecyclerView, ::RecyclerView) {
-        this.native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.VERTICAL, false)
+        native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.VERTICAL, false)
         setup()
     }
 }
@@ -967,7 +967,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
     element(::AndroidRecyclerView, ::RecyclerView) {
-        this.native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.HORIZONTAL, false)
+        native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.HORIZONTAL, false)
         setup()
     }
 }
@@ -975,7 +975,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
     element(::AndroidRecyclerView, ::RecyclerView) {
-        this.native.layoutManager = GridLayoutManager(currentView.context, 3)
+        native.layoutManager = GridLayoutManager(currentView.context, 3)
         setup()
     }
 }

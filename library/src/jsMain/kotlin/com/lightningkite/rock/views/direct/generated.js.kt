@@ -770,9 +770,12 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
             view.style.animation = "${keyframeName}-exit 0.25s"
-            view.addEventListener("animationend", {
-                native.removeChild(view)
-            })
+            val parent = view.parentElement
+            window.setTimeout({
+                if(view.parentElement == parent) {
+                    native.removeChild(view)
+                }
+            }, 250)
         }
     createNewView()
     val newView = (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast } ?: run {
@@ -856,20 +859,39 @@ actual typealias NRecyclerView = HTMLDivElement
 
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit =
-    themedElement<NRecyclerView>("div") { setup(RecyclerView(this)) }
+    themedElement<NRecyclerView>("div") {
+        classList.add("recycler")
+        this.asDynamic().__viewWriter = split()
+        setup(RecyclerView(this))
+    }
 
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit =
-    themedElement<NRecyclerView>("div") { setup(RecyclerView(this)) }
+    themedElement<NRecyclerView>("div") {
+        classList.add("recycler-horz")
+        this.asDynamic().__viewWriter = split()
+        setup(RecyclerView(this))
+    }
 
 @ViewDsl
 actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit =
-    themedElement<NRecyclerView>("div") { setup(RecyclerView(this)) }
+    themedElement<NRecyclerView>("div") {
+        classList.add("recycler-grid")
+        this.asDynamic().__viewWriter = split()
+        setup(RecyclerView(this))
+    }
+
+actual var RecyclerView.columns: Int
+    get() = 1
+    set(value) { TODO() }
 
 actual fun <T> RecyclerView.children(
     items: Readable<List<T>>,
     render: ViewWriter.(value: Readable<T>) -> Unit
-): Unit = TODO()
+): Unit {
+    val writer = this.native.asDynamic().__viewWriter as ViewWriter
+    writer.forEachUpdating(items, render)
+}
 
 @ViewModifierDsl3 actual fun ViewWriter.hasPopover(
     requireClick: Boolean,
@@ -919,6 +941,7 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         style.flexGrow = "$amount"
         style.flexShrink = "$amount"
+        style.flexBasis = "0"
     }
     return ViewWrapper
 }

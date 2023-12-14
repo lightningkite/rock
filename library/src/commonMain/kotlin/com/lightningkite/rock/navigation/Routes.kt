@@ -46,5 +46,3 @@ interface RockScreen {
 
 private val camelRegex = Regex("([a-z])([A-Z]+)")
 private fun String.camelToHuman(): String = this.replace(camelRegex) { it.groupValues[1] + " " + it.groupValues[2] }
-
-class RedirectException(val screen: RockScreen) : Exception()

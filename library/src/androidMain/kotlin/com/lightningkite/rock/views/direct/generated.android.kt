@@ -1017,6 +1017,10 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
     }
 }
 
+actual var RecyclerView.columns: Int
+    get() = 1
+    set(value) { TODO() }
+
 @ViewModifierDsl3
 actual fun ViewWriter.hasPopover(
     requireClick: Boolean,

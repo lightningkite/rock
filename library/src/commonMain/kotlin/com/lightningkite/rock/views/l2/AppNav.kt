@@ -22,8 +22,11 @@ data class ProfileInfo(
     val currentUser: UserInfo?,
 )
 
-data class UserInfo(val name: String, val profileImage:
-ImageVector? = null, val defaultIcon: Icon)
+data class UserInfo(
+    val name: String,
+    val profileImage: ImageVector? = null,
+    val defaultIcon: Icon
+)
 
 
 interface AppNav {
@@ -34,7 +37,7 @@ interface AppNav {
     var currentUser: ProfileInfo?
     var userLinks: List<NavItem>
     var actions: List<Action>
-
+    var exists: Boolean
 
     class ByProperty : AppNav {
         val appNameProperty = Property("My App")
@@ -51,6 +54,8 @@ interface AppNav {
         override var actions: List<Action> by actionsProperty
         val userLinksProperty = Property(listOf<NavItem>())
         override var userLinks: List<NavItem> by userLinksProperty
+        val existsProperty = Property(true)
+        override var exists: Boolean by existsProperty
     }
 }
 
@@ -87,13 +92,13 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
 
 fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
-    val booleanContent = Property(false)
+    val showMenu = Property(false)
     col {
 // Nav 1 hamburger
         row {
             setup(appNav)
             toggleButton {
-                checked bind booleanContent; image {
+                checked bind showMenu; image {
                 val currentTheme = currentTheme
                 ::source { Icon.menu.toImageSource(currentTheme().foreground) }
                 description = "Open naviagation menu"
@@ -125,18 +130,17 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                     }
                 }
             }
+            ::exists { appNav.existsProperty.await() }
         } in bar in marginless
         row {
-            text {
-                col {
-                    forEachUpdating(appNav.navItemsProperty) {
-                        link {
-                            ::to { it.await().destination }
-                            text { ::content { it.await().title } }
-                        } in bar
-                    }.toString()
-                }
-                ::exists { booleanContent.await() }
+            col {
+                forEachUpdating(appNav.navItemsProperty) {
+                    link {
+                        ::to { it.await().destination }
+                        text { ::content { it.await().title } }
+                    } in bar
+                }.toString()
+                ::exists { showMenu.await() && appNav.existsProperty.await() }
             } in bar in marginless
             navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
@@ -187,6 +191,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
 
                 }
             }
+            ::exists { appNav.existsProperty.await() }
         } in bar in marginless
         navigatorView(navigator) in weight(1f) in marginless
     } in marginless
@@ -223,6 +228,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                     }
                 }
             }
+            ::exists { appNav.existsProperty.await() }
         } in bar in marginless
         navigatorView(navigator) in weight(1f) in marginless
         //Nav 3 - top and bottom (bottom/tabs)
@@ -244,6 +250,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                         existing.bar() ?: existing
                 } in marginless
             }
+            ::exists { appNav.existsProperty.await() }
         } in marginless
     } in marginless
 }
@@ -307,6 +314,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 } in card
             }
 
+            ::exists { appNav.existsProperty.await() }
         } in bar in marginless
         row {
             col {
@@ -317,7 +325,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     }
                 }
 
-                ::exists { appNav.navItemsProperty.await().size > 1 }
+                ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             } in marginless
             navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)

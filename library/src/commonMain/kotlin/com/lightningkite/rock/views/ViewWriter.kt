@@ -5,12 +5,6 @@ import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.*
 
-@DslMarker
-annotation class ViewDsl
-
-@DslMarker
-annotation class ViewModifierDsl3
-
 /**
  * An object that writes view trees, similar to the way a Writer in Java sequentially writes text data.
  * Views rendered through here will be inserted into the given parent in the constructor.
@@ -122,52 +116,3 @@ class ViewWriter(
         }
     }
 }
-
-/**
- * A native view in the underlying view system.
- */
-expect open class NView
-
-/**
- * A wrapper in pure common code for a native view.
- * Used to remove naming conflicts with properties.
- */
-interface RView<Wraps: NView> {
-    val native: Wraps
-}
-
-expect val NView.calculationContext: CalculationContext
-expect var NView.nativeRotation: Angle
-expect var NView.opacity: Double
-expect var NView.exists: Boolean
-expect var NView.visible: Boolean
-expect fun NView.clearChildren()
-expect fun NView.addChild(child: NView)
-
-val RView<*>.calculationContext: CalculationContext get() = native.calculationContext
-var RView<*>.rotation: Angle
-    get() = native.nativeRotation
-    set(value) { native.nativeRotation = value }
-var RView<*>.opacity: Double
-    get() = native.opacity
-    set(value) { native.opacity = value }
-var RView<*>.exists: Boolean
-    get() = native.exists
-    set(value) { native.exists = value }
-var RView<*>.visible: Boolean
-    get() = native.visible
-    set(value) { native.visible = value }
-
-fun <T> ViewWriter.forEach(items: Readable<List<T>>, render: ViewWriter.(T)->Unit) = with(split()) {
-    calculationContext.reactiveScope {
-        currentView.clearChildren()
-        items.await().forEach {
-            render(it)
-        }
-    }
-}
-
-fun RView<*>.reactiveScope(action: suspend ()->Unit) {
-    calculationContext.reactiveScope(action)
-}
-fun RView<*>.launch(action: suspend () -> Unit) = calculationContext.launch(action)

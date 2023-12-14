@@ -89,7 +89,7 @@ actual class PlatformNavigator actual constructor(
         pushState: Boolean,
     ) {
         if (isNavigating)
-            throw RedirectException(rockScreen)
+            throw IllegalStateException()
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(

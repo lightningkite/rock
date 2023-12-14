@@ -28,9 +28,7 @@ interface Writable<T> : Readable<T> {
 }
 
 suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
-    CalculationContextStack.current().launch {
-        set(action(await()))
-    }
+    set(action(await()))
 }
 
 class Property<T>(startValue: T) : Writable<T>, ReadWriteProperty<Any?, T> {
@@ -117,7 +115,11 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
 //                    run()
 //                }
                 if(result.isSuccess) notifySuccess()
-                else notifyFailure()
+                else result.exceptionOrNull()?.let {
+                    if(it !is CancelledException) {
+                        notifyFailure(it)
+                    }
+                }
                 result.onFailure { ex: Throwable ->
                     if(ex is CancelledException) return@onFailure
                     ex.printStackTrace()
@@ -152,13 +154,12 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
     val ctx = object: CalculationContext {
         override fun notifyStart() {}
         override fun notifySuccess() {}
-        override fun notifyFailure() {}
+        override fun notifyFailure(t: Throwable) { t.printStackTrace() }
         override fun onRemove(action: () -> Unit) {
             removers.forEach { it() }
             removers.clear()
         }
     }
-    val id = Random.nextInt(100, 999)
     return object: Readable<T> {
         var value: T? = null
         var ready: Boolean = false
@@ -184,7 +185,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                     } finally {
                         ready = true
                     }
-                    listeners.forEach { it() }
+                    listeners.toList().forEach { it() }
                 }
             }
             listeners.add(listener)

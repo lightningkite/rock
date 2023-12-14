@@ -19,6 +19,7 @@ a {
     text-decoration: none;
     color: unset;
 }
+
 a:visited {
     color: unset;
 }
@@ -315,4 +316,22 @@ input:focus textarea:focus {
     display: none;
 }
 
-iframe#webpack-dev-server-client-overlay{display:none!important}
+iframe#webpack-dev-server-client-overlay {
+    display: none !important
+}
+
+.recycler {
+    overflow-y: auto;
+}
+
+.recycler-horz {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+}
+
+.recycler-grid {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+}

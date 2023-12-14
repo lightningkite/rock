@@ -31,7 +31,6 @@ data class NViewCalculationContext(val native: View): CalculationContext {
 
     override fun notifyStart() { TODO("NOT YET IMPLEMENTED") }
     override fun notifySuccess() { TODO("NOT YET IMPLEMENTED") }
-    override fun notifyFailure() { TODO("NOT YET IMPLEMENTED") }
 }
 
 actual val NView.calculationContext: CalculationContext

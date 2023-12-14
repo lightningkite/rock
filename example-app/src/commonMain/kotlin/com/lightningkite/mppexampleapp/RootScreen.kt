@@ -30,7 +30,7 @@ object RootScreen : RockScreen {
                     content =
                         "Note the magnifying glass in the top right corner - clicking it will open the source of the current screen on GitHub!"
                 }
-            } in withPadding
+            } in withDefaultPadding
             col {
 
                 fun ViewWriter.linkScreen(screen: RockScreen) = link {
@@ -57,7 +57,7 @@ object RootScreen : RockScreen {
                 linkScreen(RecyclerViewScreen)
                 linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })
 
-            } in withPadding
+            } in withDefaultPadding
         } in scrolls
     }
 }

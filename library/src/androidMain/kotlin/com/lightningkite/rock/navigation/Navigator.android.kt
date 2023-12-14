@@ -1,34 +1,35 @@
 package com.lightningkite.rock.navigation
-
 import com.lightningkite.rock.reactive.Readable
+import android.content.Context
+
 
 actual class PlatformNavigator actual constructor(routes: Routes) : RockNavigator {
+    private val localNavigator = LocalNavigator(routes)
     override val dialog: RockNavigator
-        get() = TODO("Not yet implemented")
+        get() = localNavigator.dialog
     override val routes: Routes
-        get() = TODO("Not yet implemented")
+        get() = localNavigator.routes
     override val currentScreen: Readable<RockScreen?>
-        get() = TODO("Not yet implemented")
+        get() = localNavigator.currentScreen
     override val canGoBack: Readable<Boolean>
-        get() = TODO("Not yet implemented")
+        get() = localNavigator.canGoBack
 
     override fun navigate(screen: RockScreen) {
-        TODO("Not yet implemented")
+        localNavigator.navigate(screen)
     }
 
     override fun replace(screen: RockScreen) {
-        TODO("Not yet implemented")
+        localNavigator.replace(screen)
     }
 
     override fun goBack() {
-        TODO("Not yet implemented")
+        localNavigator.goBack()
     }
 
     override fun dismiss() {
-        TODO("Not yet implemented")
+        localNavigator.dismiss()
     }
 
-    override val direction: RockNavigator.Direction?
-        get() = TODO("Not yet implemented")
+    override val direction: RockNavigator.Direction? = localNavigator.direction
 
 }

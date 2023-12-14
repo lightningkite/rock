@@ -11,6 +11,5 @@ open class RockActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidAppContext.applicationCtx = this.applicationContext
-        PlatformStorage.initialize(this)
     }
 }

@@ -16,7 +16,7 @@ object ExternalServicesScreen : RockScreen {
             col {
                 h1 { content = "This screen demonstrates various some external access." }
 //                text { content = "Note the use of the multi-layer 'Readable' in `fetching`." }
-            } in withPadding
+            } in withDefaultPadding
 
             button {
                 text { content = "openTab" }

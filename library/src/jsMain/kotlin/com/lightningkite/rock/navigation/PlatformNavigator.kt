@@ -22,6 +22,7 @@ actual class PlatformNavigator actual constructor(
     override val dialog: RockNavigator = LocalNavigator(routes).also {
         it.stack.value = listOf()
     }
+
     private var nextIndex: Int = 1
     private val currentIndexProp = Property(0)
     private var currentIndex: Int by currentIndexProp

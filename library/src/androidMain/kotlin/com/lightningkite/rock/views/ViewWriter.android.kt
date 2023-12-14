@@ -19,6 +19,7 @@ object AndroidAppContext {
     val res: Resources by lazy { applicationCtx.resources }
     val density: Float by lazy { res.displayMetrics.density }
     val oneRem: Float by lazy { density * 16 }
+    var autoCompleteLayoutResource: Int = android.R.layout.simple_list_item_1
 }
 
 private val View.removeListeners: HashMap<Int, () -> Unit>

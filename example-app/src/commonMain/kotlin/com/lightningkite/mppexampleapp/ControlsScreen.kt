@@ -17,7 +17,7 @@ object ControlsScreen : RockScreen {
         val booleanContent = Property(false)
         col {
 
-            h1 { content = "Controls" } in withPadding in hasPopover {
+            h1 { content = "Controls" } in withDefaultPadding in hasPopover {
                 text {
                     content = "Pop over!"
                 } in card
@@ -56,7 +56,7 @@ object ControlsScreen : RockScreen {
                             h3 { content = "Example Setting" } in weight(1f)
                             switch { }
                         }
-                    } in withPadding
+                    } in withDefaultPadding
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
@@ -82,7 +82,7 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Activity Indicators" }
                 row {
                     space {} in weight(1f)
-                    stack { activityIndicator { } } in withPadding
+                    stack { activityIndicator { } } in withDefaultPadding
                     stack { activityIndicator { } } in card
                     stack { activityIndicator { } } in important
                     stack { activityIndicator { } } in critical
@@ -95,7 +95,7 @@ object ControlsScreen : RockScreen {
             col {
                 h2 { content = "Drop Downs" }
                 val options = listOf("Apple", "Banana", "Crepe").map { WidgetOption(it, it) }
-                select { this.options = options } in withPadding
+                select { this.options = options } in withDefaultPadding
                 select { this.options = options } in card
                 select { this.options = options } in important
                 select { this.options = options } in critical

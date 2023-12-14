@@ -30,5 +30,7 @@ private fun Location.toGeolocationResult(): GeolocationResult {
 }
 
 actual fun ViewWriter.watchGeolocation(onUpdated: (GeolocationResult) -> Unit) {
-    TODO("Should probably have google service functionality be part of a separate package or something.")
+    TODO("This can be accomplished with the regular location manager, " +
+            "however best practice is to use the FusedLocationProvider which is part of google play servers. " +
+            "Should probably have google service functionality be part of a separate package")
 }

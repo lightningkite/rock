@@ -2,15 +2,15 @@ package com.lightningkite.rock
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.lightningkite.rock.views.AndroidAppContext
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual object PlatformStorage {
 
-    private lateinit var preferences: SharedPreferences
-
-    fun initialize(context: Context) {
-        preferences = context.applicationContext.getSharedPreferences("Rock.PLatformStorage", Context.MODE_PRIVATE)
+    private val preferences: SharedPreferences by lazy {
+        AndroidAppContext.applicationCtx.getSharedPreferences("Rock.PlatformStorage", Context.MODE_PRIVATE)
     }
+
     actual fun get(key: String): String? {
         return preferences.getString(key, null)
     }

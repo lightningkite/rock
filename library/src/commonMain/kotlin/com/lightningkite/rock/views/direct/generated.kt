@@ -54,6 +54,9 @@ value class TextView(override val native: NTextView) : RView<NTextView>
 @ViewDsl expect fun ViewWriter.h6(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewWriter.text(setup: TextView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewWriter.subtext(setup: TextView.() -> Unit = {}): Unit
+
+//expect val LocalDateField.content: Writable<LocalDate?>
+
 expect var TextView.content: String
 expect var TextView.align: Align
 expect var TextView.textSize: Dimension
@@ -127,7 +130,6 @@ expect class NLocalDateField : NView
 @JvmInline
 value class LocalDateField(override val native: NLocalDateField) : RView<NLocalDateField>
 @ViewDsl expect fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit = {}): Unit
-expect val LocalDateField.content: Writable<LocalDate?>
 expect var LocalDateField.action: Action?
 expect var LocalDateField.range: ClosedRange<LocalDate>?
 
@@ -224,4 +226,4 @@ expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWrite
 @ViewModifierDsl3 expect val ViewWriter.scrollsHorizontally: ViewWrapper
 @ViewModifierDsl3 expect fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper
 @ViewModifierDsl3 expect val ViewWriter.marginless: ViewWrapper
-@ViewModifierDsl3 expect val ViewWriter.withPadding: ViewWrapper
+@ViewModifierDsl3 expect val ViewWriter.withDefaultPadding: ViewWrapper

@@ -1,49 +1,19 @@
 package com.lightningkite.rock.views.canvas
 
+import android.content.Context
+import android.util.AttributeSet
+import android.view.View
 import com.lightningkite.rock.models.Paint
 
-actual abstract class DrawingContext2D {
-    //  abstract   fun stroke(path: Path2D)
 
-//  abstract   fun clip(fillRule: CanvasFillRule)
-//  abstract   fun clip(path: Path2D, fillRule: CanvasFillRule)
-//    abstract fun resetClip()
+abstract class DrawingView : View {
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-//  abstract   fun isPointInPath(x: Double, y: Double, fillRule: CanvasFillRule): Boolean
-//  abstract   fun isPointInPath(path: Path2D, x: Double, y: Double, fillRule: CanvasFillRule): Boolean
-//    abstract fun isPointInStroke(x: Double, y: Double): Boolean
-//  abstract   fun isPointInStroke(path: Path2D, x: Double, y: Double): Boolean
 
-//  abstract   fun drawFocusIfNeeded(element: Element)
-//  abstract   fun drawFocusIfNeeded(path: Path2D, element: Element)
-
-//    abstract fun scrollPathIntoView()
-//  abstract   fun scrollPathIntoView(path: Path2D)
-
-//    abstract fun fillText(text: String, x: Double, y: Double, maxWidth: Double)
-//    abstract fun strokeText(text: String, x: Double, y: Double, maxWidth: Double)
-
-//  abstract   fun measureText(text: String): TextMetrics
-//    abstract var font: String
-//  abstract   var textAlign: CanvasTextAlign
-//  abstract   var textBaseline: CanvasTextBaseline
-//  abstract   var direction: CanvasDirection
-
-//  abstract   fun drawImage(image: CanvasImageSource, dx: Double, dy: Double)
-//  abstract   fun drawImage(image: CanvasImageSource, dx: Double, dy: Double, dw: Double, dh: Double)
-//  abstract   fun drawImage(image: CanvasImageSource, sx: Double, sy: Double, sw: Double, sh: Double, dx: Double, dy: Double, dw: Double, dh: Double)
-//  abstract   fun createImageData(sw: Double, sh: Double): ImageData
-//  abstract   fun createImageData(imagedata: ImageData): ImageData
-//  abstract   fun getImageData(sx: Double, sy: Double, sw: Double, sh: Double): ImageData
-//  abstract   fun putImageData(imagedata: ImageData, dx: Double, dy: Double)
-//  abstract   fun putImageData(imagedata: ImageData, dx: Double, dy: Double, dirtyX: Double, dirtyY: Double, dirtyWidth: Double, dirtyHeight: Double)
-
-//  abstract   fun addHitRegion(options: HitRegionOptions)
-//    abstract fun removeHitRegion(id: String)
-//    abstract fun clearHitRegions()
-
-    //    abstract fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
-//    abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
+}
+actual abstract class DrawingContext2D(val view: View) {
     actual abstract fun save()
     actual abstract fun restore()
     actual abstract fun scale(x: Double, y: Double)

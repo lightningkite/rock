@@ -1,3 +1,5 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
@@ -9,20 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.CheckBox as AndroidCheckbox
-import android.widget.RadioButton as AndroidRadioButton
-import android.widget.AutoCompleteTextView as AndroidCompleteTextView
-import android.webkit.WebView as AndroidWebView
+import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatToggleButton
-import android.widget.Button as AndroidButton
-import android.widget.TextView as AndroidTextView
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.text.set
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lightningkite.rock.ViewWrapper
@@ -33,14 +28,18 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.datetime.*
+import android.webkit.WebView as AndroidWebView
+import android.widget.AutoCompleteTextView as AndroidCompleteTextView
+import android.widget.Button as AndroidButton
+import android.widget.CheckBox as AndroidCheckbox
+import android.widget.RadioButton as AndroidRadioButton
+import android.widget.TextView as AndroidTextView
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
-import java.lang.Exception
-import java.text.NumberFormat
-import java.text.ParseException
-import java.util.Objects
 
 
-actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {}
+@ViewDsl
+actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NContainingView = ViewGroup
@@ -52,7 +51,7 @@ actual typealias NExternalLink = AndroidTextView
 actual typealias NImage = ImageView
 actual typealias NActivityIndicator = ProgressBar
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NSpace = android.view.View
+actual typealias NSpace = View
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NButton = android.widget.Button
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -62,9 +61,9 @@ actual typealias NRadioButton = android.widget.RadioButton
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSwitch = SwitchCompat
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NToggleButton = android.view.View
+actual typealias NToggleButton = View
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NRadioToggleButton = android.view.View
+actual typealias NRadioToggleButton = View
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NLocalDateField = AndroidDateField
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -84,11 +83,13 @@ actual typealias NSwapView = AndroidSwapView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NWebView = android.webkit.WebView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NCanvas = android.view.View
+actual typealias NCanvas = SurfaceView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = androidx.recyclerview.widget.RecyclerView
 
-actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) =  element(::FrameLayout, ::ContainingView, setup)
+@ViewDsl
+actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) = element(::FrameLayout, ::ContainingView, setup)
+
 @ViewDsl
 actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
     element(::LinearLayout, ::ContainingView) {
@@ -116,6 +117,7 @@ fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) = elemen
     androidText.textSize = textSize
     setup(TextView(androidText))
 }
+
 fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
     val androidText = native
     androidText.textSize = textSize
@@ -138,39 +140,54 @@ object TextSizes {
 
 @ViewDsl
 actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = header(TextSizes.h1, setup)
+
 @ViewDsl
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = header(TextSizes.h2, setup)
+
 @ViewDsl
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = header(TextSizes.h3, setup)
+
 @ViewDsl
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = header(TextSizes.h4, setup)
+
 @ViewDsl
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = header(TextSizes.h5, setup)
+
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = header(TextSizes.h6, setup)
+
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement(TextSizes.body, setup)
 
 @ViewDsl
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement(TextSizes.subtext, setup)
-
-
 actual var Link.to: RockScreen
-    get() = TODO("Implement")
-    set(value) { TODO("Implement") }
+    get() {
+        TODO("NOT IMPLEMENTED")
+//        return runBlocking {
+//            (native.context as RockActivity).navigator.currentScreen.await()!!
+//        }
+    }
+    set(value) {
+        TODO("Not Implemented")
+    }
 
 actual var Link.newTab: Boolean
     get() {
         TODO()
     }
-    set(value) {}
+    set(value) {
+        TODO("NOT IMPLEMENTED")
+    }
 
 
 actual var ExternalLink.to: String
     get() {
         TODO()
     }
-    set(value) {}
+    set(value) {
+
+    }
 actual var ExternalLink.newTab: Boolean
     get() {
         TODO()
@@ -180,19 +197,42 @@ actual var ExternalLink.newTab: Boolean
 
 actual var Image.source: ImageSource
     get() {
-        return this.source
+        return native.tag as ImageResource
     }
-    set(value) {}
+    set(value) {
+        native.tag = value
+        native.setImageDrawable((value as ImageResource).drawable)
+    }
 actual var Image.scaleType: ImageScaleType
     get() {
-        TODO()
+        return when (this.native.scaleType) {
+            ImageView.ScaleType.MATRIX -> ImageScaleType.NoScale
+            ImageView.ScaleType.FIT_XY -> ImageScaleType.Stretch
+            ImageView.ScaleType.FIT_START -> ImageScaleType.Fit
+            ImageView.ScaleType.FIT_CENTER -> ImageScaleType.Fit
+            ImageView.ScaleType.FIT_END -> ImageScaleType.Fit
+            ImageView.ScaleType.CENTER -> ImageScaleType.Fit
+            ImageView.ScaleType.CENTER_CROP -> ImageScaleType.Crop
+            ImageView.ScaleType.CENTER_INSIDE -> ImageScaleType.NoScale
+            else -> ImageScaleType.Fit
+        }
     }
-    set(value) {}
+    set(value) {
+        val scaleType: ImageView.ScaleType = when (value) {
+            ImageScaleType.Fit -> ImageView.ScaleType.FIT_CENTER
+            ImageScaleType.Crop -> ImageView.ScaleType.CENTER_CROP
+            ImageScaleType.Stretch -> ImageView.ScaleType.FIT_XY
+            ImageScaleType.NoScale -> ImageView.ScaleType.CENTER_INSIDE
+        }
+        this.native.scaleType = scaleType
+    }
 actual var Image.description: String?
     get() {
-        TODO()
+        return native.contentDescription.toString()
     }
-    set(value) {}
+    set(value) {
+        native.contentDescription = value
+    }
 actual var TextView.content: String
     get() {
         return native.text.toString()
@@ -202,7 +242,7 @@ actual var TextView.content: String
     }
 actual var TextView.align: Align
     get() {
-        return when(native.gravity) {
+        return when (native.gravity) {
             Gravity.START -> Align.Start
             Gravity.END -> Align.End
             Gravity.CENTER -> Align.Center
@@ -246,6 +286,7 @@ actual fun Button.onClick(action: suspend () -> Unit) {
         launch { action() }
     }
 }
+
 actual var Button.enabled: Boolean
     get() {
         return native.isEnabled
@@ -330,7 +371,7 @@ val NView.selected: Writable<Boolean>
         return object : Writable<Boolean> {
             override fun addListener(listener: () -> Unit): () -> Unit {
                 NativeListeners.listeners.addListener(this@selected, listener)
-                this@selected.setOnClickListener {_ ->
+                this@selected.setOnClickListener { _ ->
                     NativeListeners.listeners.get(this@selected)?.forEach { action -> action() }
                 }
                 return this@selected.removeListener(listener)
@@ -370,9 +411,27 @@ actual val RadioToggleButton.checked: Writable<Boolean>
     get() {
         return this@checked.native.selected
     }
+
+private object ViewActions {
+    val actions: MutableMap<Int, Action> = mutableMapOf()
+}
+
+private val View.getAction: Action? get() = ViewActions.actions[hashCode()]
+private fun View.setAction(action: Action?) {
+    if (action != null) {
+        ViewActions.actions[hashCode()] = action
+    } else {
+        ViewActions.actions.remove(hashCode())
+    }
+}
+
 actual var LocalDateField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
 actual var LocalDateField.range: ClosedRange<LocalDate>?
     get() {
         return native.minDate.toKotlinDate().rangeTo(native.maxDate.toKotlinDate())
@@ -401,25 +460,33 @@ actual val LocalTimeField.content: Writable<LocalTime?>
             }
 
             override suspend fun set(value: LocalTime?) {
-               if (value == null) {
-                   this@content.native.setText("")
-               } else {
-                   this@content.native.time = java.time.LocalTime.of(value.hour, value.minute)
-               }
+                if (value == null) {
+                    this@content.native.setText("")
+                } else {
+                    this@content.native.time = java.time.LocalTime.of(value.hour, value.minute)
+                }
             }
         }
     }
 actual var LocalTimeField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
+
+//Not certain what to do here.  my first thought is to use a tag to hold the range for the time picker
+//however unlikely someone could decide to set a custom tag on the native
+// view which would then mess up the functionality.
+
 actual var LocalTimeField.range: ClosedRange<LocalTime>?
     get() {
         return LocalTime(0, 0, 0, 0)
             .rangeTo(LocalTime(23, 59, 59, 0))
     }
     set(value) {
-        //Ignore for now.  If we want to make this work will have to do a fair amount of custom stuff, also seems less
-        //than useful.
+        TODO("Not Implemented")
     }
 
 
@@ -457,8 +524,12 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
         }
     }
 actual var LocalDateTimeField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
 actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() {
         val minDate: java.time.LocalDateTime = this@range.native.minDate
@@ -467,7 +538,6 @@ actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
         val max = maxDate.toKotlinDateTime()
         return min.rangeTo(max)
     }
-
     set(value) {
         if (value != null) {
             this@range.native.minDate = value.start.toJavaLocalDateTime()
@@ -475,8 +545,12 @@ actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
         }
     }
 
-fun View.stringWritable(addNativeListener: () -> Unit, getString: () -> String, setString: (String) -> Unit): Writable<String> {
-    return object: Writable<String> {
+fun View.stringWritable(
+    addNativeListener: () -> Unit,
+    getString: () -> String,
+    setString: (String) -> Unit,
+): Writable<String> {
+    return object : Writable<String> {
         override fun addListener(listener: () -> Unit): () -> Unit {
             NativeListeners.listeners.addListener(this@stringWritable, listener)
             addNativeListener()
@@ -492,8 +566,13 @@ fun View.stringWritable(addNativeListener: () -> Unit, getString: () -> String, 
         }
     }
 }
-fun View.stringNullableWritable(addNativeListener: () -> Unit, getString: () -> String, setString: (String) -> Unit): Writable<String?> {
-    return object: Writable<String?> {
+
+fun View.stringNullableWritable(
+    addNativeListener: () -> Unit,
+    getString: () -> String,
+    setString: (String) -> Unit,
+): Writable<String?> {
+    return object : Writable<String?> {
         override fun addListener(listener: () -> Unit): () -> Unit {
             NativeListeners.listeners.addListener(this@stringNullableWritable, listener)
             addNativeListener()
@@ -514,9 +593,9 @@ val AndroidTextView.content: Writable<String>
     get() {
         return this@content.stringWritable(
             addNativeListener = {
-               this@content.addTextChangedListener { _ ->
-                   NativeListeners.listeners.get(this@content)?.forEach { action -> action() }
-               }
+                this@content.addTextChangedListener { _ ->
+                    NativeListeners.listeners.get(this@content)?.forEach { action -> action() }
+                }
             },
             getString = { this@content.text.toString() },
             setString = { value -> this@content.text = value }
@@ -531,7 +610,7 @@ actual val TextField.content: Writable<String>
 
 var EditText.keyboardHints: KeyboardHints
     get() {
-        return when(inputType) {
+        return when (inputType) {
             InputType.TYPE_CLASS_NUMBER -> KeyboardHints(KeyboardCase.None, KeyboardType.Integer)
             InputType.TYPE_CLASS_TEXT -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
             InputType.TYPE_MASK_CLASS -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
@@ -546,7 +625,11 @@ var EditText.keyboardHints: KeyboardHints
             InputType.TYPE_TEXT_FLAG_MULTI_LINE -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
             InputType.TYPE_TEXT_FLAG_IME_MULTI_LINE -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
             InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
-            InputType.TYPE_TEXT_FLAG_ENABLE_TEXT_CONVERSION_SUGGESTIONS -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
+            InputType.TYPE_TEXT_FLAG_ENABLE_TEXT_CONVERSION_SUGGESTIONS -> KeyboardHints(
+                KeyboardCase.None,
+                KeyboardType.Text
+            )
+
             InputType.TYPE_TEXT_VARIATION_URI -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
             InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS -> KeyboardHints(KeyboardCase.None, KeyboardType.Email)
             InputType.TYPE_TEXT_VARIATION_EMAIL_SUBJECT -> KeyboardHints(KeyboardCase.Words, KeyboardType.Text)
@@ -566,13 +649,13 @@ var EditText.keyboardHints: KeyboardHints
             else -> KeyboardHints(KeyboardCase.None, KeyboardType.Text)
         }
     }
-
     set(value) {
         val n = this
         val inputType = when (value.type) {
             KeyboardType.Decimal -> {
                 InputType.TYPE_CLASS_NUMBER
             }
+
             KeyboardType.Text -> {
                 when (value.case) {
                     KeyboardCase.Words -> InputType.TYPE_TEXT_FLAG_CAP_WORDS
@@ -581,6 +664,7 @@ var EditText.keyboardHints: KeyboardHints
                     else -> InputType.TYPE_CLASS_TEXT
                 }
             }
+
             KeyboardType.Integer -> InputType.TYPE_CLASS_NUMBER
             KeyboardType.Phone -> InputType.TYPE_CLASS_PHONE
             KeyboardType.Email -> InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
@@ -595,9 +679,15 @@ actual var TextField.keyboardHints: KeyboardHints
     set(value) {
         native.keyboardHints = value
     }
+
+
 actual var TextField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.getAction
+    }
+    set(value) {
+        native.setAction(value)
+    }
 actual var TextField.hint: String
     get() {
         return this@hint.native.hint.toString()
@@ -605,8 +695,6 @@ actual var TextField.hint: String
     set(value) {
         this@hint.native.hint = value
     }
-
-val numberFormat = NumberFormat.getNumberInstance()
 actual var TextField.range: ClosedRange<Double>?
     get() {
         return native.tag as? ClosedRange<Double>
@@ -626,7 +714,9 @@ actual var TextField.range: ClosedRange<Double>?
                     it.clear()
                     it.append(newValue.toString())
                 }
-            } catch (ex: Exception) { ex.printStackTrace() }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+            }
         }
     }
 
@@ -651,7 +741,6 @@ actual var TextArea.hint: String
     }
 
 
-
 actual val Select.selected: Writable<String?>
     get() {
         return this@selected.native.stringNullableWritable(
@@ -669,10 +758,10 @@ actual val Select.selected: Writable<String?>
                 val adapter = this@selected.native.adapter
                 val count = adapter.count
                 var counter = 0
-                while(counter < count) {
+                while (counter < count) {
                     val item = adapter.getItem(counter).toString()
                     if (item == value) {
-                        break;
+                        break
                     }
                     counter++
                 }
@@ -689,7 +778,7 @@ actual var Select.options: List<WidgetOption>
         val options = mutableListOf<WidgetOption>()
         val count = adapter.count
         var counter = 0
-        while(counter < count) {
+        while (counter < count) {
             adapter.getItem(counter)?.let { options.add(it as WidgetOption) }
             counter++
         }
@@ -706,18 +795,32 @@ actual val AutoCompleteTextField.content: Writable<String>
     }
 actual var AutoCompleteTextField.keyboardHints: KeyboardHints
     get() {
-        TODO()
+        return native.keyboardHints
     }
-    set(value) {}
+    set(value) {
+        native.keyboardHints = value
+    }
 actual var AutoCompleteTextField.action: Action?
-    get() = TODO()
-    set(value) {}
+    get() {
+        return native.tag as? Action
+    }
+    set(value) {
+        native.tag = value
+    }
+
+private class RockStringAdapter(context: Context, resource: Int, objects: List<String>) :
+    ArrayAdapter<String>(context, resource, objects) {
+        val items: List<String> = objects
+    }
+
 actual var AutoCompleteTextField.suggestions: List<String>
     get() {
-        TODO()
+        return (native.adapter as RockStringAdapter).items
     }
-    set(value) {}
 
+    set(value) {
+        native.setAdapter(RockStringAdapter(native.context, AndroidAppContext.autoCompleteLayoutResource, value))
+    }
 
 
 actual var WebView.url: String
@@ -736,22 +839,44 @@ actual var WebView.permitJs: Boolean
     }
 actual var WebView.content: String
     get() {
-        TODO("NOT IMPLEMENTED")
+        return native.tag as? String ?: ""
     }
-
     set(value) {
+        native.tag = value
         native.loadData(value, null, "utf8")
     }
 
 
+
 actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {}
+fun View.addLayoutChangeListener(listener: () -> Unit): () -> Unit {
+    NativeListeners.listeners.addListener(this, listener)
+    this.addOnLayoutChangeListener /* listener = */ { _, _, _, _, _, _, _, _, _ -> listener() }
+    return removeListener(listener)
+}
 actual val Canvas.width: Readable<Double>
     get() {
-        TODO()
+        return object : Readable<Double> {
+            override fun addListener(listener: () -> Unit): () -> Unit {
+                return this@width.native.addLayoutChangeListener(listener)
+            }
+
+            override suspend fun awaitRaw(): Double {
+                return this@width.native.width.toDouble()
+            }
+        }
     }
 actual val Canvas.height: Readable<Double>
     get() {
-        TODO()
+        return object : Readable<Double> {
+            override fun addListener(listener: () -> Unit): () -> Unit {
+                return this@height.native.addLayoutChangeListener(listener)
+            }
+
+            override suspend fun awaitRaw(): Double {
+                return this@height.native.height.toDouble()
+            }
+        }
     }
 
 actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {}
@@ -759,39 +884,8 @@ actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: D
 actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {}
 actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {}
 
-actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit {}
-actual fun ViewWriter.weight(amount: Float): ViewWrapper { TODO("Implement") }
-actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper { TODO("Implement") }
-actual val ViewWriter.scrolls: ViewWrapper
-    get() {
-        TODO()
-    }
-actual val ViewWriter.scrollsHorizontally: ViewWrapper
-    get() {
-        TODO()
-    }
+actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {}
 
-actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
-    beforeNextElementSetup {
-        val height = constraints.height?.value ?: constraints.maxHeight?.value ?: 0
-        val width = constraints.width?.value ?: constraints.maxWidth?.value ?: 0
-
-        minimumHeight = if (constraints.minHeight == null) {
-            0
-        } else {
-            constraints.minHeight.value
-        }
-
-        minimumWidth = if (constraints.minWidth == null)  {
-            0
-        } else {
-            constraints.minWidth.value
-        }
-
-        updateLayoutParams { this.height = height; this.width = width }
-    }
-    return ViewWrapper
-}
 actual val ViewWriter.marginless: ViewWrapper
     get() {
         beforeNextElementSetup {
@@ -801,7 +895,9 @@ actual val ViewWriter.marginless: ViewWrapper
         }
         return ViewWrapper
     }
-actual val ViewWriter.withPadding: ViewWrapper
+
+@ViewModifierDsl3
+actual val ViewWriter.withDefaultPadding: ViewWrapper
     get() {
         beforeNextElementSetup {
             val padding = (AndroidAppContext.density * 8).toInt()
@@ -814,6 +910,91 @@ actual val ViewWriter.withPadding: ViewWrapper
         }
         return ViewWrapper
     }
+
+@ViewModifierDsl3
+actual fun ViewWriter.weight(amount: Float): ViewWrapper {
+    beforeNextElementSetup {
+        try {
+            this.updateLayoutParams {
+                (this as LinearLayout.LayoutParams).weight = amount
+            }
+        } catch (ex: Throwable) {
+            throw RuntimeException("Weight is only available within a column or row.")
+        }
+    }
+    return ViewWrapper
+}
+
+private fun alignmentToGravity(alignment: Align, isVertical: Boolean): Int {
+    return when (alignment) {
+        Align.Start -> Gravity.START
+        Align.Center -> if (isVertical) Gravity.CENTER_VERTICAL else Gravity.CENTER_HORIZONTAL
+        Align.End -> Gravity.END
+        else -> Gravity.START
+    }
+}
+
+@ViewModifierDsl3
+actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
+    beforeNextElementSetup {
+        val params = this.layoutParams as LayoutParams
+        val horizontalGravity = alignmentToGravity(horizontal, isVertical = false)
+        val verticalGravity = alignmentToGravity(vertical, isVertical = true)
+        params.gravity = horizontalGravity or verticalGravity
+        if (horizontal == Align.Stretch) {
+            params.width = LayoutParams.MATCH_PARENT
+        }
+
+        if (vertical == Align.Stretch) {
+            params.height = LayoutParams.MATCH_PARENT
+        }
+
+        this.layoutParams = params
+    }
+    return ViewWrapper
+}
+
+@ViewModifierDsl3
+actual val ViewWriter.scrolls: ViewWrapper
+    get() {
+        val scrollView = ScrollView(this.currentView.context)
+        scrollView.addChild(this.currentView)
+
+        return ViewWrapper
+    }
+
+@ViewModifierDsl3
+actual val ViewWriter.scrollsHorizontally: ViewWrapper
+    get() {
+        val scrollView = HorizontalScrollView(this.currentView.context)
+        scrollView.addChild(this.currentView)
+
+        return ViewWrapper
+    }
+
+@ViewModifierDsl3
+actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
+    beforeNextElementSetup {
+        val height = constraints.height?.value ?: constraints.maxHeight?.value ?: 0
+        val width = constraints.width?.value ?: constraints.maxWidth?.value ?: 0
+
+        minimumHeight = if (constraints.minHeight == null) {
+            0
+        } else {
+            constraints.minHeight.value
+        }
+
+        minimumWidth = if (constraints.minWidth == null) {
+            0
+        } else {
+            constraints.minWidth.value
+        }
+
+        updateLayoutParams { this.height = height; this.width = width }
+    }
+    return ViewWrapper
+}
+
 @ViewDsl
 actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit) {
     return element(::ProgressBar, ::ActivityIndicator, setup)
@@ -841,29 +1022,12 @@ actual fun ViewWriter.space(
     return element(::View, ::Space, setup)
 }
 
-
-//@Suppress("ACTUAL_WITHOUT_EXPECT")
-//actual typealias NDismissBackground = HTMLDivElement
-//
-//@ViewDsl
-//actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit =
-//    themedElementPrivateMeta<NDismissBackground>(
-//        name = "span",
-//        themeLogic = { _, _ ->
-//            classList.add("dismissBackground")
-//            classList.add("inclBack")
-//        },
-//        setup = {
-//            setup(DismissBackground(this))
-//        }
-//    )
-
 actual class NDismissBackground(c: Context) : NView(c)
 
 
 @ViewDsl
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
-    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.")
+    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.  Probably will understand better or know how to implement after I implement themes.")
 }
 
 @ViewDsl

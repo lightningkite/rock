@@ -303,7 +303,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     Align.Center,
                     Align.Center
                 )
-            } in withPadding in hasPopover {
+            } in withDefaultPadding in hasPopover {
                 col {
                     forEachUpdating(appNav.userLinksProperty) {
                         link {

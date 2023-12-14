@@ -131,7 +131,7 @@ actual val RadioToggleButton.checked: Writable<Boolean> get() = Property(false)
 actual var LocalDateField.action: Action?
     get() = TODO()
     set(value) {}
-actual val LocalDateField.content: Writable<LocalDate?> get() = Property(null)
+//actual val LocalDateField.content: Writable<LocalDate?> get() = Property(null)
 actual inline var LocalDateField.range: ClosedRange<LocalDate>?
     get() = TODO()
     set(value) { }
@@ -244,5 +244,5 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWrite
 @ViewModifierDsl3 actual val ViewWriter.scrollsHorizontally: ViewWrapper get() = TODO()
 @ViewModifierDsl3 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper = TODO()
 @ViewModifierDsl3 actual val ViewWriter.marginless: ViewWrapper get() = TODO()
-@ViewModifierDsl3 actual val ViewWriter.withPadding: ViewWrapper get() = TODO()
+@ViewModifierDsl3 actual val ViewWriter.withDefaultPadding: ViewWrapper get() = TODO()
 // End

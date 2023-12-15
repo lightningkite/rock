@@ -22,6 +22,14 @@ data class Theme(
             elevation = this.elevation * 2f,
         )
     },
+    val dialog: (Theme.() -> Theme) = {
+        copy(
+            id = "${this.id}-dialog",
+            background = this.background.closestColor().lighten(0.1f),
+            outline = this.outline.closestColor().lighten(0.1f),
+            elevation = this.elevation * 2f,
+        )
+    },
     val down: (Theme.() -> Theme) = {
         copy(
             id = "${this.id}-down",
@@ -80,6 +88,7 @@ data class Theme(
         )
     },
 ) {
+    @JsName("dialogDirect") inline fun dialog() = dialog(this)
     @JsName("hoverDirect") inline fun hover() = hover(this)
     @JsName("downDirect") inline fun down() = down(this)
     @JsName("selectedDirect") inline fun selected() = selected(this)

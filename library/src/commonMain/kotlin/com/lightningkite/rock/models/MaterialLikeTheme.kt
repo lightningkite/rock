@@ -29,6 +29,14 @@ object MaterialLikeTheme {
         outlineWidth = outlineWidth,
         foreground = foreground,
         background = background,
+        dialog = {
+            copy(
+                id = "${this.id}-dialog",
+                background = this.background.closestColor().darken(0.1f),
+                outline = this.outline.closestColor().darken(0.1f),
+                elevation = this.elevation * 2f,
+            )
+        },
         important = {
             copy(
                 id = "$id-important",

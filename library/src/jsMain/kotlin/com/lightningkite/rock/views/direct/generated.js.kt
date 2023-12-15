@@ -185,7 +185,7 @@ actual inline var TextView.textSize: Dimension
 actual typealias NLabel = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
+actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     textElement("span") {
         classList.add("rock-label")
     }

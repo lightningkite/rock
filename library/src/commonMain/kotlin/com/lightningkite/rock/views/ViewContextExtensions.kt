@@ -62,6 +62,7 @@ val ViewWriter.currentTheme: suspend ()->Theme get() {
     return setTheme { calculate(previous()) }
 }
 @ViewModifierDsl3 val ViewWriter.card: ViewWrapper get() = themeFromLast { it }
+@ViewModifierDsl3 val ViewWriter.dialog: ViewWrapper get() = themeFromLast { it.dialog() }
 @ViewModifierDsl3 val ViewWriter.hover: ViewWrapper get() = themeFromLast { it.hover() }
 @ViewModifierDsl3 val ViewWriter.down: ViewWrapper get() = themeFromLast { it.down() }
 @ViewModifierDsl3 val ViewWriter.selected: ViewWrapper get() = themeFromLast { it.selected() }

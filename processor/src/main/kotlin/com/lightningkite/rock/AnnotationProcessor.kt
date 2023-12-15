@@ -49,8 +49,12 @@ class RouterGeneration(
                     appendLine("import com.lightningkite.rock.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
-                    if (allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } }) {
+                    if (allRoutables.any {
+                        it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName.asString() == "UUID" } } ||
+                                it.queryParameters.any { it.type.declaration.simpleName.asString() == "UUID" }
+                    }) {
                         appendLine("import com.lightningkite.uuid")
+                        appendLine("import com.lightningkite.UUID")
                     }
                     appendLine("")
                     appendLine("")

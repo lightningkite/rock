@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.views.AndroidAppContext
+import timber.log.Timber
 
 abstract class RockActivity : AppCompatActivity() {
     open lateinit var navigator: RockNavigator
@@ -11,5 +12,6 @@ abstract class RockActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidAppContext.applicationCtx = this.applicationContext
+        Timber.plant(Timber.DebugTree())
     }
 }

@@ -5,8 +5,11 @@ import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.lightningkite.rock.WebSocket
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
 
 /**
@@ -20,6 +23,9 @@ object AndroidAppContext {
     val density: Float by lazy { res.displayMetrics.density }
     val oneRem: Float by lazy { density * 16 }
     var autoCompleteLayoutResource: Int = android.R.layout.simple_list_item_1
+    var ktorClient: HttpClient = HttpClient() {
+        install(WebSockets)
+    }
 }
 
 private val View.removeListeners: HashMap<Int, () -> Unit>

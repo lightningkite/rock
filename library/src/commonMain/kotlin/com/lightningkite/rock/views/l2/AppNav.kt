@@ -62,7 +62,7 @@ interface AppNav {
 
 val ViewWriter.appNavFactory by viewWriterAddon<Property<ViewWriter.(AppNav.() -> Unit) -> Unit>>(
     Property(
-        ViewWriter::appNavTopAndLeft
+        ViewWriter::appNavBottomTabs
     )
 )
 

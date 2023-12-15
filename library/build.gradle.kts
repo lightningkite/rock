@@ -29,8 +29,10 @@ kotlin {
         dependencies {
             implementation("androidx.transition:transition:1.4.1")
             implementation("androidx.cardview:cardview:1.0.0")
+            implementation("com.jakewharton.timber:timber:5.0.1")
             implementation("io.ktor:ktor-client-core:$ktorVersion")
             implementation("io.ktor:ktor-client-cio:$ktorVersion")
+            implementation("io.ktor:ktor-client-websockets:$ktorVersion")
         }
     }
     jvm()

@@ -33,6 +33,7 @@ val okHttpVersion: String = "4.11.0"
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation(project(":library"))
+    api(project(":example-app"))
     testImplementation("junit:junit:4.13.2")
     implementation(platform("com.squareup.okhttp3:okhttp-bom:$okHttpVersion"))
     implementation("com.squareup.okhttp3:okhttp")

@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.canvas
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.SurfaceView
 import android.view.View
 import com.lightningkite.rock.models.Paint
 
@@ -13,8 +14,10 @@ abstract class DrawingView : View {
 
 
 }
-actual abstract class DrawingContext2D(val view: View) {
-    actual abstract fun save()
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual abstract class DrawingContext2D {
+
+    actual fun save() {}
     actual abstract fun restore()
     actual abstract fun scale(x: Double, y: Double)
     actual abstract fun rotate(angle: Double)

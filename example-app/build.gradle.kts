@@ -11,7 +11,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.google.devtools.ksp")
 //    kotlin("native.cocoapods")
-//    id("com.android.library")
+    id("com.android.library")
 }
 apply<RockPlugin>()
 
@@ -26,7 +26,7 @@ repositories {
 kotlin {
     targetHierarchy.default()
     jvm()
-//    androidTarget()
+    androidTarget()
 //    ios()
 //    listOf(
 //        iosX64(),
@@ -111,24 +111,24 @@ configure<RockPluginExtension> {
     this.packageName = "com.lightningkite.mppexampleapp"
 }
 
-//android {
-//    namespace = "$group.mppexampleapp"
-//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-//    compileSdk = 31
-//
-//    defaultConfig {
-//        minSdk = 21
-//    }
-//    compileOptions {
-//        // Flag to enable support for the new language APIs
-//        isCoreLibraryDesugaringEnabled = true
-//        sourceCompatibility = JavaVersion.VERSION_1_8
-//        targetCompatibility = JavaVersion.VERSION_1_8
-//    }
-//    dependencies {
-//        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-//    }
-//}
+android {
+    namespace = "$group.mppexampleapp"
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    compileSdk = 31
+
+    defaultConfig {
+        minSdk = 21
+    }
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    dependencies {
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    }
+}
 
 //tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
 //    this.args

@@ -2,23 +2,41 @@ package com.lightningkite.rockexample
 
 import android.os.Bundle
 import android.widget.FrameLayout
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.navigation.PlatformNavigator
-import com.lightningkite.rock.navigation.RockNavigator
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.navigation.Routes
-import com.lightningkite.rock.views.AndroidAppContext
+import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.appNav
+import okhttp3.OkHttpClient
 
-//actual constructor(routes: Routes)
 class MainActivity : RockActivity() {
+    override val httpClientFactory: ()  -> OkHttpClient
+        get() = {
+            OkHttpClient()
+        }
+
     private val routes = Routes(
-        listOf(),
-        renderers = mapOf(),
+        parsers = listOf test@{ path ->
+            if (path.segments.isEmpty()) return@test null
+
+            if (path.segments[0] == "Test") {
+                TestScreen
+            } else {
+                return@test null
+            }
+        },
+        renderers = mapOf(
+            TestScreen::class to test@{
+                val p = HashMap<String, String>()
+                RouteRendered(
+                    UrlLikePath(
+                    segments = listOf("Test"),
+                    parameters = p
+                ), listOf()
+                )
+            }
+        ),
         fallback = object : RockScreen {
             override fun ViewWriter.render() {
                 col {
@@ -28,21 +46,36 @@ class MainActivity : RockActivity() {
         }
     )
 
-    override var navigator: RockNavigator = PlatformNavigator(routes)
+//    override var navigator: RockNavigator = PlatformNavigator(routes)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val frame = FrameLayout(this)
         setContentView(frame)
         ViewWriter(frame).apply {
-            col {
-                h1 { this.native.text = "H1 Header" } in withDefaultPadding
-                text { this.native.text = "H5 HEADER" }
-                localDateField {  }
-                localTimeField {  }
-                textField {
-                    range = 5.0..20.0
-                }
+            appNav(routes) {
+                routes.render(TestScreen)
+            }
+        }
+    }
+}
+
+object TestScreen : RockScreen {
+    override fun ViewWriter.render() {
+        col {
+            h1 {
+                this.native.text = "H1 Header"
+            } in withDefaultPadding
+            text {
+                this.native.text = "H5 HEADER"
+            }
+
+            localDateField {}
+
+            localTimeField {}
+
+            textField {
+                range = 5.0..20.0
             }
         }
     }

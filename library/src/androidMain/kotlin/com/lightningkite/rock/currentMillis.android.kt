@@ -1,5 +1,5 @@
 package com.lightningkite.rock
 
 actual fun clockMillis(): Double {
-    TODO("Not yet implemented")
+    return System.currentTimeMillis().toDouble()
 }

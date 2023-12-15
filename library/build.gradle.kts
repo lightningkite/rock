@@ -15,6 +15,8 @@ repositories {
     mavenCentral()
 }
 
+val ktorVersion = "2.3.7"
+
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
@@ -23,6 +25,12 @@ kotlin {
             kotlinOptions {
                 jvmTarget = "1.8"
             }
+        }
+        dependencies {
+            implementation("androidx.transition:transition:1.4.1")
+            implementation("androidx.cardview:cardview:1.0.0")
+            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-cio:$ktorVersion")
         }
     }
     jvm()

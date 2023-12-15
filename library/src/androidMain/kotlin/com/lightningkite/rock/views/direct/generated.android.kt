@@ -5,6 +5,7 @@ package com.lightningkite.rock.views.direct
 import android.content.Context
 import android.graphics.Typeface
 import android.text.InputType
+import androidx.transition.TransitionManager
 import android.view.Gravity
 import android.view.SurfaceView
 import android.view.View
@@ -15,11 +16,14 @@ import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.appcompat.widget.SwitchCompat
+import androidx.cardview.widget.CardView
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.Transition
+import androidx.transition.TransitionSet
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
@@ -79,7 +83,7 @@ actual typealias NSelect = AppCompatSpinner
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NAutoCompleteTextField = AndroidCompleteTextView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NSwapView = AndroidSwapView
+actual typealias NSwapView = FrameLayout
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NWebView = android.webkit.WebView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -958,8 +962,13 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
         val scrollView = ScrollView(this.currentView.context)
+        val parentView = this.currentView.parent as ViewGroup
+        scrollView.updateLayoutParams<ViewGroup.LayoutParams> {
+            width = LayoutParams.MATCH_PARENT
+            height = LayoutParams.MATCH_PARENT
+        }
+        parentView.removeView(currentView)
         scrollView.addChild(this.currentView)
-
         return ViewWrapper
     }
 
@@ -1027,7 +1036,7 @@ actual class NDismissBackground(c: Context) : NView(c)
 
 @ViewDsl
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
-    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.  Probably will understand better or know how to implement after I implement themes.")
+
 }
 
 @ViewDsl
@@ -1108,6 +1117,18 @@ actual fun SwapView.swap(
     transition: ScreenTransition,
     createNewView: () -> Unit,
 ) {
+    val oldView = this.native.getChildAt(0)
+    createNewView()
+    val newView = this.native.getChildAt(1)
+
+    TransitionManager.beginDelayedTransition(native, TransitionSet().apply {
+        transition.exit?.addTarget(oldView ?: View(native.context))
+        transition.enter?.addTarget(newView)
+        transition.enter?.let { addTransition(it) }
+        transition.exit?.let { addTransition(it) }
+    })
+    native.removeView(oldView)
+    native.addView(newView)
 }
 
 @ViewDsl

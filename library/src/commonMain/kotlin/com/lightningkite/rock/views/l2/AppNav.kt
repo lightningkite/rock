@@ -73,7 +73,9 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             val alt = split()
             reactiveScope {
-                val viewMaker = appNavFactory.await()
+                val viewMaker = appNavFactory
+                    .await()
+
                 swap {
                     viewMaker.invoke(alt, setup)
                 }

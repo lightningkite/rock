@@ -31,7 +31,7 @@ suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
     set(action(await()))
 }
 
-class Property<T>(startValue: T) : Writable<T>, ReadWriteProperty<Any?, T> {
+class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = HashSet<() -> Unit>()
     var value: T = startValue
         set(value) {
@@ -108,12 +108,6 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
                         data.removers.remove(entry.key)
                     }
                 }
-//                isRunning = false
-//
-//                if (queueRerun) {
-//                    queueRerun = false
-//                    run()
-//                }
                 if(result.isSuccess) notifySuccess()
                 else result.exceptionOrNull()?.let {
                     if(it !is CancelledException) {

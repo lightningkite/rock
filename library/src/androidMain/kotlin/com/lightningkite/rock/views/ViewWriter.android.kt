@@ -30,8 +30,8 @@ data class NViewCalculationContext(val native: View): CalculationContext {
         native.removeListeners[action.hashCode()] = action
     }
 
-    override fun notifyStart() { TODO("NOT YET IMPLEMENTED") }
-    override fun notifySuccess() { TODO("NOT YET IMPLEMENTED") }
+    override fun notifyStart() {  }
+    override fun notifySuccess() {  }
 }
 
 actual val NView.calculationContext: CalculationContext

@@ -828,8 +828,6 @@ actual typealias NCanvas = HTMLCanvasElement
 
 @ViewDsl
 actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
-    style.width = "100%"
-    style.height = "100%"
     setup(Canvas(this))
 }
 
@@ -970,7 +968,7 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
         beforeNextElementSetup {
-            style.overflowY = "auto"
+            classList.add("scroll-vertical")
         }
         return ViewWrapper
     }
@@ -978,9 +976,7 @@ actual val ViewWriter.scrolls: ViewWrapper
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         beforeNextElementSetup {
-            style.display = "flex"
-            style.flexDirection = "row"
-            style.overflowX = "auto"
+            classList.add("scroll-horizontal")
         }
         return ViewWrapper
     }
@@ -993,19 +989,13 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
         else style.minHeight = constraints.minHeight.value
 
         if (constraints.maxHeight == null) style.removeProperty("maxHeight")
-        else {
-            style.maxHeight = constraints.maxHeight.value
-            classList.add("rock-max-sized")
-        }
+        else style.maxHeight = constraints.maxHeight.value
 
         if (constraints.minWidth == null) style.removeProperty("minWidth")
         else style.minWidth = constraints.minWidth.value
 
         if (constraints.maxWidth == null) style.removeProperty("maxWidth")
-        else {
-            style.maxWidth = constraints.maxWidth.value
-            classList.add("rock-max-sized")
-        }
+        else style.maxWidth = constraints.maxWidth.value
 
         if (constraints.width == null) style.removeProperty("width")
         else style.width = constraints.width.value

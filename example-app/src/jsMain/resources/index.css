@@ -194,11 +194,6 @@ input:focus textarea:focus {
     align-self: end;
 }
 
-.rock-max-sized {
-    align-self: center;
-    justify-self: center;
-}
-
 @keyframes flickerAnimation {
     0% {
         opacity: 1;
@@ -334,4 +329,30 @@ iframe#webpack-dev-server-client-overlay {
     display: flex;
     flex-direction: row;
     overflow-x: auto;
+}
+
+.scroll-vertical > * {
+    max-height: unset;
+}
+.scroll-vertical {
+    overflow-y: auto;
+}
+
+.scroll-horizontal > * {
+    max-width: unset;
+}
+.scroll-horizontal {
+    overflow-x: auto;
+}
+::-webkit-scrollbar {
+    background: #0000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, currentColor 20%, transparent);
+    -webkit-border-radius: 4px;
+}
+
+::-webkit-scrollbar-corner {
+    background: #0000;
 }

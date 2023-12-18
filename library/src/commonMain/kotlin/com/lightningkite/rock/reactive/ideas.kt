@@ -158,7 +158,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
         var ready: Boolean = false
         var exception: Exception? = null
         var listening = false
-        val queued = ArrayList<Continuation<T>>()
+        var queued = ArrayList<Continuation<T>>()
         override suspend fun awaitRaw(): T = if(ready) {
 //            println("$this: Ready answer")
             exception?.let { throw it } ?: value as T
@@ -196,10 +196,11 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                             // This is a first result; send to our queue
                             val e = exception
                             val result = value as T
-                            queued.forEach {
+                            val copy = queued
+                            queued = ArrayList()
+                            copy.forEach {
                                 e?.let { e -> it.resumeWithException(e) } ?: it.resume(result)
                             }
-                            queued.clear()
                         }
                     }
                 }

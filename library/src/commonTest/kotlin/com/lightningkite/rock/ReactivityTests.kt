@@ -94,9 +94,10 @@ class ReactivityTests {
     @Test fun sharedTest3() {
         val a = VirtualDelay { 1 }
         val c = shared { a.await() }
+        val d = shared { c.await() }
         testContext {
-            launch { println("launch got " + c.await()) }
-            reactiveScope { println("reactiveScope got " + c.await()) }
+            launch { println("launch got " + d.await()) }
+            reactiveScope { println("reactiveScope got " + d.await()) }
             println("Ready... GO!")
             a.go()
         }

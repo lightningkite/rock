@@ -46,9 +46,7 @@ actual class PlatformNavigator actual constructor(
     private val _currentScreen = Property(run {
         val path = window.location.urlLike()
         println(path)
-        isNavigating = true
         val screen = routes.parse(path) ?: routes.fallback
-        isNavigating = false
         (screen)
     })
     override val currentScreen: Readable<RockScreen>
@@ -72,7 +70,6 @@ actual class PlatformNavigator actual constructor(
         }
     }
 
-    private var isNavigating = false
     override var direction: RockNavigator.Direction? = null
         private set
     private fun navigate(urlLikePath: UrlLikePath, pushState: Boolean) {
@@ -89,8 +86,6 @@ actual class PlatformNavigator actual constructor(
         rockScreen: RockScreen,
         pushState: Boolean,
     ) {
-        if (isNavigating)
-            throw IllegalStateException()
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(
@@ -101,9 +96,7 @@ actual class PlatformNavigator actual constructor(
             window.history.replaceState(currentIndex, "", path.render())
             window.history.scrollRestoration = ScrollRestoration.MANUAL
         }
-        isNavigating = true
         _currentScreen.value = rockScreen
-        isNavigating = false
     }
 
     override fun navigate(screen: RockScreen) {

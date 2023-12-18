@@ -764,12 +764,20 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedE
 }
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
+    native.asDynamic().__ROCK__next = null
+    val alreadyChanging = native.asDynamic().__ROCK__swapping as? Boolean
+    if(alreadyChanging == true) {
+        native.asDynamic().__ROCK__next = transition to createNewView
+        return
+    }
+    native.asDynamic().__ROCK__swapping = true
     val keyframeName = DynamicCSS.transition(transition)
     val previousLast = native.lastElementChild
     native.children.let { (0 until it.length).map { i -> it.get(i) } }.filterIsInstance<HTMLElement>()
         .forEach { view ->
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
+            console.log("Animating old view out ", view)
             view.style.animation = "${keyframeName}-exit 0.25s"
             val parent = view.parentElement
             window.setTimeout({
@@ -778,15 +786,22 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
                 }
             }, 250)
         }
+    console.log("Creating new view, count ", native.childElementCount)
     createNewView()
-    val newView = (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast } ?: run {
+    console.log("Created new view, count ", native.childElementCount)
+    (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
+        console.log("Animating new view in ", newView)
+        native.hidden = false
+        newView.style.animation = "${keyframeName}-enter 0.25s"
+        newView.style.marginLeft = "auto"
+        newView.style.marginRight = "auto"
+    } ?: run {
         native.hidden = true
-        return
     }
-    native.hidden = false
-    newView.style.animation = "${keyframeName}-enter 0.25s"
-    newView.style.marginLeft = "auto"
-    newView.style.marginRight = "auto"
+    native.asDynamic().__ROCK__swapping = false
+    (native.asDynamic().__ROCK__next as? Pair<ScreenTransition, ()->Unit>)?.let {
+        swap(it.first, it.second)
+    }
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")

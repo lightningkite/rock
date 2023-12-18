@@ -777,7 +777,6 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
         .forEach { view ->
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
-            console.log("Animating old view out ", view)
             view.style.animation = "${keyframeName}-exit 0.25s"
             val parent = view.parentElement
             window.setTimeout({

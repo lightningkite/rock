@@ -786,11 +786,8 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
                 }
             }, 250)
         }
-    console.log("Creating new view, count ", native.childElementCount)
     createNewView()
-    console.log("Created new view, count ", native.childElementCount)
     (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
-        console.log("Animating new view in ", newView)
         native.hidden = false
         newView.style.animation = "${keyframeName}-enter 0.25s"
         newView.style.marginLeft = "auto"

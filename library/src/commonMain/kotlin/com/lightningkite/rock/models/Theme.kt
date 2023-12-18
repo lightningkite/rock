@@ -3,7 +3,6 @@ package com.lightningkite.rock.models
 import kotlin.js.JsName
 
 data class Theme(
-    val id: String,
     val title: FontAndStyle = FontAndStyle(systemDefaultFont),
     val body: FontAndStyle = FontAndStyle(systemDefaultFont),
     val elevation: Dimension = 2.px,
@@ -16,7 +15,6 @@ data class Theme(
     val noMarginOnSwitch: Boolean = false,
     val hover: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-hover",
             background = this.background.closestColor().highlight(0.2f),
             outline = this.background.closestColor().highlight(0.2f).highlight(0.1f),
             elevation = this.elevation * 2f,
@@ -24,7 +22,6 @@ data class Theme(
     },
     val dialog: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-dialog",
             background = this.background.closestColor().lighten(0.1f),
             outline = this.outline.closestColor().lighten(0.1f),
             elevation = this.elevation * 2f,
@@ -32,7 +29,6 @@ data class Theme(
     },
     val down: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-down",
             background = this.background.closestColor().highlight(0.3f),
             outline = this.background.closestColor().highlight(0.3f).highlight(0.1f),
             elevation = this.elevation / 2f,
@@ -42,13 +38,11 @@ data class Theme(
     val selected: (Theme.() -> Theme) = { this.important(this) },
     val disabled: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-disabled",
             foreground = this.foreground.closestColor().copy(alpha = 0.5f)
         )
     },
     val bar: (Theme.() -> Theme?) = {
         copy(
-            id = "${this.id}-bar",
             foreground = this.background,
             background = this.foreground,
             outline = this.foreground.closestColor().highlight(1f)
@@ -56,7 +50,6 @@ data class Theme(
     },
     val important: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-important",
             foreground = this.background,
             background = this.foreground,
             outline = this.foreground.closestColor().highlight(1f)
@@ -65,7 +58,6 @@ data class Theme(
     val critical: (Theme.() -> Theme) = { this.important(this).let { it.important(it) } },
     val warning: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-warning",
             background = Color.fromHex(0xFFe36e24.toInt()),
             outline = Color.fromHex(0xFFe36e24.toInt()).highlight(0.1f),
             foreground = Color.white
@@ -73,7 +65,6 @@ data class Theme(
     },
     val danger: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-danger",
             background = Color.fromHex(0xFFB00020.toInt()),
             outline = Color.fromHex(0xFFB00020.toInt()).highlight(0.1f),
             foreground = Color.white
@@ -81,7 +72,6 @@ data class Theme(
     },
     val affirmative: (Theme.() -> Theme) = {
         copy(
-            id = "${this.id}-affirmitive",
             background = Color.fromHex(0xFF20a020.toInt()),
             outline = Color.fromHex(0xFF20a020.toInt()).highlight(0.1f),
             foreground = Color.white
@@ -100,5 +90,7 @@ data class Theme(
     @JsName("warningDirect") inline fun warning() = warning(this)
     @JsName("dangerDirect") inline fun danger() = danger(this)
     @JsName("affirmativeDirect") inline fun affirmative() = affirmative(this)
+
+    val id: String get() = hashCode().toString()
 }
 

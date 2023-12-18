@@ -19,7 +19,6 @@ object MaterialLikeTheme {
         outline: Paint = background.closestColor().highlight(0.1f),
         outlineWidth: Dimension = 0.px,
     ) = Theme(
-        id = id,
         title = title,
         body = body,
         elevation = elevation,
@@ -31,7 +30,6 @@ object MaterialLikeTheme {
         background = background,
         dialog = {
             copy(
-                id = "${this.id}-dialog",
                 background = this.background.closestColor().darken(0.1f),
                 outline = this.outline.closestColor().darken(0.1f),
                 elevation = this.elevation * 2f,
@@ -39,13 +37,11 @@ object MaterialLikeTheme {
         },
         important = {
             copy(
-                id = "$id-important",
                 foreground = primaryForeground,
                 background = primary,
                 outline = primary.highlight(0.1f),
                 important = {
                     copy(
-                        id = "$id-critical",
                         foreground = secondaryForeground,
                         background = secondary,
                         outline = secondary.highlight(0.1f),
@@ -55,13 +51,11 @@ object MaterialLikeTheme {
         },
         bar = {
             copy(
-                id = "$id-important",
                 foreground = primaryForeground,
                 background = primary,
                 outline = primary.highlight(0.1f),
                 important = {
                     copy(
-                        id = "$id-critical",
                         foreground = secondaryForeground,
                         background = secondary,
                         outline = secondary.highlight(0.1f),
@@ -71,7 +65,6 @@ object MaterialLikeTheme {
         },
         critical = {
             copy(
-                id = "$id-critical",
                 foreground = secondaryForeground,
                 background = secondary,
                 outline = secondary.highlight(0.1f),
@@ -84,7 +77,6 @@ object MaterialLikeTheme {
         val saturation = Random.nextFloat() * 0.5f + 0.25f
         val value = Random.nextFloat() * 0.5f + 0.25f
         return MaterialLikeTheme(
-            id = "material-${Random.nextInt(100000)}",
             primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),
             secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB(),
         )
@@ -95,7 +87,6 @@ object MaterialLikeTheme {
         val saturation = Random.nextFloat() * 0.5f + 0.25f
         val value = Random.nextFloat() * 0.5f + 0.25f
         return MaterialLikeTheme(
-            id = "material-${Random.nextInt(100000)}",
             foreground = Color.white,
             background = Color.gray(0.2f),
             primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),

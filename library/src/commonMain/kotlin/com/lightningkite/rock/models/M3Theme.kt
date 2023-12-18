@@ -20,7 +20,6 @@ object M3Theme {
         outline: Paint = background.closestColor().highlight(0.1f),
         outlineWidth: Dimension = 0.px,
     ) = Theme(
-        id = id,
         title = title,
         body = body,
         elevation = elevation,
@@ -32,7 +31,6 @@ object M3Theme {
         background = background,
         hover = {
             copy(
-                id = "${this.id}-hover",
                 background = this.background.closestColor().highlight(0.2f),
                 outline = this.background.closestColor().highlight(0.2f).highlight(0.1f),
                 elevation = this.elevation * 2f,
@@ -40,7 +38,6 @@ object M3Theme {
         },
         down = {
             copy(
-                id = "${this.id}-down",
                 background = this.background.closestColor().highlight(0.3f),
                 outline = this.background.closestColor().highlight(0.3f).highlight(0.1f),
                 elevation = this.elevation / 2f,
@@ -49,13 +46,11 @@ object M3Theme {
         bar = { null },
         important = {
             copy(
-                id = "$id-important",
                 foreground = primaryForeground,
                 background = primary,
                 outline = primary.highlight(0.1f),
                 important = {
                     copy(
-                        id = "$id-critical",
                         foreground = secondaryForeground,
                         background = secondary,
                         outline = secondary.highlight(0.1f),
@@ -65,7 +60,6 @@ object M3Theme {
         },
         critical = {
             copy(
-                id = "$id-critical",
                 foreground = secondaryForeground,
                 background = secondary,
                 outline = secondary.highlight(0.1f),

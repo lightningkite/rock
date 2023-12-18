@@ -131,7 +131,7 @@ actual val RadioToggleButton.checked: Writable<Boolean> get() = Property(false)
 actual var LocalDateField.action: Action?
     get() = TODO()
     set(value) {}
-//actual val LocalDateField.content: Writable<LocalDate?> get() = Property(null)
+actual val LocalDateField.content: Writable<LocalDate?> get() = Property(null)
 actual inline var LocalDateField.range: ClosedRange<LocalDate>?
     get() = TODO()
     set(value) { }

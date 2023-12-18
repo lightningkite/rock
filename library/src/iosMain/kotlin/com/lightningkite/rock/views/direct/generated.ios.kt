@@ -428,5 +428,5 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
 @ViewModifierDsl3
 actual val ViewWriter.marginless: ViewWrapper get() = ViewWrapper
 @ViewModifierDsl3
-actual val ViewWriter.withPadding: ViewWrapper get() = ViewWrapper
+actual val ViewWriter.withDefaultPadding: ViewWrapper get() = ViewWrapper
 // End

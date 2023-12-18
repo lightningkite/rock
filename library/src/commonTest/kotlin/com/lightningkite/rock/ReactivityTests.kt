@@ -1,8 +1,11 @@
 package com.lightningkite.rock
 
 import com.lightningkite.rock.reactive.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ReactivityTests {
     @Test
@@ -20,5 +23,127 @@ class ReactivityTests {
             cancel()
         }
         assertEquals((0..9).toList(), emissions)
+    }
+
+    @Test fun sharedTest() {
+        val a = Property(1)
+        val b = Property(2)
+        var cInvocations = 0
+        val c = shared { cInvocations++; println("cInvocations: $cInvocations"); a.await() + b.await() }
+        println("$c: c")
+        var dInvocations = 0
+        val d = shared { dInvocations++; println("dInvocations: $dInvocations"); c.await() + c.await() }
+        println("$d: d")
+        var eInvocations = 0
+        val e = shared { eInvocations++; println("eInvocations: $eInvocations"); d.await() / 2 }
+        println("$e: e")
+
+        with(CalculationContext.Standard()) {
+            reactiveScope {
+                e.await()
+            }
+            assertEquals(1, cInvocations)
+            assertEquals(1, dInvocations)
+            assertEquals(1, eInvocations)
+            println("a.value = 3")
+            a.value = 3
+            assertEquals(2, cInvocations)
+            assertEquals(2, dInvocations)
+            assertEquals(2, eInvocations)
+            println("b.value = 4")
+            b.value = 4
+            assertEquals(3, cInvocations)
+            assertEquals(3, dInvocations)
+            assertEquals(3, eInvocations)
+        }
+    }
+
+    @Test fun sharedTest2() {
+        val a = Property(1)
+        val b = Property(2)
+        var cInvocations = 0
+        val c = shared { cInvocations++; println("cInvocations: $cInvocations"); a.await() + b.await() }
+        println("$c: c")
+        var dInvocations = 0
+        val d = shared { dInvocations++; println("dInvocations: $dInvocations"); c.await() + b.await() }
+        println("$d: d")
+        var eInvocations = 0
+        val e = shared { eInvocations++; println("eInvocations: $eInvocations"); d.await() / 2 }
+        println("$e: e")
+
+        with(CalculationContext.Standard()) {
+            reactiveScope {
+                e.await()
+            }
+            assertEquals(1, cInvocations)
+            assertEquals(1, dInvocations)
+            assertEquals(1, eInvocations)
+            println("a.value = 3")
+            a.value = 3
+            assertEquals(2, cInvocations)
+            assertEquals(2, dInvocations)
+            assertEquals(2, eInvocations)
+            println("b.value = 4")
+            b.value = 4
+            assertEquals(3, cInvocations)
+            assertTrue(4 >= dInvocations)
+            assertTrue(4 >= eInvocations)
+        }
+    }
+
+    @Test fun sharedTest3() {
+        val a = VirtualDelay { 1 }
+        val c = shared { a.await() }
+        testContext {
+            launch { println("launch got " + c.await()) }
+            reactiveScope { println("reactiveScope got " + c.await()) }
+            println("Ready... GO!")
+            a.go()
+        }
+    }
+}
+
+class VirtualDelay<T>(val action: () -> T) {
+    val continuations = ArrayList<Continuation<T>>()
+    var value: T? = null
+    var ready: Boolean = false
+    suspend fun await(): T {
+        if(ready) return value as T
+        return suspendCoroutineCancellable {
+            continuations.add(it)
+            return@suspendCoroutineCancellable {}
+        }
+    }
+    fun go() {
+        val value = action()
+        this.value = value
+        ready = true
+        for(continuation in continuations) {
+            continuation.resume(value)
+        }
+        continuations.clear()
+    }
+}
+
+fun testContext(action: CalculationContext.()->Unit): Cancellable {
+    var error: Throwable? = null
+    val onRemoveSet = HashSet<()->Unit>()
+    with(object: CalculationContext {
+        override fun onRemove(action: () -> Unit) {
+            onRemoveSet.add(action)
+        }
+        override fun notifyFailure(t: Throwable) {
+            t.printStackTrace()
+            error = t
+        }
+    }) {
+        action()
+        if(error != null) throw error!!
+    }
+    return object: Cancellable {
+        override fun cancel() {
+            onRemoveSet.forEach { it() }
+            onRemoveSet.clear()
+        }
     }
 }

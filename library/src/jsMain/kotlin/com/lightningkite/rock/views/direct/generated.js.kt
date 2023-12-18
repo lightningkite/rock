@@ -404,7 +404,6 @@ actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit =
         setup(LocalDateField(this))
     }
 
-@Suppress("ACTUAL_WITHOUT_EXPECT")
 actual val LocalDateField.content: Writable<LocalDate?>
     get() = native.vprop(
         "input",

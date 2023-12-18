@@ -444,6 +444,9 @@ actual var LocalDateField.range: ClosedRange<LocalDate>?
             native.maxDate = value.endInclusive.toJavaLocalDate()
         }
     }
+actual val LocalDateField.content: Writable<LocalDate?>
+    get() = TODO()
+
 actual val LocalTimeField.content: Writable<LocalTime?>
     get() {
         return object : Writable<LocalTime?> {

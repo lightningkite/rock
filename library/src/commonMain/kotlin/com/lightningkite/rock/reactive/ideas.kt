@@ -78,8 +78,6 @@ fun CalculationContext.use(resourceUse: ResourceUse) {
 }
 
 fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
-//    var queueRerun = false
-//    var isRunning = false
     var run: () -> Unit = {}
     val data = ReactiveScopeData {
         run()
@@ -91,11 +89,6 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
         previousContext?.cancel()
         previousContext = context
         data.latestPass.clear()
-//        if (isRunning) {
-//            queueRerun = true
-//            return@run
-//        }
-//        isRunning = true
         action.startCoroutine(object : Continuation<Unit> {
             override val context: CoroutineContext = context
 
@@ -108,12 +101,6 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
                         data.removers.remove(entry.key)
                     }
                 }
-//                isRunning = false
-//
-//                if (queueRerun) {
-//                    queueRerun = false
-//                    run()
-//                }
                 if(result.isSuccess) notifySuccess()
                 else result.exceptionOrNull()?.let {
                     if(it !is CancelledException) {
@@ -149,6 +136,12 @@ suspend fun <T> Readable<T>.await(): T {
     return awaitRaw()
 }
 
+/**
+ * Desired behavior for shared:
+ *
+ * - Outside a reactive scope, [Readable.await] invokes the action with no sharing
+ * - Inside a reactive scope, [Readable.await] starts the whole system listening and sharing the calculation.
+ */
 fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
     val removers = ArrayList<()->Unit>()
     val ctx = object: CalculationContext {
@@ -167,26 +160,50 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
         var listening = false
         val queued = ArrayList<Continuation<T>>()
         override suspend fun awaitRaw(): T = if(ready) {
+//            println("$this: Ready answer")
             exception?.let { throw it } ?: value as T
         } else if(listening) {
+//            println("$this: Already listening; queue")
             suspendCoroutineCancellable<T> { queued.add(it); { queued.remove(it) } }
-        } else action(ctx)
+        } else {
+//            println("$this: Nobody listening; action")
+            action(ctx)
+        }
+
         private val listeners = HashSet<() -> Unit>()
         override fun addListener(listener: () -> Unit): () -> Unit {
             if (listeners.isEmpty()) {
                 // startup
-                listening = true
+//                println("$this: Start listening")
                 ctx.reactiveScope {
+                    val listening = listening
+//                    if (listening) println("$this: Recalculating...")
+//                    else println("$this: Starting initial calculation...")
                     try {
-                        value = action(ctx)
+                        val result = action(ctx)
+                        value = result
                         exception = null
                     } catch (e: Exception) {
                         exception = e
                     } finally {
                         ready = true
+                        if (listening) {
+//                            println("$this: Change calculation complete, notifying")
+                            // This is a change notification; notify our listeners
+                            listeners.toList().forEach { it() }
+                        } else {
+//                            println("$this: Initial calculation complete")
+                            // This is a first result; send to our queue
+                            val e = exception
+                            val result = value as T
+                            queued.forEach {
+                                e?.let { e -> it.resumeWithException(e) } ?: it.resume(result)
+                            }
+                            queued.clear()
+                        }
                     }
-                    listeners.toList().forEach { it() }
                 }
+                listening = true
             }
             listeners.add(listener)
             return {

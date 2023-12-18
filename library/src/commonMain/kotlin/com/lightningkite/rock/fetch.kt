@@ -4,8 +4,9 @@ suspend inline fun fetch(
     url: String,
     method: HttpMethod = HttpMethod.GET,
     headers: HttpHeaders = httpHeaders(),
+    type: String = "text/plain",
     body: String
-) = fetch(url = url, method = method, headers = headers, body = RequestBodyText(body))
+) = fetch(url = url, method = method, headers = headers, body = RequestBodyText(body, type))
 suspend inline fun fetch(
     url: String,
     method: HttpMethod = HttpMethod.GET,
@@ -50,7 +51,7 @@ expect class Blob
 expect class FileReference
 
 sealed interface RequestBody
-data class RequestBodyText(val content: String): RequestBody
+data class RequestBodyText(val content: String, val type: String): RequestBody
 data class RequestBodyBlob(val content: Blob): RequestBody
 data class RequestBodyFile(val content: FileReference): RequestBody
 

@@ -10,7 +10,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
     id("com.google.devtools.ksp")
-//    kotlin("native.cocoapods")
+    kotlin("native.cocoapods")
 //    id("com.android.library")
 }
 apply<RockPlugin>()
@@ -24,10 +24,13 @@ repositories {
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
+    applyDefaultHierarchyTemplate()
+
     jvm()
 //    androidTarget()
-//    ios()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 //    listOf(
 //        iosX64(),
 //        iosArm64(),
@@ -68,34 +71,34 @@ kotlin {
 //        }
     }
 
-//    cocoapods {
-//        // Required properties
-//        // Specify the required Pod version here. Otherwise, the Gradle project version is used.
-//        version = "1.0"
-//        summary = "Some description for a Kotlin/Native module"
-//        homepage = "Link to a Kotlin/Native module homepage"
-//        ios.deploymentTarget = "11.0"
-//
-//        // Optional properties
-//        // Configure the Pod name here instead of changing the Gradle project name
-//        name = "shared"
-//
-//        framework {
-//            baseName = "shared"
-//            export(project(":library"))
-//            embedBitcode(BitcodeEmbeddingMode.BITCODE)
-////            embedBitcode(BitcodeEmbeddingMode.DISABLE)
-////            podfile = project.file("../example-app-ios/Podfile")
+    cocoapods {
+        // Required properties
+        // Specify the required Pod version here. Otherwise, the Gradle project version is used.
+        version = "1.0"
+        summary = "Some description for a Kotlin/Native module"
+        homepage = "Link to a Kotlin/Native module homepage"
+        ios.deploymentTarget = "11.0"
+
+        // Optional properties
+        // Configure the Pod name here instead of changing the Gradle project name
+        name = "shared"
+
+        framework {
+            baseName = "shared"
+            export(project(":library"))
+            embedBitcode(BitcodeEmbeddingMode.BITCODE)
+//            embedBitcode(BitcodeEmbeddingMode.DISABLE)
+//            podfile = project.file("../example-app-ios/Podfile")
+        }
+//        pod("Library") {
+//            version = "1.0"
+//            source = path(project.file("../library"))
 //        }
-////        pod("Library") {
-////            version = "1.0"
-////            source = path(project.file("../library"))
-////        }
-//
-//        // Maps custom Xcode configuration to NativeBuildType
-//        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
-//        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
-//    }
+
+        // Maps custom Xcode configuration to NativeBuildType
+        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
+        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
+    }
 }
 ksp {
     arg("generateFields", "true")

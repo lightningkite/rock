@@ -10,8 +10,10 @@ import com.lightningkite.rock.reactive.*
  * Views rendered through here will be inserted into the given parent in the constructor.
  */
 class ViewWriter(
-    parent: NView
+    parent: NView,
+    private val startDepth: Int = 0,
 ) {
+    val depth: Int get() = stack.size - 1 + startDepth
     /**
      * Additional data keyed by string attached to the context.
      * Copied to writers that are split off.
@@ -23,7 +25,7 @@ class ViewWriter(
      * Creates a copy of the [ViewWriter] with the current view as its root.
      * Used for view containers that need their contents removed and replaced later.
      */
-    fun split(): ViewWriter = ViewWriter(stack.last()).also {
+    fun split(): ViewWriter = ViewWriter(stack.last(), startDepth = depth).also {
         it.addons.putAll(this.addons)
     }
 

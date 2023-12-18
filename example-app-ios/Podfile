@@ -1,20 +1,19 @@
 # Uncomment the next line to define a global platform for your project
-# platform :ios, '9.0'
+platform :ios, '11.0'
 
-target 'example-app-ios' do
+target 'Rock Example App' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
-  # Pods for example-app-ios
+  # Pods for Rock Example App
   pod 'shared', :path => '../example-app/shared.podspec'
-  pod 'Library', :path => '../library/library.podspec'
 
-  target 'example-app-iosTests' do
+  target 'Rock Example AppTests' do
     inherit! :search_paths
     # Pods for testing
   end
 
-  target 'example-app-iosUITests' do
+  target 'Rock Example AppUITests' do
     # Pods for testing
   end
 

@@ -1,0 +1,22 @@
+language = Objective-C
+package = com.lightningkite.rock.objc
+---
+#import <objc/runtime.h>
+#import <UIKit/UIColor.h>
+#import <Foundation/NSArray.h>
+#import <Foundation/NSURLSession.h>
+#import <Foundation/NSURL.h>
+#import <Foundation/NSData.h>
+#import <Foundation/NSURLResponse.h>
+#import <Foundation/NSError.h>
+
+id getAssociatedObjectWithKey(id object, NSValue* key) {
+  return objc_getAssociatedObject(object, key.pointerValue);
+}
+void setAssociatedObjectWithKey(id object, NSValue* key, id value) {
+  return objc_setAssociatedObject(object, key.pointerValue, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+@protocol KeyValueObserver
+- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context;
+@end

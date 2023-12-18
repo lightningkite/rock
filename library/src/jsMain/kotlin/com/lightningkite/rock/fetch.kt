@@ -21,14 +21,23 @@ actual suspend fun fetch(
     val a: dynamic = js("new AbortController()")
     val o = js("({})")
     o.method = method.name
-    o.headers = headers
     o.body = when(body) {
         null -> undefined
-        is RequestBodyBlob -> body.content
-        is RequestBodyFile -> body.content
-        is RequestBodyText -> body.content
+        is RequestBodyBlob -> {
+            headers.append("Content-Type", body.content.type)
+            body.content
+        }
+        is RequestBodyFile -> {
+            headers.append("Content-Type", body.content.type)
+            body.content
+        }
+        is RequestBodyText -> {
+            headers.append("Content-Type", body.type)
+            body.content
+        }
         else -> throw NotImplementedError()
     }
+    o.headers = headers
     o.signal = a.signal
     val promise = window.fetch(url, o as RequestInit)
     return suspendCoroutineCancellable { cont ->

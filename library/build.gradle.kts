@@ -17,7 +17,6 @@ repositories {
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -27,7 +26,9 @@ kotlin {
     }
     jvm()
 //    android()
-//    ios()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 //    listOf(
 //        iosX64(),
 //        iosArm64(),
@@ -42,6 +43,8 @@ kotlin {
     }
 
     sourceSets {
+        applyDefaultHierarchyTemplate()
+
         val commonMain by getting {
             dependencies {
                 api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
@@ -63,6 +66,12 @@ kotlin {
 
         val commonHtmlMain by creating {
             dependsOn(commonMain)
+        }
+
+        val iosMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:2.3.7")
+            }
         }
 
         val jvmMain by getting {
@@ -109,6 +118,20 @@ kotlin {
 //        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
 //        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
 //    }
+}
+
+kotlin {
+    targets
+        .matching { it is org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget }
+        .configureEach {
+            this as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
+            compilations.getByName("main") {
+                val objcAddition by cinterops.creating {
+                    defFile(project.file("src/iosMain/def/objcAddition.def"))
+                }
+            }
+        }
 }
 
 android {

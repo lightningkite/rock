@@ -82,10 +82,9 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         stack {
             val nav = navigator.dialog
             dismissBackground {
-                onClick { nav.dismiss() }
-            }
+                onClick { nav.dismiss() } }
             ::exists { nav.currentScreen.await() != null }
-            navigatorViewDialog() in scrolls in card in gravity(Align.Center, Align.Center)
+            navigatorViewDialog() in scrolls in dialog in gravity(Align.Center, Align.Center)
         }
     } in marginless
 }
@@ -101,7 +100,7 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 checked bind showMenu; image {
                 val currentTheme = currentTheme
                 ::source { Icon.menu.toImageSource(currentTheme().foreground) }
-                description = "Open naviagation menu"
+                description = "Open navigation menu"
             }
             }
             h1 { ::content.invoke { appNav.appNameProperty.await() } }
@@ -303,7 +302,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     Align.Center,
                     Align.Center
                 )
-            } in withPadding in hasPopover {
+            } in withDefaultPadding in hasPopover {
                 col {
                     forEachUpdating(appNav.userLinksProperty) {
                         link {

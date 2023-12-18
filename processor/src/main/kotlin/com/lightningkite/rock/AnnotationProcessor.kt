@@ -49,9 +49,19 @@ class RouterGeneration(
                     appendLine("import com.lightningkite.rock.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
-                    if (allRoutables.any { it.routes.any { it.any { it is ParsedRoutable.Segment.Variable && it.type.declaration.simpleName?.asString() == "UUID" } } }) {
-                        appendLine("import com.lightningkite.uuid")
+                    allRoutables.asSequence().flatMap {
+                        it.routes.asSequence().flatMap {
+                            it.asSequence().mapNotNull { (it as? ParsedRoutable.Segment.Variable)?.type }
+                        } + it.queryParameters.map { it.type }
                     }
+                        .flatMap { sequenceOf(it) + it.arguments.mapNotNull { it.type?.resolve() } }
+                        .mapNotNull { it.declaration.qualifiedName?.asString() }
+                        .distinct()
+                        .filter { !it.startsWith("kotlin.") }
+                        .sorted()
+                        .forEach {
+                            appendLine("import $it")
+                        }
                     appendLine("")
                     appendLine("")
                     appendLine("val AutoRoutes = Routes(")

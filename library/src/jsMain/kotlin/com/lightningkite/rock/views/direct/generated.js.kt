@@ -185,7 +185,7 @@ actual inline var TextView.textSize: Dimension
 actual typealias NLabel = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLLabelElement>("label") {
+actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     textElement("span") {
         classList.add("rock-label")
     }
@@ -403,6 +403,8 @@ actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit =
         type = "date"
         setup(LocalDateField(this))
     }
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
 actual val LocalDateField.content: Writable<LocalDate?>
     get() = native.vprop(
         "input",
@@ -1015,7 +1017,7 @@ actual val ViewWriter.marginless: ViewWrapper
         return ViewWrapper
     }
 @ViewModifierDsl3
-actual val ViewWriter.withPadding: ViewWrapper
+actual val ViewWriter.withDefaultPadding: ViewWrapper
     get() {
         beforeNextElementSetup {
             classList.add("addPadding")

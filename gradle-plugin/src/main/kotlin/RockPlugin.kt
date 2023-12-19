@@ -67,9 +67,9 @@ expect object Resources {
                     .sortedBy { it.key }
                     .joinToString("\n    ") {
                         when(val r = it.value) {
-                            is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal}\", bold = ${r.bold?.let { "\"/common/$it\"" }}, italic = ${r.italic?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.let { "\"/common/$it\"" }}))"
-                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.file}\")"
-                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.file}\").blob()"
+                            is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal.path.replace('\\', '/')}\", bold = ${r.bold?.let { "\"/common/$it\"" }}, italic = ${r.italic?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.let { "\"/common/$it\"" }}))"
+                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.file.path.replace('\\', '/')}\")"
+                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.file.path.replace('\\', '/')}\").blob()"
                             else -> ""
                         }
                     }

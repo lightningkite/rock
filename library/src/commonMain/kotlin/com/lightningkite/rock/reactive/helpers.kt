@@ -2,6 +2,7 @@ package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.launch
 import com.lightningkite.rock.launchGlobal
+import kotlin.jvm.JvmName
 
 
 infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writable<Boolean> {
@@ -44,11 +45,11 @@ fun <T> Readable<T>.withWrite(action: suspend Readable<T>.(T)->Unit): Writable<T
     }
 }
 
-fun Writable<Int>.asString(): Writable<String> = shared { this@asString.await().toString() }
+@JvmName("writableIntAsString") fun Writable<Int>.asString(): Writable<String> = shared { this@asString.await().toString() }
     .withWrite { it.toIntOrNull()?.let { this@asString.set(it) } }
-fun Writable<Long>.asString(): Writable<String> = shared { this@asString.await().toString() }
+@JvmName("writableLongAsString") fun Writable<Long>.asString(): Writable<String> = shared { this@asString.await().toString() }
     .withWrite { it.toLongOrNull()?.let { this@asString.set(it) } }
-fun Writable<Float>.asString(): Writable<String> = shared { this@asString.await().toString() }
+@JvmName("writableFloatAsString") fun Writable<Float>.asString(): Writable<String> = shared { this@asString.await().toString() }
     .withWrite { it.toFloatOrNull()?.let { this@asString.set(it) } }
-fun Writable<Double>.asString(): Writable<String> = shared { this@asString.await().toString() }
+@JvmName("writableDoubleAsString") fun Writable<Double>.asString(): Writable<String> = shared { this@asString.await().toString() }
     .withWrite { it.toDoubleOrNull()?.let { this@asString.set(it) } }

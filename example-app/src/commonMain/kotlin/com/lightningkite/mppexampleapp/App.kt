@@ -13,7 +13,7 @@ fun ViewWriter.app() {
 
     appNav(AutoRoutes) {
         appName = "Rock Sample App"
-        ::navItems{
+        ::navItems {
             listOf(
                 NavItem("Home", Icon.home, RootScreen),
                 NavItem("Themes", Icon.sync, ThemesScreen),

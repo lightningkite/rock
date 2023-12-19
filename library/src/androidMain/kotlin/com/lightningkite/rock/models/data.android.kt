@@ -10,24 +10,24 @@ actual val systemDefaultFont: Font
     get() = Typeface.DEFAULT
 
 //actual sealed class ImageSource actual constructor()
-actual typealias DimensionRaw = Int
+actual typealias DimensionRaw = Float
 
 actual val Int.px: Dimension
-    get() = Dimension(this)
+    get() = Dimension(this.toFloat())
 actual val Int.rem: Dimension
-    get() = Dimension((this * AndroidAppContext.oneRem).toInt())
+    get() = Dimension((this * AndroidAppContext.oneRem))
 actual val Double.rem: Dimension
-    get() = Dimension((this * AndroidAppContext.oneRem).toInt())
+    get() = Dimension((this.toFloat() * AndroidAppContext.oneRem))
 
 actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension(this.value + other.value)
 actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimension(this.value - other.value)
 actual inline operator fun Dimension.times(other: Float): Dimension = Dimension(this.value * other.toInt())
 actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(
     if (other != 0f) {
-        val dimenValue = this.value.toFloat() / other
-        dimenValue.toInt()
+        val dimenValue = this.value / other
+        dimenValue
     } else {
-        0
+        0f
     }
 )
 

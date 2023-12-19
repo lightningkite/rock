@@ -95,7 +95,6 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val showMenu = Property(false)
     col {
-// Nav 1 hamburger
         row {
             setup(appNav)
             toggleButton {

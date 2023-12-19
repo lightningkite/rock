@@ -2,29 +2,16 @@ package com.lightningkite.rockexample
 
 import android.os.Bundle
 import android.widget.FrameLayout
+import com.lightningkite.mppexampleapp.*
 import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.bar
-import com.lightningkite.rock.views.currentTheme
-import com.lightningkite.rock.views.dialog
 import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.exists
 import com.lightningkite.rock.views.l2.AppNav
-import com.lightningkite.rock.views.l2.appNav
-import com.lightningkite.rock.views.l2.appNavFactory
 import com.lightningkite.rock.views.l2.navigatorView
-import com.lightningkite.rock.views.l2.navigatorViewDialog
-import com.lightningkite.rock.views.navigator
-import com.lightningkite.rock.views.themeFromLast
-import com.lightningkite.rock.views.visible
-import com.lightningkite.rockexample.TestScreen.render
-import com.lightningkite.mppexampleapp.AutoRoutes
+import com.lightningkite.rock.views.*
 
 class MainActivity : RockActivity() {
 
@@ -32,21 +19,59 @@ class MainActivity : RockActivity() {
         super.onCreate(savedInstanceState)
         val frame = FrameLayout(this)
         setContentView(frame)
-        ViewWriter(frame).apply {
-
-//            appNavFactory.value = ViewWriter::appNavBareBones
-
-            appNav(AutoRoutes) {}
-//            navigatorView(LocalNavigator(routes))
-//            with(TestScreen) {
-//                render()
-//            }
-//            with(routes.fallback) {
-//                render()
-//            }
-        }
+        ViewWriter(frame).app()
     }
 }
+
+//@Routable("/")
+//object RootScreen : RockScreen {
+//    override fun ViewWriter.render() {
+//        col {
+//            col {
+//                h1 { content = "Beautiful by default." }
+//                separator()
+//                text {
+//                    content =
+//                        "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.  Just how it should be."
+//                }
+//                text {
+//                    content = "Take a look below at some examples."
+//                }
+//                text {
+//                    content =
+//                        "Note the magnifying glass in the top right corner - clicking it will open the source of the current screen on GitHub!"
+//                }
+//            } in withDefaultPadding
+//            col {
+//
+//                fun ViewWriter.linkScreen(screen: RockScreen) = link {
+//                    to = screen
+//                    row {
+//                        text { ::content{ screen.title.await() } } in weight(1f)
+//                        image { source = Icon.chevronRight.toImageSource(Color.black) }
+//                    }
+//                } in card
+//
+//                linkScreen(ThemesScreen)
+//                linkScreen(ControlsScreen)
+//                linkScreen(FormsScreen)
+//                linkScreen(NavigationScreen)
+//                linkScreen(LayoutExamplesScreen)
+//                linkScreen(SampleLogInScreen)
+//                linkScreen(DataLoadingExampleScreen)
+//                linkScreen(CanvasSampleScreen)
+//                linkScreen(AnimationSampleScreen)
+//                linkScreen(ReactivityScreen)
+//                linkScreen(DialogSamplesScreen)
+//                linkScreen(ExternalServicesScreen)
+//                linkScreen(FullExampleScreen())
+//                linkScreen(RecyclerViewScreen)
+//                linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })
+//
+//            } in withDefaultPadding
+//        } in scrolls
+//    }
+//}
 
 object TestScreen : RockScreen {
     override fun ViewWriter.render() {

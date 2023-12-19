@@ -124,6 +124,7 @@ kotlin {
 android {
     namespace = "com.lightningkite.rock"
     compileSdk = 34
+
     defaultConfig {
         minSdk = 24
     }

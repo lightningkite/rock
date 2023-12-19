@@ -1,6 +1,12 @@
 package com.lightningkite.rock.views.canvas
 
+import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.FontAndStyle
 import com.lightningkite.rock.models.Paint
+
+enum class TextAlign{
+    start, end, left, right, center
+}
 
 expect abstract class DrawingContext2D {
     abstract fun save()
@@ -59,7 +65,7 @@ expect abstract class DrawingContext2D {
 
 //  abstract   fun measureText(text: String): TextMetrics
 //    abstract var font: String
-//  abstract   var textAlign: CanvasTextAlign
+//  abstract   var textAlign: TextAlign
 //  abstract   var textBaseline: CanvasTextBaseline
 //  abstract   var direction: CanvasDirection
 
@@ -95,6 +101,10 @@ expect abstract class DrawingContext2D {
 //    abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
+expect fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
+expect fun DrawingContext2D.drawText(text: String, x: Double, y: Double, maxWidth: Double)
+expect fun DrawingContext2D.font(size: Dimension, value: FontAndStyle)
+expect fun DrawingContext2D.textAlign(alignment: TextAlign)
 expect fun DrawingContext2D.fill()
 expect fun DrawingContext2D.fillEvenOdd()
 expect var DrawingContext2D.strokePaint: Paint

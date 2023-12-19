@@ -162,6 +162,8 @@ fun CalculationContext.launch(action: suspend () -> Unit) {
         } catch(e: Exception) {
             if(e !is CancelledException) {
                 notifyFailure(e)
+            } else {
+                notifySuccess()
             }
         }
     }

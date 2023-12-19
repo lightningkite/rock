@@ -17,7 +17,9 @@ import kotlin.math.max
 
 @OptIn(ExperimentalForeignApi::class)
 class FrameLayout: UIView(CGRectZero.readValue()) {
-    var padding: CGFloat = 0.0
+    var padding: Double
+        get() = extensionPadding ?: 0.0
+        set(value) { extensionPadding = value }
 
     data class Size(var width: Double = 0.0, var height: Double = 0.0, var margin: Double = 0.0) {
     }
@@ -77,13 +79,15 @@ class FrameLayout: UIView(CGRectZero.readValue()) {
                 Align.Start -> m + padding
                 Align.Stretch -> m + padding
                 Align.End -> mySize.width - m - padding - size.width
-                Align.Center -> (mySize.width - size.width - 2 * m) / 2
+//                Align.Center -> (mySize.width - size.width - 2 * m) / 2
+                Align.Center -> (mySize.width - size.width) / 2
             }
             val offsetV = when(v) {
                 Align.Start -> m + padding
                 Align.Stretch -> m + padding
                 Align.End -> mySize.height - m - padding - size.height
-                Align.Center -> (mySize.height - size.height - 2 * m) / 2
+//                Align.Center -> (mySize.height - size.height - 2 * m) / 2
+                Align.Center -> (mySize.height - size.height) / 2
             }
             val widthSize = if(h == Align.Stretch) mySize.width - m * 2 - padding * 2 else size.width
             val heightSize = if(v == Align.Stretch) mySize.height - m * 2 - padding * 2 else size.height

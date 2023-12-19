@@ -128,8 +128,10 @@ object ControlsScreen : RockScreen {
             } in card
 
             col {
+                val number = Property(1)
                 h2 { content = "Text Fields" }
-                textField {  }
+                textField { content bind number.asString() }
+                text { ::content { "Value: ${number.await()}" }}
                 textField {  } in card
                 textField {  } in important
                 textField {  } in critical

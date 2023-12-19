@@ -26,33 +26,21 @@ actual typealias NContainingView = UIView
 
 @ViewDsl
 actual fun ViewWriter.stack(setup: ContainingView.() -> Unit): Unit = element(FrameLayout()) {
-    val c = currentTheme
-    calculationContext.reactiveScope {
-        val t = c()
-        padding = t.spacing.value
-    }
+    handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
 
 @ViewDsl
 actual fun ViewWriter.col(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = false
-    val c = currentTheme
-    calculationContext.reactiveScope {
-        val t = c()
-        padding = t.spacing.value
-    }
+    handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
 
 @ViewDsl
 actual fun ViewWriter.row(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = true
-    val c = currentTheme
-    calculationContext.reactiveScope {
-        val t = c()
-        padding = t.spacing.value
-    }
+    handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
 
@@ -99,21 +87,61 @@ actual inline var Image.description: String?
 actual typealias NTextView = UILabel
 
 @ViewDsl
-actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 @ViewDsl
-actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(UILabel()) { setup(TextView(this)) }
+actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    handleTheme(this) {
+        this.textColor = it.foreground.closestColor().toUiColor()
+    }
+    setup(TextView(this))
+}
 actual inline var TextView.content: String
     get() = native.text ?: ""
     set(value) {

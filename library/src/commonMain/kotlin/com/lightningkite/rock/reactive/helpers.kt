@@ -43,3 +43,12 @@ fun <T> Readable<T>.withWrite(action: suspend Readable<T>.(T)->Unit): Writable<T
         action(this@withWrite, value)
     }
 }
+
+fun Writable<Int>.asString(): Writable<String> = shared { this@asString.await().toString() }
+    .withWrite { it.toIntOrNull()?.let { this@asString.set(it) } }
+fun Writable<Long>.asString(): Writable<String> = shared { this@asString.await().toString() }
+    .withWrite { it.toLongOrNull()?.let { this@asString.set(it) } }
+fun Writable<Float>.asString(): Writable<String> = shared { this@asString.await().toString() }
+    .withWrite { it.toFloatOrNull()?.let { this@asString.set(it) } }
+fun Writable<Double>.asString(): Writable<String> = shared { this@asString.await().toString() }
+    .withWrite { it.toDoubleOrNull()?.let { this@asString.set(it) } }

@@ -4,7 +4,6 @@ import kotlin.random.Random
 
 object M3Theme {
     operator fun invoke(
-        id: String = "material",
         primary: Color = Color.fromHex(0xFF6200EE.toInt()),
         secondary: Color = Color.fromHex(0xFF03DAC6.toInt()),
         primaryForeground: Color = if (primary.perceivedBrightness < 0.6f) Color.white else Color.black,
@@ -72,7 +71,6 @@ object M3Theme {
         val saturation = Random.nextFloat() * 0.5f + 0.25f
         val value = Random.nextFloat() * 0.5f + 0.25f
         return this(
-            id = "material-${Random.nextInt(100000)}",
             primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),
             secondary = HSVColor(hue = hue + Angle.halfTurn, saturation = 1f - saturation, value = 1f - value).toRGB(),
             backgroundAdjust = Random.nextFloat() * 0.15f,
@@ -84,7 +82,6 @@ object M3Theme {
         val saturation = Random.nextFloat() * 0.5f + 0.25f
         val value = Random.nextFloat() * 0.5f + 0.25f
         return this(
-            id = "material-${Random.nextInt(100000)}",
             foreground = Color.white,
             backgroundAdjust = Random.nextFloat() * 0.5f,
             primary = HSVColor(hue = hue, saturation = saturation, value = value).toRGB(),

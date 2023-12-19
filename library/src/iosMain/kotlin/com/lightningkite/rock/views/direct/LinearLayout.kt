@@ -18,7 +18,9 @@ import kotlin.math.max
 @OptIn(ExperimentalForeignApi::class)
 class LinearLayout: UIView(CGRectZero.readValue()) {
     var horizontal: Boolean = true
-    var padding: CGFloat = 0.0
+    var padding: Double
+        get() = extensionPadding ?: 0.0
+        set(value) { extensionPadding = value }
 
     data class Size(var primary: Double = 0.0, var secondary: Double = 0.0, var margin: Double = 0.0) {
     }
@@ -79,7 +81,7 @@ class LinearLayout: UIView(CGRectZero.readValue()) {
             } ?: run {
                 remaining.primary -= required.primary
             }
-            remaining.primary.minus(m * 2)
+            remaining.primary -= m * 2
             required
         }.map {
             if(it.primary < -0.001) {

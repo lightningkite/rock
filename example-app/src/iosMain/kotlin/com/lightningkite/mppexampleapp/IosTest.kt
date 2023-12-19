@@ -1,15 +1,20 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.SizeConstraints
-import com.lightningkite.rock.models.px
+import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.*
+import kotlin.random.Random
 
 fun ViewWriter.iosTest() {
+    val theme = M3Theme(
+        foreground = Color.white,
+        backgroundAdjust = 0.5f,
+        primary = Color.blue.toHSV().copy(saturation = 0.5f, value = 0.5f).toRGB(),
+        secondary = Color.green.toHSV().copy(saturation = 0.5f, value = 0.5f).toRGB(),
+    )
     col {
         h1 { content = "Sampling" }
 
@@ -68,7 +73,20 @@ fun ViewWriter.iosTest() {
 //            }
         } in card
 
+//        col {
+//            h2 { content = "Style Test" }
+//            stack { text { content = "card" } } in card
+//            stack { text { content = "bar" } } in bar
+//            stack { text { content = "important" } } in important
+//            stack { text { content = "critical" } } in critical
+//            stack { text { content = "warning" } } in warning
+//            stack { text { content = "danger" } } in danger
+//            stack { text { content = "affirmative" } } in affirmative
+//        }
+
         space() in weight(1f)
+    } in setTheme {
+        theme
     }
 }
 

@@ -1,9 +1,6 @@
 package com.lightningkite.rock.views.canvas
 
-import com.lightningkite.rock.models.Color
-import com.lightningkite.rock.models.LinearGradient
-import com.lightningkite.rock.models.Paint
-import com.lightningkite.rock.models.RadialGradient
+import com.lightningkite.rock.models.*
 
 actual abstract class DrawingContext2D {
     actual abstract fun save()
@@ -98,6 +95,9 @@ actual abstract class DrawingContext2D {
 //    actual abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
+actual fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean): Unit = TODO()
+actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double, maxWidth: Double):Unit = TODO()
+//actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle):Unit = TODO()
 actual fun DrawingContext2D.fill(): Unit = TODO()
 actual fun DrawingContext2D.fillEvenOdd(): Unit = TODO()
 actual var DrawingContext2D.strokePaint: Paint

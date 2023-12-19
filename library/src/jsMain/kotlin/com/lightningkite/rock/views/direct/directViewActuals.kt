@@ -187,7 +187,7 @@ external interface ResizeObserverEntryBoxSize {
     val inlineSize: Double
 }
 
-class SizeReader(val native: HTMLElement, val key: String): Readable<Double> {
+data class SizeReader(val native: HTMLElement, val key: String): Readable<Double> {
     override suspend fun awaitRaw(): Double = native.asDynamic()[key].unsafeCast<Int>().toDouble()
     override fun addListener(listener: () -> Unit): () -> Unit {
         val o = ResizeObserver { _, _ ->

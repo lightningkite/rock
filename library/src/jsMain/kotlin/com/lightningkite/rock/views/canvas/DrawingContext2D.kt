@@ -10,10 +10,12 @@ actual typealias DrawingContext2D = CanvasRenderingContext2D
 
 actual fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean) = arc(x, y, radius, startAngle, endAngle, anticlockwise)
 actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double, maxWidth: Double):Unit = fillText(text, x, y, maxWidth)
-//actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle) {
-//    font = "${if(value.bold) "bold " else ""}${if(value.italic) "italic " else ""}${size.value}/${value.lineSpacingMultiplier} \"${value.font.cssFontFamilyName}\""
-//}
-//expect fun DrawingContext2D.textAlign(alignment: TextAlign) =
+actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle) {
+    font = "${if(value.bold) "bold " else ""}${if(value.italic) "italic " else ""}${size.value}/${value.lineSpacingMultiplier} ${value.font.cssFontFamilyName}"
+}
+actual fun DrawingContext2D.textAlign(alignment: TextAlign){
+    textAlign = alignment.toString().asDynamic().unsafeCast<CanvasTextAlign>()
+}
 actual fun DrawingContext2D.fill() = fill("nonzero".asDynamic().unsafeCast<CanvasFillRule>())
 actual fun DrawingContext2D.fillEvenOdd() = fill("evenodd".asDynamic().unsafeCast<CanvasFillRule>())
 

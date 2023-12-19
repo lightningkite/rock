@@ -97,7 +97,8 @@ actual abstract class DrawingContext2D {
 
 actual fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean): Unit = TODO()
 actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double, maxWidth: Double):Unit = TODO()
-//actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle):Unit = TODO()
+actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle):Unit = TODO()
+actual fun DrawingContext2D.textAlign(alignment: TextAlign): Unit = TODO()
 actual fun DrawingContext2D.fill(): Unit = TODO()
 actual fun DrawingContext2D.fillEvenOdd(): Unit = TODO()
 actual var DrawingContext2D.strokePaint: Paint

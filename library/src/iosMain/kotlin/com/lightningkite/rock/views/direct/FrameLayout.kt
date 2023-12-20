@@ -4,6 +4,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
@@ -16,7 +17,7 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class FrameLayout: UIView(CGRectZero.readValue()) {
+class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
@@ -27,5 +28,14 @@ class FrameLayout: UIView(CGRectZero.readValue()) {
 
     override fun layoutSubviews() {
         frameLayoutLayoutSubviews()
+    }
+
+    override fun subviewDidChangeSizing(view: UIView?) {
+        if(view?.extensionSizeConstraints?.let { it.width != null || it.height != null } == true) {
+            // skip layout
+        } else {
+            setNeedsLayout()
+            informParentOfSizeChange()
+        }
     }
 }

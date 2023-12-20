@@ -153,7 +153,10 @@ actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = headerElement("h6",
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
 @ViewDsl
-actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement("span", setup)
+actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement("span") {
+    native.classList.add("subtext")
+    setup()
+}
 actual inline var TextView.content: String
     get() = native.innerText
     set(value) {

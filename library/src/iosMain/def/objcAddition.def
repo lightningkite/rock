@@ -3,7 +3,6 @@ package = com.lightningkite.rock.objc
 ---
 #import <objc/runtime.h>
 #import <UIKit/UIView.h>
-#import <UIKit/UIView.h>
 #import <UIKit/UIColor.h>
 #import <Foundation/NSArray.h>
 #import <Foundation/NSURLSession.h>
@@ -29,4 +28,9 @@ void setAssociatedObjectWithKey(id object, NSValue* key, id value) {
 @property (nullable, nonatomic, readonly, strong) __kindof UIView *inputView API_AVAILABLE(ios(3.2));
 @property (nullable, nonatomic, readonly, strong) __kindof UIView *inputAccessoryView API_AVAILABLE(ios(3.2)) API_UNAVAILABLE(visionos);
 
+@end
+
+
+@protocol UIViewWithSizeOverrides
+- (void)subviewDidChangeSizing:(UIView*)view;
 @end

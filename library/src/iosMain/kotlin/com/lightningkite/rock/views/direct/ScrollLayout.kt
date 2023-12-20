@@ -7,14 +7,8 @@ import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
-import objcnames.classes.Protocol
 import platform.CoreGraphics.*
-import platform.Foundation.NSCoder
-import platform.QuartzCore.CALayer
-import platform.QuartzCore.CATransform3D
 import platform.UIKit.*
-import platform.darwin.NSInteger
-import platform.darwin.NSUInteger
 import kotlin.math.max
 
 //private val UIViewLayoutParams = ExtensionProperty<UIView, LayoutParams>()
@@ -23,7 +17,7 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
+class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
     var horizontal: Boolean = true
     var padding: Double
         get() = extensionPadding ?: 0.0
@@ -51,30 +45,28 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     val SizeConstraints.secondary get() = if(horizontal) height else width
     val UIView.secondaryAlign get() = if(horizontal) extensionVerticalAlign else extensionHorizontalAlign
 
+    val mainSubview get() = subviews.filterIsInstance<UIView>().firstOrNull { !it.hidden }
+
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
         val size = size.local
         val measuredSize = Size()
 
-        val sizes = calcSizes(size)
+        val subsize = calcSizes(size)
         measuredSize.primary += padding
-        for (size in sizes) {
-            measuredSize.primary += size.primary + size.margin * 2
-            measuredSize.secondary = max(measuredSize.secondary, size.secondary + padding * 2 + size.margin * 2)
-        }
+        measuredSize.primary += subsize.primary + subsize.margin * 2
+        measuredSize.secondary = max(measuredSize.secondary, subsize.secondary + padding * 2 + subsize.margin * 2)
         measuredSize.primary += padding
 
         return measuredSize.objc
     }
 
-    fun calcSizes(size: Size): List<Size> {
-//        let size = padding.shrinkSize(size)
+    fun calcSizes(size: Size): Size {
         val remaining = size.copy()
         remaining.primary -= padding * 2
         remaining.secondary -= padding * 2
 
         var totalWeight = 0f
-        return subviews.map {
-            it as UIView
+        return mainSubview?.let {
             val required = it.sizeThatFits(remaining.objc).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
@@ -84,7 +76,6 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
                 it.primary?.let { required.primary = it.value }
                 it.secondary?.let { required.secondary = it.value }
             }
-            if(it.hidden) return@map Size(0.0, 0.0)
             val m = it.extensionMargin ?: 0.0
             required.margin = m
             required.primary = required.primary.coerceAtLeast(0.0)
@@ -99,41 +90,46 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             }
             remaining.primary -= m * 2
             required
-        }.map {
-            if(it.primary < -0.001) {
-                it.primary = (-it.primary / totalWeight) * remaining.primary
-            }
-            it
-        }
+        } ?: size
     }
 
     override fun layoutSubviews() {
         val mySize = bounds.useContents { size.local }
         var primary = padding
-        subviews.zip(calcSizes(frame.useContents { size.local })) { view, size ->
-            view as UIView
-            if(view.hidden) return@zip
-            val m = view.extensionMargin ?: 0.0
-            val ps = primary + m
-            val a = view.secondaryAlign ?: Align.Stretch
-            val offset = when(a) {
-                Align.Start -> m + padding
-                Align.Stretch -> m + padding
-                Align.End -> mySize.secondary - m - padding - size.secondary
-                Align.Center -> (mySize.secondary - size.secondary - 2 * m) / 2
-            }
-            val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * 2 else size.secondary
-            view.setFrame(
-                CGRectMake(
-                    if(horizontal) ps else offset,
-                    if(horizontal) offset else ps,
-                    if(horizontal) size.primary else secondarySize,
-                    if(horizontal) secondarySize else size.primary,
-                )
-            )
-            view.layoutSubviews()
-            primary += size.primary + 2 * m
+        var lastChildSize: Size? = null
+        val view = mainSubview ?: run {
+            println("Abandon")
+            return
         }
+        val size = calcSizes(frame.useContents { size.local })
+        lastChildSize = size
+        val m = view.extensionMargin ?: 0.0
+        val ps = primary + m
+        val a = view.secondaryAlign ?: Align.Stretch
+        val offset = when(a) {
+            Align.Start -> m + padding
+            Align.Stretch -> m + padding
+            Align.End -> mySize.secondary - m - padding - size.secondary
+            Align.Center -> (mySize.secondary - size.secondary - 2 * m) / 2
+        }
+        val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * 2 else size.secondary
+        view.setFrame(
+            CGRectMake(
+                if(horizontal) ps else offset,
+                if(horizontal) offset else ps,
+                if(horizontal) size.primary else secondarySize,
+                if(horizontal) secondarySize else size.primary,
+            )
+        )
+        view.layoutSubviews()
+        primary += size.primary + 2 * m
+        primary += padding
+        setContentSize(
+            CGSizeMake(
+                if(horizontal) primary else frame.useContents { size.secondary },
+                if(!horizontal) primary else frame.useContents { size.secondary },
+            )
+        )
+        println("content size is ${contentSize.local.primary} vs child ${subviews.size - 1} size ${lastChildSize?.primary} + margin and ${padding * 2}")
     }
-
 }

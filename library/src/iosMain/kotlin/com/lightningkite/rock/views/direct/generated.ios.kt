@@ -10,9 +10,7 @@ import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
-import kotlinx.cinterop.readValue
 import kotlinx.datetime.*
-import platform.CoreGraphics.CGRectZero
 import platform.Foundation.NSDate
 import platform.UIKit.*
 import platform.darwin.NSObject
@@ -116,57 +114,81 @@ actual typealias NTextView = UILabel
 
 @ViewDsl
 actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 2)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.title
+        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.6)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.title
+        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.4)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.title
+        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.3)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.title
+        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.2)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.title
+        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.1)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.title
+        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.0)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.body
+        it.body.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
 @ViewDsl
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+    font = UIFont.systemFontOfSize(UIFont.systemFontSize * 0.8)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
+        this.extensionFontAndStyle = it.body
+        it.body.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
@@ -174,6 +196,7 @@ actual inline var TextView.content: String
     get() = native.text ?: ""
     set(value) {
         native.text = value
+        native.informParentOfSizeChange()
     }
 actual inline var TextView.align: Align
     get() = when (native.textAlignment) {
@@ -194,7 +217,9 @@ actual inline var TextView.align: Align
 actual inline var TextView.textSize: Dimension
     get() = Dimension(native.font.pointSize)
     set(value) {
-        native.font = UIFont.systemFontOfSize(value.value)
+        native.extensionFontAndStyle?.let {
+            native.font = it.font.get(value.value, if(it.bold) UIFontWeightBold else UIFontWeightRegular)
+        }
     }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -494,7 +519,7 @@ actual var TextField.action: Action?
             }
             native.extensionDelegateStrongRef = d
             d
-        } ?: NextFocusDelegate
+        } ?: NextFocusDelegateShared
         native.returnKeyType = when(action?.title) {
             "Emergency Call" -> UIReturnKeyType.UIReturnKeyEmergencyCall
             "Go" -> UIReturnKeyType.UIReturnKeyGo
@@ -609,6 +634,7 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
     native.clearChildren()
     createNewView()
+    native.hidden = native.subviews.isEmpty()
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -691,12 +717,25 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     return ViewWrapper
 }
 @ViewModifierDsl3
-actual val ViewWriter.scrolls: ViewWrapper get() = ViewWrapper
+actual val ViewWriter.scrolls: ViewWrapper get() {
+    wrapNext(ScrollLayout()) {
+        handleTheme(this, viewDraws = false)
+        horizontal = false
+    }
+    return ViewWrapper
+}
 @ViewModifierDsl3
-actual val ViewWriter.scrollsHorizontally: ViewWrapper get() = ViewWrapper
+actual val ViewWriter.scrollsHorizontally: ViewWrapper get() {
+    wrapNext(ScrollLayout()) {
+        handleTheme(this, viewDraws = false)
+        horizontal = true
+    }
+    return ViewWrapper
+}
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
     beforeNextElementSetup {
+        println("Applying $constraints to $this")
         extensionSizeConstraints = constraints
     }
     return ViewWrapper

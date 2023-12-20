@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.contains
+import com.lightningkite.rock.delay
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewWriter
@@ -15,7 +16,14 @@ fun ViewWriter.iosTest() {
         primary = Color.blue.toHSV().copy(saturation = 0.5f, value = 0.5f).toRGB(),
         secondary = Color.green.toHSV().copy(saturation = 0.5f, value = 0.5f).toRGB(),
     )
+    val incrementing = Property(7)
     col {
+        launch {
+            while(true) {
+                delay(1000L)
+                incrementing.value++
+            }
+        }
         h1 { content = "Sampling" }
 
         col {
@@ -54,19 +62,25 @@ fun ViewWriter.iosTest() {
             } in sizedBox(SizeConstraints(minHeight = 300.px))
         } in card
 
+        row {
+            text { ::content { incrementing.await().toString() } }
+            text { ::content { incrementing.await().toString() } }
+            text { ::content { incrementing.await().toString() } }
+        } in card
+
         col {
             h2 { content = "Dynamic List" }
             val countString = Property("5")
-            row {
+            col {
                 forEachUpdating(
                     shared {
-                        (1..(countString.await().toIntOrNull() ?: 1).coerceAtMost(100)).map { "Item $it" }
+                        (1..incrementing.await().coerceAtMost(20)).map { "Item $it" }
                     }
                 ) {
                     text { ::content.invoke { it.await() } }
                 }
                 space() in weight(1f)
-            } in scrollsHorizontally
+            } in scrolls in sizedBox(SizeConstraints(maxHeight = 300.px))
 //            label {
 //                content = "Element count:"
 //                textField { content bind countString }

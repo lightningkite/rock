@@ -14,6 +14,7 @@ class ViewWriter(
     private val startDepth: Int = 0,
 ) {
     val depth: Int get() = stack.size - 1 + startDepth
+
     /**
      * Additional data keyed by string attached to the context.
      * Copied to writers that are split off.
@@ -48,17 +49,20 @@ class ViewWriter(
     /**
      * Runs the given [action] on the next created element before its setup block is run.
      */
-    fun beforeNextElementSetup(action: NView.()->Unit) {
+    fun beforeNextElementSetup(action: NView.() -> Unit) {
         beforeNextElementSetupList.add(action)
     }
+
     /**
      * Runs the given [action] on the next created element after its setup block is run.
      */
-    fun afterNextElementSetup(action: NView.()->Unit) {
+    fun afterNextElementSetup(action: NView.() -> Unit) {
         afterNextElementSetupList.add(action)
     }
+
     private var beforeNextElementSetupList = ArrayList<NView.() -> Unit>()
     private var afterNextElementSetupList = ArrayList<NView.() -> Unit>()
+
     //    private val wrapperToDoList = ArrayList<NView.() -> Unit>()
     private var popCount = 0
 
@@ -68,8 +72,14 @@ class ViewWriter(
     @Suppress("UNCHECKED_CAST")
     fun <T : NView> wrapNext(element: T, setup: T.() -> Unit): ViewWrapper {
         stack.add(element)
+        val beforeCopy = if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
+        beforeNextElementSetupList = ArrayList()
+        val afterCopy = if (afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
+        afterNextElementSetupList = ArrayList()
         CalculationContextStack.useIn(element.calculationContext) {
+            beforeCopy.forEach { it(element) }
             setup(element)
+            afterCopy.forEach { it(element) }
         }
         popCount++
         return ViewWrapper
@@ -81,9 +91,10 @@ class ViewWriter(
     fun <T : NView> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
             stack.last().addChild(this)
-            val beforeCopy = if(beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
+            val beforeCopy =
+                if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
             beforeNextElementSetupList = ArrayList()
-            val afterCopy = if(afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
+            val afterCopy = if (afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
             afterNextElementSetupList = ArrayList()
             var toPop = popCount
             popCount = 0
@@ -101,7 +112,7 @@ class ViewWriter(
         }
     }
 
-    fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewWriter.(Readable<T>)->Unit) {
+    fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewWriter.(Readable<T>) -> Unit) {
         // TODO: Faster version
         return with(split()) {
             calculationContext.reactiveScope {

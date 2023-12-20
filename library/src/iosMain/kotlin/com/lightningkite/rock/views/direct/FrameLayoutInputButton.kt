@@ -12,11 +12,13 @@ import platform.CoreGraphics.*
 import platform.UIKit.*
 import platform.objc.sel_registerName
 import com.lightningkite.rock.objc.UIResponderWithOverridesProtocol
+import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.reactive.Property
 import kotlin.math.max
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithOverridesProtocol {
+class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithOverridesProtocol,
+    UIViewWithSizeOverridesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
@@ -27,6 +29,15 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
 
     override fun layoutSubviews() {
         frameLayoutLayoutSubviews()
+    }
+
+    override fun subviewDidChangeSizing(view: UIView?) {
+        if(view?.extensionSizeConstraints?.let { it.width != null || it.height != null } == true) {
+            // skip layout
+        } else {
+            setNeedsLayout()
+            informParentOfSizeChange()
+        }
     }
 
     val toolbar = UIToolbar().apply {

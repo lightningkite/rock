@@ -18,6 +18,7 @@ fun UIView.frameLayoutLayoutSubviews() {
     var padding = extensionPadding ?: 0.0
     subviews.zip(frameLayoutCalcSizes(frame.useContents { size.local })) { view, size ->
         view as UIView
+        if(view.hidden) return@zip
         val m = view.extensionMargin ?: 0.0
         val h = view.extensionHorizontalAlign ?: Align.Stretch
         val v = view.extensionVerticalAlign ?: Align.Stretch

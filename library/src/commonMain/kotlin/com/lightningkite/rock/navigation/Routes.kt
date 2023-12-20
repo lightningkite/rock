@@ -1,5 +1,6 @@
 package com.lightningkite.rock.navigation
 
+import com.lightningkite.rock.approximateSimpleName
 import com.lightningkite.rock.reactive.Constant
 import com.lightningkite.rock.reactive.Listenable
 import com.lightningkite.rock.reactive.Readable
@@ -31,7 +32,9 @@ data class UrlLikePath(
 }
 
 interface RockScreen {
-    val title: Readable<String> get() = Constant(this::class.toString().removePrefix("class ").removeSuffix("Screen").camelToHuman())
+    val title: Readable<String> get() = Constant(
+        this::class.approximateSimpleName().removeSuffix("Screen").camelToHuman()
+    )
     fun ViewWriter.render()
     object Empty: RockScreen {
         override fun ViewWriter.render() {

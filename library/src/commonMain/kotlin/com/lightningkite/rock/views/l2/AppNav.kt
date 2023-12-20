@@ -62,7 +62,7 @@ interface AppNav {
 
 val ViewWriter.appNavFactory by viewWriterAddon<Property<ViewWriter.(AppNav.() -> Unit) -> Unit>>(
     Property(
-        ViewWriter::appNavTopAndLeft
+        ViewWriter::appNavBottomTabs
     )
 )
 
@@ -73,7 +73,9 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             val alt = split()
             reactiveScope {
-                val viewMaker = appNavFactory.await()
+                val viewMaker = appNavFactory
+                    .await()
+
                 swap {
                     viewMaker.invoke(alt, setup)
                 }

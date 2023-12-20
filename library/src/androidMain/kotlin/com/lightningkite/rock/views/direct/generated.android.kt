@@ -3,7 +3,10 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
+import android.graphics.drawable.VectorDrawable
+import android.net.Uri
 import android.text.InputType
 import android.view.Gravity
 import android.view.SurfaceView
@@ -20,6 +23,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
@@ -28,9 +32,10 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.datetime.*
+import timber.log.Timber
+import java.util.UUID
 import android.webkit.WebView as AndroidWebView
 import android.widget.AutoCompleteTextView as AndroidCompleteTextView
-import android.widget.Button as AndroidButton
 import android.widget.CheckBox as AndroidCheckbox
 import android.widget.RadioButton as AndroidRadioButton
 import android.widget.TextView as AndroidTextView
@@ -46,14 +51,17 @@ actual typealias NContainingView = ViewGroup
 
 actual typealias NTextView = AndroidTextView
 actual typealias NLabel = AndroidTextView
-actual typealias NLink = AndroidTextView
-actual typealias NExternalLink = AndroidTextView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NLink = LinkFrameLayout
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NExternalLink = FrameLayout
+
 actual typealias NImage = ImageView
 actual typealias NActivityIndicator = ProgressBar
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSpace = View
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NButton = android.widget.Button
+actual typealias NButton = android.widget.FrameLayout
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NCheckbox = android.widget.CheckBox
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -79,7 +87,7 @@ actual typealias NSelect = AppCompatSpinner
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NAutoCompleteTextField = AndroidCompleteTextView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NSwapView = AndroidSwapView
+actual typealias NSwapView = FrameLayout
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NWebView = android.webkit.WebView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -110,7 +118,7 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
 }
 
 @ViewDsl
-actual fun ViewWriter.button(setup: Button.() -> Unit) = element(::AndroidButton, ::Button, setup)
+actual fun ViewWriter.button(setup: Button.() -> Unit) = element(::FrameLayout, ::Button, setup)
 
 fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
     val androidText = native
@@ -163,36 +171,50 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement(TextS
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement(TextSizes.subtext, setup)
 actual var Link.to: RockScreen
     get() {
-        TODO("NOT IMPLEMENTED")
-//        return runBlocking {
-//            (native.context as RockActivity).navigator.currentScreen.await()!!
+        return TODO()
+//        val rockScreen: RockScreen
+//        runBlocking {
+//            rockScreen = (native.context as RockActivity).navigator.currentScreen.await()!!
 //        }
+//        return rockScreen
     }
     set(value) {
-        TODO("Not Implemented")
+        native.setOnClickListener {
+            native.navigator.navigate(value)
+        }
     }
 
 actual var Link.newTab: Boolean
     get() {
-        TODO()
+        return false
     }
     set(value) {
-        TODO("NOT IMPLEMENTED")
+        Timber.d("New Tab called with value $value")
     }
-
 
 actual var ExternalLink.to: String
     get() {
-        TODO()
+        return (native.tag as? Pair<UUID, String>)?.second ?: ""
     }
-    set(value) {
 
+    set(value) {
+        native.tag = UUID.randomUUID() to value
+        native.setOnClickListener { view ->
+            val intent = Intent().apply {
+                action = Intent.ACTION_VIEW
+                categories.add(Intent.CATEGORY_APP_BROWSER)
+                data = Uri.parse(value)
+            }
+            view.context.packageManager.resolveActivity(intent, intent.flags)?.let {
+                view.context.startActivity(intent)
+            }
+        }
     }
 actual var ExternalLink.newTab: Boolean
     get() {
-        TODO()
+        return false
     }
-    set(value) {}
+    set(value) { Timber.d("WHAT AM I? $value") }
 
 
 actual var Image.source: ImageSource
@@ -201,7 +223,29 @@ actual var Image.source: ImageSource
     }
     set(value) {
         native.tag = value
-        native.setImageDrawable((value as ImageResource).drawable)
+        when(value) {
+            is ImageRaw -> {
+                //TODO()
+            }
+            is ImageRemote -> {
+                //TODO()
+            }
+            is ImageResource -> {
+                native.setImageDrawable(value.drawable)
+            }
+            is ImageVector -> {
+                native.setImageDrawable(VectorDrawableCreator.getVectorDrawable(
+                    context = native.context,
+                    width = value.width.value,
+                    height = value.height.value,
+                    viewportWidth = value.viewBoxWidth.toFloat(),
+                    viewportHeight = value.viewBoxHeight.toFloat(),
+                    paths = value.paths.map {
+                        return@map VectorDrawableCreator.PathData(it.path, it.fillColor?.closestColor()?.toInt() ?: 0)
+                    }
+                ))
+            }
+        }
     }
 actual var Image.scaleType: ImageScaleType
     get() {
@@ -489,7 +533,7 @@ actual var LocalTimeField.range: ClosedRange<LocalTime>?
             .rangeTo(LocalTime(23, 59, 59, 0))
     }
     set(value) {
-        TODO("Not Implemented")
+//        TODO("Not Implemented")
     }
 
 
@@ -940,10 +984,13 @@ private fun alignmentToGravity(alignment: Align, isVertical: Boolean): Int {
 @ViewModifierDsl3
 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     beforeNextElementSetup {
-        val params = this.layoutParams as LayoutParams
+        val params = this.layoutParams as ViewGroup.LayoutParams
         val horizontalGravity = alignmentToGravity(horizontal, isVertical = false)
         val verticalGravity = alignmentToGravity(vertical, isVertical = true)
-        params.gravity = horizontalGravity or verticalGravity
+        if(params is LinearLayout.LayoutParams)
+            params.gravity = horizontalGravity or verticalGravity
+        else if (params is FrameLayout.LayoutParams)
+            params.gravity = horizontalGravity or verticalGravity
         if (horizontal == Align.Stretch) {
             params.width = LayoutParams.MATCH_PARENT
         }
@@ -960,18 +1007,24 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 @ViewModifierDsl3
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
-        val scrollView = ScrollView(this.currentView.context)
-        scrollView.addChild(this.currentView)
-
+        wrapNext(ScrollView(this.currentView.context)) {
+            layoutParams = ViewGroup.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
+        }
         return ViewWrapper
     }
 
 @ViewModifierDsl3
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
-        val scrollView = HorizontalScrollView(this.currentView.context)
-        scrollView.addChild(this.currentView)
-
+        wrapNext(HorizontalScrollView(this.currentView.context)) {
+            layoutParams = ViewGroup.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
+        }
         return ViewWrapper
     }
 
@@ -1005,7 +1058,10 @@ actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.link(setup: Link.() -> Unit) {
-    return element(::AndroidTextView, ::Link, setup)
+    return element(::LinkFrameLayout, ::Link) {
+        native.navigator = navigator
+        setup(this)
+    }
 }
 
 @ViewDsl
@@ -1030,7 +1086,7 @@ actual class NDismissBackground(c: Context) : NView(c)
 
 @ViewDsl
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
-    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.  Probably will understand better or know how to implement after I implement themes.")
+
 }
 
 @ViewDsl
@@ -1099,7 +1155,7 @@ actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> U
 
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
-    return element(::AndroidSwapView, ::SwapView, setup)
+    return element(::FrameLayout, ::SwapView, setup)
 }
 
 @ViewDsl
@@ -1111,6 +1167,28 @@ actual fun SwapView.swap(
     transition: ScreenTransition,
     createNewView: () -> Unit,
 ) {
+    native.removeAllViews()
+    createNewView()
+//    val oldView = this.native.getChildAt(0)
+//    println("CALL CREATE NEW VIEW")
+//    createNewView()
+//    println("AFTER CREATE NEW VIEW")
+//    val newViewIndex = if (oldView == null) {
+//        0
+//    } else {
+//        1
+//    }
+//
+//    val newView = this.native.getChildAt(newViewIndex)
+//
+//    TransitionManager.beginDelayedTransition(native, TransitionSet().apply {
+//        transition.exit?.addTarget(oldView ?: View(native.context))
+//        transition.enter?.addTarget(newView)
+//        transition.enter?.let { addTransition(it) }
+//        transition.exit?.let { addTransition(it) }
+//    })
+//    oldView?.let { oldNN -> native.removeView(oldNN) }
+//    native.addView(newView)
 }
 
 @ViewDsl
@@ -1149,7 +1227,7 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
 
 actual var RecyclerView.columns: Int
     get() = 1
-    set(value) { TODO() }
+    set(value) { TODO("WHAT") }
 
 @ViewModifierDsl3
 actual fun ViewWriter.hasPopover(
@@ -1157,12 +1235,13 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit,
 ): ViewWrapper {
-    TODO("Not yet implemented")
+//    TODO("Not yet implemented")
+    return ViewWrapper
 }
 
 @ViewDsl
 actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) {
-    TODO("Implement")
+    element(::FrameLayout, ::ExternalLink, setup)
 }
 
 @ViewDsl
@@ -1170,4 +1249,4 @@ actual fun ViewWriter.label(setup: Label.() -> Unit) {
     element(::AndroidTextView, ::Label, setup)
 }
 
-actual class NSeparator(c: Context) : NView(c)
+actual class NSeparator(context: Context): NView(context) {}

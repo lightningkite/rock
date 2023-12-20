@@ -2,26 +2,72 @@
 
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.Writable
-import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.readValue
-import platform.CoreGraphics.CGRectZero
-import platform.UIKit.UIView
+import kotlinx.cinterop.ObjCAction
+import platform.UIKit.*
+import platform.darwin.NSObject
+import platform.objc.sel_registerName
 
 fun ViewWriter.todo(name: String) = element(UIView())  {}
 
+class Ref<T>(var target: T?)
 
-
-class SpacerView: UIView(CGRectZero.readValue()) {
-
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+inline fun UIControl.onEvent(events: UIControlEvents, crossinline action: ()->Unit): ()->Unit {
+    val actionHolder = object: NSObject() {
+        @ObjCAction
+        fun eventHandler() = action()
+    }
+    val sel = sel_registerName("eventHandler")
+    addTarget(actionHolder, sel, events)
+    val ref = Ref(actionHolder)
+    calculationContext.onRemove {
+        // Retain the sleeve until disposed
+        ref.target?.let { removeTarget(it, sel, events) }
+        ref.target = null
+    }
+    return {
+        ref.target?.let { removeTarget(it, sel, events) }
+        ref.target = null
+    }
 }
 
-class FrameView: UIView(CGRectZero.readValue()) {
+fun UIControl.findNextFocus(): UIView? {
+    return superview?.let {
+        it.findNextParentFocus(startingAtIndex = subviews.indexOf(this) + 1)
+    }
+}
 
+private fun UIView.findNextParentFocus(startingAtIndex: Int): UIView? {
+    findNextChildFocus(startingAtIndex = startingAtIndex)?.let { return it }
+    return superview?.let {
+        it.findNextParentFocus(startingAtIndex = subviews.indexOf(this) + 1)
+    }
+}
+
+private fun UIView.findNextChildFocus(startingAtIndex: Int): UIView? {
+    var index = startingAtIndex
+    while(index < subviews.size - 1) {
+        val sub = subviews[index] as UIView
+        if (sub.canBecomeFirstResponder) {
+            return sub
+        } else {
+            sub.findNextChildFocus(0)?.let { return it }
+        }
+        index++
+    }
+    return null
+}
+
+object NextFocusDelegate: NSObject(), UITextFieldDelegateProtocol {
+    override fun textFieldShouldReturn(textField: UITextField): Boolean {
+        textField.findNextFocus()?.let {
+            it.becomeFirstResponder()
+        } ?: textField.resignFirstResponder()
+        return true
+    }
 }
 
 //private val UIViewExtensionGravity = ExtensionProperty<UIView, Pair<Align, Align>>()

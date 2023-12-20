@@ -2,6 +2,8 @@ language = Objective-C
 package = com.lightningkite.rock.objc
 ---
 #import <objc/runtime.h>
+#import <UIKit/UIView.h>
+#import <UIKit/UIView.h>
 #import <UIKit/UIColor.h>
 #import <Foundation/NSArray.h>
 #import <Foundation/NSURLSession.h>
@@ -19,4 +21,12 @@ void setAssociatedObjectWithKey(id object, NSValue* key, id value) {
 
 @protocol KeyValueObserver
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context;
+@end
+
+@protocol UIResponderWithOverrides
+
+// Called and presented when object becomes first responder.  Goes up the responder chain.
+@property (nullable, nonatomic, readonly, strong) __kindof UIView *inputView API_AVAILABLE(ios(3.2));
+@property (nullable, nonatomic, readonly, strong) __kindof UIView *inputAccessoryView API_AVAILABLE(ios(3.2)) API_UNAVAILABLE(visionos);
+
 @end

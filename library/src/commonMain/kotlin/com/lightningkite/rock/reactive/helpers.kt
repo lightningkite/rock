@@ -53,3 +53,12 @@ fun <T> Readable<T>.withWrite(action: suspend Readable<T>.(T)->Unit): Writable<T
     .withWrite { it.toFloatOrNull()?.let { this@asString.set(it) } }
 @JvmName("writableDoubleAsString") fun Writable<Double>.asString(): Writable<String> = shared { this@asString.await().toString() }
     .withWrite { it.toDoubleOrNull()?.let { this@asString.set(it) } }
+
+@JvmName("writableIntNullableAsString") fun Writable<Int?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toIntOrNull()) }
+@JvmName("writableLongNullableAsString") fun Writable<Long?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toLongOrNull()) }
+@JvmName("writableFloatNullableAsString") fun Writable<Float?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toFloatOrNull()) }
+@JvmName("writableDoubleNullableAsString") fun Writable<Double?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toDoubleOrNull()) }

@@ -16,7 +16,7 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class FrameLayout: UIView(CGRectZero.readValue()) {
+class FrameLayoutButton: UIButton(CGRectZero.readValue()) {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }

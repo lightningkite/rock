@@ -65,3 +65,6 @@ var UIView.extensionHorizontalAlign: Align? by UIViewHorizontalAlign
 
 private val UIViewVerticalAlign = ExtensionProperty<UIView, Align>()
 var UIView.extensionVerticalAlign: Align? by UIViewVerticalAlign
+
+private val UIViewDelegateStrongRef = ExtensionProperty<UIView, NSObject>()
+var UIView.extensionDelegateStrongRef: NSObject? by UIViewDelegateStrongRef

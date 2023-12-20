@@ -16,7 +16,7 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class FrameLayout: UIView(CGRectZero.readValue()) {
+class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()) {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
@@ -27,5 +27,17 @@ class FrameLayout: UIView(CGRectZero.readValue()) {
 
     override fun layoutSubviews() {
         frameLayoutLayoutSubviews()
+    }
+
+    var allowUnselect = true
+    var on: Boolean = false
+    init {
+        onEvent(UIControlEventTouchUpInside) {
+            if(!on || allowUnselect) {
+                on = !on
+                selected = on
+                sendActionsForControlEvents(UIControlEventValueChanged)
+            }
+        }
     }
 }

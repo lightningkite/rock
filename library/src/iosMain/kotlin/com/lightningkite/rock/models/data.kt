@@ -29,7 +29,7 @@ data class FontDirect(val normal: String, val bold: String? = null, val italic: 
 actual val systemDefaultFont: Font get() = Font("'Montserrat'", "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap", "Helvetica")
 
 actual sealed class ImageSource actual constructor()
-actual class ImageResource(val relativeUrl: String) : ImageSource()
+actual class ImageResource(val name: String) : ImageSource()
 
 class ScreenTransitionPart(
     val from: Map<String, String>,

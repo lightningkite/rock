@@ -6,7 +6,6 @@ import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.direct.SpacerView
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.readValue
 import platform.CoreGraphics.CGRect

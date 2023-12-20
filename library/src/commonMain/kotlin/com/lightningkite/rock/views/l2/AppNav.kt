@@ -243,7 +243,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                         } in gravity(Align.Center, Align.Center)
                         subtext { ::content { it.await().title } } in gravity(Align.Center, Align.Center)
                     }
-                } in weight(1f) in marginless in themeFromLast { existing ->
+                } in weight(1f) in themeFromLast { existing ->
                     if (navigator.currentScreen.await() == it.await().destination)
                         (existing.bar() ?: existing).down()
                     else

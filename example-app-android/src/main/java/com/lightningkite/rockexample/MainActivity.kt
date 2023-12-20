@@ -20,6 +20,11 @@ class MainActivity : RockActivity() {
         val frame = FrameLayout(this)
         setContentView(frame)
         ViewWriter(frame).app()
+//        ViewWriter(frame).apply {
+//            with(TestScreen) {
+//                render()
+//            }
+//        }
     }
 }
 
@@ -76,19 +81,30 @@ class MainActivity : RockActivity() {
 object TestScreen : RockScreen {
     override fun ViewWriter.render() {
         col {
-            h1 {
-                this.native.text = "H1 Header"
-            } in withDefaultPadding
             text {
-                this.native.text = "H5 HEADER"
-            }
+                content = "ME TEXT"
+            } in marginless
 
-            localDateField {}
+            text {
+                content = "H5 HEADER"
+            } in marginless
 
-            localTimeField {}
+            text {
+                content = "H5 HEADER"
+            } in marginless
 
-            textField {
-                range = 5.0..20.0
+            text {
+                content = "H5 HEADER"
+            } in marginless
+
+            row {
+                button {
+                    text { content = "Me Button" }
+                } in withDefaultPadding
+
+                button {
+                    text { content = "What up" }
+                } in withDefaultPadding
             }
         }
     }

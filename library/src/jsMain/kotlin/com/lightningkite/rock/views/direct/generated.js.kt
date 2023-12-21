@@ -109,6 +109,7 @@ actual inline var Image.source: ImageSource
             is ImageRemote -> native.src = value.url
             is ImageRaw -> native.src = URL.Companion.createObjectURL(Blob(arrayOf(value.data)))
             is ImageResource -> native.src = value.relativeUrl
+            is ImageLocal -> native.src = URL.createObjectURL(value.file)
             is ImageVector -> {
                 native.src = value.toWeb()
                 native.style.width = value.width.value

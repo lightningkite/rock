@@ -126,10 +126,9 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         primary += padding
         setContentSize(
             CGSizeMake(
-                if(horizontal) primary else frame.useContents { size.secondary },
-                if(!horizontal) primary else frame.useContents { size.secondary },
+                if(horizontal) primary else 0.0,
+                if(!horizontal) primary else 0.0,
             )
         )
-        println("content size is ${contentSize.local.primary} vs child ${subviews.size - 1} size ${lastChildSize?.primary} + margin and ${padding * 2}")
     }
 }

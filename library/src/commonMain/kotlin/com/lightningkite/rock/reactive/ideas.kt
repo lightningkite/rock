@@ -82,6 +82,7 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
     val data = ReactiveScopeData {
         run()
     }
+    val name = Random.nextInt(1000000)
     var previousContext: CoroutineContext? = null
     run = run@{
         notifyStart()

@@ -22,6 +22,8 @@ class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtoc
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
+//    init { setUserInteractionEnabled(false) }
+
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
         return frameLayoutSizeThatFits(size)
     }
@@ -37,5 +39,8 @@ class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtoc
             setNeedsLayout()
             informParentOfSizeChange()
         }
+    }
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return super.hitTest(point, withEvent).takeUnless { it == this }
     }
 }

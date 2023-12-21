@@ -112,7 +112,10 @@ actual var NView.nativeRotation: Angle
     }
 
 actual fun NView.clearChildren() {
-    this.subviews.toList().forEach { (it as? UIView)?.removeFromSuperview() }
+    this.subviews.toList().forEach {
+        if(it is RemovedDetectorView) return@forEach
+        (it as? UIView)?.removeFromSuperview()
+    }
 }
 actual fun NView.addChild(child: NView) {
 //    child.setTranslatesAutoresizingMaskIntoConstraints(false)

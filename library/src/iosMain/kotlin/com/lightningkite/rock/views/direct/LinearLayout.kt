@@ -29,6 +29,8 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
+//    init { setUserInteractionEnabled(false) }
+
     override fun subviewDidChangeSizing(view: UIView?) {
         if(view?.extensionSizeConstraints?.let { it.width != null || it.height != null } == true) {
             // skip layout
@@ -134,6 +136,10 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             view.layoutSubviews()
             primary += size.primary + 2 * m
         }
+    }
+
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return super.hitTest(point, withEvent).takeUnless { it == this }
     }
 
 }

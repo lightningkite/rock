@@ -16,14 +16,14 @@ class ViewController: UIViewController {
         
         let writer = ViewWriter(parent: self.view, startDepth: 0)
         print("Beginning write...")
-        writer.iosTest()
+        writer.app()
         print("Write complete.")
         self.view.subviews.forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
-            $0.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-            $0.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-            $0.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
-            $0.rightAnchor.constraint(equalTo: self.view.rightAnchor).isActive = true
+            $0.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor).isActive = true
+            $0.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+            $0.leftAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leftAnchor).isActive = true
+            $0.rightAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.rightAnchor).isActive = true
         }
     }
 

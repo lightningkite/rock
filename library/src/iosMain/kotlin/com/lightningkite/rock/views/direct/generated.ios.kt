@@ -91,14 +91,14 @@ actual inline var Image.source: ImageSource
     get() = TODO()
     set(value) {
         when(value) {
-            is ImageRaw -> TODO()
+            is ImageRaw -> {}
             is ImageRemote -> {
                 launch {
                     fetch(value.url).blob()
                 }
             }
             is ImageResource -> UIImage.imageNamed(value.name)
-            is ImageVector -> TODO()
+            is ImageVector -> {}
             else -> {}
         }
     }
@@ -625,15 +625,20 @@ actual typealias NSwapView = FrameLayout
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) = element(FrameLayout()) {
     handleTheme(this, viewDraws = false)
+    setup(SwapView(this))
 }
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element(FrameLayout()) {
     handleTheme(this, viewDraws = false)
     hidden = true
+    setup(SwapView(this))
 }
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
+    println("Clearing views. Children count: ${native.subviews.size}")
     native.clearChildren()
+    println("Creating a new view. Children count: ${native.subviews.size}")
     createNewView()
+    println("Created a new view. Children count: ${native.subviews.size}")
     native.hidden = native.subviews.isEmpty()
 }
 

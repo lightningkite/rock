@@ -2,6 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.FullExampleScreen
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.RecyclerViewScreen
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.VectorsTestScreen
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Color
@@ -46,6 +47,7 @@ object RootScreen : RockScreen {
                 linkScreen(FormsScreen)
                 linkScreen(NavigationScreen)
                 linkScreen(LayoutExamplesScreen)
+                linkScreen(VectorsTestScreen)
                 linkScreen(SampleLogInScreen)
                 linkScreen(DataLoadingExampleScreen)
                 linkScreen(CanvasSampleScreen)

@@ -6,7 +6,6 @@ import java.util.WeakHashMap
 
 
 fun <T: NView, W: RView<T>> ViewWriter.viewElement(
-    viewDraws: Boolean = true,
     factory: (Context) -> T,
     wrapper: (T) -> W,
     setup: W.() -> Unit,
@@ -14,7 +13,6 @@ fun <T: NView, W: RView<T>> ViewWriter.viewElement(
     val native = factory(currentView.context)
     val wrapped = wrapper(native)
     element(native) {
-        applyTheme(native, viewDraws)
         setup(wrapped)
     }
 }

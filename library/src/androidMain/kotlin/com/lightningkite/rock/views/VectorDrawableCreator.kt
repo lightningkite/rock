@@ -72,17 +72,7 @@ object VectorDrawableCreator {
             val parser = xmlParserNew.invoke(
                 xmlBlockConstr.newInstance(binXml as Any)
             ) as XmlPullParser
-            return if (Build.VERSION.SDK_INT >= 24) {
-                Drawable.createFromXml(context.resources, parser)
-            } else {
-                // Before API 24, vector drawables aren't rendered correctly without compat lib
-                val attrs = Xml.asAttributeSet(parser)
-                var type = parser.next()
-                while (type != XmlPullParser.START_TAG) {
-                    type = parser.next()
-                }
-                VectorDrawableCompat.createFromXmlInner(context.resources, parser, attrs, null)
-            }
+            return Drawable.createFromXml(context.resources, parser)
         } catch (e: Exception) {
             Log.e("VectorDrawableCreator", "Vector creation failed", e)
         }

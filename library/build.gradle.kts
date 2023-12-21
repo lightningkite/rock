@@ -15,13 +15,23 @@ repositories {
     mavenCentral()
 }
 
+val ktorVersion = "2.3.7"
+
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     androidTarget {
         compilations.all {
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "17"
             }
+        }
+        dependencies {
+            implementation("androidx.transition:transition:1.4.1")
+            implementation("androidx.cardview:cardview:1.0.0")
+            implementation("com.jakewharton.timber:timber:5.0.1")
+            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-cio:$ktorVersion")
+            implementation("io.ktor:ktor-client-websockets:$ktorVersion")
         }
     }
     jvm()
@@ -137,13 +147,14 @@ kotlin {
 android {
     namespace = "com.lightningkite.rock"
     compileSdk = 34
+
     defaultConfig {
         minSdk = 24
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     dependencies {
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

@@ -31,7 +31,7 @@ data class UrlLikePath(
 }
 
 interface RockScreen {
-    val title: Readable<String> get() = Constant(this::class.toString().removePrefix("class ").removeSuffix("Screen").camelToHuman())
+    val title: Readable<String> get() = Constant(this::class.simpleName.toString().camelToHuman())
     fun ViewWriter.render()
     object Empty: RockScreen {
         override fun ViewWriter.render() {

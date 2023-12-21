@@ -2,7 +2,10 @@ package com.lightningkite.rock.views.canvas
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.SurfaceView
 import android.view.View
+import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.FontAndStyle
 import com.lightningkite.rock.models.Paint
 
 
@@ -13,8 +16,10 @@ abstract class DrawingView : View {
 
 
 }
-actual abstract class DrawingContext2D(val view: View) {
-    actual abstract fun save()
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual abstract class DrawingContext2D {
+
+    actual fun save() {}
     actual abstract fun restore()
     actual abstract fun scale(x: Double, y: Double)
     actual abstract fun rotate(angle: Double)
@@ -103,3 +108,30 @@ actual val DrawingContext2D.width: Double
     get() = TODO("implemenet")
 actual val DrawingContext2D.height: Double
     get() = TODO("implemenet")
+
+actual fun DrawingContext2D.drawCircle(
+    x: Double,
+    y: Double,
+    radius: Double,
+    startAngle: Double,
+    endAngle: Double,
+    anticlockwise: Boolean
+) {
+}
+
+actual fun DrawingContext2D.drawText(
+    text: String,
+    x: Double,
+    y: Double,
+    maxWidth: Double
+) {
+}
+
+actual fun DrawingContext2D.font(
+    size: Dimension,
+    value: FontAndStyle
+) {
+}
+
+actual fun DrawingContext2D.textAlign(alignment: TextAlign) {
+}

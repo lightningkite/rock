@@ -3,7 +3,6 @@ import com.lightningkite.rock.RockPluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import java.util.*
 
 plugins {
@@ -11,7 +10,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.google.devtools.ksp")
     kotlin("native.cocoapods")
-//    id("com.android.library")
+    id("com.android.library")
 }
 apply<RockPlugin>()
 
@@ -27,19 +26,10 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     jvm()
-//    androidTarget()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-//    listOf(
-//        iosX64(),
-//        iosArm64(),
-//        iosSimulatorArm64()
-//    ).forEach {
-//        it.binaries.framework {
-//            baseName = "library"
-//        }
-//    }
+    androidTarget()
     js {
         binaries.executable()
         browser {
@@ -114,24 +104,25 @@ configure<RockPluginExtension> {
     this.packageName = "com.lightningkite.mppexampleapp"
 }
 
-//android {
-//    namespace = "$group.mppexampleapp"
-//    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-//    compileSdk = 31
-//
-//    defaultConfig {
-//        minSdk = 21
-//    }
-//    compileOptions {
-//        // Flag to enable support for the new language APIs
-//        isCoreLibraryDesugaringEnabled = true
-//        sourceCompatibility = JavaVersion.VERSION_1_8
-//        targetCompatibility = JavaVersion.VERSION_1_8
-//    }
-//    dependencies {
-//        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-//    }
-//}
+android {
+    namespace = "$group.mppexampleapp"
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    compileSdk = 31
+
+    defaultConfig {
+        minSdk = 21
+    }
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        isCoreLibraryDesugaringEnabled = true
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    dependencies {
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+    }
+}
 
 //tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
 //    this.args

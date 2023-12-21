@@ -3,42 +3,71 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.GradientDrawable.Orientation
+import android.net.Uri
 import android.text.InputType
+import android.util.AttributeSet
 import android.view.Gravity
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatToggleButton
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.setMargins
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
+import com.lightningkite.rock.R
+import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.await
+import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.*
+import timber.log.Timber
+import java.util.*
+import kotlin.collections.set
 import android.webkit.WebView as AndroidWebView
 import android.widget.AutoCompleteTextView as AndroidCompleteTextView
-import android.widget.Button as AndroidButton
 import android.widget.CheckBox as AndroidCheckbox
 import android.widget.RadioButton as AndroidRadioButton
 import android.widget.TextView as AndroidTextView
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
+import com.lightningkite.rock.models.Paint as RockPaint
 
 
 @ViewDsl
 actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {
+    viewElement(factory = ::NSeparator, wrapper = ::Separator) {
+        native.updateLayoutParams {
+            width = LayoutParams.MATCH_PARENT
+            height = (2 * native.resources.displayMetrics.density).toInt()
+        }
+        applyTheme(native, viewDraws = false)
+        setup(this)
+    }
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -46,14 +75,17 @@ actual typealias NContainingView = ViewGroup
 
 actual typealias NTextView = AndroidTextView
 actual typealias NLabel = AndroidTextView
-actual typealias NLink = AndroidTextView
-actual typealias NExternalLink = AndroidTextView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NLink = LinkFrameLayout
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NExternalLink = FrameLayout
+
 actual typealias NImage = ImageView
 actual typealias NActivityIndicator = ProgressBar
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSpace = View
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NButton = android.widget.Button
+actual typealias NButton = FrameLayout
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NCheckbox = android.widget.CheckBox
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -61,7 +93,7 @@ actual typealias NRadioButton = android.widget.RadioButton
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSwitch = SwitchCompat
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NToggleButton = View
+actual typealias NToggleButton = FrameLayout
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRadioToggleButton = View
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -79,7 +111,7 @@ actual typealias NSelect = AppCompatSpinner
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NAutoCompleteTextField = AndroidCompleteTextView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NSwapView = AndroidSwapView
+actual typealias NSwapView = FrameLayout
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NWebView = android.webkit.WebView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -88,42 +120,61 @@ actual typealias NCanvas = SurfaceView
 actual typealias NRecyclerView = androidx.recyclerview.widget.RecyclerView
 
 @ViewDsl
-actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) = element(::FrameLayout, ::ContainingView, setup)
+actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) = viewElement(
+    factory = ::FrameLayout,
+    wrapper = ::ContainingView
+) {
+    applyTheme(native, viewDraws = false) { theme, view ->
+        view.background = colorDrawable(theme.background.colorInt())
+    }
+    setup(this)
+}
 
 @ViewDsl
 actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
-    element(::LinearLayout, ::ContainingView) {
+    viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.VERTICAL
+        applyTheme(l, viewDraws = false)
         setup(ContainingView(l))
     }
-
 }
 
 @ViewDsl
 actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
-    element(::LinearLayout, ::ContainingView) {
+    viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.HORIZONTAL
+        applyTheme(l, viewDraws = false)
         setup(ContainingView(l))
     }
 }
 
 @ViewDsl
-actual fun ViewWriter.button(setup: Button.() -> Unit) = element(::AndroidButton, ::Button, setup)
-
-fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
-    val androidText = native
-    androidText.textSize = textSize
-    setup(TextView(androidText))
+actual fun ViewWriter.button(setup: Button.() -> Unit) {
+    viewElement(factory = ::FrameLayout, wrapper = ::ContainingView) {
+        val frame = native as FrameLayout
+        applyTheme(frame)
+        setup(Button(frame))
+    }
 }
 
-fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) = element(::AndroidTextView, ::TextView) {
-    val androidText = native
-    androidText.textSize = textSize
-    androidText.setTypeface(androidText.typeface, Typeface.BOLD)
-    setup(TextView(androidText))
-}
+fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
+    viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
+        val androidText = native
+        androidText.textSize = textSize
+        applyTheme(native, foreground = applyTextColorFromTheme)
+        setup(TextView(androidText))
+    }
+
+fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) =
+    viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
+        val androidText = native
+        androidText.textSize = textSize
+        androidText.setTypeface(androidText.typeface, Typeface.BOLD)
+        applyTheme(native, foreground = applyTextColorFromTheme)
+        setup(TextView(androidText))
+    }
 
 object TextSizes {
     var h1 = 26f
@@ -163,36 +214,50 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement(TextS
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement(TextSizes.subtext, setup)
 actual var Link.to: RockScreen
     get() {
-        TODO("NOT IMPLEMENTED")
-//        return runBlocking {
-//            (native.context as RockActivity).navigator.currentScreen.await()!!
-//        }
+        val rockScreen: RockScreen
+        runBlocking {
+            rockScreen = (native.context as RockActivity).navigator.currentScreen.await()!!
+        }
+        return rockScreen
     }
     set(value) {
-        TODO("Not Implemented")
+        native.setOnClickListener {
+            native.navigator.navigate(value)
+        }
     }
 
 actual var Link.newTab: Boolean
     get() {
-        TODO()
+        return false
     }
     set(value) {
-        TODO("NOT IMPLEMENTED")
+        Timber.d("New Tab called with value $value")
     }
-
 
 actual var ExternalLink.to: String
     get() {
-        TODO()
+        return (native.tag as? Pair<UUID, String>)?.second ?: ""
     }
     set(value) {
-
+        native.tag = UUID.randomUUID() to value
+        native.setOnClickListener { view ->
+            val intent = Intent().apply {
+                action = Intent.ACTION_VIEW
+                categories.add(Intent.CATEGORY_APP_BROWSER)
+                data = Uri.parse(value)
+            }
+            view.context.packageManager.resolveActivity(intent, intent.flags)?.let {
+                view.context.startActivity(intent)
+            }
+        }
     }
 actual var ExternalLink.newTab: Boolean
     get() {
-        TODO()
+        return false
     }
-    set(value) {}
+    set(value) {
+        Timber.d("WHAT AM I? $value")
+    }
 
 
 actual var Image.source: ImageSource
@@ -201,7 +266,47 @@ actual var Image.source: ImageSource
     }
     set(value) {
         native.tag = value
-        native.setImageDrawable((value as ImageResource).drawable)
+        when (value) {
+            is ImageRaw -> {
+                //TODO()
+            }
+
+            is ImageRemote -> {
+                //TODO()
+            }
+
+            is ImageResource -> {
+                Timber.d("HITHER AND THITHER IMAGE RESOURCE")
+                native.setImageDrawable(value.drawable)
+            }
+
+            is ImageVector -> {
+//                val drawable = VectorDrawableCreator.getVectorDrawable(
+//                    context = native.context,
+//                    width = value.width.value.toInt(),
+//                    height = value.height.value.toInt(),
+//                    viewportWidth = value.viewBoxWidth.toFloat(),
+//                    viewportHeight = value.viewBoxHeight.toFloat(),
+//                    paths = value.paths.map {
+//                        val path = VectorDrawableCreator.PathData(
+//                            it.path,
+//                            it.fillColor?.closestColor()?.toInt() ?: 0
+//                        )
+//                        path
+//                    }
+//                )
+                native.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        native.context,
+                        R.drawable.ic_android_black_24dp
+                    )
+                )
+            }
+
+            else -> {
+                throw RuntimeException("Android View Tag is not an Image Source")
+            }
+        }
     }
 actual var Image.scaleType: ImageScaleType
     get() {
@@ -266,7 +371,7 @@ actual var TextView.align: Align
     }
 actual var TextView.textSize: Dimension
     get() {
-        return Dimension(native.textSize.toInt())
+        return Dimension(native.textSize)
     }
     set(value) {
         native.textSize = value.value.toFloat()
@@ -489,7 +594,7 @@ actual var LocalTimeField.range: ClosedRange<LocalTime>?
             .rangeTo(LocalTime(23, 59, 59, 0))
     }
     set(value) {
-        TODO("Not Implemented")
+//        TODO("Not Implemented")
     }
 
 
@@ -813,14 +918,13 @@ actual var AutoCompleteTextField.action: Action?
 
 private class RockStringAdapter(context: Context, resource: Int, objects: List<String>) :
     ArrayAdapter<String>(context, resource, objects) {
-        val items: List<String> = objects
-    }
+    val items: List<String> = objects
+}
 
 actual var AutoCompleteTextField.suggestions: List<String>
     get() {
         return (native.adapter as RockStringAdapter).items
     }
-
     set(value) {
         native.setAdapter(RockStringAdapter(native.context, AndroidAppContext.autoCompleteLayoutResource, value))
     }
@@ -850,13 +954,13 @@ actual var WebView.content: String
     }
 
 
-
 actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {}
 fun View.addLayoutChangeListener(listener: () -> Unit): () -> Unit {
     NativeListeners.listeners.addListener(this, listener)
     this.addOnLayoutChangeListener /* listener = */ { _, _, _, _, _, _, _, _, _ -> listener() }
     return removeListener(listener)
 }
+
 actual val Canvas.width: Readable<Double>
     get() {
         return object : Readable<Double> {
@@ -889,12 +993,145 @@ actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Dou
 
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {}
 
+fun View.setPaddingAll(padding: Int) = setPadding(padding, padding, padding, padding)
+fun View.setMarginAll(margin: Int) {
+    Timber.d("SET MARGIN ALL: $margin for view $this")
+    (layoutParams as? MarginLayoutParams)?.setMargins(margin)
+}
+private fun colorDrawable(color: Int): ColorDrawable = ColorDrawable(color)
+private fun RockPaint.colorInt(): Int = closestColor().toInt()
+private fun CornerRadii.toFloatArray(): FloatArray {
+    return floatArrayOf(
+        topLeft.value,
+        topLeft.value,
+        topRight.value,
+        topRight.value,
+        bottomLeft.value,
+        bottomLeft.value,
+        bottomRight.value,
+        bottomRight.value
+    )
+}
+
+private fun noCorners(): FloatArray {
+    return floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
+}
+
+private fun LinearGradient.orientation(): Orientation {
+    return when (angle.degrees.toInt()) {
+        in 0..90 -> GradientDrawable.Orientation.LEFT_RIGHT
+        in 91..180 -> GradientDrawable.Orientation.TOP_BOTTOM
+        in 181..270 -> GradientDrawable.Orientation.RIGHT_LEFT
+        in 271..360 -> GradientDrawable.Orientation.BOTTOM_TOP
+        else -> GradientDrawable.Orientation.LEFT_RIGHT
+    }
+}
+
+private fun View.noBorderElevationOrCorners() {
+    setMarginAll(0)
+    (background as? GradientDrawable)?.cornerRadii = noCorners()
+    elevation = 0f
+    invalidate()
+}
+
+val applyTextColorFromTheme: (Theme, AndroidTextView) -> Unit = { theme, textView ->
+    textView.setTextColor(theme.foreground.colorInt())
+}
+
+fun <T : View>ViewWriter.applyTheme(
+    view: T,
+    id: String = UUID.randomUUID().toString(),
+    viewDraws: Boolean = true,
+    background: (Theme) -> Unit = {},
+    backgroundRemove: () -> Unit = {},
+    foreground: (Theme, T) -> Unit = { _, _  -> },
+) {
+
+    val rootTheme = themeStack.size == 1
+    val themeGetter = themeStack.lastOrNull() ?: { null }
+    val theme2 = currentTheme
+    val themeChanged = themeJustChanged
+    themeJustChanged = false
+
+    calculationContext.reactiveScope {
+//        Timber.d("THEME JUST CHANGED!!!!")
+        Timber.d("SET BACKGROUND ON $id")
+        val theme = theme2()
+        val useBackground = themeChanged && themeGetter() != null
+        if (rootTheme) {
+            view.noBorderElevationOrCorners()
+            return@reactiveScope
+        }
+
+        if (viewDraws) {
+            view.setMarginAll(theme.spacing.value.toInt())
+        }
+
+        if (useBackground || viewDraws && !rootTheme) {
+            view.setPaddingAll(theme.spacing.value.toInt())
+            view.setMarginAll(theme.spacing.value.toInt())
+        } else {
+            view.setMarginAll(0)
+            view.setPaddingAll(0)
+            view.invalidate()
+        }
+
+        if (useBackground) {
+            var nativeProperties: ViewProperty? = view.tag as? ViewProperty
+//
+            val tagId = view.tag as? String ?: ""
+            if (tagId.isNotEmpty()) {
+                nativeProperties = viewPropertiesMap[tagId]
+            }
+
+            val gradientDrawable = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                val containsMarginLess = nativeProperties?.properties?.contains(ViewProperties.MARGINLESS) ?: false
+                if (!containsMarginLess) {
+                    cornerRadii = theme.cornerRadii.toFloatArray()
+                    setStroke(theme.outlineWidth.value.toInt(), theme.outline.colorInt())
+                }
+
+                when(theme.background) {
+                    is Color -> {
+                        colors = intArrayOf(theme.background.colorInt(), theme.background.colorInt())
+                    }
+                    is LinearGradient -> {
+                        colors = theme.background.stops.map { it.color.toInt() }.toIntArray()
+                        orientation = theme.background.orientation()
+                        gradientType = GradientDrawable.LINEAR_GRADIENT
+                    }
+                    is RadialGradient -> {
+                        colors = theme.background.stops.map { it.color.toInt() }.toIntArray()
+                        gradientType = GradientDrawable.RADIAL_GRADIENT
+                    }
+                }
+            }
+
+            view.background = gradientDrawable
+            background(theme)
+        } else {
+            backgroundRemove()
+        }
+        foreground(theme, view)
+    }
+}
+
+private val viewPropertiesMap: WeakHashMap<String, ViewProperty> = WeakHashMap()
+
+data class ViewProperty(val properties: List<ViewProperties>)
+enum class ViewProperties {
+    MARGINLESS
+}
+
 actual val ViewWriter.marginless: ViewWrapper
     get() {
-        beforeNextElementSetup {
-            this.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                setMargins(0, 0, 0, 0)
-            }
+        afterNextElementSetup {
+            val idTag = UUID.randomUUID().toString()
+            this.tag = idTag
+            viewPropertiesMap[idTag] = ViewProperty(listOf(ViewProperties.MARGINLESS))
+
+            this.noBorderElevationOrCorners()
         }
         return ViewWrapper
     }
@@ -940,10 +1177,13 @@ private fun alignmentToGravity(alignment: Align, isVertical: Boolean): Int {
 @ViewModifierDsl3
 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     beforeNextElementSetup {
-        val params = this.layoutParams as LayoutParams
+        val params = this.layoutParams as ViewGroup.LayoutParams
         val horizontalGravity = alignmentToGravity(horizontal, isVertical = false)
         val verticalGravity = alignmentToGravity(vertical, isVertical = true)
-        params.gravity = horizontalGravity or verticalGravity
+        if (params is LinearLayout.LayoutParams)
+            params.gravity = horizontalGravity or verticalGravity
+        else if (params is FrameLayout.LayoutParams)
+            params.gravity = horizontalGravity or verticalGravity
         if (horizontal == Align.Stretch) {
             params.width = LayoutParams.MATCH_PARENT
         }
@@ -960,18 +1200,24 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 @ViewModifierDsl3
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
-        val scrollView = ScrollView(this.currentView.context)
-        scrollView.addChild(this.currentView)
-
+        wrapNext(ScrollView(this.currentView.context)) {
+            layoutParams = ViewGroup.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
+        }
         return ViewWrapper
     }
 
 @ViewModifierDsl3
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
-        val scrollView = HorizontalScrollView(this.currentView.context)
-        scrollView.addChild(this.currentView)
-
+        wrapNext(HorizontalScrollView(this.currentView.context)) {
+            layoutParams = ViewGroup.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT
+            )
+        }
         return ViewWrapper
     }
 
@@ -984,45 +1230,70 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
         minimumHeight = if (constraints.minHeight == null) {
             0
         } else {
-            constraints.minHeight.value
+            constraints.minHeight.value.toInt()
         }
 
         minimumWidth = if (constraints.minWidth == null) {
             0
         } else {
-            constraints.minWidth.value
+            constraints.minWidth.value.toInt()
         }
 
-        updateLayoutParams { this.height = height; this.width = width }
+        updateLayoutParams { this.height = height.toInt(); this.width = width.toInt() }
     }
     return ViewWrapper
 }
 
 @ViewDsl
 actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit) {
-    return element(::ProgressBar, ::ActivityIndicator, setup)
+    return viewElement(factory = ::ProgressBar, wrapper = ::ActivityIndicator) {
+        applyTheme(native)
+        setup(this)
+    }
 }
+
+var linkCounter = 0;
 
 @ViewDsl
 actual fun ViewWriter.link(setup: Link.() -> Unit) {
-    return element(::AndroidTextView, ::Link, setup)
+    return viewElement(factory = ::LinkFrameLayout, wrapper = ::Link) {
+        native.navigator = navigator
+        linkCounter++
+        applyTheme(native, "LinkView: $linkCounter")
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit) {
-    return element(::ImageView, ::Image, setup)
+    return viewElement(factory = ::ImageView, wrapper = ::Image) {
+        applyTheme(native) { theme, view ->
+            afterNextElementSetup {
+                view.drawable?.colorFilter = PorterDuffColorFilter(theme.foreground.colorInt(), PorterDuff.Mode.MULTIPLY)
+            }
+        }
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.space(setup: Space.() -> Unit) {
-    return element(::View, ::Space, setup)
+    return viewElement(factory = ::NSpace, wrapper = ::Space) {
+        applyTheme(native)
+        setup(this)
+    }
 }
 
 actual fun ViewWriter.space(
     multiplier: Double,
     setup: Space.() -> Unit,
 ) {
-    return element(::View, ::Space, setup)
+    return viewElement(factory = ::View, wrapper = ::Space) {
+        applyTheme(native) { theme, view, ->
+            view.setPaddingAll((theme.spacing.value * multiplier).toInt())
+            setup(this)
+        }
+    }
 }
 
 actual class NDismissBackground(c: Context) : NView(c)
@@ -1030,76 +1301,100 @@ actual class NDismissBackground(c: Context) : NView(c)
 
 @ViewDsl
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
-    TODO("NOT YET CERTAIN WHAT THE POINT OF THIS IS.  Probably will understand better or know how to implement after I implement themes.")
+    currentView.background = null
 }
 
 @ViewDsl
 actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
-    return element(::AndroidCheckbox, ::Checkbox, setup)
+    return viewElement(factory = ::AndroidCheckbox, wrapper = ::Checkbox) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit) {
-    return element(::AndroidRadioButton, ::RadioButton, setup)
+    return viewElement(factory = ::AndroidRadioButton, wrapper = ::RadioButton) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.switch(setup: Switch.() -> Unit) {
-    return element(::SwitchCompat, ::Switch, setup)
+    return viewElement(factory = ::SwitchCompat, wrapper = ::Switch) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit) {
-    return element(::AppCompatToggleButton, ::ToggleButton, setup)
+    return viewElement(factory = ::FrameLayout, wrapper = ::ToggleButton) {
+        applyTheme(native)
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit) {
-    return element(::AndroidDateField, ::LocalDateField) {
+    return viewElement(factory = ::AndroidDateField, wrapper = ::LocalDateField) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
         setup()
     }
 }
 
 @ViewDsl
 actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit) {
-    return element(::AndroidTimeField, ::LocalTimeField) {
+    return viewElement(factory = ::AndroidTimeField, wrapper = ::LocalTimeField) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
         setup()
     }
 }
 
 @ViewDsl
 actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit) {
-    return element(::AndroidDateTimeField, ::LocalDateTimeField) { setup() }
+    return viewElement(factory = ::AndroidDateTimeField, wrapper = ::LocalDateTimeField) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        setup()
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit) {
-    return element(::AppCompatToggleButton, ::RadioToggleButton, setup)
+    return viewElement(factory = ::AppCompatToggleButton, wrapper = ::RadioToggleButton) {
+        applyTheme(native)
+        setup(this)
+    }
 }
+
 
 @ViewDsl
 actual fun ViewWriter.textField(setup: TextField.() -> Unit) {
-    return element(::EditText, ::TextField, setup)
+    return viewElement(factory = ::EditText, wrapper = ::TextField) {
+        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        setup(this)
+    }
 }
 
 @ViewDsl
 actual fun ViewWriter.textArea(setup: TextArea.() -> Unit) {
-    return element(::EditText, ::TextArea, setup)
+    return viewElement(factory = ::EditText, wrapper = ::TextArea, setup = setup)
 }
 
 @ViewDsl
 actual fun ViewWriter.select(setup: Select.() -> Unit) {
-    return element(::AppCompatSpinner, ::Select, setup)
+    return viewElement(factory = ::AppCompatSpinner, wrapper = ::Select, setup = setup)
 }
 
 @ViewDsl
 actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit) {
-    return element(::AndroidCompleteTextView, ::AutoCompleteTextField, setup)
+    return viewElement(factory = ::AndroidCompleteTextView, wrapper = ::AutoCompleteTextField, setup = setup)
 }
 
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
-    return element(::AndroidSwapView, ::SwapView, setup)
+    return viewElement(factory = ::FrameLayout, wrapper = ::SwapView, setup = setup)
 }
 
 @ViewDsl
@@ -1111,21 +1406,38 @@ actual fun SwapView.swap(
     transition: ScreenTransition,
     createNewView: () -> Unit,
 ) {
+    val oldView = this.native.getChildAt(0)
+    val newViewIndex = if (oldView == null) {
+        0
+    } else {
+        1
+    }
+
+    val newView = this.native.getChildAt(newViewIndex)
+
+    TransitionManager.beginDelayedTransition(native, TransitionSet().apply {
+        transition.exit?.addTarget(oldView ?: View(native.context))
+        transition.enter?.addTarget(newView)
+        transition.enter?.let { addTransition(it) }
+        transition.exit?.let { addTransition(it) }
+    })
+    oldView?.let { oldNN -> native.removeView(oldNN) }
+    createNewView()
 }
 
 @ViewDsl
 actual fun ViewWriter.webView(setup: WebView.() -> Unit) {
-    return element(::AndroidWebView, ::WebView, setup)
+    return viewElement(factory = ::AndroidWebView, wrapper = ::WebView, setup = setup)
 }
 
 @ViewDsl
 actual fun ViewWriter.canvas(setup: Canvas.() -> Unit) {
-    return element(::SurfaceView, ::Canvas, setup)
+    return viewElement(factory = ::SurfaceView, wrapper = ::Canvas, setup = setup)
 }
 
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
-    element(::AndroidRecyclerView, ::RecyclerView) {
+    viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
         native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.VERTICAL, false)
         setup()
     }
@@ -1133,7 +1445,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
-    element(::AndroidRecyclerView, ::RecyclerView) {
+    viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
         native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.HORIZONTAL, false)
         setup()
     }
@@ -1141,7 +1453,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
-    element(::AndroidRecyclerView, ::RecyclerView) {
+    viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
         native.layoutManager = GridLayoutManager(currentView.context, 3)
         setup()
     }
@@ -1149,7 +1461,9 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
 
 actual var RecyclerView.columns: Int
     get() = 1
-    set(value) { TODO() }
+    set(value) {
+        TODO("WHAT")
+    }
 
 @ViewModifierDsl3
 actual fun ViewWriter.hasPopover(
@@ -1157,17 +1471,22 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit,
 ): ViewWrapper {
-    TODO("Not yet implemented")
+//    TODO("Not yet implemented")
+    return ViewWrapper
 }
 
 @ViewDsl
 actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) {
-    TODO("Implement")
+    viewElement(factory = ::FrameLayout, wrapper = ::ExternalLink, setup = setup)
 }
 
 @ViewDsl
 actual fun ViewWriter.label(setup: Label.() -> Unit) {
-    element(::AndroidTextView, ::Label, setup)
+    viewElement(factory = ::AndroidTextView, wrapper = ::Label, setup = setup)
 }
 
-actual class NSeparator(c: Context) : NView(c)
+actual class NSeparator : View {
+    constructor(context: Context?) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+}

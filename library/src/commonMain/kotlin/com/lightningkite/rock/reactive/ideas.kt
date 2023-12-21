@@ -31,7 +31,7 @@ suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
     set(action(await()))
 }
 
-class Property<T>(startValue: T) : Writable<T>, ReadWriteProperty<Any?, T> {
+class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = HashSet<() -> Unit>()
     var value: T = startValue
         set(value) {

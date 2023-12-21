@@ -62,7 +62,7 @@ interface AppNav {
 
 val ViewWriter.appNavFactory by viewWriterAddon<Property<ViewWriter.(AppNav.() -> Unit) -> Unit>>(
     Property(
-        ViewWriter::appNavTopAndLeft
+        ViewWriter::appNavBottomTabs
     )
 )
 
@@ -73,7 +73,9 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             val alt = split()
             reactiveScope {
-                val viewMaker = appNavFactory.await()
+                val viewMaker = appNavFactory
+                    .await()
+
                 swap {
                     viewMaker.invoke(alt, setup)
                 }
@@ -93,7 +95,6 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val showMenu = Property(false)
     col {
-// Nav 1 hamburger
         row {
             setup(appNav)
             toggleButton {
@@ -242,7 +243,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                         } in gravity(Align.Center, Align.Center)
                         subtext { ::content { it.await().title } } in gravity(Align.Center, Align.Center)
                     }
-                } in weight(1f) in marginless in themeFromLast { existing ->
+                } in weight(1f) in themeFromLast { existing ->
                     if (navigator.currentScreen.await() == it.await().destination)
                         (existing.bar() ?: existing).down()
                     else

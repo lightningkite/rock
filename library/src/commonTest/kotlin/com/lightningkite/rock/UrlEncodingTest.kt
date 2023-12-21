@@ -11,6 +11,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.properties.Properties
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class UrlEncodingTest {
     @Serializable

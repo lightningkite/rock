@@ -34,6 +34,10 @@ abstract class CommonSymbolProcessor(
             .let {
                 it.substring(it.indexOfLast { it.isUpperCase() }.coerceAtLeast(0))
             }
+            .let {
+                if(it == "Debug" || it == "Release") "Main"
+                else it
+            }
         val outFolder = projectFolder.resolve("build/generated/ksp/common/common$flavor/kotlin")
         outFolder.mkdirs()
         val createdFiles = HashSet<File>()

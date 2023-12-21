@@ -6,7 +6,6 @@ import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.*
 
 val appTheme = Property<Theme>(MaterialLikeTheme(title = FontAndStyle(font = Resources.fontsMontserrat)))
@@ -14,7 +13,7 @@ fun ViewWriter.app() {
 
     appNav(AutoRoutes) {
         appName = "Rock Sample App"
-        ::navItems{
+        ::navItems {
             listOf(
                 NavItem("Home", Icon.home, RootScreen),
                 NavItem("Themes", Icon.sync, ThemesScreen),
@@ -23,7 +22,7 @@ fun ViewWriter.app() {
                 NavItem("Forms", Icon.done, FormsScreen)
             )
         }
-        ::currentUser{
+        ::currentUser {
             ProfileInfo(
                 UserInfo("Test User", null, Icon.person),
             )

@@ -1,25 +1,22 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
-import android.view.View
-import com.lightningkite.rock.reactive.Writable
-import com.lightningkite.rock.views.NView
-import com.lightningkite.rock.views.RView
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewWriter
-import java.util.UUID
+import com.lightningkite.rock.views.*
 import java.util.WeakHashMap
-import kotlin.properties.ReadWriteProperty
 
 
-@ViewDsl
-inline fun <T: NView, W: RView<T>> ViewWriter.element(factory: (Context)->T, wrapper: (T)->W, crossinline setup: W.() -> Unit) {
+fun <T: NView, W: RView<T>> ViewWriter.viewElement(
+    factory: (Context) -> T,
+    wrapper: (T) -> W,
+    setup: W.() -> Unit,
+) {
     val native = factory(currentView.context)
     val wrapped = wrapper(native)
     element(native) {
         setup(wrapped)
     }
 }
+
 
 class ViewListeners<T: NView> {
     private val map = WeakHashMap<T, MutableList<()->Unit>>()

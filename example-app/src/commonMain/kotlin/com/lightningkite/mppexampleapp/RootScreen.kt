@@ -38,7 +38,7 @@ object RootScreen : RockScreen {
                     row {
                         text { ::content{ screen.title.await() } } in weight(1f)
                         image { source = Icon.chevronRight.toImageSource(Color.black) }
-                    }
+                    } in marginless
                 } in card
 
                 linkScreen(ThemesScreen)

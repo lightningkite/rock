@@ -1074,16 +1074,21 @@ fun <T : View>ViewWriter.applyTheme(
         }
 
         if (useBackground) {
-            val nativeProperties: ViewProperty? = view.tag as? ViewProperty
-            val containsMarginLess = nativeProperties?.properties
-                ?.contains(ViewProperties.MARGINLESS) ?: false
+            var nativeProperties: ViewProperty? = view.tag as? ViewProperty
+//
+            val tagId = view.tag as? String ?: ""
+            if (tagId.isNotEmpty()) {
+                nativeProperties = viewPropertiesMap[tagId]
+            }
 
             val gradientDrawable = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
+                val containsMarginLess = nativeProperties?.properties?.contains(ViewProperties.MARGINLESS) ?: false
                 if (!containsMarginLess) {
                     cornerRadii = theme.cornerRadii.toFloatArray()
                     setStroke(theme.outlineWidth.value.toInt(), theme.outline.colorInt())
                 }
+
                 when(theme.background) {
                     is Color -> {
                         colors = intArrayOf(theme.background.colorInt(), theme.background.colorInt())
@@ -1109,6 +1114,8 @@ fun <T : View>ViewWriter.applyTheme(
     }
 }
 
+private val viewPropertiesMap: WeakHashMap<String, ViewProperty> = WeakHashMap()
+
 data class ViewProperty(val properties: List<ViewProperties>)
 enum class ViewProperties {
     MARGINLESS
@@ -1117,7 +1124,10 @@ enum class ViewProperties {
 actual val ViewWriter.marginless: ViewWrapper
     get() {
         afterNextElementSetup {
-            this.tag = ViewProperty(listOf(ViewProperties.MARGINLESS))
+            val idTag = UUID.randomUUID().toString()
+            this.tag = idTag
+            viewPropertiesMap[idTag] = ViewProperty(listOf(ViewProperties.MARGINLESS))
+
             this.noBorderElevationOrCorners()
         }
         return ViewWrapper

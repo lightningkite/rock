@@ -298,7 +298,7 @@ actual var Image.source: ImageSource
                 native.setImageDrawable(
                     ContextCompat.getDrawable(
                         native.context,
-                        R.drawable.ic_android_black_24dp
+                        android.R.drawable.ic_menu_camera
                     )
                 )
             }

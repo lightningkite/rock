@@ -1,6 +1,5 @@
 package com.lightningkite.rock.models
 
-import com.lightningkite.rock.navigation.RockScreen
 import kotlin.jvm.JvmInline
 
 class AnimationId

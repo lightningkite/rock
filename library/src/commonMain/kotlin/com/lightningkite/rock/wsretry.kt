@@ -17,7 +17,6 @@ fun retryWebsocket(
     val onBinaryMessageList = ArrayList<(Blob) -> Unit>()
     val onCloseList = ArrayList<(Short) -> Unit>()
     fun reset() {
-        println("Resetting...")
         currentWebSocket = websocket(url).also {
             onOpenList.forEach { l -> it.onOpen(l) }
             onMessageList.forEach { l -> it.onMessage(l) }
@@ -53,9 +52,6 @@ fun retryWebsocket(
                 val shouldBeOn = shouldBeOn.await() > 0
                 val isOn = connected.await()
                 delay(currentDelay)
-                println("Checking if we should be on...")
-                println("shouldBeOn: $shouldBeOn")
-                println("isOn: $isOn")
                 if (shouldBeOn && !isOn) {
                     reset()
                 } else if (!shouldBeOn && isOn) {

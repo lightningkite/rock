@@ -19,7 +19,7 @@ interface CalculationContext {
         override fun onRemove(action: () -> Unit) {}
     }
     class Standard: CalculationContext, Cancellable {
-        val onRemoveSet = HashSet<()->Unit>()
+        val onRemoveSet = ArrayList<()->Unit>()
         override fun onRemove(action: () -> Unit) {
             onRemoveSet.add(action)
         }

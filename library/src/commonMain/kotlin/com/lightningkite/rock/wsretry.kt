@@ -119,7 +119,7 @@ val <RECEIVE> TypedWebSocket<*, RECEIVE>.mostRecentMessage: Readable<RECEIVE?>
         var value: RECEIVE? = null
             private set
 
-        val listeners = HashSet<() -> Unit>()
+        val listeners = ArrayList<() -> Unit>()
 
         init {
             onMessage {

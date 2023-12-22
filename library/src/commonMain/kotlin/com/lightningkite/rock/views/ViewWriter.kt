@@ -35,7 +35,7 @@ class ViewWriter(
 
     private val stack = arrayListOf(parent)
     val currentView: NView get() = stack.last()
-    private fun <T : NView> stackUse(item: T, action: T.() -> Unit) =
+    private inline fun <T : NView> stackUse(item: T, action: T.() -> Unit) =
         CalculationContextStack.useIn(item.calculationContext) {
             stack.add(item)
             try {
@@ -121,7 +121,6 @@ class ViewWriter(
      */
     fun <T : NView> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
-            stack.last().addChild(this)
             val beforeCopy =
                 if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
             beforeNextElementSetupList = ArrayList()
@@ -139,6 +138,7 @@ class ViewWriter(
                 stack.last().addChild(item)
                 toPop--
             }
+            stack.last().addChild(this)
 //            wrapperToDoList.clear()
         }
     }

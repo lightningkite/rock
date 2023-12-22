@@ -32,7 +32,7 @@ suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
 }
 
 class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
-    private val listeners = HashSet<() -> Unit>()
+    private val listeners = ArrayList<() -> Unit>()
     var value: T = startValue
         set(value) {
             field = value
@@ -48,7 +48,10 @@ class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
     override fun addListener(listener: () -> Unit): () -> Unit {
         listeners.add(listener)
         return {
-            listeners.remove(listener)
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
         }
     }
 
@@ -66,7 +69,7 @@ class Constant<T>(val value: T) : Readable<T> {
 
 private class ReactiveScopeData(val rerun: () -> Unit) : CoroutineContext.Element {
     val removers: HashMap<ResourceUse, () -> Unit> = HashMap()
-    val latestPass: HashSet<ResourceUse> = HashSet()
+    val latestPass: ArrayList<ResourceUse> = ArrayList()
     override val key: CoroutineContext.Key<ReactiveScopeData> = Key
 
     object Key : CoroutineContext.Key<ReactiveScopeData>
@@ -171,7 +174,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             action(ctx)
         }
 
-        private val listeners = HashSet<() -> Unit>()
+        private val listeners = ArrayList<() -> Unit>()
         override fun addListener(listener: () -> Unit): () -> Unit {
             if (listeners.isEmpty()) {
                 // startup
@@ -213,7 +216,10 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             }
         }
         private fun removeListener(listener: () -> Unit) {
-            listeners.remove(listener)
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
             if (listeners.isEmpty()) {
                 // shutdown
                 removers.forEach { it() }

@@ -242,9 +242,9 @@ actual typealias NDismissBackground = HTMLDivElement
 actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit =
     themedElementPrivateMeta<NDismissBackground>(
         name = "span",
-        themeLogic = { _, _ ->
-            classList.add("dismissBackground")
-            classList.add("inclBack")
+        themeLogic = { _, _, virtualClasses ->
+            virtualClasses.add("dismissBackground")
+            virtualClasses.add("inclBack")
         },
         setup = {
             setup(DismissBackground(this))

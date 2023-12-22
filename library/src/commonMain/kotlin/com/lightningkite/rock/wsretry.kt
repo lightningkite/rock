@@ -37,6 +37,8 @@ fun retryWebsocket(
 
     return object : RetryWebsocket, CalculationContext {
 
+        override val connected: Readable<Boolean>
+            get() = connected
         val shouldBeOn = Property(0)
 
         override fun start(): () -> Unit {
@@ -103,6 +105,8 @@ interface RetryWebsocket : WebSocket, TypedWebSocket<String, String> {
 
 
 interface TypedWebSocket<SEND, RECEIVE>: ResourceUse {
+    val connected: Readable<Boolean>
+
     fun close(code: Short, reason: String)
     fun send(data: SEND)
     fun onOpen(action: () -> Unit)
@@ -146,6 +150,8 @@ fun <SEND, RECEIVE> RetryWebsocket.typed(
     send: KSerializer<SEND>,
     receive: KSerializer<RECEIVE>
 ): TypedWebSocket<SEND, RECEIVE> = object : TypedWebSocket<SEND, RECEIVE> {
+    override val connected: Readable<Boolean>
+        get() = this@typed.connected
     override fun start(): () -> Unit = this@typed.start()
     override fun close(code: Short, reason: String) = this@typed.close(code, reason)
     override fun onOpen(action: () -> Unit) = this@typed.onOpen(action)

@@ -35,6 +35,7 @@ class RouterGeneration(
             .takeIf { it.isNotEmpty() }
             ?.map { it.source.packageName.asString() }
             ?.reduce { a, b -> a.commonPrefixWith(b) }
+            ?.removeSuffix(".")
             ?: ""
 
         createNewFile(
@@ -100,7 +101,7 @@ class RouterGeneration(
                                             appendLine(").apply {")
                                             tab {
                                                 for (qp in routable.queryParameters) {
-                                                    appendLine("UrlProperties.decodeFromStringMap<${qp.type}>(\"${qp.qpName}\", it.parameters)?.let { this.${qp.name}.value = it }")
+                                                    appendLine("UrlProperties.decodeFromStringMap<${qp.type.toKotlin()}>(\"${qp.qpName}\", it.parameters)?.let { this.${qp.name}.value = it }")
                                                 }
                                             }
                                             appendLine("}")
@@ -204,4 +205,19 @@ class ParsedRoutable(
             )
         }
         .sortedBy { it.qpName }
+}
+
+fun KSTypeReference.toKotlin(annotations: Sequence<KSAnnotation>? = null): String =
+    this.resolve().toKotlin(annotations ?: this.resolve().annotations)
+
+fun KSType.toKotlin(annotations: Sequence<KSAnnotation> = this.annotations): String {
+    (this.declaration as? KSTypeParameter)?.let { return it.name.asString() }
+
+    val annotationString = annotations.joinToString(" ") {
+        it.toString()
+    }.let { if (it.isBlank()) "" else "$it " }
+
+    return annotationString + (declaration.qualifiedName!!.asString() + if (arguments.isNotEmpty() && this.declaration !is KSTypeAlias) {
+        arguments.joinToString(", ", "<", ">") { it.type?.toKotlin() ?: "*" }
+    } else "") + if (isMarkedNullable) "?" else ""
 }

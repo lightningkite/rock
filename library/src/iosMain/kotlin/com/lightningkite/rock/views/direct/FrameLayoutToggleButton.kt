@@ -5,6 +5,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
@@ -36,6 +37,17 @@ class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()), UIViewWithSizeO
                 selected = on
                 sendActionsForControlEvents(UIControlEventValueChanged)
             }
+        }
+    }
+
+    val checkedWritable: Writable<Boolean> = object : Writable<Boolean> {
+        override suspend fun awaitRaw(): Boolean = on
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            return onEvent(UIControlEventValueChanged) { listener() }
+        }
+
+        override suspend fun set(value: Boolean) {
+            on = value
         }
     }
 }

@@ -84,10 +84,11 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         stack {
             val nav = navigator.dialog
             dismissBackground {
-                onClick { nav.dismiss() } }
+                onClick { nav.dismiss() }
+            } in marginless
             ::exists { nav.currentScreen.await() != null }
             navigatorViewDialog() in scrolls in dialog in gravity(Align.Center, Align.Center)
-        }
+        } in marginless
     } in marginless
 }
 

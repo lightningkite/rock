@@ -5,6 +5,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.objc.KeyValueObserverProtocol
+import com.lightningkite.rock.reactive.await
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -34,6 +35,23 @@ inline fun UIControl.onEvent(events: UIControlEvents, crossinline action: ()->Un
         }
         ref.target = null
     }
+    return {
+        ref.target?.let {
+            removeTarget(it, sel, events)
+        }
+        ref.target = null
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+inline fun UIControl.onEventNoRemove(events: UIControlEvents, crossinline action: ()->Unit): ()->Unit {
+    val actionHolder = object: NSObject() {
+        @ObjCAction
+        fun eventHandler() = action()
+    }
+    val sel = sel_registerName("eventHandler")
+    addTarget(actionHolder, sel, events)
+    val ref = Ref(actionHolder)
     return {
         ref.target?.let {
             removeTarget(it, sel, events)
@@ -114,6 +132,35 @@ class NextFocusDelegate: NSObject(), UITextFieldDelegateProtocol {
             it.becomeFirstResponder()
         } ?: textField.resignFirstResponder()
         return true
+    }
+}
+
+inline fun ViewWriter.handleThemeControl(view: UIControl, crossinline checked: suspend ()->Boolean = { false }, setup: ()->Unit) {
+    val s = view.stateReadable
+    withThemeGetter({
+        if(checked()) return@withThemeGetter it().selected()
+        val state = s.await()
+        when {
+            state and UIControlStateDisabled != 0UL -> it().disabled()
+            state and UIControlStateHighlighted != 0UL -> it().down()
+            state and UIControlStateFocused != 0UL -> it().hover()
+            else -> it()
+        }
+    }) {
+        if(transitionNextView == ViewWriter.TransitionNextView.No) {
+            transitionNextView = ViewWriter.TransitionNextView.Maybe {
+                if(checked()) return@Maybe true
+                val state = s.await()
+                when {
+                    state and UIControlStateDisabled != 0UL -> true
+                    state and UIControlStateHighlighted != 0UL -> true
+                    state and UIControlStateFocused != 0UL -> true
+                    else -> false
+                }
+            }
+        }
+        handleTheme(view, viewDraws = false)
+        setup()
     }
 }
 

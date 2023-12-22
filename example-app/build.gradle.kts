@@ -77,7 +77,7 @@ kotlin {
         version = "1.0"
         summary = "Some description for a Kotlin/Native module"
         homepage = "Link to a Kotlin/Native module homepage"
-        ios.deploymentTarget = "11.0"
+        ios.deploymentTarget = "12.0"
 
         // Optional properties
         // Configure the Pod name here instead of changing the Gradle project name

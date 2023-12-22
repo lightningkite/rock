@@ -8,11 +8,14 @@ import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
+import com.lightningkite.rock.views.l2.icon
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.useContents
 import kotlinx.datetime.*
 import platform.Foundation.NSDate
 import platform.UIKit.*
+import platform.darwin.NSInteger
 import platform.darwin.NSObject
 import platform.objc.sel_registerName
 
@@ -51,10 +54,12 @@ actual typealias NLink = NativeLink
 
 @ViewDsl
 actual fun ViewWriter.link(setup: Link.() -> Unit): Unit = element(NativeLink()) {
-    handleTheme(this, viewDraws = false)
-    setup(Link(this))
-    onNavigator = navigator
+    handleThemeControl(this) {
+        setup(Link(this))
+        onNavigator = navigator
+    }
 }
+
 actual inline var Link.to: RockScreen
     get() = native.toScreen ?: RockScreen.Empty
     set(value) {
@@ -62,22 +67,30 @@ actual inline var Link.to: RockScreen
     }
 actual inline var Link.newTab: Boolean
     get() = native.newTab
-    set(value) { native.newTab = value }
+    set(value) {
+        native.newTab = value
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NExternalLink = NativeLink
 
 @ViewDsl
 actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit): Unit = element(NativeLink()) {
-    handleTheme(this, viewDraws = false)
-    setup(ExternalLink(this))
+    handleThemeControl(this) {
+        setup(ExternalLink(this))
+    }
 }
+
 actual inline var ExternalLink.to: String
     get() = native.toUrl ?: ""
-    set(value) { native.toUrl = value }
+    set(value) {
+        native.toUrl = value
+    }
 actual inline var ExternalLink.newTab: Boolean
     get() = native.newTab
-    set(value) { native.newTab = value }
+    set(value) {
+        native.newTab = value
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NImage = UIImageView
@@ -88,35 +101,40 @@ actual fun ViewWriter.image(setup: Image.() -> Unit): Unit = element(NImage()) {
     this.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
     setup(Image(this))
 }
+
 actual inline var Image.source: ImageSource
     get() = TODO()
     set(value) {
-        when(value) {
+        when (value) {
             is ImageRaw -> {
                 native.image = UIImage(data = value.data.toNSData())
                 native.informParentOfSizeChange()
             }
+
             is ImageRemote -> {
                 launch {
                     native.image = UIImage(data = fetch(value.url).blob().data)
                     native.informParentOfSizeChange()
                 }
             }
+
             is ImageResource -> {
                 native.image = UIImage.imageNamed(value.name)
                 native.informParentOfSizeChange()
             }
+
             is ImageVector -> {
                 native.image = value.render()
                 native.informParentOfSizeChange()
             }
+
             else -> {}
         }
     }
 actual inline var Image.scaleType: ImageScaleType
     get() = TODO()
     set(value) {
-        when(value) {
+        when (value) {
             ImageScaleType.Fit -> native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
             ImageScaleType.Crop -> native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFill
             ImageScaleType.Stretch -> native.contentMode = UIViewContentMode.UIViewContentModeScaleToFill
@@ -138,80 +156,88 @@ actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.6)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.4)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.3)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.2)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.1)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.0)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
-        it.body.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 0.8)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
-        it.body.let { this.font = it.font.get(font.pointSize, if(it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
     }
     setup(TextView(this))
 }
+
 actual inline var TextView.content: String
     get() = native.text ?: ""
     set(value) {
@@ -238,7 +264,7 @@ actual inline var TextView.textSize: Dimension
     get() = Dimension(native.font.pointSize)
     set(value) {
         native.extensionFontAndStyle?.let {
-            native.font = it.font.get(value.value, if(it.bold) UIFontWeightBold else UIFontWeightRegular)
+            native.font = it.font.get(value.value, if (it.bold) UIFontWeightBold else UIFontWeightRegular)
         }
     }
 
@@ -255,9 +281,16 @@ actual inline var Label.content: String
 actual typealias NActivityIndicator = UIActivityIndicatorView
 
 @ViewDsl
-actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit = element(UIActivityIndicatorView()) {
-    setup(ActivityIndicator(this))
-}
+actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
+    element(UIActivityIndicatorView()) {
+        hidden = false
+        startAnimating()
+        handleTheme(this) {
+            this.color = it.foreground.closestColor().toUiColor()
+        }
+        extensionSizeConstraints = SizeConstraints(minWidth = 2.rem, minHeight = 2.rem)
+        setup(ActivityIndicator(this))
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSpace = UIView
@@ -266,6 +299,7 @@ actual typealias NSpace = UIView
 actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = element(UIView()) {
     setup(Space(this))
 }
+
 actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit = element(UIView()) {
     handleTheme(this) {
         extensionSizeConstraints = SizeConstraints(minHeight = it.spacing * multiplier)
@@ -274,18 +308,19 @@ actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit =
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NDismissBackground = FrameLayout
+actual typealias NDismissBackground = UIView
 
 @ViewDsl
-actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit = element(FrameLayout()) {
+actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit = element(UIView()) {
     handleTheme(this) {
         backgroundColor = it.background.closestColor().copy(alpha = 0.5f).toUiColor()
     }
     setup(DismissBackground(this))
 }
+
 @OptIn(ExperimentalForeignApi::class)
 actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit {
-    val actionHolder = object: NSObject() {
+    val actionHolder = object : NSObject() {
         @ObjCAction
         fun eventHandler() = launch(action)
     }
@@ -303,57 +338,60 @@ actual typealias NButton = FrameLayoutButton
 
 @ViewDsl
 actual fun ViewWriter.button(setup: Button.() -> Unit): Unit = element(FrameLayoutButton()) {
-    val s = stateReadable
-    withThemeGetter({
-        val state = s.await()
-        when {
-            state and UIControlStateDisabled != 0UL -> it().disabled()
-            state and UIControlStateHighlighted != 0UL -> it().down()
-            state and UIControlStateFocused != 0UL -> it().hover()
-            else -> it()
-        }
-    }) {
-        if(transitionNextView == ViewWriter.TransitionNextView.No) {
-            transitionNextView = ViewWriter.TransitionNextView.Maybe {
-                val state = s.await()
-                when {
-                    state and UIControlStateDisabled != 0UL -> true
-                    state and UIControlStateHighlighted != 0UL -> true
-                    state and UIControlStateFocused != 0UL -> true
-                    else -> false
-                }
-            }
-        }
-        handleTheme(this, viewDraws = false)
+    handleThemeControl(this) {
         setup(Button(this))
     }
 }
+
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
     native.onEvent(UIControlEventTouchUpInside) { launch(action) }
 }
+
 actual inline var Button.enabled: Boolean
     get() = native.enabled
-    set(value) { native.enabled = value }
+    set(value) {
+        native.enabled = value
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NCheckbox = UIView
+actual typealias NCheckbox = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit = todo("checkbox")
+actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit {
+    val checked = Property(false)
+    transitionNextView = ViewWriter.TransitionNextView.Yes
+    toggleButton {
+        this.checked bind checked
+        icon(Icon.done, "") {
+            ::visible { checked.await() }
+        } in marginless
+        setup(Checkbox(this.native))
+    }
+}
 actual inline var Checkbox.enabled: Boolean
-    get() = TODO()
-    set(value) {}
-actual val Checkbox.checked: Writable<Boolean> get() = Property(false)
+    get() = native.enabled
+    set(value) { native.enabled = value }
+actual val Checkbox.checked: Writable<Boolean> get() =  native.checkedWritable
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NRadioButton = UIView
+actual typealias NRadioButton = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit = todo("radioButton")
+actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit {
+    val checked = Property(false)
+    transitionNextView = ViewWriter.TransitionNextView.Yes
+    radioToggleButton {
+        this.checked bind checked
+        icon(Icon.done, "") {
+            ::visible { checked.await() }
+        } in marginless
+        setup(RadioButton(this.native))
+    }
+}
 actual inline var RadioButton.enabled: Boolean
-    get() = TODO()
-    set(value) {}
-actual val RadioButton.checked: Writable<Boolean> get() = Property(false)
+    get() = native.enabled
+    set(value) { native.enabled = value }
+actual val RadioButton.checked: Writable<Boolean> get() =  native.checkedWritable
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSwitch = UISwitch
@@ -365,189 +403,259 @@ actual fun ViewWriter.switch(setup: Switch.() -> Unit): Unit = element(UISwitch(
     }
     setup(Switch(this))
 }
+
 actual inline var Switch.enabled: Boolean
     get() = native.enabled
-    set(value) { native.enabled = value }
-actual val Switch.checked: Writable<Boolean> get() {
-    return object: Writable<Boolean> {
-        override suspend fun awaitRaw(): Boolean = native.on
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            return native.onEvent(UIControlEventValueChanged) { listener() }
-        }
-        override suspend fun set(value: Boolean) { native.on = value }
+    set(value) {
+        native.enabled = value
     }
-}
+actual val Switch.checked: Writable<Boolean>
+    get() {
+        return object : Writable<Boolean> {
+            override suspend fun awaitRaw(): Boolean = native.on
+            override fun addListener(listener: () -> Unit): () -> Unit {
+                return native.onEvent(UIControlEventValueChanged) { listener() }
+            }
+
+            override suspend fun set(value: Boolean) {
+                native.on = value
+            }
+        }
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NToggleButton = FrameLayoutToggleButton
 
 @ViewDsl
 actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = element(FrameLayoutToggleButton()) {
-    handleTheme(this, viewDraws = false)
-    setup(ToggleButton(this))
-}
-actual inline var ToggleButton.enabled: Boolean
-    get() = native.enabled
-    set(value) { native.enabled = value }
-actual val ToggleButton.checked: Writable<Boolean> get() {
-    return object: Writable<Boolean> {
-        override suspend fun awaitRaw(): Boolean = native.on
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            return native.onEvent(UIControlEventValueChanged) { listener() }
-        }
-        override suspend fun set(value: Boolean) { native.on = value }
+    handleThemeControl(this, { checkedWritable.await() }) {
+        setup(ToggleButton(this))
     }
 }
+
+actual inline var ToggleButton.enabled: Boolean
+    get() = native.enabled
+    set(value) {
+        native.enabled = value
+    }
+actual val ToggleButton.checked: Writable<Boolean> get() = native.checkedWritable
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRadioToggleButton = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = element(FrameLayoutToggleButton()) {
-    handleTheme(this, viewDraws = false)
-    allowUnselect = false
-    setup(RadioToggleButton(this))
-}
+actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit =
+    element(FrameLayoutToggleButton()) {
+        handleThemeControl(this, { checkedWritable.await() }) {
+            allowUnselect = false
+            setup(RadioToggleButton(this))
+        }
+    }
+
 actual inline var RadioToggleButton.enabled: Boolean
     get() = native.enabled
-    set(value) { native.enabled = value }
-actual val RadioToggleButton.checked: Writable<Boolean> get() {
-    return object: Writable<Boolean> {
-        override suspend fun awaitRaw(): Boolean = native.on
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            return native.onEvent(UIControlEventValueChanged) { listener() }
-        }
-        override suspend fun set(value: Boolean) { native.on = value }
+    set(value) {
+        native.enabled = value
     }
-}
+actual val RadioToggleButton.checked: Writable<Boolean> get() = native.checkedWritable
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NLocalDateField = FrameLayoutInputButton
+actual typealias NLocalDateField = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit = element(FrameLayoutInputButton()) {
-    handleTheme(this, viewDraws = false)
-    val p = Property<LocalDate?>(null)
-    currentValue = p
-    _inputView = UIDatePicker().apply {
-        datePickerMode = UIDatePickerMode.UIDatePickerModeDate
-        date = p.value?.toNSDateComponents()?.date() ?: NSDate()
-        onEvent(UIControlEventValueChanged) {
-            p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date
+actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit = stack {
+    element(TextFieldInput()) {
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        val p = Property<LocalDate?>(null)
+        currentValue = p
+        inputView = UIDatePicker().apply {
+            setPreferredDatePickerStyle(UIDatePickerStyle.UIDatePickerStyleInline)
+            datePickerMode = UIDatePickerMode.UIDatePickerModeDate
+            date = p.value?.toNSDateComponents()?.date() ?: NSDate()
+            this@element.calculationContext.onRemove(onEventNoRemove(UIControlEventValueChanged) {
+                p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date
+                text = p.value?.toString() ?: "Pick one"
+            })
         }
+        setup(LocalDateField(this))
+        text = p.value?.toString() ?: "Pick one"
     }
-    setup(LocalDateField(this))
 }
+
 actual var LocalDateField.action: Action?
     get() = native.action
-    set(value) { native.action = value }
-actual val LocalDateField.content: Writable<LocalDate?> get() {
-    @Suppress("UNCHECKED_CAST")
-    return native.currentValue as Property<LocalDate?>
-}
+    set(value) {
+        native.action = value
+    }
+actual val LocalDateField.content: Writable<LocalDate?>
+    get() {
+        @Suppress("UNCHECKED_CAST")
+        return native.currentValue as Property<LocalDate?>
+    }
 actual inline var LocalDateField.range: ClosedRange<LocalDate>?
     get() {
         @Suppress("UNCHECKED_CAST")
         return native.valueRange as ClosedRange<LocalDate>
     }
-    set(value) { native.valueRange = value }
+    set(value) {
+        native.valueRange = value
+    }
+
+//@Suppress("ACTUAL_WITHOUT_EXPECT")
+//actual typealias NLocalTimeField = UIDatePicker
+//
+//@ViewDsl
+//actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = stack {
+//    element(UIDatePicker()){
+//        setPreferredDatePickerStyle(UIDatePickerStyle.UIDatePickerStyleCompact)
+////        handleTheme(this) { this. = it.foreground.closestColor().toUiColor() }
+//        datePickerMode = UIDatePickerMode.UIDatePickerModeTime
+//    }
+//}
+//
+//actual var LocalTimeField.action: Action?
+//    get() = TODO()
+//    set(value) {}
+//actual val LocalTimeField.content: Writable<LocalTime?> get() = object: Writable<LocalTime?> {
+//    override suspend fun set(value: LocalTime?) {
+//        native.date = value?.atDate(1970, 1, 1)?.toNSDateComponents()?.date() ?: NSDate()
+//    }
+//
+//    override suspend fun awaitRaw(): LocalTime? = native.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).time
+//
+//    override fun addListener(listener: () -> Unit): () -> Unit {
+//        return native.onEvent(UIControlEventValueChanged, listener)
+//    }
+//
+//}
+//actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
+//    get() = TODO()
+//    set(value) {
+//    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NLocalTimeField = FrameLayoutInputButton
+actual typealias NLocalTimeField = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = element(FrameLayoutInputButton()) {
-    handleTheme(this, viewDraws = false)
-    val p = Property<LocalTime?>(null)
-    currentValue = p
-    _inputView = UIDatePicker().apply {
-        datePickerMode = UIDatePickerMode.UIDatePickerModeTime
-        date = p.value?.atDate(1970, 1, 1)?.toNSDateComponents()?.date() ?: NSDate()
-        onEvent(UIControlEventValueChanged) {
-            p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).time
+actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = stack {
+    element(TextFieldInput()) {
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        val p = Property<LocalTime?>(null)
+        currentValue = p
+        inputView = UIDatePicker().apply {
+            setPreferredDatePickerStyle(UIDatePickerStyle.UIDatePickerStyleWheels)
+            datePickerMode = UIDatePickerMode.UIDatePickerModeTime
+            date = p.value?.atDate(1970, 1, 1)?.toNSDateComponents()?.date() ?: NSDate()
+            this@element.calculationContext.onRemove(onEventNoRemove(UIControlEventValueChanged) {
+                p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).time
+                text = p.value?.toString() ?: "Pick one"
+            })
         }
+        setup(LocalTimeField(this))
+        text = p.value?.toString() ?: "Pick one"
     }
-    setup(LocalTimeField(this))
 }
+
 actual var LocalTimeField.action: Action?
     get() = native.action
-    set(value) { native.action = value }
-actual val LocalTimeField.content: Writable<LocalTime?> get() {
-    @Suppress("UNCHECKED_CAST")
-    return native.currentValue as Property<LocalTime?>
-}
+    set(value) {
+        native.action = value
+    }
+actual val LocalTimeField.content: Writable<LocalTime?>
+    get() {
+        @Suppress("UNCHECKED_CAST")
+        return native.currentValue as Property<LocalTime?>
+    }
 actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
     get() {
         @Suppress("UNCHECKED_CAST")
         return native.valueRange as ClosedRange<LocalTime>
     }
-    set(value) { native.valueRange = value }
+    set(value) {
+        native.valueRange = value
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NLocalDateTimeField = FrameLayoutInputButton
+actual typealias NLocalDateTimeField = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): Unit = element(FrameLayoutInputButton()) {
-    handleTheme(this, viewDraws = false)
-    val p = Property<LocalDateTime?>(null)
-    currentValue = p
-    _inputView = UIDatePicker().apply {
-        datePickerMode = UIDatePickerMode.UIDatePickerModeDateAndTime
-        date = p.value?.toNSDateComponents()?.date() ?: NSDate()
-        onEvent(UIControlEventValueChanged) {
-            p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault())
+actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): Unit = stack {
+    element(TextFieldInput()) {
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        val p = Property<LocalDateTime?>(null)
+        currentValue = p
+        inputView = UIDatePicker().apply {
+            setPreferredDatePickerStyle(UIDatePickerStyle.UIDatePickerStyleWheels)
+            datePickerMode = UIDatePickerMode.UIDatePickerModeDateAndTime
+            date = p.value?.toNSDateComponents()?.date() ?: NSDate()
+            this@element.calculationContext.onRemove(onEventNoRemove(UIControlEventValueChanged) {
+                p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault())
+                text = p.value?.toString() ?: "Pick one"
+            })
         }
+        setup(LocalDateTimeField(this))
+        text = p.value?.toString() ?: "Pick one"
     }
-    setup(LocalDateTimeField(this))
 }
+
 actual var LocalDateTimeField.action: Action?
     get() = native.action
-    set(value) { native.action = value }
-actual val LocalDateTimeField.content: Writable<LocalDateTime?> get() {
-    @Suppress("UNCHECKED_CAST")
-    return native.currentValue as Property<LocalDateTime?>
-}
+    set(value) {
+        native.action = value
+    }
+actual val LocalDateTimeField.content: Writable<LocalDateTime?>
+    get() {
+        @Suppress("UNCHECKED_CAST")
+        return native.currentValue as Property<LocalDateTime?>
+    }
 actual inline var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() {
         @Suppress("UNCHECKED_CAST")
         return native.valueRange as ClosedRange<LocalDateTime>
     }
-    set(value) { native.valueRange = value }
+    set(value) {
+        native.valueRange = value
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NTextField = UITextField
 
 @ViewDsl
-actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit = element(UITextField()) {
-    smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
-    smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
-    handleTheme(this, viewDraws = true)
-    calculationContext.onRemove {
-        extensionDelegateStrongRef = null
+actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit = stack {
+    element(UITextField()) {
+        smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
+        smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        calculationContext.onRemove {
+            extensionDelegateStrongRef = null
+        }
+        setup(TextField(this))
     }
-    setup(TextField(this))
 }
-actual val TextField.content: Writable<String> get() = object: Writable<String> {
-    override suspend fun awaitRaw(): String = native.text ?: ""
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        return native.onEvent(UIControlEventEditingChanged) {
-            listener()
+
+actual val TextField.content: Writable<String>
+    get() = object : Writable<String> {
+        override suspend fun awaitRaw(): String = native.text ?: ""
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            return native.onEvent(UIControlEventEditingChanged) {
+                listener()
+            }
+        }
+
+        override suspend fun set(value: String) {
+            native.text = value
         }
     }
-    override suspend fun set(value: String) {
-        native.text = value
-    }
-}
 actual inline var TextField.keyboardHints: KeyboardHints
     get() = TODO()
     set(value) {
-        native.autocapitalizationType = when(value.case) {
+        native.autocapitalizationType = when (value.case) {
             KeyboardCase.None -> UITextAutocapitalizationType.UITextAutocapitalizationTypeNone
             KeyboardCase.Letters -> UITextAutocapitalizationType.UITextAutocapitalizationTypeAllCharacters
             KeyboardCase.Words -> UITextAutocapitalizationType.UITextAutocapitalizationTypeWords
             KeyboardCase.Sentences -> UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
         }
-        native.keyboardType = when(value.type) {
+        native.keyboardType = when (value.type) {
             KeyboardType.Text -> UIKeyboardTypeDefault
             KeyboardType.Integer -> UIKeyboardTypeNumberPad
             KeyboardType.Phone -> UIKeyboardTypePhonePad
@@ -559,7 +667,7 @@ actual var TextField.action: Action?
     get() = TODO()
     set(value) {
         native.delegate = action?.let {
-            val d = object: NSObject(), UITextFieldDelegateProtocol {
+            val d = object : NSObject(), UITextFieldDelegateProtocol {
                 override fun textFieldShouldReturn(textField: UITextField): Boolean {
                     launch { it.onSelect() }
                     return true
@@ -568,7 +676,7 @@ actual var TextField.action: Action?
             native.extensionDelegateStrongRef = d
             d
         } ?: NextFocusDelegateShared
-        native.returnKeyType = when(action?.title) {
+        native.returnKeyType = when (action?.title) {
             "Emergency Call" -> UIReturnKeyType.UIReturnKeyEmergencyCall
             "Go" -> UIReturnKeyType.UIReturnKeyGo
             "Next" -> UIReturnKeyType.UIReturnKeyNext
@@ -586,7 +694,9 @@ actual var TextField.action: Action?
     }
 actual inline var TextField.hint: String
     get() = native.placeholder ?: ""
-    set(value) { native.placeholder = value }
+    set(value) {
+        native.placeholder = value
+    }
 actual inline var TextField.range: ClosedRange<Double>?
     get() = TODO()
     set(value) {}
@@ -595,39 +705,46 @@ actual inline var TextField.range: ClosedRange<Double>?
 actual typealias NTextArea = UITextView
 
 @ViewDsl
-actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit = element(UITextView()) {
-    smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
-    smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
-    handleTheme(this, viewDraws = true)
-    setup(TextArea(this))
-    calculationContext.onRemove {
-        extensionDelegateStrongRef = null
-    }
-}
-actual val TextArea.content: Writable<String> get() = object: Writable<String> {
-    override suspend fun awaitRaw(): String = native.text ?: ""
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        native.setDelegate(object: NSObject(), UITextViewDelegateProtocol {
-            override fun textViewDidChange(textView: UITextView) {
-                listener()
-            }
-        })
-        return {
-            native.setDelegate(null)
+actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit = stack {
+    element(UITextView()) {
+        smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
+        smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        setup(TextArea(this))
+        calculationContext.onRemove {
+            extensionDelegateStrongRef = null
         }
     }
-    override suspend fun set(value: String) { native.text = value }
 }
+
+actual val TextArea.content: Writable<String>
+    get() = object : Writable<String> {
+        override suspend fun awaitRaw(): String = native.text ?: ""
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            native.setDelegate(object : NSObject(), UITextViewDelegateProtocol {
+                override fun textViewDidChange(textView: UITextView) {
+                    listener()
+                }
+            })
+            return {
+                native.setDelegate(null)
+            }
+        }
+
+        override suspend fun set(value: String) {
+            native.text = value
+        }
+    }
 actual inline var TextArea.keyboardHints: KeyboardHints
     get() = TODO()
     set(value) {
-        native.autocapitalizationType = when(value.case) {
+        native.autocapitalizationType = when (value.case) {
             KeyboardCase.None -> UITextAutocapitalizationType.UITextAutocapitalizationTypeNone
             KeyboardCase.Letters -> UITextAutocapitalizationType.UITextAutocapitalizationTypeAllCharacters
             KeyboardCase.Words -> UITextAutocapitalizationType.UITextAutocapitalizationTypeWords
             KeyboardCase.Sentences -> UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
         }
-        native.keyboardType = when(value.type) {
+        native.keyboardType = when (value.type) {
             KeyboardType.Text -> UIKeyboardTypeDefault
             KeyboardType.Integer -> UIKeyboardTypeNumberPad
             KeyboardType.Phone -> UIKeyboardTypePhonePad
@@ -640,14 +757,56 @@ actual inline var TextArea.hint: String
     set(value) {}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NSelect = UIView
+actual typealias NSelect = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = todo("select")
-actual val Select.selected: Writable<String?> get() = Property(null)
-actual inline var Select.options: List<WidgetOption>
-    get() = TODO()
-    set(value) {}
+actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = stack {
+    element(TextFieldInput()) {
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        val p = Property<String?>(null)
+        currentValue = p
+        inputView = UIPickerView().apply {
+        }
+        setup(Select(this))
+        text = p.value?.toString() ?: "Pick one"
+    }
+}
+actual fun <T> Select.bind(
+    edits: Writable<T>,
+    data: suspend () -> List<T>,
+    render: (T) -> String
+) {
+    val picker = (native.inputView as UIPickerView)
+    val source = object: NSObject(), UIPickerViewDataSourceProtocol, UIPickerViewDelegateProtocol {
+        var list: List<T> = listOf()
+
+        init {
+            reactiveScope {
+                list = data()
+                picker.reloadAllComponents()
+            }
+        }
+
+        override fun numberOfComponentsInPickerView(pickerView: UIPickerView): NSInteger = 1L
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun pickerView(pickerView: UIPickerView, numberOfRowsInComponent: NSInteger): NSInteger = list.size.toLong()
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun pickerView(pickerView: UIPickerView, titleForRow: NSInteger, forComponent: NSInteger): String? {
+            return render(list[titleForRow.toInt()])
+        }
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun pickerView(pickerView: UIPickerView, didSelectRow: NSInteger, inComponent: NSInteger) {
+            launch {
+                val item = list[didSelectRow.toInt()]
+                edits set item
+                native.text = render(item)
+            }
+        }
+    }
+    picker.setDataSource(source)
+    picker.setDelegate(source)
+    picker.extensionDelegateStrongRef = source
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NAutoCompleteTextField = UIView
@@ -675,16 +834,18 @@ actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) = element(FrameLayout
     handleTheme(this, viewDraws = false)
     setup(SwapView(this))
 }
+
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element(FrameLayout()) {
     handleTheme(this, viewDraws = false)
     hidden = true
     setup(SwapView(this))
 }
+
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
     native.clearChildren()
     createNewView()
-    native.hidden = native.subviews.isEmpty()
+    native.hidden = native.subviews.all { (it as UIView).hidden }
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -703,32 +864,39 @@ actual inline var WebView.content: String
     set(value) {}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NCanvas = UIView
+actual typealias NCanvas = CanvasView
 
 @ViewDsl
-actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = todo("canvas")
-actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit = TODO()
-actual val Canvas.width: Readable<Double> get() = Property(0.0)
-actual val Canvas.height: Readable<Double> get() = Property(0.0)
-actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit =
-    TODO()
-
-actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit =
-    TODO()
-
-actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit =
-    TODO()
-
-actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit =
-    TODO()
-
+actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element(CanvasView()) {
+    setup(Canvas(this))
+}
+actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {
+    this.native.draw = action
+    this.native.setNeedsDisplay()
+}
+actual val Canvas.width: Readable<Double> get() = Property(this.native.bounds.useContents { size.width })
+actual val Canvas.height: Readable<Double> get() = Property(this.native.bounds.useContents { size.height })
+actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.onPointerDown.add(action)
+}
+actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.onPointerMove.add(action)
+}
+actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.onPointerCancel.add(action)
+}
+actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
+    native.onPointerUp.add(action)
+}
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = UIView
 
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
+
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")
+
 @ViewDsl
 actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("gridRecyclerView")
 actual var RecyclerView.columns: Int
@@ -758,6 +926,7 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     }
     return ViewWrapper
 }
+
 @ViewModifierDsl3
 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     beforeNextElementSetup {
@@ -766,22 +935,27 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     }
     return ViewWrapper
 }
+
 @ViewModifierDsl3
-actual val ViewWriter.scrolls: ViewWrapper get() {
-    wrapNext(ScrollLayout()) {
-        handleTheme(this, viewDraws = false)
-        horizontal = false
+actual val ViewWriter.scrolls: ViewWrapper
+    get() {
+        wrapNext(ScrollLayout()) {
+            handleTheme(this, viewDraws = false)
+            horizontal = false
+        }
+        return ViewWrapper
     }
-    return ViewWrapper
-}
+
 @ViewModifierDsl3
-actual val ViewWriter.scrollsHorizontally: ViewWrapper get() {
-    wrapNext(ScrollLayout()) {
-        handleTheme(this, viewDraws = false)
-        horizontal = true
+actual val ViewWriter.scrollsHorizontally: ViewWrapper
+    get() {
+        wrapNext(ScrollLayout()) {
+            handleTheme(this, viewDraws = false)
+            horizontal = true
+        }
+        return ViewWrapper
     }
-    return ViewWrapper
-}
+
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
     beforeNextElementSetup {
@@ -789,18 +963,22 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
     }
     return ViewWrapper
 }
+
 @ViewModifierDsl3
-actual val ViewWriter.marginless: ViewWrapper get() {
-    beforeNextElementSetup {
-        extensionMarginless = true
+actual val ViewWriter.marginless: ViewWrapper
+    get() {
+        beforeNextElementSetup {
+            extensionMarginless = true
+        }
+        return ViewWrapper
     }
-    return ViewWrapper
-}
+
 @ViewModifierDsl3
-actual val ViewWriter.withDefaultPadding: ViewWrapper get() {
-    beforeNextElementSetup {
+actual val ViewWriter.withDefaultPadding: ViewWrapper
+    get() {
+        beforeNextElementSetup {
 //        extensionPadding
+        }
+        return ViewWrapper
     }
-    return ViewWrapper
-}
 // End

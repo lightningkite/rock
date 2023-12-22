@@ -172,8 +172,7 @@ expect class NSelect : NView
 @JvmInline
 value class Select(override val native: NSelect) : RView<NSelect>
 @ViewDsl expect fun ViewWriter.select(setup: Select.() -> Unit = {}): Unit
-expect val Select.selected: Writable<String?>
-expect var Select.options: List<WidgetOption>
+expect fun <T> Select.bind(edits: Writable<T>, data: suspend ()->List<T>, render: (T)->String = { it.toString() })
 
 expect class NAutoCompleteTextField : NView
 @JvmInline

@@ -140,24 +140,31 @@ actual typealias NTextView = HTMLElement
 
 @ViewDsl
 actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
+
 @ViewDsl
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
+
 @ViewDsl
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
+
 @ViewDsl
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
+
 @ViewDsl
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
+
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
 
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
+
 @ViewDsl
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement("span") {
     native.classList.add("subtext")
     setup()
 }
+
 actual inline var TextView.content: String
     get() = native.innerText
     set(value) {
@@ -301,6 +308,7 @@ fun <T : HTMLElement, V> T.vprop(
         override suspend fun set(value: V) {
             set(this@vprop, value)
         }
+
         private var block = false
 
         override fun addListener(listener: () -> Unit): () -> Unit {
@@ -423,8 +431,8 @@ actual val LocalDateField.content: Writable<LocalDate?>
 actual var LocalDateField.action: Action?
     get() = TODO()
     set(value) {
-        native.onkeyup = if(value == null) null else { ev ->
-            if(ev.keyCode == 13) {
+        native.onkeyup = if (value == null) null else { ev ->
+            if (ev.keyCode == 13) {
                 launch {
                     value.onSelect()
                 }
@@ -452,6 +460,7 @@ actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit =
         type = "time"
         setup(LocalTimeField(this))
     }
+
 actual val LocalTimeField.content: Writable<LocalTime?>
     get() = native.vprop(
         "input",
@@ -461,14 +470,15 @@ actual val LocalTimeField.content: Writable<LocalTime?>
             )?.time
         },
         {
-            valueAsDate = it?.let { LocalDateTime(LocalDate(1970, 1, 1), it).toInstant(TimeZone.currentSystemDefault()) }
+            valueAsDate =
+                it?.let { LocalDateTime(LocalDate(1970, 1, 1), it).toInstant(TimeZone.currentSystemDefault()) }
         }
     )
 actual var LocalTimeField.action: Action?
     get() = TODO()
     set(value) {
-        native.onkeyup = if(value == null) null else { ev ->
-            if(ev.keyCode == 13) {
+        native.onkeyup = if (value == null) null else { ev ->
+            if (ev.keyCode == 13) {
                 launch {
                     value.onSelect()
                 }
@@ -496,6 +506,7 @@ actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): 
         type = "datetime-local"
         setup(LocalDateTimeField(this))
     }
+
 actual val LocalDateTimeField.content: Writable<LocalDateTime?>
     get() = native.vprop(
         "input",
@@ -511,8 +522,8 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
 actual var LocalDateTimeField.action: Action?
     get() = TODO()
     set(value) {
-        native.onkeyup = if(value == null) null else { ev ->
-            if(ev.keyCode == 13) {
+        native.onkeyup = if (value == null) null else { ev ->
+            if (ev.keyCode == 13) {
                 launch {
                     value.onSelect()
                 }
@@ -588,8 +599,8 @@ actual inline var TextField.keyboardHints: KeyboardHints
 actual var TextField.action: Action?
     get() = TODO()
     set(value) {
-        native.onkeyup = if(value == null) null else { ev ->
-            if(ev.keyCode == 13) {
+        native.onkeyup = if (value == null) null else { ev ->
+            if (ev.keyCode == 13) {
                 launch {
                     value.onSelect()
                 }
@@ -661,13 +672,22 @@ actual typealias NSelect = HTMLSelectElement
 actual fun ViewWriter.select(setup: Select.() -> Unit): Unit =
     themedElementClickable<NSelect>("select") { setup(Select(this)) }
 
-actual val Select.selected: Writable<String?> get() = native.vprop("change", { value }, { value = it ?: "" })
-actual inline var Select.options: List<WidgetOption>
-    get() = TODO()
-    set(value) {
-        val v = this.native.value
-        native.__resetContentToOptionList(value, v)
+actual fun <T> Select.bind(
+    edits: Writable<T>,
+    data: suspend () -> List<T>,
+    render: (T) -> String
+) {
+    var list: List<T> = listOf()
+    reactiveScope {
+        list = data()
+        native.__resetContentToOptionList(list.mapIndexed { index, t ->
+            WidgetOption(index.toString(), render(t))
+        }, list.indexOf(edits.awaitRaw()).toString())
     }
+    native.onchange = {
+        launch { native.value.toIntOrNull()?.let { list.getOrNull(it) }?.let { edits set it } }
+    }
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NAutoCompleteTextField = HTMLInputElement
@@ -741,8 +761,8 @@ actual inline var AutoCompleteTextField.keyboardHints: KeyboardHints
 actual var AutoCompleteTextField.action: Action?
     get() = TODO()
     set(value) {
-        native.onkeyup = if(value == null) null else { ev ->
-            if(ev.keyCode == 13) {
+        native.onkeyup = if (value == null) null else { ev ->
+            if (ev.keyCode == 13) {
                 launch {
                     value.onSelect()
                 }
@@ -770,7 +790,7 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedE
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
     native.asDynamic().__ROCK__next = null
     val alreadyChanging = native.asDynamic().__ROCK__swapping as? Boolean
-    if(alreadyChanging == true) {
+    if (alreadyChanging == true) {
         native.asDynamic().__ROCK__next = transition to createNewView
         return
     }
@@ -784,7 +804,7 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
             view.style.animation = "${keyframeName}-exit 0.25s"
             val parent = view.parentElement
             window.setTimeout({
-                if(view.parentElement == parent) {
+                if (view.parentElement == parent) {
                     native.removeChild(view)
                 }
             }, 250)
@@ -799,7 +819,7 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
         native.hidden = true
     }
     native.asDynamic().__ROCK__swapping = false
-    (native.asDynamic().__ROCK__next as? Pair<ScreenTransition, ()->Unit>)?.let {
+    (native.asDynamic().__ROCK__next as? Pair<ScreenTransition, () -> Unit>)?.let {
         swap(it.first, it.second)
     }
 }
@@ -897,7 +917,9 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit =
 
 actual var RecyclerView.columns: Int
     get() = 1
-    set(value) { TODO() }
+    set(value) {
+        TODO()
+    }
 
 actual fun <T> RecyclerView.children(
     items: Readable<List<T>>,
@@ -907,7 +929,8 @@ actual fun <T> RecyclerView.children(
     writer.forEachUpdating(items, render)
 }
 
-@ViewModifierDsl3 actual fun ViewWriter.hasPopover(
+@ViewModifierDsl3
+actual fun ViewWriter.hasPopover(
     requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit
@@ -918,7 +941,7 @@ actual fun <T> RecyclerView.children(
         }
         style.position = "relative"
         element<HTMLDivElement>("div") {
-            if(!requireClick) classList.add("visibleOnParentHover")
+            if (!requireClick) classList.add("visibleOnParentHover")
             style.position = "absolute"
             style.zIndex = "9999"
             if (preferredDirection.horizontal) {
@@ -976,6 +999,7 @@ actual val ViewWriter.scrolls: ViewWrapper
         }
         return ViewWrapper
     }
+
 @ViewModifierDsl3
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
@@ -1020,6 +1044,7 @@ actual val ViewWriter.marginless: ViewWrapper
         }
         return ViewWrapper
     }
+
 @ViewModifierDsl3
 actual val ViewWriter.withDefaultPadding: ViewWrapper
     get() {

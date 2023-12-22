@@ -109,7 +109,7 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
 
 fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?){
     val it = child ?: return
-    if(it.hidden) return
+//    if(it.hidden) return
 //    if(
 //        it.extensionHorizontalAlign.let { it == null || it == Align.Stretch} &&
 //        it.extensionVerticalAlign.let { it == null || it == Align.Stretch}
@@ -119,6 +119,7 @@ fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?){
 //    it.extensionSizeConstraints?.takeIf { it.width != null && it.height != null }?.let {
 //        return
 //    }
+    informParentOfSizeChange()
 }
 
 data class Size(var width: Double = 0.0, var height: Double = 0.0, var margin: Double = 0.0) {

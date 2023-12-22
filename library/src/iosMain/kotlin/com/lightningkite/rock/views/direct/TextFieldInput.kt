@@ -9,19 +9,10 @@ import kotlinx.cinterop.*
 import platform.CoreGraphics.*
 import platform.UIKit.*
 import platform.objc.sel_registerName
-import com.lightningkite.rock.objc.UIResponderWithOverridesProtocol
-import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.reactive.Property
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithOverridesProtocol,
-    UIViewWithSizeOverridesProtocol {
-    var padding: Double
-        get() = extensionPadding ?: 0.0
-        set(value) { extensionPadding = value }
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews()
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
+class TextFieldInput: UITextField(CGRectZero.readValue()) {
 
     val toolbar = UIToolbar().apply {
         barStyle = UIBarStyleDefault
@@ -29,12 +20,14 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
         sizeToFit()
         setItems(listOf(
             UIBarButtonItem(barButtonSystemItem = UIBarButtonSystemItem.UIBarButtonSystemItemFlexibleSpace, target = null, action = null),
-            UIBarButtonItem(title = "Done", style = UIBarButtonItemStyle.UIBarButtonItemStylePlain, target = this, action = sel_registerName("done")),
+            UIBarButtonItem(title = "Done", style = UIBarButtonItemStyle.UIBarButtonItemStylePlain, target = this@TextFieldInput, action = sel_registerName("done")),
         ), animated = false)
+    }
+    init {
+        inputAccessoryView = toolbar
         onEvent(UIControlEventTouchUpInside) {
             becomeFirstResponder()
-            println("canBecomeFirstResponder: ${canBecomeFirstResponder}")
-            println("isFirstResponder: ${isFirstResponder}")
+            println("I am a first responder! $isFirstResponder $canBecomeFirstResponder ${this.canBecomeFirstResponder()} $canResignFirstResponder")
         }
     }
 
@@ -44,10 +37,6 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
         calculationContext.launch { action?.onSelect?.invoke() }
     }
 
-    override fun inputAccessoryView(): UIView? = null
-    var _inputView: UIView? = null
-    override fun inputView(): UIView? = _inputView
-    override fun canBecomeFirstResponder(): Boolean = true
     var currentValue: Property<*>? = null
     var valueRange: ClosedRange<*>? = null
     var action: Action? = null
@@ -55,11 +44,13 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
             field = value
             toolbar.setItems(listOf(
                 UIBarButtonItem(barButtonSystemItem = UIBarButtonSystemItem.UIBarButtonSystemItemFlexibleSpace, target = null, action = null),
-                UIBarButtonItem(title = value?.title ?: "Done", style = UIBarButtonItemStyle.UIBarButtonItemStylePlain, target = this, action = sel_registerName("done")),
+                UIBarButtonItem(title = value?.title ?: "Done", style = UIBarButtonItemStyle.UIBarButtonItemStylePlain, target = this@TextFieldInput, action = sel_registerName("done")),
             ), animated = false)
         }
 
     init {
         setUserInteractionEnabled(true)
     }
+
+    override fun caretRectForPosition(position: UITextPosition): CValue<CGRect> = CGRectMake(0.0, 0.0, 0.0, 0.0)
 }

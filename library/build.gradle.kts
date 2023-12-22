@@ -81,6 +81,7 @@ kotlin {
         val iosMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-darwin:2.3.7")
+                implementation("io.ktor:ktor-client-websockets:2.3.7")
             }
         }
 

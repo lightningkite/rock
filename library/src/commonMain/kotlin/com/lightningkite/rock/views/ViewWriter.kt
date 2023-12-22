@@ -133,12 +133,12 @@ class ViewWriter(
                 setup()
                 afterCopy.forEach { it(this) }
             }
+            stack.last().addChild(this)
             while (toPop > 0) {
                 val item = stack.removeLast()
                 stack.last().addChild(item)
                 toPop--
             }
-            stack.last().addChild(this)
 //            wrapperToDoList.clear()
         }
     }

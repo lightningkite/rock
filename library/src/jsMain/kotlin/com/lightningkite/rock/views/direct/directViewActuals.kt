@@ -21,22 +21,20 @@ internal inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
     crossinline setup: T.() -> Unit,
 ) = element<T>(name) {
     var previousThemeClass: String? = null
-    val rootTheme = themeStack.size == 1
-    val themeGetter = themeStack.lastOrNull()
+    val rootTheme = isRoot
+    isRoot = false
     val theme2 = currentTheme
-    val themeChanged = themeJustChanged
-    themeJustChanged = false
+    val themeChanged = transitionNextView
+    transitionNextView = ViewWriter.TransitionNextView.No
 
-    if (themeGetter != null) {
-        calculationContext.reactiveScope {
-            previousThemeClass?.let { classList.remove(it) }
-            val t = theme2()
-            val base = themeToClass(t)
-            classList.add(base)
-            previousThemeClass = base
+    calculationContext.reactiveScope {
+        previousThemeClass?.let { classList.remove(it) }
+        val t = theme2()
+        val base = themeToClass(t)
+        classList.add(base)
+        previousThemeClass = base
 
-            themeLogic(rootTheme, themeChanged && themeGetter() != null)
-        }
+        themeLogic(rootTheme, themeChanged != ViewWriter.TransitionNextView.No)
     }
     setup()
 }

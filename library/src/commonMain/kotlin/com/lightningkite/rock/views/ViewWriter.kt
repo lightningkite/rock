@@ -29,6 +29,7 @@ class ViewWriter(
     fun split(): ViewWriter = ViewWriter(stack.last(), startDepth = depth).also {
         it.addons.putAll(this.addons)
         it.currentTheme = currentTheme
+        it.isRoot = isRoot
         it.transitionNextView = transitionNextView
     }
 
@@ -72,6 +73,7 @@ class ViewWriter(
         class Maybe(val logic: suspend () -> Boolean): TransitionNextView
     }
     var transitionNextView: TransitionNextView = TransitionNextView.No
+    var isRoot: Boolean = true
 
     val calculationContext: CalculationContext = stack.last().calculationContext
 

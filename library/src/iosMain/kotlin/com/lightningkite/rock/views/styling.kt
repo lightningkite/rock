@@ -25,8 +25,21 @@ fun ViewWriter.handleTheme(
     val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
     val currentTheme = currentTheme
+    val isRoot = isRoot
+    this.isRoot = false
+
+    var firstTime = true
+    inline fun animateAfterFirst(crossinline action: ()->Unit) {
+        if(firstTime) {
+            firstTime = false
+            action()
+        } else {
+            UIView.animateWithDuration(0.25) { action() }
+        }
+    }
+
     view.calculationContext.reactiveScope {
-        var theme = currentTheme()
+        val theme = currentTheme()
 
         val shouldTransition = when(transition) {
             ViewWriter.TransitionNextView.No -> false
@@ -35,7 +48,7 @@ fun ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = (viewDraws || mightTransition)
+        val usePadding = (viewDraws || (mightTransition && !isRoot))
         val useMargins = (viewDraws || mightTransition) && !(view.extensionMarginless ?: false)
 
         val borders = !(view.extensionMarginless ?: false) && shouldTransition
@@ -51,7 +64,7 @@ fun ViewWriter.handleTheme(
             view.extensionPadding = 0.0
         }
 
-        UIView.animateWithDuration(0.25) {
+        animateAfterFirst {
             if (useBackground) {
                 when (val b = theme.background) {
                     is Color -> {

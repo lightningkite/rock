@@ -12,6 +12,7 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.icon
 
 @Routable("/")
 object RootScreen : RockScreen {
@@ -38,7 +39,7 @@ object RootScreen : RockScreen {
                     to = screen
                     row {
                         text { ::content{ screen.title.await() } } in weight(1f)
-                        image { source = Icon.chevronRight.toImageSource(Color.black) }
+                        icon(Icon.chevronRight, "Open")
                     }
                 } in card
 

@@ -3,6 +3,7 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.FontAndStyle
 import com.lightningkite.rock.models.SizeConstraints
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.*
@@ -65,3 +66,16 @@ var UIView.extensionHorizontalAlign: Align? by UIViewHorizontalAlign
 
 private val UIViewVerticalAlign = ExtensionProperty<UIView, Align>()
 var UIView.extensionVerticalAlign: Align? by UIViewVerticalAlign
+
+private val UIViewDelegateStrongRef = ExtensionProperty<UIView, NSObject>()
+var UIView.extensionDelegateStrongRef: NSObject? by UIViewDelegateStrongRef
+
+private val UIViewFontAndStyle = ExtensionProperty<UIView, FontAndStyle>()
+var UIView.extensionFontAndStyle: FontAndStyle? by UIViewFontAndStyle
+
+private val UIViewTextSize = ExtensionProperty<UIView, Double>()
+var UIView.extensionTextSize: Double? by UIViewTextSize
+
+private val UIViewMarginless = ExtensionProperty<UIView, Boolean>()
+var UIView.extensionMarginless: Boolean? by UIViewMarginless
+

@@ -29,37 +29,14 @@ fun <T> viewWriterAddonLateInit(): ReadWriteProperty<ViewWriter, T> = object : R
 var ViewWriter.navigator by viewWriterAddonLateInit<RockNavigator>()
 //var ViewContext.screenTransitions by viewContextAddon(ScreenTransitions.HorizontalSlide)
 
-var ViewWriter.themeStack by viewWriterAddon(listOf<suspend () -> Theme?>())
-val ViewWriter.currentTheme: suspend ()->Theme get() {
-    val currentStack = themeStack
-    return label@{
-        for(item in currentStack.asReversed())
-            item()?.let { return@label it }
-        MaterialLikeTheme()
-    }
-}
-@ViewModifierDsl3 inline fun ViewWriter.withTheme(theme: Theme, action: () -> Unit) {
-    val old = themeStack
-    themeStack += { theme }
-    try {
-        action()
-    } finally {
-        themeStack = old
-    }
-}
+@ViewModifierDsl3 inline fun ViewWriter.withTheme(theme: Theme, action: () -> Unit) = withThemeGetter({theme}, action)
 @ViewModifierDsl3 fun ViewWriter.setTheme(calculate: suspend ()-> Theme?): ViewWrapper {
-    val old = themeStack
-    themeStack += calculate
-    themeJustChanged = true
-    this.afterNextElementSetup {
-        themeStack = old
-        themeJustChanged = false
-    }
-    return ViewWrapper
+    transitionNextView = ViewWriter.TransitionNextView.Yes
+    return themeModifier { calculate() ?: it() }
 }
 @ViewModifierDsl3 inline fun ViewWriter.themeFromLast(crossinline calculate: suspend (Theme)->Theme?): ViewWrapper {
-    val previous = currentTheme
-    return setTheme { calculate(previous()) }
+    transitionNextView = ViewWriter.TransitionNextView.Yes
+    return themeModifier { val e = it(); calculate(e) ?: e }
 }
 @ViewModifierDsl3 val ViewWriter.card: ViewWrapper get() = themeFromLast { it }
 @ViewModifierDsl3 val ViewWriter.dialog: ViewWrapper get() = themeFromLast { it.dialog() }

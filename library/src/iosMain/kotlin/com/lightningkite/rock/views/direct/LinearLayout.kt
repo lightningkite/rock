@@ -4,10 +4,17 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
+import objcnames.classes.Protocol
 import platform.CoreGraphics.*
+import platform.Foundation.NSCoder
+import platform.QuartzCore.CALayer
+import platform.QuartzCore.CATransform3D
 import platform.UIKit.*
+import platform.darwin.NSInteger
+import platform.darwin.NSUInteger
 import kotlin.math.max
 
 //private val UIViewLayoutParams = ExtensionProperty<UIView, LayoutParams>()
@@ -16,11 +23,26 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class LinearLayout: UIView(CGRectZero.readValue()) {
+class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
     var horizontal: Boolean = true
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
+
+//    init { setUserInteractionEnabled(false) }
+
+    override fun subviewDidChangeSizing(view: UIView?) {
+        val it = view ?: return
+        if(it.hidden) return
+//        it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
+//            return
+//        }
+//        val m = it.extensionMargin ?: 0.0
+//        if(it.extensionWeight != null && it.extensionWeight!! > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
+//            return
+//        }
+        informParentOfSizeChange()
+    }
 
     data class Size(var primary: Double = 0.0, var secondary: Double = 0.0, var margin: Double = 0.0) {
     }
@@ -59,6 +81,18 @@ class LinearLayout: UIView(CGRectZero.readValue()) {
         var totalWeight = 0f
         return subviews.map {
             it as UIView
+            if(it.hidden) return@map Size(0.0, 0.0)
+//            it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
+//                remaining.primary -= it.primary!!.value
+//                return@map Size(primary = it.primary!!.value, secondary = it.secondary!!.value)
+//            }
+            val m = it.extensionMargin ?: 0.0
+//            it.extensionWeight?.let { w ->
+//                if(w > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
+//                    totalWeight += w
+//                    return@map Size(primary = (-w).toDouble(), secondary = remaining.secondary, margin = m)
+//                }
+//            }
             val required = it.sizeThatFits(remaining.objc).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
@@ -68,13 +102,11 @@ class LinearLayout: UIView(CGRectZero.readValue()) {
                 it.primary?.let { required.primary = it.value }
                 it.secondary?.let { required.secondary = it.value }
             }
-            if(it.hidden) return@map Size(0.0, 0.0)
-            val m = it.extensionMargin ?: 0.0
             required.margin = m
             required.primary = required.primary.coerceAtLeast(0.0)
             required.secondary = required.secondary.coerceAtLeast(0.0)
 
-            remaining.secondary = remaining.secondary.coerceAtLeast(required.secondary + 2 * m)
+            remaining.secondary = remaining.secondary
             it.extensionWeight?.let { w ->
                 totalWeight += w
                 required.primary = (-w).toDouble()
@@ -85,6 +117,7 @@ class LinearLayout: UIView(CGRectZero.readValue()) {
             required
         }.map {
             if(it.primary < -0.001) {
+                if(totalWeight == 0f) throw IllegalStateException("View in LL has weight ${-it.primary} but total weight is ${totalWeight}")
                 it.primary = (-it.primary / totalWeight) * remaining.primary
             }
             it
@@ -96,6 +129,7 @@ class LinearLayout: UIView(CGRectZero.readValue()) {
         var primary = padding
         subviews.zip(calcSizes(frame.useContents { size.local })) { view, size ->
             view as UIView
+            if(view.hidden) return@zip
             val m = view.extensionMargin ?: 0.0
             val ps = primary + m
             val a = view.secondaryAlign ?: Align.Stretch
@@ -103,19 +137,29 @@ class LinearLayout: UIView(CGRectZero.readValue()) {
                 Align.Start -> m + padding
                 Align.Stretch -> m + padding
                 Align.End -> mySize.secondary - m - padding - size.secondary
-                Align.Center -> (mySize.secondary - size.secondary - 2 * m) / 2
+                Align.Center -> (mySize.secondary - size.secondary) / 2
             }
             val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * 2 else size.secondary
+            val oldSize = view.bounds.useContents { this.size.width to this.size.height }
+            val widthSize = if(horizontal) size.primary else secondarySize
+            val heightSize = if(horizontal) secondarySize else size.primary
             view.setFrame(
                 CGRectMake(
                     if(horizontal) ps else offset,
                     if(horizontal) offset else ps,
-                    if(horizontal) size.primary else secondarySize,
-                    if(horizontal) secondarySize else size.primary,
+                    widthSize,
+                    heightSize,
                 )
             )
-            view.layoutSubviews()
+            if(oldSize.first != widthSize || oldSize.second != heightSize) {
+                view.layoutSubviews()
+            }
             primary += size.primary + 2 * m
         }
     }
+
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return super.hitTest(point, withEvent).takeUnless { it == this }
+    }
+
 }

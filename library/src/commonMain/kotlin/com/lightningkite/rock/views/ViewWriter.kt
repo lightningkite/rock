@@ -1,8 +1,8 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.ViewWrapper
-import com.lightningkite.rock.launch
-import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.MaterialLikeTheme
+import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
 
 /**
@@ -14,6 +14,7 @@ class ViewWriter(
     private val startDepth: Int = 0,
 ) {
     val depth: Int get() = stack.size - 1 + startDepth
+
     /**
      * Additional data keyed by string attached to the context.
      * Copied to writers that are split off.
@@ -27,9 +28,10 @@ class ViewWriter(
      */
     fun split(): ViewWriter = ViewWriter(stack.last(), startDepth = depth).also {
         it.addons.putAll(this.addons)
+        it.currentTheme = currentTheme
+        it.isRoot = isRoot
+        it.transitionNextView = transitionNextView
     }
-
-    internal var themeJustChanged: Boolean = false
 
     private val stack = arrayListOf(parent)
     val currentView: NView get() = stack.last()
@@ -43,22 +45,55 @@ class ViewWriter(
             }
         }
 
+    var currentTheme: suspend () -> Theme = { MaterialLikeTheme() }
+    inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend ()->Theme)->Theme, action: ()->T): T {
+        val old = currentTheme
+        currentTheme = { calculate(old) }
+        try {
+            return action()
+        } finally {
+            currentTheme = old
+        }
+    }
+    @ViewModifierDsl3 inline fun ViewWriter.themeModifier(crossinline calculate: suspend (suspend ()->Theme)->Theme): ViewWrapper {
+        val old = currentTheme
+        currentTheme = { calculate(old) }
+        afterNextElementSetup {
+            currentTheme = old
+        }
+        return ViewWrapper
+    }
+
+    /**
+     * Adds a card / border / padding to the next view.
+     */
+    sealed interface TransitionNextView {
+        object No: TransitionNextView
+        object Yes: TransitionNextView
+        class Maybe(val logic: suspend () -> Boolean): TransitionNextView
+    }
+    var transitionNextView: TransitionNextView = TransitionNextView.No
+    var isRoot: Boolean = true
+
     val calculationContext: CalculationContext = stack.last().calculationContext
 
     /**
      * Runs the given [action] on the next created element before its setup block is run.
      */
-    fun beforeNextElementSetup(action: NView.()->Unit) {
+    fun beforeNextElementSetup(action: NView.() -> Unit) {
         beforeNextElementSetupList.add(action)
     }
+
     /**
      * Runs the given [action] on the next created element after its setup block is run.
      */
-    fun afterNextElementSetup(action: NView.()->Unit) {
+    fun afterNextElementSetup(action: NView.() -> Unit) {
         afterNextElementSetupList.add(action)
     }
+
     private var beforeNextElementSetupList = ArrayList<NView.() -> Unit>()
     private var afterNextElementSetupList = ArrayList<NView.() -> Unit>()
+
     //    private val wrapperToDoList = ArrayList<NView.() -> Unit>()
     private var popCount = 0
 
@@ -68,8 +103,14 @@ class ViewWriter(
     @Suppress("UNCHECKED_CAST")
     fun <T : NView> wrapNext(element: T, setup: T.() -> Unit): ViewWrapper {
         stack.add(element)
+        val beforeCopy = if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
+        beforeNextElementSetupList = ArrayList()
+        val afterCopy = if (afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
+        afterNextElementSetupList = ArrayList()
         CalculationContextStack.useIn(element.calculationContext) {
+            beforeCopy.forEach { it(element) }
             setup(element)
+            afterCopy.forEach { it(element) }
         }
         popCount++
         return ViewWrapper
@@ -81,9 +122,10 @@ class ViewWriter(
     fun <T : NView> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
             stack.last().addChild(this)
-            val beforeCopy = if(beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
+            val beforeCopy =
+                if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
             beforeNextElementSetupList = ArrayList()
-            val afterCopy = if(afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
+            val afterCopy = if (afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
             afterNextElementSetupList = ArrayList()
             var toPop = popCount
             popCount = 0
@@ -101,7 +143,7 @@ class ViewWriter(
         }
     }
 
-    fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewWriter.(Readable<T>)->Unit) {
+    fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewWriter.(Readable<T>) -> Unit) {
         // TODO: Faster version
         return with(split()) {
             calculationContext.reactiveScope {

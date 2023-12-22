@@ -17,7 +17,7 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
+class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
@@ -25,7 +25,17 @@ class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtoc
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
 
-    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
-        return super.hitTest(point, withEvent).takeUnless { it == this }
+    var allowUnselect = true
+    var on: Boolean = false
+    init {
+        println("Setup")
+        onEvent(UIControlEventTouchUpInside) {
+            println("TOUCH UP INSIDE!!! $on $allowUnselect")
+            if(!on || allowUnselect) {
+                on = !on
+                selected = on
+                sendActionsForControlEvents(UIControlEventValueChanged)
+            }
+        }
     }
 }

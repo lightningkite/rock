@@ -17,18 +17,24 @@ infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writabl
 
 infix fun <T> Writable<T>.bind(master: Writable<T>) {
     with(CalculationContextStack.current()) {
-        launch { this@bind.set(master.await()) }
+        launch {
+            this@bind.set(master.await())
+        }
         var setting = false
         master.addListener {
             if (setting) return@addListener
             setting = true
-            launch { this@bind.set(master.await()) }
+            launch {
+                this@bind.set(master.await())
+            }
             setting = false
         }.also { onRemove(it) }
         this@bind.addListener {
             if (setting) return@addListener
             setting = true
-            launch { master.set(this@bind.await()) }
+            launch {
+                master.set(this@bind.await())
+            }
             setting = false
         }.also { onRemove(it) }
     }
@@ -53,3 +59,12 @@ fun <T> Readable<T>.withWrite(action: suspend Readable<T>.(T)->Unit): Writable<T
     .withWrite { it.toFloatOrNull()?.let { this@asString.set(it) } }
 @JvmName("writableDoubleAsString") fun Writable<Double>.asString(): Writable<String> = shared { this@asString.await().toString() }
     .withWrite { it.toDoubleOrNull()?.let { this@asString.set(it) } }
+
+@JvmName("writableIntNullableAsString") fun Writable<Int?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toIntOrNull()) }
+@JvmName("writableLongNullableAsString") fun Writable<Long?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toLongOrNull()) }
+@JvmName("writableFloatNullableAsString") fun Writable<Float?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toFloatOrNull()) }
+@JvmName("writableDoubleNullableAsString") fun Writable<Double?>.asString(): Writable<String> = shared { this@asString.await()?.toString() ?: "" }
+    .withWrite { this@asString.set(it.toDoubleOrNull()) }

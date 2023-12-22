@@ -1,13 +1,17 @@
 package com.lightningkite.rock.models
 
+import platform.CoreGraphics.CGFloat
 import platform.UIKit.UIScreen
+import platform.UIKit.UIFont
+import platform.UIKit.UIFontWeight
+import platform.UIKit.systemFontSize
 
 actual typealias DimensionRaw = Double
 actual val Int.px: Dimension
     get() = Dimension(this.toDouble() / UIScreen.mainScreen.scale)
 
 actual val Int.rem: Dimension
-    get() = Dimension(this.toDouble() * 8)
+    get() = Dimension(this.toDouble() * UIFont.systemFontSize)
 
 actual val Double.rem: Dimension
     get() = Dimension(this * 8)
@@ -17,19 +21,11 @@ actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimens
 actual inline operator fun Dimension.times(other: Float): Dimension = Dimension(this.value.times(other))
 actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(this.value.div(other))
 
-actual data class Font(
-    val cssFontFamilyName: String,
-    val url: String? = null,
-    val fallback: String = "Helvetica",
-    val direct: FontDirect? = null,
-)
-
-data class FontDirect(val normal: String, val bold: String? = null, val italic: String? = null, val boldItalic: String? = null)
-
-actual val systemDefaultFont: Font get() = Font("'Montserrat'", "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap", "Helvetica")
+actual data class Font(val get: (size: CGFloat, weight: UIFontWeight)->UIFont)
+actual val systemDefaultFont: Font get() = Font { size, weight -> UIFont.systemFontOfSize(size, weight) }
 
 actual sealed class ImageSource actual constructor()
-actual class ImageResource(val relativeUrl: String) : ImageSource()
+actual class ImageResource(val name: String) : ImageSource()
 
 class ScreenTransitionPart(
     val from: Map<String, String>,

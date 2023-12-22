@@ -26,10 +26,20 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     jvm()
+    androidTarget()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    androidTarget()
+//    ios()
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach {
+//        it.binaries.framework {
+//            baseName = "library"
+//        }
+//    }
     js {
         binaries.executable()
         browser {

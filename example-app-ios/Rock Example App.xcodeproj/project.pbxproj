@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0899F8D6A21066721E56642F /* Pods_Rock_Example_AppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 833634D8CEA5B31E303DE247 /* Pods_Rock_Example_AppTests.framework */; };
+		183A2D592B335230001011C3 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 183A2D582B335230001011C3 /* test.m */; };
 		188D8B992B2B9CB400732A2E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188D8B982B2B9CB400732A2E /* AppDelegate.swift */; };
 		188D8B9B2B2B9CB400732A2E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188D8B9A2B2B9CB400732A2E /* SceneDelegate.swift */; };
 		188D8B9D2B2B9CB400732A2E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188D8B9C2B2B9CB400732A2E /* ViewController.swift */; };
@@ -40,6 +41,8 @@
 
 /* Begin PBXFileReference section */
 		126B1CC2D6B37BD601820B66 /* Pods-Rock Example AppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rock Example AppTests.debug.xcconfig"; path = "Target Support Files/Pods-Rock Example AppTests/Pods-Rock Example AppTests.debug.xcconfig"; sourceTree = "<group>"; };
+		183A2D572B33522F001011C3 /* Rock Example App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Rock Example App-Bridging-Header.h"; sourceTree = "<group>"; };
+		183A2D582B335230001011C3 /* test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
 		188D8B952B2B9CB400732A2E /* Rock Example App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Rock Example App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		188D8B982B2B9CB400732A2E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		188D8B9A2B2B9CB400732A2E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -123,6 +126,8 @@
 				188D8BA12B2B9CB500732A2E /* Assets.xcassets */,
 				188D8BA32B2B9CB500732A2E /* LaunchScreen.storyboard */,
 				188D8BA62B2B9CB500732A2E /* Info.plist */,
+				183A2D582B335230001011C3 /* test.m */,
+				183A2D572B33522F001011C3 /* Rock Example App-Bridging-Header.h */,
 			);
 			path = "Rock Example App";
 			sourceTree = "<group>";
@@ -240,6 +245,7 @@
 				TargetAttributes = {
 					188D8B942B2B9CB400732A2E = {
 						CreatedOnToolsVersion = 15.1;
+						LastSwiftMigration = 1510;
 					};
 					188D8BAA2B2B9CB500732A2E = {
 						CreatedOnToolsVersion = 15.1;
@@ -407,6 +413,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				188D8B9D2B2B9CB400732A2E /* ViewController.swift in Sources */,
+				183A2D592B335230001011C3 /* test.m in Sources */,
 				188D8B992B2B9CB400732A2E /* AppDelegate.swift in Sources */,
 				188D8B9B2B2B9CB400732A2E /* SceneDelegate.swift in Sources */,
 			);
@@ -589,6 +596,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = EF4N5K3F2Q;
@@ -607,6 +615,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.lightningkite.Rock-Example-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Rock Example App/Rock Example App-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -618,6 +628,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = EF4N5K3F2Q;
@@ -636,6 +647,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.lightningkite.Rock-Example-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Rock Example App/Rock Example App-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -12,6 +12,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import platform.Foundation.*
 import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 import platform.posix.memcpy
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -24,7 +26,7 @@ actual suspend fun fetch(
     headers: HttpHeaders,
     body: RequestBody?
 ): RequestResponse {
-    val response = client.request {
+    val response = client.request(url) {
         this.method = when(method) {
             HttpMethod.GET -> io.ktor.http.HttpMethod.Get
             HttpMethod.POST -> io.ktor.http.HttpMethod.Post
@@ -145,10 +147,19 @@ actual suspend fun fetch(
                 contentType(ContentType.parse(body.type))
                 setBody(body.content)
             }
-            null -> TODO()
+            null -> {}
         }
     }
+    backToMainThread()
     return RequestResponse(response)
+}
+suspend fun backToMainThread() {
+    suspendCoroutineCancellable<Unit> {
+        dispatch_async(queue = dispatch_get_main_queue(), block = {
+            it.resume(Unit)
+        })
+        return@suspendCoroutineCancellable {}
+    }
 }
 actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders = HttpHeaders(map.entries.associateTo(HashMap()) { it.key.lowercase() to listOf(it.value) })
 actual inline fun httpHeaders(headers: HttpHeaders): HttpHeaders =  HttpHeaders(headers.map.toMutableMap())
@@ -163,8 +174,16 @@ actual class HttpHeaders(val map: MutableMap<String, List<String>>) {
 actual class RequestResponse(val wraps: HttpResponse) {
     actual val status: Short get() = wraps.status.value.toShort()
     actual val ok: Boolean get() = wraps.status.isSuccess()
-    actual suspend fun text(): String = wraps.bodyAsText()
-    actual suspend fun blob(): Blob = wraps.body<ByteArray>().let { Blob(it.toNSData(), wraps.contentType()?.toString() ?: "application/octet-stream") }
+    actual suspend fun text(): String {
+        val result = wraps.bodyAsText()
+        backToMainThread()
+        return result
+    }
+    actual suspend fun blob(): Blob {
+        val result = wraps.body<ByteArray>().let { Blob(it.toNSData(), wraps.contentType()?.toString() ?: "application/octet-stream") }
+        backToMainThread()
+        return result
+    }
 }
 
 actual class Blob(val data: NSData, val type: String = "application/octet-stream")
@@ -197,8 +216,14 @@ class WebSocketWrapper(val url: String): WebSocket {
                 var reason: CloseReason? = null
                 while(stayOn) {
                     when(val x = incoming.receive()) {
-                        is Frame.Binary -> onBinaryMessage.forEach { it(Blob(x.data.toNSData())) }
-                        is Frame.Text -> TODO()
+                        is Frame.Binary -> {
+                            backToMainThread()
+                            onBinaryMessage.forEach { it(Blob(x.data.toNSData())) }
+                        }
+                        is Frame.Text -> {
+                            backToMainThread()
+                            onMessage.forEach { it(x.readText()) }
+                        }
                         is Frame.Close -> {
                             reason = x.readReason()
                             break
@@ -206,6 +231,7 @@ class WebSocketWrapper(val url: String): WebSocket {
                         else -> {}
                     }
                 }
+                backToMainThread()
                 onClose.forEach { it(reason?.code ?: 0) }
             }
         }

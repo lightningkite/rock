@@ -17,5 +17,5 @@ import kotlin.math.max
 
 @OptIn(ExperimentalForeignApi::class)
 class StyledUILabel: UILabel(CGRectZero.readValue()) {
-
+    init { numberOfLines = -1 }
 }

@@ -22,23 +22,9 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
-
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
-        return frameLayoutSizeThatFits(size)
-    }
-
-    override fun layoutSubviews() {
-        frameLayoutLayoutSubviews()
-    }
-
-    override fun subviewDidChangeSizing(view: UIView?) {
-        if(view?.extensionSizeConstraints?.let { it.width != null || it.height != null } == true) {
-            // skip layout
-        } else {
-            setNeedsLayout()
-            informParentOfSizeChange()
-        }
-    }
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews()
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
 
     val toolbar = UIToolbar().apply {
         barStyle = UIBarStyleDefault

@@ -17,18 +17,24 @@ infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writabl
 
 infix fun <T> Writable<T>.bind(master: Writable<T>) {
     with(CalculationContextStack.current()) {
-        launch { this@bind.set(master.await()) }
+        launch {
+            this@bind.set(master.await())
+        }
         var setting = false
         master.addListener {
             if (setting) return@addListener
             setting = true
-            launch { this@bind.set(master.await()) }
+            launch {
+                this@bind.set(master.await())
+            }
             setting = false
         }.also { onRemove(it) }
         this@bind.addListener {
             if (setting) return@addListener
             setting = true
-            launch { master.set(this@bind.await()) }
+            launch {
+                master.set(this@bind.await())
+            }
             setting = false
         }.also { onRemove(it) }
     }

@@ -19,9 +19,7 @@ class LocalNavigator(override val routes: Routes, dialog: RockNavigator? = null)
     override val dialog: RockNavigator = dialog ?: this
     override var direction: RockNavigator.Direction? = null
         private set
-    val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback))).apply {
-        addListener { println("Stack updated!") }
-    }
+    val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback)))
     override val canGoBack: Readable<Boolean>
         get() = shared { stack.await().size > 1 }
     override val currentScreen: Readable<RockScreen?>

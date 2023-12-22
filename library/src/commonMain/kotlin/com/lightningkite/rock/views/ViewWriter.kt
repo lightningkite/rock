@@ -1,8 +1,8 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.ViewWrapper
-import com.lightningkite.rock.launch
-import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.MaterialLikeTheme
+import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
 
 /**
@@ -28,9 +28,9 @@ class ViewWriter(
      */
     fun split(): ViewWriter = ViewWriter(stack.last(), startDepth = depth).also {
         it.addons.putAll(this.addons)
+        it.currentTheme = currentTheme
+        it.transitionNextView = transitionNextView
     }
-
-    internal var themeJustChanged: Boolean = false
 
     private val stack = arrayListOf(parent)
     val currentView: NView get() = stack.last()
@@ -43,6 +43,35 @@ class ViewWriter(
                 stack.removeLast()
             }
         }
+
+    var currentTheme: suspend () -> Theme = { MaterialLikeTheme() }
+    inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend ()->Theme)->Theme, action: ()->T): T {
+        val old = currentTheme
+        currentTheme = { calculate(old) }
+        try {
+            return action()
+        } finally {
+            currentTheme = old
+        }
+    }
+    @ViewModifierDsl3 inline fun ViewWriter.themeModifier(crossinline calculate: suspend (suspend ()->Theme)->Theme): ViewWrapper {
+        val old = currentTheme
+        currentTheme = { calculate(old) }
+        afterNextElementSetup {
+            currentTheme = old
+        }
+        return ViewWrapper
+    }
+
+    /**
+     * Adds a card / border / padding to the next view.
+     */
+    sealed interface TransitionNextView {
+        object No: TransitionNextView
+        object Yes: TransitionNextView
+        class Maybe(val logic: suspend () -> Boolean): TransitionNextView
+    }
+    var transitionNextView: TransitionNextView = TransitionNextView.No
 
     val calculationContext: CalculationContext = stack.last().calculationContext
 

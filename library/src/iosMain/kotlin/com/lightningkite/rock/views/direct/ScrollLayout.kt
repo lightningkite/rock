@@ -24,12 +24,6 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         set(value) { extensionPadding = value }
 
     override fun subviewDidChangeSizing(view: UIView?) {
-        if(view?.extensionSizeConstraints?.let { it.width != null || it.height != null } == true) {
-            // skip layout
-        } else {
-            setNeedsLayout()
-            informParentOfSizeChange()
-        }
     }
 
     data class Size(var primary: Double = 0.0, var secondary: Double = 0.0, var margin: Double = 0.0) {
@@ -113,15 +107,20 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
             Align.Center -> (mySize.secondary - size.secondary - 2 * m) / 2
         }
         val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * 2 else size.secondary
+        val oldSize = view.bounds.useContents { this.size.width to this.size.height }
+        val widthSize = if(horizontal) size.primary else secondarySize
+        val heightSize = if(horizontal) secondarySize else size.primary
         view.setFrame(
             CGRectMake(
                 if(horizontal) ps else offset,
                 if(horizontal) offset else ps,
-                if(horizontal) size.primary else secondarySize,
-                if(horizontal) secondarySize else size.primary,
+                widthSize,
+                heightSize,
             )
         )
-        view.layoutSubviews()
+        if(oldSize.first != widthSize || oldSize.second != heightSize) {
+            view.layoutSubviews()
+        }
         primary += size.primary + 2 * m
         primary += padding
         setContentSize(

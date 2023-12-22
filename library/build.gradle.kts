@@ -4,7 +4,7 @@ import com.lightningkite.deployhelpers.*
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization")
-//    kotlin("native.cocoapods")
+    kotlin("native.cocoapods")
     id("com.android.library")
     id("maven-publish")
     id("signing")
@@ -96,39 +96,23 @@ kotlin {
     }
 
 //    cocoapods {
-//        val uppercaseName = project.name
-//            .replace(
-//                Regex("[-_](a-zA-Z)")
-//            ) { it.groupValues[1].toUpperCaseAsciiOnly() }.capitalizeAsciiOnly()
+//        summary = "Rock"
+//        homepage = "https://github.com/lightningkite/rock"
+//        ios.deploymentTarget = "12.0"
 //
-//        // Required properties
-//        // Specify the required Pod version here. Otherwise, the Gradle project version is used.
-//        version = "1.0"
-//        summary = "Some description for a Kotlin/Native module"
-//        homepage = "Link to a Kotlin/Native module homepage"
-//        ios.deploymentTarget = "11.0"
-//
-//        // Optional properties
-//        // Configure the Pod name here instead of changing the Gradle project name
-//        name = uppercaseName
-//
-//        framework {
-//            // Required properties
-//            // Framework name configuration. Use this property instead of deprecated 'frameworkName'
-//            baseName = uppercaseName
-//            embedBitcode(BitcodeEmbeddingMode.BITCODE)
-////            embedBitcode(BitcodeEmbeddingMode.DISABLE)
+//        pod("FlexLayout") { version = "2.0.03" }
+//        pod("PinLayout") {
+//            version = "1.10.5"
+//            extraOpts += listOf("-compiler-option", "-fmodules")
 //        }
-//
-////        pod("RxSwift") {
-////            version = "~> 6.5.0"
-////        }
-//
-//        // Maps custom Xcode configuration to NativeBuildType
-//        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = NativeBuildType.DEBUG
-//        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = NativeBuildType.RELEASE
 //    }
 }
+
+//tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.PodGenTask>().configureEach {
+//    doLast {
+//        podfile.get().appendText("\nENV['SWIFT_VERSION'] = '5'")
+//    }
+//}
 
 kotlin {
     targets

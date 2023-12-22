@@ -303,8 +303,30 @@ actual typealias NButton = FrameLayoutButton
 
 @ViewDsl
 actual fun ViewWriter.button(setup: Button.() -> Unit): Unit = element(FrameLayoutButton()) {
-    handleTheme(this, viewDraws = false)
-    setup(Button(this))
+    val s = stateReadable
+    withThemeGetter({
+        val state = s.await()
+        when {
+            state and UIControlStateDisabled != 0UL -> it().disabled()
+            state and UIControlStateHighlighted != 0UL -> it().down()
+            state and UIControlStateFocused != 0UL -> it().hover()
+            else -> it()
+        }
+    }) {
+        if(transitionNextView == ViewWriter.TransitionNextView.No) {
+            transitionNextView = ViewWriter.TransitionNextView.Maybe {
+                val state = s.await()
+                when {
+                    state and UIControlStateDisabled != 0UL -> true
+                    state and UIControlStateHighlighted != 0UL -> true
+                    state and UIControlStateFocused != 0UL -> true
+                    else -> false
+                }
+            }
+        }
+        handleTheme(this, viewDraws = false)
+        setup(Button(this))
+    }
 }
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
     native.onEvent(UIControlEventTouchUpInside) { launch(action) }
@@ -362,6 +384,7 @@ actual typealias NToggleButton = FrameLayoutToggleButton
 @ViewDsl
 actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = element(FrameLayoutToggleButton()) {
     handleTheme(this, viewDraws = false)
+    setup(ToggleButton(this))
 }
 actual inline var ToggleButton.enabled: Boolean
     get() = native.enabled
@@ -383,6 +406,7 @@ actual typealias NRadioToggleButton = FrameLayoutToggleButton
 actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = element(FrameLayoutToggleButton()) {
     handleTheme(this, viewDraws = false)
     allowUnselect = false
+    setup(RadioToggleButton(this))
 }
 actual inline var RadioToggleButton.enabled: Boolean
     get() = native.enabled
@@ -506,9 +530,13 @@ actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit = element(UIT
 actual val TextField.content: Writable<String> get() = object: Writable<String> {
     override suspend fun awaitRaw(): String = native.text ?: ""
     override fun addListener(listener: () -> Unit): () -> Unit {
-        return native.onEvent(UIControlEventValueChanged) { listener() }
+        return native.onEvent(UIControlEventEditingChanged) {
+            listener()
+        }
     }
-    override suspend fun set(value: String) { native.text = value }
+    override suspend fun set(value: String) {
+        native.text = value
+    }
 }
 actual inline var TextField.keyboardHints: KeyboardHints
     get() = TODO()
@@ -654,11 +682,8 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element
     setup(SwapView(this))
 }
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
-    println("Clearing views. Children count: ${native.subviews.size}")
     native.clearChildren()
-    println("Creating a new view. Children count: ${native.subviews.size}")
     createNewView()
-    println("Created a new view. Children count: ${native.subviews.size}")
     native.hidden = native.subviews.isEmpty()
 }
 
@@ -760,13 +785,22 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper get() {
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
     beforeNextElementSetup {
-        println("Applying $constraints to $this")
         extensionSizeConstraints = constraints
     }
     return ViewWrapper
 }
 @ViewModifierDsl3
-actual val ViewWriter.marginless: ViewWrapper get() = ViewWrapper
+actual val ViewWriter.marginless: ViewWrapper get() {
+    beforeNextElementSetup {
+        extensionMarginless = true
+    }
+    return ViewWrapper
+}
 @ViewModifierDsl3
-actual val ViewWriter.withDefaultPadding: ViewWrapper get() = ViewWrapper
+actual val ViewWriter.withDefaultPadding: ViewWrapper get() {
+    beforeNextElementSetup {
+//        extensionPadding
+    }
+    return ViewWrapper
+}
 // End

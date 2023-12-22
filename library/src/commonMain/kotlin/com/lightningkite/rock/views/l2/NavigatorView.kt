@@ -11,7 +11,6 @@ fun ViewWriter.navigatorView(navigator: RockNavigator) {
         fork.navigator = navigator
         reactiveScope {
             val screen = navigator.currentScreen.await()
-            println("Moving screens to $screen")
             this@swapView.swap {
                 if (screen != null)
                     with(screen) { fork.render() }

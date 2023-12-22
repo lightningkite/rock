@@ -2,10 +2,14 @@
 
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.views.*
+import com.lightningkite.rock.objc.KeyValueObserverProtocol
 import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.COpaquePointer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
+import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSObject
 import platform.objc.sel_registerName
@@ -25,12 +29,54 @@ inline fun UIControl.onEvent(events: UIControlEvents, crossinline action: ()->Un
     val ref = Ref(actionHolder)
     calculationContext.onRemove {
         // Retain the sleeve until disposed
-        ref.target?.let { removeTarget(it, sel, events) }
+        ref.target?.let {
+            removeTarget(it, sel, events)
+        }
         ref.target = null
     }
     return {
-        ref.target?.let { removeTarget(it, sel, events) }
+        ref.target?.let {
+            removeTarget(it, sel, events)
+        }
         ref.target = null
+    }
+}
+
+val observers = ArrayList<NSObject>()
+@OptIn(ExperimentalForeignApi::class)
+fun NSObject.observe(key: String, action: ()->Unit): ()->Unit {
+    val observer = object: NSObject(), KeyValueObserverProtocol {
+        override fun observeValueForKeyPath(
+            keyPath: String?,
+            ofObject: Any?,
+            change: Map<Any?, *>?,
+            context: COpaquePointer?
+        ) {
+            action()
+        }
+    }
+    val ref = Ref(observer)
+    addObserver(observer, key, NSKeyValueObservingOptionNew, null)
+    observers.add(observer)
+    return {
+        ref.target?.let {
+            removeObserver(it, key)
+        }
+        ref.target = null
+    }
+}
+
+val UIControl.stateReadable: Readable<UIControlState> get() {
+    return object: Readable<UIControlState> {
+        override suspend fun awaitRaw(): UIControlState = this@stateReadable.state
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            val toCall = listOf(
+                this@stateReadable.observe("highlighted", listener),
+                this@stateReadable.observe("selected", listener),
+                this@stateReadable.observe("enabled", listener),
+            )
+            return { toCall.forEach { it() } }
+        }
     }
 }
 

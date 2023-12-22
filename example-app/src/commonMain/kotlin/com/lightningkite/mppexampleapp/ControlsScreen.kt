@@ -2,10 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.ImageRemote
-import com.lightningkite.rock.models.SizeConstraints
-import com.lightningkite.rock.models.WidgetOption
-import com.lightningkite.rock.models.px
+import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
@@ -129,10 +126,12 @@ object ControlsScreen : RockScreen {
 
             col {
                 val number = Property(1)
+                val text = Property("text")
                 h2 { content = "Text Fields" }
                 textField { content bind number.asString() }
                 text { ::content { "Value: ${number.await()}" }}
-                textField {  } in card
+                textField { content bind text } in card
+                text { ::content { "Text: ${text.await()}" }}
                 textField {  } in important
                 textField {  } in critical
             } in card
@@ -151,8 +150,7 @@ object ControlsScreen : RockScreen {
                     repeat(5) {
                         image { source = ImageRemote("https://picsum.photos/seed/${it}/200/300") } in sizedBox(
                             SizeConstraints(
-                                maxWidth = 100.px,
-                                minWidth = 100.px
+                                width = 5.rem
                             )
                         )
                     }

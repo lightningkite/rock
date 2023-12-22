@@ -75,3 +75,7 @@ var UIView.extensionFontAndStyle: FontAndStyle? by UIViewFontAndStyle
 
 private val UIViewTextSize = ExtensionProperty<UIView, Double>()
 var UIView.extensionTextSize: Double? by UIViewTextSize
+
+private val UIViewMarginless = ExtensionProperty<UIView, Boolean>()
+var UIView.extensionMarginless: Boolean? by UIViewMarginless
+

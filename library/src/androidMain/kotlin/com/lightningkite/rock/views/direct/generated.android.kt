@@ -4,13 +4,17 @@ package com.lightningkite.rock.views.direct
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.Orientation
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.text.InputType
 import android.util.AttributeSet
 import android.view.Gravity
@@ -23,6 +27,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.ActionBar.LayoutParams
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.AppCompatToggleButton
+import androidx.appcompat.widget.ContentFrameLayout.OnAttachListener
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.setMargins
@@ -253,10 +258,10 @@ actual var ExternalLink.to: String
     }
 actual var ExternalLink.newTab: Boolean
     get() {
-        return false
+        return native.tag as? Boolean ?: false
     }
     set(value) {
-        Timber.d("WHAT AM I? $value")
+        native.tag = value
     }
 
 
@@ -268,11 +273,47 @@ actual var Image.source: ImageSource
         native.tag = value
         when (value) {
             is ImageRaw -> {
-                //TODO()
+                val imageData = value.data
+                try {
+                    native.setImageDrawable(
+                        BitmapDrawable(
+                            native.resources,
+                            BitmapFactory.decodeByteArray(
+                                /* data = */ imageData,
+                                /* offset = */ 0,
+                                /* length = */ imageData.size
+                            )
+                        )
+                    )
+                } catch(ex: Exception) {
+                    native.setImageResource(R.drawable.baseline_broken_image_24)
+                }
+                val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+                BitmapDrawable(native.resources, bitmap)
             }
 
             is ImageRemote -> {
-                //TODO()
+                var nativeView: ImageView? = native
+                native.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                    override fun onViewAttachedToWindow(v: View) {}
+
+                    override fun onViewDetachedFromWindow(v: View) { nativeView = null }
+                })
+
+                LoadRemoteImageScope.bitmapFromUrl(value.url, onBitmapLoaded = { bitmap ->
+                    Handler(Looper.getMainLooper()).post {
+                        Timber.d("REMOTE IMAGE SET DRAWABLE")
+                        if (nativeView != null) {
+                            nativeView!!.setImageDrawable(BitmapDrawable(nativeView!!.resources, bitmap))
+                        } else {
+                            bitmap.recycle()
+                        }
+                    }
+                }) {
+                    Handler(Looper.getMainLooper()).post {
+                        native.setImageResource(R.drawable.baseline_broken_image_24)
+                    }
+                }
             }
 
             is ImageResource -> {
@@ -298,7 +339,7 @@ actual var Image.source: ImageSource
                 native.setImageDrawable(
                     ContextCompat.getDrawable(
                         native.context,
-                        android.R.drawable.ic_menu_camera
+                        android.R.drawable.ic_dialog_alert
                     )
                 )
             }
@@ -1223,23 +1264,11 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
 
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
-    beforeNextElementSetup {
-        val height = constraints.height?.value ?: constraints.maxHeight?.value ?: 0
-        val width = constraints.width?.value ?: constraints.maxWidth?.value ?: 0
-
-        minimumHeight = if (constraints.minHeight == null) {
-            0
-        } else {
-            constraints.minHeight.value.toInt()
-        }
-
-        minimumWidth = if (constraints.minWidth == null) {
-            0
-        } else {
-            constraints.minWidth.value.toInt()
-        }
-
-        updateLayoutParams { this.height = height.toInt(); this.width = width.toInt() }
+    wrapNext(FrameLayout(this.currentView.context)) {
+        layoutParams = ViewGroup.LayoutParams(
+            /* width = */ constraints.width?.value?.toInt() ?: LayoutParams.WRAP_CONTENT,
+            /* height = */ constraints.height?.value?.toInt() ?: LayoutParams.WRAP_CONTENT
+        )
     }
     return ViewWrapper
 }
@@ -1460,9 +1489,9 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
 }
 
 actual var RecyclerView.columns: Int
-    get() = 1
+    get() = (native.layoutManager as? GridLayoutManager)?.spanCount ?: 0
     set(value) {
-        TODO("WHAT")
+        (native.layoutManager as? GridLayoutManager)?.spanCount = value
     }
 
 @ViewModifierDsl3

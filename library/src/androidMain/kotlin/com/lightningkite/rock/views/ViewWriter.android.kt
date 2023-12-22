@@ -36,8 +36,14 @@ data class NViewCalculationContext(val native: View): CalculationContext {
         native.removeListeners[action.hashCode()] = action
     }
 
-    override fun notifyStart() {  }
+    override fun notifyStart() {
+
+    }
     override fun notifySuccess() {  }
+
+    override fun notifyFailure(t: Throwable) {
+
+    }
 }
 
 actual val NView.calculationContext: CalculationContext

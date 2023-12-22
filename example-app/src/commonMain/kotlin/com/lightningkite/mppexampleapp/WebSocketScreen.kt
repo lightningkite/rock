@@ -2,10 +2,7 @@ package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.*
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.reactive.shared
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
@@ -16,22 +13,21 @@ import kotlin.random.Random
 @Routable("sample/websockets")
 object WebSocketScreen : RockScreen {
     override fun ViewWriter.render() {
-        val socket = websocket("wss://socketsbay.com/wss/v2/1/demo/")
-        val counter = Property("")
-        socket.onMessage {
-            counter.value = it
-        }
-        socket.onOpen {
-            socket.send("BLAHSDEIOHJOREF")
-        }
+        val socket = shared { retryWebsocket("wss://socketsbay.com/wss/v2/1/demo/").also { use(it) } }
+        val mostRecent = shared { socket.await().mostRecentMessage }
         col {
-            calculationContext.onRemove { socket.close(1000, "") }
             h1 { content = "WS time!" }
-            text { ::content { counter.await() } }
+            text { ::content { mostRecent.await().await() ?: "Nothing yet" } }
             button {
                 text("Send junk")
                 onClick {
-                    socket.send(Random.nextInt().toString())
+                    socket.await().send("From Rock (Kotlin): ${clockMillis()}")
+                }
+            }
+            button {
+                text("Kill")
+                onClick {
+                    socket.await().close(1000, "OK")
                 }
             }
         }

@@ -17,10 +17,6 @@ data class NavItem(
     val children: List<NavItem> = listOf()
 )
 
-data class ProfileInfo(
-    //...
-    val currentUser: UserInfo?,
-)
 
 data class UserInfo(
     val name: String,
@@ -34,7 +30,7 @@ interface AppNav {
     var appIcon: Icon
     var appLogo: ImageSource
     var navItems: List<NavItem>
-    var currentUser: ProfileInfo?
+    var currentUser: UserInfo?
     var userLinks: List<NavItem>
     var actions: List<Action>
     var exists: Boolean
@@ -48,8 +44,8 @@ interface AppNav {
         override var appLogo: ImageSource by appLogoProperty
         val navItemsProperty = Property(listOf<NavItem>())
         override var navItems: List<NavItem> by navItemsProperty
-        val currentUserProperty = Property<ProfileInfo?>(null)
-        override var currentUser: ProfileInfo? by currentUserProperty
+        val currentUserProperty = Property<UserInfo?>(null)
+        override var currentUser: UserInfo? by currentUserProperty
         val actionsProperty = Property<List<Action>>(listOf())
         override var actions: List<Action> by actionsProperty
         val userLinksProperty = Property(listOf<NavItem>())
@@ -292,14 +288,14 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 image {
                     val currentTheme = currentTheme
                     ::source {
-                        appNav.currentUser?.currentUser?.profileImage ?: Icon.person.toImageSource(
+                        appNav.currentUser?.profileImage ?: Icon.person.toImageSource(
                             currentTheme().foreground
                         )
                     }
                     description = "User icon"
                 }
                 text {
-                    content = appNav.currentUser?.currentUser?.name ?: "No user"
+                    content = appNav.currentUser?.name ?: "No user"
                 } in gravity(
                     Align.Center,
                     Align.Center

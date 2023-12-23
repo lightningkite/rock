@@ -121,6 +121,7 @@ class ViewWriter(
      */
     fun <T : NView> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
+            stack.last().addChild(this)
             val beforeCopy =
                 if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
             beforeNextElementSetupList = ArrayList()
@@ -133,7 +134,6 @@ class ViewWriter(
                 setup()
                 afterCopy.forEach { it(this) }
             }
-            stack.last().addChild(this)
             while (toPop > 0) {
                 val item = stack.removeLast()
                 stack.last().addChild(item)

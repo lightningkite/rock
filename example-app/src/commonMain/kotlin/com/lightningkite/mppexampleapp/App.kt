@@ -22,11 +22,7 @@ fun ViewWriter.app() {
                 NavItem("Forms", Icon.done, FormsScreen)
             )
         }
-        ::currentUser {
-            ProfileInfo(
-                UserInfo("Test User", null, Icon.person),
-            )
-        }
+        ::currentUser { UserInfo("Test User", null, Icon.person) }
 
         ::userLinks {
             listOf(

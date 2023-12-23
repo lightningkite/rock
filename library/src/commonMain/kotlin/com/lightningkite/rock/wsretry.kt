@@ -128,7 +128,8 @@ val <RECEIVE> TypedWebSocket<*, RECEIVE>.mostRecentMessage: Readable<RECEIVE?>
 
         override fun addListener(listener: () -> Unit): () -> Unit {
             listeners.add(listener)
-            return { listeners.remove(listener) }
+            val parent = this@mostRecentMessage.start()
+            return { listeners.remove(listener); parent() }
         }
 
         override fun hashCode(): Int {

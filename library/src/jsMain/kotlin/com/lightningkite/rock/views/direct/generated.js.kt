@@ -1,21 +1,25 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.*
-import com.lightningkite.rock.models.toWeb
+import com.lightningkite.rock.Blob
+import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.*
-import com.lightningkite.rock.reactive.*
+import com.lightningkite.rock.navigation.RockNavigator
+import com.lightningkite.rock.navigation.RockScreen
+import com.lightningkite.rock.navigation.render
+import com.lightningkite.rock.reactive.Readable
+import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.browser.document
 import kotlinx.browser.window
+import kotlinx.datetime.*
 import kotlinx.dom.addClass
 import org.w3c.dom.*
-import org.w3c.dom.url.URL
-import kotlin.random.Random
-import kotlinx.datetime.*
 import org.w3c.dom.events.Event
+import org.w3c.dom.url.URL
 import kotlin.js.Date
+import kotlin.random.Random
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -401,10 +405,12 @@ actual inline var RadioToggleButton.enabled: Boolean
         (this.native.previousElementSibling as HTMLInputElement).disabled = !value
     }
 actual val RadioToggleButton.checked: Writable<Boolean>
-    get() = (this.native.previousElementSibling as HTMLInputElement).vprop(
-        "input",
-        { checked },
-        { checked = it })
+    get() {
+        return (this.native.previousElementSibling as HTMLInputElement).vprop(
+            "input",
+            { checked },
+            { checked = it })
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NLocalDateField = HTMLInputElement
@@ -674,18 +680,23 @@ actual fun ViewWriter.select(setup: Select.() -> Unit): Unit =
 
 actual fun <T> Select.bind(
     edits: Writable<T>,
-    data: suspend () -> List<T>,
+    data: Readable<List<T>>,
     render: (T) -> String
 ) {
     var list: List<T> = listOf()
     reactiveScope {
-        list = data()
-        native.__resetContentToOptionList(list.mapIndexed { index, t ->
-            WidgetOption(index.toString(), render(t))
-        }, list.indexOf(edits.awaitRaw()).toString())
+        list = data.await()
+        native.__resetContentToOptionList(
+            list.mapIndexed { index, t ->
+                WidgetOption(index.toString(), render(t))
+            },
+            list.indexOf(edits.awaitRaw()).toString()
+        )
     }
     native.onchange = {
-        launch { native.value.toIntOrNull()?.let { list.getOrNull(it) }?.let { edits set it } }
+        launch {
+            native.value.toIntOrNull()?.let { edits set list[it] }
+        }
     }
 }
 

@@ -773,7 +773,7 @@ actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = stack {
 }
 actual fun <T> Select.bind(
     edits: Writable<T>,
-    data: suspend () -> List<T>,
+    data: Readable<List<T>>,
     render: (T) -> String
 ) {
     val picker = (native.inputView as UIPickerView)
@@ -782,7 +782,7 @@ actual fun <T> Select.bind(
 
         init {
             reactiveScope {
-                list = data()
+                list = data.await()
                 picker.reloadAllComponents()
             }
         }

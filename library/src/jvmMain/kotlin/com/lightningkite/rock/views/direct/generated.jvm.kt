@@ -186,7 +186,7 @@ actual inline var TextArea.hint: String
 @ViewDsl actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = todo("select")
 actual fun <T> Select.bind(
     edits: Writable<T>,
-    data: suspend () -> List<T>,
+    data: Readable<List<T>>,
     render: (T) -> String
 ) {
 }

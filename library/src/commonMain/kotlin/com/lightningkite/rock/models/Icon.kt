@@ -7,7 +7,6 @@ data class Icon(
 ) {
     fun toImageSource(fillColor: Paint?, strokeColor: Color? = null, strokeWidth: Double? = null) = ImageVector(width, height, viewBoxMinX, viewBoxMinY, viewBoxWidth, viewBoxHeight, pathDatas.map { ImageVector.Path(fillColor, strokeColor, strokeWidth, it) })
     companion object {
-        val briefcase = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M160-120q-33 0-56.5-23.5T80-200v-440q0-33 23.5-56.5T160-720h160v-80q0-33 23.5-56.5T400-880h160q33 0 56.5 23.5T640-800v80h160q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120H160Zm0-80h640v-440H160v440Zm240-520h160v-80H400v80ZM160-200v-440 440Z"))
         val search = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"))
         val home = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"))
         val menu = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"))

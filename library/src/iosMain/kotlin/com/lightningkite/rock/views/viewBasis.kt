@@ -56,6 +56,7 @@ actual var NView.exists: Boolean
     get() = !hidden
     set(value) {
         hidden = !value
+        informParentOfSizeChange()
     }
 
 actual var NView.visible: Boolean

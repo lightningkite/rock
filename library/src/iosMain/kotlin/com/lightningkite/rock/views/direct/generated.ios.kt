@@ -936,7 +936,9 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
                     count = 1,
                 )
             )
-        )
+        ).apply {
+            configuration.scrollDirection = UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal
+        }
     })) {
     extensionViewWriter = newViews()
     handleTheme(this, viewDraws = false)
@@ -958,7 +960,10 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
     @OverrideInit constructor(coder: NSCoder):super(coder = coder)
     val data = LateInitProperty<T>()
     var ready = false
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
+    override fun subviewDidChangeSizing(view: UIView?) {
+        frameLayoutSubviewDidChangeSizing(view)
+        generateSequence(this as UIView) { it.superview }.filterIsInstance<UICollectionView>().firstOrNull()?.collectionViewLayout?.invalidateLayout()
+    }
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }

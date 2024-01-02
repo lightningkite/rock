@@ -33,7 +33,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 
     override fun subviewDidChangeSizing(view: UIView?) {
         val it = view ?: return
-        if(it.hidden) return
+//        if(it.hidden) return
 //        it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
 //            return
 //        }

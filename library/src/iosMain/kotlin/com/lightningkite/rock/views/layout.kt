@@ -7,4 +7,5 @@ import platform.UIKit.UIView
 @OptIn(ExperimentalForeignApi::class)
 fun UIView.informParentOfSizeChange() {
     (superview as? UIViewWithSizeOverridesProtocol)?.subviewDidChangeSizing(this)
+    setNeedsLayout()
 }

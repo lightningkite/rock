@@ -21,5 +21,6 @@
 			</array>
 		</dict>
 	</dict>
+<key>UIAppFonts</key><array><string>fontsMontserrat-normal.ttf</string><string>fontsMontserrat-bold.ttf</string><string>fontsMontserrat-italic.ttf</string><string>fontsMontserrat-bold-italic.ttf</string></array>
 </dict>
 </plist>

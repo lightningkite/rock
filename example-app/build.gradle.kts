@@ -77,7 +77,7 @@ kotlin {
         version = "1.0"
         summary = "Some description for a Kotlin/Native module"
         homepage = "Link to a Kotlin/Native module homepage"
-        ios.deploymentTarget = "12.0"
+        ios.deploymentTarget = "14.0"
 
         // Optional properties
         // Configure the Pod name here instead of changing the Gradle project name
@@ -112,6 +112,7 @@ dependencies {
 
 configure<RockPluginExtension> {
     this.packageName = "com.lightningkite.mppexampleapp"
+    this.iosProjectRoot = project.file("../example-app-ios/Rock Example App")
 }
 
 android {

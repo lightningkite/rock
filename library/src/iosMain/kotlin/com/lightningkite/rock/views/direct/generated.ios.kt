@@ -30,7 +30,13 @@ import kotlin.experimental.ExperimentalObjCName
 actual typealias NSeparator = UIView
 
 @ViewDsl
-actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit = todo("separator")
+actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit = element(UIView()) {
+    handleTheme(this) {
+        backgroundColor = it.foreground.closestColor().toUiColor()
+        alpha = 0.25
+    }
+    extensionSizeConstraints = SizeConstraints(minWidth = 1.px, minHeight = 1.px)
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NContainingView = UIView
@@ -162,7 +168,7 @@ actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -173,7 +179,7 @@ actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -184,7 +190,7 @@ actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -195,7 +201,7 @@ actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -206,7 +212,7 @@ actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -217,7 +223,7 @@ actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(StyledUILab
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
-        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -228,7 +234,7 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(StyledUIL
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
-        it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -239,7 +245,7 @@ actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(Styled
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
-        it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular) }
+        it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
     }
     setup(TextView(this))
 }
@@ -270,7 +276,7 @@ actual inline var TextView.textSize: Dimension
     get() = Dimension(native.font.pointSize)
     set(value) {
         native.extensionFontAndStyle?.let {
-            native.font = it.font.get(value.value, if (it.bold) UIFontWeightBold else UIFontWeightRegular)
+            native.font = it.font.get(value.value, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic)
         }
     }
 
@@ -278,10 +284,13 @@ actual inline var TextView.textSize: Dimension
 actual typealias NLabel = UIView
 
 @ViewDsl
-actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = todo("label")
+actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = col {
+    subtext {  }
+    setup(Label(native))
+}
 actual inline var Label.content: String
-    get() = TODO()
-    set(value) {}
+    get() = (native.subviews[0] as UILabel).text ?: ""
+    set(value) { (native.subviews[0] as UILabel).text = value }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NActivityIndicator = UIActivityIndicatorView
@@ -814,23 +823,109 @@ actual fun <T> Select.bind(
     picker.extensionDelegateStrongRef = source
 }
 
+//@Suppress("ACTUAL_WITHOUT_EXPECT")
+//actual typealias NAutoCompleteTextField = UIView
+//
+//@ViewDsl
+//actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit =
+//    todo("autoCompleteTextField")
+//
+//actual val AutoCompleteTextField.content: Writable<String> get() = Property("")
+//actual inline var AutoCompleteTextField.keyboardHints: KeyboardHints
+//    get() = TODO()
+//    set(value) {}
+//actual var AutoCompleteTextField.action: Action?
+//    get() = TODO()
+//    set(value) {}
+//actual inline var AutoCompleteTextField.suggestions: List<String>
+//    get() = TODO()
+//    set(value) {}
+
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NAutoCompleteTextField = UIView
+actual typealias NAutoCompleteTextField = UITextField
 
 @ViewDsl
-actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit =
-    todo("autoCompleteTextField")
+actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = stack {
+    element(UITextField()) {
+        smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
+        smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
+        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        calculationContext.onRemove {
+            extensionDelegateStrongRef = null
+        }
+        setup(AutoCompleteTextField(this))
+    }
+}
 
-actual val AutoCompleteTextField.content: Writable<String> get() = Property("")
+actual val AutoCompleteTextField.content: Writable<String>
+    get() = object : Writable<String> {
+        override suspend fun awaitRaw(): String = native.text ?: ""
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            return native.onEvent(UIControlEventEditingChanged) {
+                listener()
+            }
+        }
+
+        override suspend fun set(value: String) {
+            native.text = value
+        }
+    }
 actual inline var AutoCompleteTextField.keyboardHints: KeyboardHints
     get() = TODO()
-    set(value) {}
+    set(value) {
+        native.autocapitalizationType = when (value.case) {
+            KeyboardCase.None -> UITextAutocapitalizationType.UITextAutocapitalizationTypeNone
+            KeyboardCase.Letters -> UITextAutocapitalizationType.UITextAutocapitalizationTypeAllCharacters
+            KeyboardCase.Words -> UITextAutocapitalizationType.UITextAutocapitalizationTypeWords
+            KeyboardCase.Sentences -> UITextAutocapitalizationType.UITextAutocapitalizationTypeSentences
+        }
+        native.keyboardType = when (value.type) {
+            KeyboardType.Text -> UIKeyboardTypeDefault
+            KeyboardType.Integer -> UIKeyboardTypeNumberPad
+            KeyboardType.Phone -> UIKeyboardTypePhonePad
+            KeyboardType.Decimal -> UIKeyboardTypeNumbersAndPunctuation
+            KeyboardType.Email -> UIKeyboardTypeEmailAddress
+        }
+    }
 actual var AutoCompleteTextField.action: Action?
     get() = TODO()
-    set(value) {}
+    set(value) {
+        native.delegate = action?.let {
+            val d = object : NSObject(), UITextFieldDelegateProtocol {
+                override fun textFieldShouldReturn(textField: UITextField): Boolean {
+                    launch { it.onSelect() }
+                    return true
+                }
+            }
+            native.extensionDelegateStrongRef = d
+            d
+        } ?: NextFocusDelegateShared
+        native.returnKeyType = when (action?.title) {
+            "Emergency Call" -> UIReturnKeyType.UIReturnKeyEmergencyCall
+            "Go" -> UIReturnKeyType.UIReturnKeyGo
+            "Next" -> UIReturnKeyType.UIReturnKeyNext
+            "Continue" -> UIReturnKeyType.UIReturnKeyContinue
+            "Default" -> UIReturnKeyType.UIReturnKeyDefault
+            "Join" -> UIReturnKeyType.UIReturnKeyJoin
+            "Done" -> UIReturnKeyType.UIReturnKeyDone
+            "Yahoo" -> UIReturnKeyType.UIReturnKeyYahoo
+            "Send" -> UIReturnKeyType.UIReturnKeySend
+            "Google" -> UIReturnKeyType.UIReturnKeyGoogle
+            "Route" -> UIReturnKeyType.UIReturnKeyRoute
+            "Search" -> UIReturnKeyType.UIReturnKeySearch
+            else -> UIReturnKeyType.UIReturnKeyDone
+        }
+    }
+//actual inline var AutoCompleteTextField.hint: String
+//    get() = native.placeholder ?: ""
+//    set(value) {
+//        native.placeholder = value
+//    }
 actual inline var AutoCompleteTextField.suggestions: List<String>
     get() = TODO()
-    set(value) {}
+    set(value) {
+
+    }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSwapView = FrameLayout

@@ -1,20 +1,22 @@
 package com.lightningkite.rock
 
+import org.apache.fontbox.ttf.OTFParser
+import org.apache.fontbox.ttf.TTFParser
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import java.io.File
 import java.util.HashMap
 
 interface RockPluginExtension {
     var packageName: String
+    var iosProjectRoot: File
 }
 
 // Test Note
 
-class RockPlugin: Plugin<Project> {
+class RockPlugin : Plugin<Project> {
     override fun apply(project: Project) = with(project) {
         val ext = extensions.create("rock", RockPluginExtension::class.java)
         tasks.create("commonResources", Task::class.java).apply {
@@ -28,7 +30,7 @@ class RockPlugin: Plugin<Project> {
                     .entries
                     .sortedBy { it.key }
                     .joinToString("\n    ") {
-                        when(val r = it.value) {
+                        when (val r = it.value) {
                             is Resource.Font -> "val ${r.name}: Font"
                             is Resource.Image -> "val ${r.name}: ImageResource"
                             is Resource.Binary -> "suspend fun ${r.name}(): Blob"
@@ -66,10 +68,10 @@ expect object Resources {
                     .entries
                     .sortedBy { it.key }
                     .joinToString("\n    ") {
-                        when(val r = it.value) {
+                        when (val r = it.value) {
                             is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal}\", bold = ${r.bold?.let { "\"/common/$it\"" }}, italic = ${r.italic?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.let { "\"/common/$it\"" }}))"
-                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.file}\")"
-                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.file}\").blob()"
+                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.relativeFile}\")"
+                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.relativeFile}\").blob()"
                             else -> ""
                         }
                     }
@@ -87,71 +89,211 @@ actual object Resources {
             }
         }
 
+        tasks.create("iosResources").apply {
+            dependsOn("commonResources")
+            group = "build"
+            val outKt = project.file("src/iosMain/kotlin/ResourcesActual.kt")
+            outputs.file(outKt)
+
+            afterEvaluate {
+
+                val outProject = ext.iosProjectRoot
+                val outAssets = outProject.resolve("Assets.xcassets")
+                val outNonAssets = outProject.resolve("resourcesFromCommon")
+                val outPlist = outProject.resolve("Info.plist")
+//                outputs.files(outAssets)
+//                outputs.files(outNonAssets)
+//                outputs.file(outPlist)
+                val resourceFolder = project.file("src/commonMain/resources")
+                inputs.files(resourceFolder)
+                doLast {
+                    val resources = resourceFolder.resources()
+                        .entries
+                        .sortedBy { it.key }
+
+                    run {
+                        val original = outPlist.readText()
+                        val uiAppFontsContent = resources.map { it.value }.filterIsInstance<Resource.Font>().flatMap {
+                            it.files.map { f ->
+                                val copyName = it.name + "-" + f.source.name
+                                f.source.copyTo(outNonAssets.resolve(copyName), overwrite = true)
+                                copyName
+                            }
+                        }.joinToString("") {
+                            "<string>$it</string>"
+                        }
+                        if(original.contains("<key>UIAppFonts</key>")) {
+                            outPlist.writeText(original
+                                .substringBefore("<key>UIAppFonts</key>") +
+                                    "<key>UIAppFonts</key><array>" +
+                                    uiAppFontsContent +
+                                    "</array>" +
+                                    original.substringAfter("<key>UIAppFonts</key>")
+                                        .substringAfter("</array>")
+                            )
+                        } else {
+                            outPlist.writeText(original
+                                .substringBefore("</dict>\n</plist>") +
+                                    "<key>UIAppFonts</key><array>" +
+                                    uiAppFontsContent +
+                                    "</array>\n" +
+                                    "</dict>\n</plist>"
+                            )
+                        }
+                    }
+
+                    resources.forEach {
+                        when (val r = it.value) {
+                            is Resource.Font -> {}
+                            is Resource.Image -> {
+                                val f = outAssets.resolve(it.key + ".imageset")
+                                f.mkdirs()
+                                val i = f.resolve(r.source.name)
+                                r.source.copyTo(i, overwrite = true)
+                                f.resolve("Contents.json").writeText(
+                                    """
+                                {
+                                    "info": { "version": 1, "author": "xcode" },
+                                    "images": [
+                                        { 
+                                            "filename": "${i.name}",
+                                            "scale": "1x",
+                                            "idiom": "universal"
+                                        }
+                                    ]
+                                }
+                            """.trimIndent()
+                                )
+                            }
+
+                            is Resource.Binary -> {
+
+                            }
+
+                            else -> {}
+                        }
+                    }
+
+                    val lines = resources
+                        .joinToString("\n    ") {
+                            when (val r = it.value) {
+                                is Resource.Font -> "actual val ${r.name}: Font = fontFromFamilyInfo(normal = ${r.normal.postScriptName.str()}, " +
+                                        "italic = ${r.italic?.postScriptName.str()}, " +
+                                        "bold = ${r.bold?.postScriptName.str()}, " +
+                                        "boldItalic = ${r.boldItalic?.postScriptName.str()})  // ${r}"
+                                is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"${it.key}\")"
+                                is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = TODO()"
+                                else -> ""
+                            }
+                        }
+                    outKt.writeText(
+                        """
+package ${ext.packageName}
+
+import com.lightningkite.rock.models.*
+
+actual object Resources {
+    $lines
+}
+        """.trimIndent()
+                    )
+                }
+            }
+        }
+
         Unit
     }
 }
+
+fun String?.str() = if(this == null) "null" else "\"$this\""
 
 
 sealed class Resource {
     data class Font(
         val name: String,
-        val normal: File,
-        val bold: File? = null,
-        val italic: File? = null,
-        val boldItalic: File? = null
-    ) : Resource()
+        val normal: SubFont,
+        val bold: SubFont? = null,
+        val italic: SubFont? = null,
+        val boldItalic: SubFont? = null
+    ) : Resource() {
+        data class SubFont(
+            val source: File,
+            val relativeFile: File,
+            val fontSuperFamily: String,
+            val fontFamily: String,
+            val fontSubFamily: String,
+            val postScriptName: String,
+        )
+        val files get() = listOfNotNull(normal, bold, italic, boldItalic)
+    }
 
-    data class Image(val name: String, val file: File) : Resource()
-    data class Binary(val name: String, val file: File) : Resource()
+    data class Image(val name: String, val source: File, val relativeFile: File) : Resource()
+    data class Binary(val name: String, val source: File, val relativeFile: File) : Resource()
 }
 
 fun File.resources(): Map<String, Resource> {
     val out = HashMap<String, Resource>()
-    walkTopDown().forEach { it ->
-        if(it.name.isEmpty()) return@forEach
-        if(it.isDirectory) return@forEach
-        val file = it.relativeTo(this)
-        val name = file.path.replace('/', ' ').replace('\\', ' ')
+    walkTopDown().forEach { file ->
+        if (file.name.isEmpty()) return@forEach
+        if (file.isDirectory) return@forEach
+        val relativeFile = file.relativeTo(this)
+        val name = relativeFile.path.replace('/', ' ').replace('\\', ' ')
             .substringBeforeLast('.')
             .camelCase()
-        when (file.extension) {
-            "png", "jpg" -> out[name] = Resource.Image(name, file)
+        when (relativeFile.extension) {
+            "png", "jpg" -> out[name] = Resource.Image(name, file, relativeFile)
             "otf", "ttf" -> {
-                if (file.nameWithoutExtension in setOf(
+                val font = when(relativeFile.extension) {
+                    "otf" -> OTFParser().parse(file)
+                    "ttf" -> TTFParser().parse(file)
+                    else -> throw IllegalArgumentException()
+                }
+                val sf = Resource.Font.SubFont(
+                    source = file,
+                    relativeFile = relativeFile,
+                    fontSuperFamily = font.naming.getName(16, 1, 0, 0) ?: font.naming.nameRecords.find { it.nameId == 16 }?.string ?: "",
+                    fontFamily = font.naming.fontFamily,
+                    fontSubFamily = font.naming.fontSubFamily,
+                    postScriptName = font.naming.postScriptName,
+                )
+                if (relativeFile.nameWithoutExtension in setOf(
                         "bold",
                         "bold-italic",
                         "italic",
                         "normal",
                     )
                 ) {
-                    val folderName = file.parentFile.path.replace('/', ' ').replace('\\', ' ')
+                    val folderName = relativeFile.parentFile.path.replace('/', ' ').replace('\\', ' ')
                         .substringBeforeLast('.')
                         .camelCase()
                     out[folderName] = (out[folderName] as? Resource.Font)?.let {
                         it.copy(
-                            normal = if (file.nameWithoutExtension == "normal") file else it.normal,
-                            boldItalic = if (file.nameWithoutExtension == "bold-italic") file else it.boldItalic,
-                            italic = if (file.nameWithoutExtension == "italic") file else it.italic,
-                            bold = if (file.nameWithoutExtension == "bold") file else it.bold,
+                            normal = if (relativeFile.nameWithoutExtension == "normal") sf else it.normal,
+                            boldItalic = if (relativeFile.nameWithoutExtension == "bold-italic") sf else it.boldItalic,
+                            italic = if (relativeFile.nameWithoutExtension == "italic") sf else it.italic,
+                            bold = if (relativeFile.nameWithoutExtension == "bold") sf else it.bold,
                         )
                     } ?: Resource.Font(
-                        folderName, file,
-                        boldItalic = if (file.nameWithoutExtension == "bold-italic") file else null,
-                        italic = if (file.nameWithoutExtension == "italic") file else null,
-                        bold = if (file.nameWithoutExtension == "bold") file else null,
+                        folderName,
+                        normal = sf,
+                        boldItalic = if (relativeFile.nameWithoutExtension == "bold-italic") sf else null,
+                        italic = if (relativeFile.nameWithoutExtension == "italic") sf else null,
+                        bold = if (relativeFile.nameWithoutExtension == "bold") sf else null,
                     )
-                } else out[name] = Resource.Font(name, file)
+                } else out[name] = Resource.Font(name, sf)
             }
+
             "" -> {}
-            else -> out[name] = Resource.Binary(name, file)
+            else -> out[name] = Resource.Binary(name, file, relativeFile)
         }
     }
     return out
 }
+
 val `casing separator regex` = Regex("([-_\\s]+([A-Z]*[a-z0-9]+))|([-_\\s]*[A-Z]+)")
 inline fun String.caseAlter(crossinline update: (after: String) -> String): String =
     `casing separator regex`.replace(this) {
-        if(it.range.start == 0) it.value
+        if (it.range.start == 0) it.value
         else update(it.value.filter { !(it == '-' || it == '_' || it.isWhitespace()) })
     }
 

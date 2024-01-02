@@ -18,6 +18,6 @@ actual object ExternalServices {
     }
     actual fun requestFile(mimeTypes: List<String>, onResult: (FileReference?)->Unit) = requestFileInput(mimeTypes, {}, { onResult(it.firstOrNull()) })
     actual fun requestFiles(mimeTypes: List<String>, onResult: (List<FileReference>)->Unit) = requestFileInput(mimeTypes, { multiple = true }, { onResult(it) })
-    actual fun requestCaptureSelf(mimeTypes: List<String>, onResult: (List<FileReference>)->Unit) = requestFileInput(mimeTypes, { setAttribute("capture", "user") }, { onResult(it) })
-    actual fun requestCaptureEnvironment(mimeTypes: List<String>, onResult: (List<FileReference>)->Unit) = requestFileInput(mimeTypes, { setAttribute("capture", "environment") }, { onResult(it) })
+    actual fun requestCaptureSelf(mimeTypes: List<String>, onResult: (FileReference?)->Unit) = requestFileInput(mimeTypes, { setAttribute("capture", "user") }, { onResult(it.firstOrNull()) })
+    actual fun requestCaptureEnvironment(mimeTypes: List<String>, onResult: (FileReference?)->Unit) = requestFileInput(mimeTypes, { setAttribute("capture", "environment") }, { onResult(it.firstOrNull()) })
 }

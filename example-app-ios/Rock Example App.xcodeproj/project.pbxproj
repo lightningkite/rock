@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		0899F8D6A21066721E56642F /* Pods_Rock_Example_AppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 833634D8CEA5B31E303DE247 /* Pods_Rock_Example_AppTests.framework */; };
+		18267D822B44BFFC00A45F8C /* fontsMontserrat-bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18267D7E2B44BFFC00A45F8C /* fontsMontserrat-bold.ttf */; };
+		18267D832B44BFFC00A45F8C /* fontsMontserrat-italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18267D7F2B44BFFC00A45F8C /* fontsMontserrat-italic.ttf */; };
+		18267D842B44BFFC00A45F8C /* fontsMontserrat-normal.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18267D802B44BFFC00A45F8C /* fontsMontserrat-normal.ttf */; };
+		18267D852B44BFFC00A45F8C /* fontsMontserrat-bold-italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 18267D812B44BFFC00A45F8C /* fontsMontserrat-bold-italic.ttf */; };
 		183A2D592B335230001011C3 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = 183A2D582B335230001011C3 /* test.m */; };
 		188D8B992B2B9CB400732A2E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188D8B982B2B9CB400732A2E /* AppDelegate.swift */; };
 		188D8B9B2B2B9CB400732A2E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188D8B9A2B2B9CB400732A2E /* SceneDelegate.swift */; };
@@ -41,6 +45,10 @@
 
 /* Begin PBXFileReference section */
 		126B1CC2D6B37BD601820B66 /* Pods-Rock Example AppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Rock Example AppTests.debug.xcconfig"; path = "Target Support Files/Pods-Rock Example AppTests/Pods-Rock Example AppTests.debug.xcconfig"; sourceTree = "<group>"; };
+		18267D7E2B44BFFC00A45F8C /* fontsMontserrat-bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontsMontserrat-bold.ttf"; sourceTree = "<group>"; };
+		18267D7F2B44BFFC00A45F8C /* fontsMontserrat-italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontsMontserrat-italic.ttf"; sourceTree = "<group>"; };
+		18267D802B44BFFC00A45F8C /* fontsMontserrat-normal.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontsMontserrat-normal.ttf"; sourceTree = "<group>"; };
+		18267D812B44BFFC00A45F8C /* fontsMontserrat-bold-italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontsMontserrat-bold-italic.ttf"; sourceTree = "<group>"; };
 		183A2D572B33522F001011C3 /* Rock Example App-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Rock Example App-Bridging-Header.h"; sourceTree = "<group>"; };
 		183A2D582B335230001011C3 /* test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; };
 		188D8B952B2B9CB400732A2E /* Rock Example App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Rock Example App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +102,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		18267D752B44BF5300A45F8C /* resourcesFromCommon */ = {
+			isa = PBXGroup;
+			children = (
+				18267D812B44BFFC00A45F8C /* fontsMontserrat-bold-italic.ttf */,
+				18267D7E2B44BFFC00A45F8C /* fontsMontserrat-bold.ttf */,
+				18267D7F2B44BFFC00A45F8C /* fontsMontserrat-italic.ttf */,
+				18267D802B44BFFC00A45F8C /* fontsMontserrat-normal.ttf */,
+			);
+			path = resourcesFromCommon;
+			sourceTree = "<group>";
+		};
 		188D8B8C2B2B9CB400732A2E = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +138,7 @@
 		188D8B972B2B9CB400732A2E /* Rock Example App */ = {
 			isa = PBXGroup;
 			children = (
+				18267D752B44BF5300A45F8C /* resourcesFromCommon */,
 				188D8B982B2B9CB400732A2E /* AppDelegate.swift */,
 				188D8B9A2B2B9CB400732A2E /* SceneDelegate.swift */,
 				188D8B9C2B2B9CB400732A2E /* ViewController.swift */,
@@ -285,6 +305,10 @@
 				188D8BA52B2B9CB500732A2E /* LaunchScreen.storyboard in Resources */,
 				188D8BA22B2B9CB500732A2E /* Assets.xcassets in Resources */,
 				188D8BA02B2B9CB400732A2E /* Main.storyboard in Resources */,
+				18267D832B44BFFC00A45F8C /* fontsMontserrat-italic.ttf in Resources */,
+				18267D822B44BFFC00A45F8C /* fontsMontserrat-bold.ttf in Resources */,
+				18267D842B44BFFC00A45F8C /* fontsMontserrat-normal.ttf in Resources */,
+				18267D852B44BFFC00A45F8C /* fontsMontserrat-bold-italic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

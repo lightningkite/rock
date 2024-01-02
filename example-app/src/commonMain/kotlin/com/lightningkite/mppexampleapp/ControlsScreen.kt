@@ -121,13 +121,13 @@ object ControlsScreen : RockScreen {
 
             col {
                 h2 { content = "Drop Downs" }
-                val options = listOf("Apple", "Banana", "Crepe")
-                select { bind(Property("Apple"), data = { options }, render = { it }) } in withDefaultPadding
-                select { bind(Property("Apple"), data = { options }, render = { it }) } in card
-                select { bind(Property("Apple"), data = { options }, render = { it }) } in important
-                select { bind(Property("Apple"), data = { options }, render = { it }) } in critical
-                select { bind(Property("Apple"), data = { options }, render = { it }) } in warning
-                select { bind(Property("Apple"), data = { options }, render = { it }) } in danger
+                val options = shared { listOf("Apple", "Banana", "Crepe") }
+                select { bind(Property("Apple"), data = options, render = { it }) } in withDefaultPadding
+                select { bind(Property("Apple"), data = options, render = { it }) } in card
+                select { bind(Property("Apple"), data = options, render = { it }) } in important
+                select { bind(Property("Apple"), data = options, render = { it }) } in critical
+                select { bind(Property("Apple"), data = options, render = { it }) } in warning
+                select { bind(Property("Apple"), data = options, render = { it }) } in danger
             } in card
 
             col {

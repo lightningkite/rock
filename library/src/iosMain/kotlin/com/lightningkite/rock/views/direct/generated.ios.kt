@@ -9,15 +9,21 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import com.lightningkite.rock.views.l2.icon
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ObjCAction
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import kotlinx.datetime.*
 import platform.Foundation.NSDate
+import platform.Foundation.NSIndexPath
 import platform.UIKit.*
 import platform.darwin.NSInteger
+import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import platform.CoreGraphics.*
+import platform.CoreImage.provideImageData
+import platform.Foundation.NSBundle
+import platform.Foundation.NSCoder
 import platform.darwin.NSObject
+import platform.objc.object_getClass
 import platform.objc.sel_registerName
+import kotlin.experimental.ExperimentalObjCName
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -889,23 +895,176 @@ actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Dou
     native.onPointerUp.add(action)
 }
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NRecyclerView = UIView
+actual typealias NRecyclerView = UICollectionView
 
 @ViewDsl
-actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
+actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = element(UICollectionView(CGRectMake(0.0, 0.0, 0.0, 0.0), run {
+        val size = NSCollectionLayoutSize.sizeWithWidthDimension(
+            width = NSCollectionLayoutDimension.fractionalWidthDimension(1.0),
+            heightDimension = NSCollectionLayoutDimension.estimatedDimension(50.0),
+        )
+        UICollectionViewCompositionalLayout(
+            NSCollectionLayoutSection.sectionWithGroup(
+                NSCollectionLayoutGroup.horizontalGroupWithLayoutSize(
+                    layoutSize = size,
+                    subitem = NSCollectionLayoutItem.itemWithLayoutSize(
+                        layoutSize = size
+                    ),
+                    count = 1,
+                )
+            )
+        )
+    })) {
+    extensionViewWriter = newViews()
+    handleTheme(this, viewDraws = false)
+    setup(RecyclerView(this))
+}
 
 @ViewDsl
-actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")
+actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = element(UICollectionView(CGRectMake(0.0, 0.0, 0.0, 0.0), run {
+        val size = NSCollectionLayoutSize.sizeWithWidthDimension(
+            width = NSCollectionLayoutDimension.estimatedDimension(50.0),
+            heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension(1.0),
+        )
+        UICollectionViewCompositionalLayout(
+            NSCollectionLayoutSection.sectionWithGroup(
+                NSCollectionLayoutGroup.verticalGroupWithLayoutSize(
+                    layoutSize = size,
+                    subitem = NSCollectionLayoutItem.itemWithLayoutSize(
+                        layoutSize = size
+                    ),
+                    count = 1,
+                )
+            )
+        )
+    })) {
+    extensionViewWriter = newViews()
+    handleTheme(this, viewDraws = false)
+    setup(RecyclerView(this))
+}
 
 @ViewDsl
-actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("gridRecyclerView")
+actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = recyclerView(setup)
 actual var RecyclerView.columns: Int
     get() = 1
     set(value) {
     }
 
-actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {
-    // TODO()
+@OptIn(ExperimentalObjCName::class)
+@ExportObjCClass
+class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesProtocol {
+    constructor():this(CGRectMake(0.0, 0.0, 0.0, 0.0))
+    @OverrideInit constructor(frame: CValue<CGRect>):super(frame = frame)
+    @OverrideInit constructor(coder: NSCoder):super(coder = coder)
+    val data = LateInitProperty<T>()
+    var ready = false
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
+    var padding: Double
+        get() = extensionPadding ?: 0.0
+        set(value) { extensionPadding = value }
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews()
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return super.hitTest(point, withEvent).takeUnless { it == this }
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun <T> RecyclerView.children(
+    items: Readable<List<T>>,
+    render: ViewWriter.(value: Readable<T>) -> Unit
+) {
+    val altCellRef = HashSet<UICollectionViewCell>()
+    calculationContext.onRemove {
+        altCellRef.forEach { it.shutdown() }
+        altCellRef.clear()
+    }
+    val source = object: NSObject(), UICollectionViewDelegateProtocol, UICollectionViewDataSourceProtocol {
+        var list: List<T> = listOf()
+
+        init {
+            reactiveScope {
+                list = items.await()
+                native.reloadData()
+            }
+        }
+        val registered = HashSet<String>()
+        override fun collectionView(collectionView: UICollectionView, cellForItemAtIndexPath: NSIndexPath): UICollectionViewCell {
+            if (registered.add("main")) {
+                collectionView.registerClass(object_getClass(ObsUICollectionViewCell<T>())!!, "main")
+            }
+            val cell = collectionView.dequeueReusableCellWithReuseIdentifier("main", cellForItemAtIndexPath) as ObsUICollectionViewCell<T>
+            if(altCellRef.add(cell)) collectionView.calculationContext.onRemove { cell.shutdown() }
+//                ?: run {
+//                val vw = native.extensionViewWriter ?: throw IllegalStateException("No view writer attached")
+//                vw!!.element(ObsUICollectionViewCell<T>()) {
+//                    render(vw, data)
+//                }
+//                vw.rootCreated as? ObsUICollectionViewCell<T> ?: throw IllegalStateException("No view created")
+//            }
+            list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
+                cell.data.value = it
+            }
+            if(!cell.ready) {
+                val vw = native.extensionViewWriter ?: throw IllegalStateException("No view writer attached")
+                render(vw.targeting(cell), cell.data)
+                cell.ready = true
+            }
+            return cell
+        }
+
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun collectionView(
+            collectionView: UICollectionView,
+            canPerformAction: COpaquePointer?,
+            forItemAtIndexPath: NSIndexPath,
+            withSender: Any?
+        ): Boolean = true
+
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun collectionView(
+            collectionView: UICollectionView,
+            performAction: COpaquePointer?,
+            forItemAtIndexPath: NSIndexPath,
+            withSender: Any?
+        ) {
+        }
+
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun collectionView(
+            collectionView: UICollectionView,
+            targetIndexPathForMoveFromItemAtIndexPath: NSIndexPath,
+            toProposedIndexPath: NSIndexPath
+        ): NSIndexPath = toProposedIndexPath
+
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun collectionView(
+            collectionView: UICollectionView,
+            contextMenuConfigurationForItemAtIndexPath: NSIndexPath,
+            point: CValue<CGPoint>
+        ): UIContextMenuConfiguration? = null
+
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun collectionView(
+            collectionView: UICollectionView,
+            sceneActivationConfigurationForItemAtIndexPath: NSIndexPath,
+            point: CValue<CGPoint>
+        ): UIWindowSceneActivationConfiguration? = null
+
+        override fun collectionView(collectionView: UICollectionView, numberOfItemsInSection: NSInteger): NSInteger = list.size.toLong()
+
+        @Suppress("CONFLICTING_OVERLOADS")
+        override fun collectionView(
+            collectionView: UICollectionView,
+            moveItemAtIndexPath: NSIndexPath,
+            toIndexPath: NSIndexPath
+        ) {
+        }
+
+    }
+    native.setDataSource(source)
+    native.setDelegate(source)
+    native.extensionDelegateStrongRef = source
 }
 
 @ViewModifierDsl3

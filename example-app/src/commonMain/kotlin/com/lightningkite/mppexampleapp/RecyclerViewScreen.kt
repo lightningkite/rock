@@ -16,18 +16,18 @@ object RecyclerViewScreen : RockScreen {
         col {
             recyclerView {
                 children(items) {
-                    text { ::content { "Item ${it.await()}" } }
+                    text { ::content { "Item ${it.await().also { println("Text render $it") }}" } }
                 }
             } in weight(1f)
             horizontalRecyclerView {
                 children(items) {
-                    text { ::content { "Item ${it.await()}" } }
+                    text { ::content { "Item ${it.await().also { println("Text render $it") }}" } }
                 }
             } in weight(1f)
             gridRecyclerView {
                 columns = 4
                 children(items) {
-                    text { ::content { "Item ${it.await()}" } }
+                    text { ::content { "Item ${it.await().also { println("Text render $it") }}" } }
                 }
             } in weight(1f)
         }

@@ -56,7 +56,7 @@ object CanvasSampleScreen : RockScreen {
                 redraw {
                     fillPaint = Color.white
                     clearRect(0.0, 0.0, width, height)
-                    fillPaint = Color.black
+                    fillPaint = Color.red
                     strokePaint = Color.black
                     lineWidth = 5.0
 

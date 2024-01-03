@@ -12,6 +12,10 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        ExternalServices.shared.currentPresenter = { [weak self] (it) in
+            print("Present \(it)")
+            self?.present(it, animated: true)
+        }
         // Do any additional setup after loading the view.
         
         let writer = ViewWriter(parent: self.view, startDepth: 0)

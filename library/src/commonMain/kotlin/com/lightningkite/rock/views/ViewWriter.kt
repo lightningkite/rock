@@ -10,10 +10,11 @@ import com.lightningkite.rock.reactive.*
  * Views rendered through here will be inserted into the given parent in the constructor.
  */
 class ViewWriter(
-    parent: NView,
+    parent: NView?,
     private val startDepth: Int = 0,
 ) {
     val depth: Int get() = stack.size - 1 + startDepth
+    var rootCreated: NView? = null
 
     /**
      * Additional data keyed by string attached to the context.
@@ -33,7 +34,29 @@ class ViewWriter(
         it.transitionNextView = transitionNextView
     }
 
-    private val stack = arrayListOf(parent)
+    /**
+     * Creates a copy of the [ViewWriter] with no root view.
+     * Used for view containers that need their contents removed and replaced later.
+     */
+    fun newViews(): ViewWriter = ViewWriter(null, startDepth = depth).also {
+        it.addons.putAll(this.addons)
+        it.currentTheme = currentTheme
+        it.isRoot = isRoot
+        it.transitionNextView = transitionNextView
+    }
+
+    /**
+     * Creates a copy of the [ViewWriter] with no root view.
+     * Used for view containers that need their contents removed and replaced later.
+     */
+    fun targeting(view: NView): ViewWriter = ViewWriter(view, startDepth = depth).also {
+        it.addons.putAll(this.addons)
+        it.currentTheme = currentTheme
+        it.isRoot = isRoot
+        it.transitionNextView = transitionNextView
+    }
+
+    private val stack = if(parent == null) arrayListOf() else arrayListOf(parent)
     val currentView: NView get() = stack.last()
     private inline fun <T : NView> stackUse(item: T, action: T.() -> Unit) =
         CalculationContextStack.useIn(item.calculationContext) {
@@ -75,7 +98,7 @@ class ViewWriter(
     var transitionNextView: TransitionNextView = TransitionNextView.No
     var isRoot: Boolean = true
 
-    val calculationContext: CalculationContext = stack.last().calculationContext
+    val calculationContext: CalculationContext get() = stack.last().calculationContext
 
     /**
      * Runs the given [action] on the next created element before its setup block is run.
@@ -121,7 +144,7 @@ class ViewWriter(
      */
     fun <T : NView> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
-            stack.last().addChild(this)
+            stack.lastOrNull()?.addChild(this) ?: run { rootCreated = this }
             val beforeCopy =
                 if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
             beforeNextElementSetupList = ArrayList()
@@ -136,7 +159,7 @@ class ViewWriter(
             }
             while (toPop > 0) {
                 val item = stack.removeLast()
-                stack.last().addChild(item)
+                stack.lastOrNull()?.addChild(item) ?: run { rootCreated = item }
                 toPop--
             }
 //            wrapperToDoList.clear()

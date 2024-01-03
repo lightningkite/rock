@@ -18,13 +18,13 @@ actual object ExternalServices {
 
     actual fun requestCaptureSelf(
         mimeTypes: List<String>,
-        onResult: (List<FileReference>) -> Unit,
+        onResult: (FileReference?) -> Unit,
     ) {
     }
 
     actual fun requestCaptureEnvironment(
         mimeTypes: List<String>,
-        onResult: (List<FileReference>) -> Unit,
+        onResult: (FileReference?) -> Unit,
     ) {
     }
 }

@@ -31,6 +31,45 @@ suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
     set(action(await()))
 }
 
+class LateInitProperty<T>(): Writable<T>, ReadWriteProperty<Any?, T> {
+    private val listeners = ArrayList<() -> Unit>()
+    private var queued = ArrayList<Continuation<T>>()
+    private var _value: T? = null
+    var value: T
+        get() = if(ready) _value as T else throw IllegalStateException()
+        set(value) {
+            _value = value
+            ready = true
+            val old = queued
+            queued = ArrayList()
+            old.forEach { it.resume(value) }
+            listeners.toList().forEach { it() }
+        }
+    private var ready: Boolean = false
+
+    override suspend infix fun set(value: T) {
+        this.value = value
+    }
+
+    override suspend fun awaitRaw(): T {
+        if (ready) return value as T
+        else return suspendCoroutineCancellable<T> { queued.add(it); return@suspendCoroutineCancellable { queued.remove(it) } }
+    }
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return {
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
+        }
+    }
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = value
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
+}
+
 class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = ArrayList<() -> Unit>()
     var value: T = startValue

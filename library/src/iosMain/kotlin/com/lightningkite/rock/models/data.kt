@@ -1,10 +1,7 @@
 package com.lightningkite.rock.models
 
 import platform.CoreGraphics.CGFloat
-import platform.UIKit.UIScreen
-import platform.UIKit.UIFont
-import platform.UIKit.UIFontWeight
-import platform.UIKit.systemFontSize
+import platform.UIKit.*
 
 actual typealias DimensionRaw = Double
 actual val Int.px: Dimension
@@ -21,8 +18,23 @@ actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimens
 actual inline operator fun Dimension.times(other: Float): Dimension = Dimension(this.value.times(other))
 actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(this.value.div(other))
 
-actual data class Font(val get: (size: CGFloat, weight: UIFontWeight)->UIFont)
-actual val systemDefaultFont: Font get() = Font { size, weight -> UIFont.systemFontOfSize(size, weight) }
+actual data class Font(val get: (size: CGFloat, weight: UIFontWeight, italic: Boolean)->UIFont)
+fun fontFromFamilyInfo(
+    normal: String,
+    italic: String?,
+    bold: String?,
+    boldItalic: String?
+) = Font { size, weight, getItalic ->
+    val fn = if(getItalic) {
+        if(weight >= UIFontWeightBold) boldItalic ?: bold ?: italic ?: normal
+        else italic ?: normal
+    } else {
+        if(weight >= UIFontWeightBold) bold ?: normal
+        else normal
+    }
+    UIFont.fontWithName(fn, size) ?: systemDefaultFont.get(size, weight, getItalic)
+}
+actual val systemDefaultFont: Font get() = Font { size, weight, italic -> if(italic) UIFont.italicSystemFontOfSize(size) else UIFont.systemFontOfSize(size, weight) }
 
 actual sealed class ImageSource actual constructor()
 actual class ImageResource(val name: String) : ImageSource()

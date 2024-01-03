@@ -274,7 +274,7 @@ actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double, maxWidt
 
 actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle): Unit {
     (this as DrawingContext2DImpl).font =
-        value.font.get(size.value, if (value.bold) UIFontWeightBold else UIFontWeightRegular)
+        value.font.get(size.value, if (value.bold) UIFontWeightBold else UIFontWeightRegular, value.italic)
 }
 
 actual fun DrawingContext2D.textAlign(alignment: TextAlign): Unit {

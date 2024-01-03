@@ -79,3 +79,10 @@ var UIView.extensionTextSize: Double? by UIViewTextSize
 private val UIViewMarginless = ExtensionProperty<UIView, Boolean>()
 var UIView.extensionMarginless: Boolean? by UIViewMarginless
 
+private val UIViewWriter = ExtensionProperty<UIView, ViewWriter>()
+var UIView.extensionViewWriter: ViewWriter? by UIViewWriter
+
+
+private val NSObjectStrongRefHolder = ExtensionProperty<NSObject, NSObject>()
+var NSObject.extensionStrongRef: NSObject? by NSObjectStrongRefHolder
+

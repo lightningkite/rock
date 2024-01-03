@@ -37,6 +37,9 @@ gradlePlugin {
 repositories {
     mavenCentral()
 }
+dependencies {
+    implementation("org.apache.pdfbox:fontbox:2.0.27")
+}
 tasks.validatePlugins {
     enableStricterValidation.set(true)
 }

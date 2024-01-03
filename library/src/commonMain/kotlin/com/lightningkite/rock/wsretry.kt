@@ -18,10 +18,18 @@ fun retryWebsocket(
     val onCloseList = ArrayList<(Short) -> Unit>()
     fun reset() {
         currentWebSocket = websocket(url).also {
-            onOpenList.forEach { l -> it.onOpen(l) }
-            onMessageList.forEach { l -> it.onMessage(l) }
-            onBinaryMessageList.forEach { l -> it.onBinaryMessage(l) }
-            onCloseList.forEach { l -> it.onClose(l) }
+            it.onOpen {
+                onOpenList.forEach { l -> l() }
+            }
+            it.onMessage {
+                onMessageList.forEach { l -> l(it) }
+            }
+            it.onBinaryMessage {
+                onBinaryMessageList.forEach { l -> l(it) }
+            }
+            it.onClose {
+                onCloseList.forEach { l -> l(it) }
+            }
             it.onOpen {
                 lastConnect = clockMillis()
                 connected.value = true

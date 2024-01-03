@@ -153,8 +153,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
         override fun notifySuccess() {}
         override fun notifyFailure(t: Throwable) { t.printStackTrace() }
         override fun onRemove(action: () -> Unit) {
-            removers.forEach { it() }
-            removers.clear()
+            removers.add(action)
         }
     }
     return object: Readable<T> {

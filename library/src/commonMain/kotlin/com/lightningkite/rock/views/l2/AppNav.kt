@@ -247,7 +247,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                         existing.bar() ?: existing
                 } in marginless
             }
-            ::exists { appNav.existsProperty.await() }
+            ::exists { appNav.existsProperty.await() && !SoftInputOpen.await() }
         } in marginless
     } in marginless
 }

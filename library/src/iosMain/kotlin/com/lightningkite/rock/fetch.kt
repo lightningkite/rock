@@ -47,7 +47,7 @@ actual suspend fun fetch(
             }
 
             is RequestBodyFile -> {
-                val mime = (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
+                val mime = body.content.suggestedType ?: (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
                 contentType(ContentType.parse(mime.preferredMIMEType!!))
                 body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
                     if(error != null) throw Exception(error?.description)
@@ -117,7 +117,7 @@ actual class RequestResponse(val wraps: HttpResponse) {
 }
 
 actual class Blob(val data: NSData, val type: String = "application/octet-stream")
-actual class FileReference(val provider: NSItemProvider)
+actual class FileReference(val provider: NSItemProvider, val suggestedType: UTType? = null)
 
 actual fun websocket(url: String): WebSocket {
     return WebSocketWrapper(url)

@@ -17,6 +17,9 @@ id getAssociatedObjectWithKey(id object, NSValue* key) {
 void setAssociatedObjectWithKey(id object, NSValue* key, id value) {
   return objc_setAssociatedObject(object, key.pointerValue, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
+CGRect cgRectValue(NSValue* key) {
+  return key.CGRectValue;
+}
 
 @protocol KeyValueObserver
 - (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context;

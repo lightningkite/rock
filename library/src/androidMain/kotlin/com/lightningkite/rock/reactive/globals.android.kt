@@ -27,3 +27,11 @@ actual object InForeground: Readable<Boolean> {
         TODO("Not yet implemented")
     }
 }
+
+actual object SoftInputOpen : Readable<Boolean> {
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        return {}
+    }
+
+    override suspend fun awaitRaw(): Boolean = false
+}

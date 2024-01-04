@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.Blob
 import com.lightningkite.rock.ViewWrapper
+import com.lightningkite.rock.launchGlobal
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.navigation.RockScreen
@@ -274,7 +275,7 @@ actual fun ViewWriter.button(setup: Button.() -> Unit): Unit =
     themedElementClickable<NButton>("button") { setup(Button(this)) }
 
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
-    native.onclick = { launch { action() } }
+    native.onclick = { launchGlobal(action) }
 }
 
 actual inline var Button.enabled: Boolean
@@ -607,7 +608,7 @@ actual var TextField.action: Action?
     set(value) {
         native.onkeyup = if (value == null) null else { ev ->
             if (ev.keyCode == 13) {
-                launch {
+                launchGlobal {
                     value.onSelect()
                 }
             }

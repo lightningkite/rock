@@ -36,7 +36,7 @@ fun retryWebsocket(
             }
             it.onClose {
                 currentDelay *= 2
-                if(clockMillis() - lastConnect > 60_000.0) currentDelay = baseDelay
+                if(connected.value && clockMillis() - lastConnect > 60_000.0) currentDelay = baseDelay
                 connected.value = false
             }
         }

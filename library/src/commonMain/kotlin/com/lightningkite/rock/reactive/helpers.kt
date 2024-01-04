@@ -1,7 +1,6 @@
 package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.launch
-import com.lightningkite.rock.launchGlobal
 import kotlin.jvm.JvmName
 
 

@@ -1,11 +1,7 @@
 package com.lightningkite.rock.views
 
-import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.reactiveScope
 
 
 /**

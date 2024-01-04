@@ -1,7 +1,10 @@
 package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.*
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.*
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.properties.ReadWriteProperty
 import kotlin.random.Random
 import kotlin.reflect.KProperty
@@ -53,7 +56,10 @@ class LateInitProperty<T>(): Writable<T>, ReadWriteProperty<Any?, T> {
 
     override suspend fun awaitRaw(): T {
         if (ready) return value as T
-        else return suspendCoroutineCancellable<T> { queued.add(it); return@suspendCoroutineCancellable { queued.remove(it) } }
+        else return suspendCancellableCoroutine { continuation ->
+            queued.add(continuation)
+            continuation.invokeOnCancellation { queued.remove(continuation) }
+        }
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
@@ -146,12 +152,12 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
                 }
                 if(result.isSuccess) notifySuccess()
                 else result.exceptionOrNull()?.let {
-                    if(it !is CancelledException) {
+                    if(it !is CancellationException) {
                         notifyFailure(it)
                     }
                 }
                 result.onFailure { ex: Throwable ->
-                    if(ex is CancelledException) return@onFailure
+                    if(ex is CancellationException) return@onFailure
                     ex.printStackTrace()
                 }
             }
@@ -206,7 +212,10 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             exception?.let { throw it } ?: value as T
         } else if(listening) {
 //            println("$this: Already listening; queue")
-            suspendCoroutineCancellable<T> { queued.add(it); { queued.remove(it) } }
+            suspendCancellableCoroutine { continuation ->
+                queued.add(continuation);
+                continuation.invokeOnCancellation { queued.remove(continuation) }
+            }
         } else {
 //            println("$this: Nobody listening; action")
             action(ctx)
@@ -273,7 +282,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
 private class WaitForNotNull<T: Any>(val wraps: Readable<T?>): Readable<T> {
     override suspend fun awaitRaw(): T {
         val basis = wraps.awaitRaw()
-        if(basis == null) return suspendCoroutineCancellable<T> { {  } }
+        if(basis == null) return suspendCancellableCoroutine {  }
         else return basis
     }
 
@@ -289,6 +298,6 @@ private class WaitForNotNull<T: Any>(val wraps: Readable<T?>): Readable<T> {
 val <T: Any> Readable<T?>.waitForNotNull: Readable<T> get() = WaitForNotNull(this)
 suspend fun <T: Any> Readable<T?>.awaitNotNull(): T {
     val basis = await()
-    if(basis == null) return suspendCoroutineCancellable<T> { {} }
+    if(basis == null) return suspendCancellableCoroutine { }
     else return basis
 }

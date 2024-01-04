@@ -1,8 +1,9 @@
 package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.Cancellable
-import com.lightningkite.rock.CancelledException
 import com.lightningkite.rock.debugger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlin.reflect.KMutableProperty0
 
 interface CalculationContext {
@@ -12,14 +13,18 @@ interface CalculationContext {
         t.printStackTrace()
         debugger()
     }
+
     fun onRemove(action: () -> Unit)
+
     companion object {
     }
-    object NeverEnds: CalculationContext {
+
+    object NeverEnds : CalculationContext {
         override fun onRemove(action: () -> Unit) {}
     }
     class Standard: CalculationContext, Cancellable {
         val onRemoveSet = ArrayList<()->Unit>()
+
         override fun onRemove(action: () -> Unit) {
             onRemoveSet.add(action)
         }
@@ -32,7 +37,8 @@ interface CalculationContext {
 
 object CalculationContextStack {
     val stack = ArrayList<CalculationContext>()
-    fun current() = stack.lastOrNull() ?: throw IllegalStateException("CalculationContextStack.onRemove called outside of a builder.")
+    fun current() = stack.lastOrNull()
+        ?: throw IllegalStateException("CalculationContextStack.onRemove called outside of a builder.")
 
     inline fun useIn(handler: CalculationContext, action: () -> Unit) {
         start(handler)
@@ -42,9 +48,11 @@ object CalculationContextStack {
             end(handler)
         }
     }
+
     inline fun start(handler: CalculationContext) {
         stack.add(handler)
     }
+
     inline fun end(handler: CalculationContext) {
         if (stack.removeLast() != handler)
             throw ConcurrentModificationException("Multiple threads have been attempting to instantiate views at the same time.")
@@ -55,11 +63,13 @@ object CalculationContextStack {
 annotation class ReactiveB
 
 @ReactiveB
-operator fun <T, IGNORED> ((T) -> IGNORED).invoke(actionToCalculate: suspend () -> T) = CalculationContextStack.current().reactiveScope {
-    this@invoke(actionToCalculate())
-}
+operator fun <T, IGNORED> ((T) -> IGNORED).invoke(actionToCalculate: suspend () -> T) =
+    CalculationContextStack.current().reactiveScope {
+        this@invoke(actionToCalculate())
+    }
 
 @ReactiveB
-operator fun <T> KMutableProperty0<T>.invoke(actionToCalculate: suspend () -> T) = CalculationContextStack.current().reactiveScope {
-    this@invoke.set(actionToCalculate())
-}
+operator fun <T> KMutableProperty0<T>.invoke(actionToCalculate: suspend () -> T) =
+    CalculationContextStack.current().reactiveScope {
+        this@invoke.set(actionToCalculate())
+    }

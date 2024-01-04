@@ -10,6 +10,8 @@ import org.w3c.fetch.Response
 import org.w3c.files.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE", "UnsafeCastFromDynamic")
 actual suspend fun fetch(
@@ -40,16 +42,30 @@ actual suspend fun fetch(
     o.headers = headers
     o.signal = a.signal
     val promise = window.fetch(url, o as RequestInit)
-    return suspendCoroutineCancellable { cont ->
+
+    return suspendCancellableCoroutine { cont ->
+        println("Fetch: Inside suspendCoroutineCancellable")
+        var resumed = false
         promise.then(
             onFulfilled = {
+                if(resumed) return@then
+                resumed = true
+                println("Fetch: OnFulfilled")
                 cont.resume(RequestResponse(it))
             },
             onRejected = {
+                if(resumed) return@then
+                resumed = true
+                println("Fetch: OnRejected")
                 cont.resumeWithException(it)
             }
         )
-        return@suspendCoroutineCancellable { a.abort(); Unit }
+        cont.invokeOnCancellation {
+            if(resumed) return@invokeOnCancellation
+            resumed = true
+            println("Fetch: Cancelled")
+            a.abort(); Unit
+        }
     }
 }
 actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders = HttpHeaders().apply {
@@ -67,7 +83,14 @@ actual typealias HttpHeaders = Headers
 actual class RequestResponse(val wraps: Response) {
     actual val status: Short get() = wraps.status
     actual val ok: Boolean get() = wraps.ok
-    actual suspend fun text(): String = wraps.text().await()
+    actual suspend fun text(): String {
+        println("text(): Getting Text Promise")
+        val textPromise = wraps.text()
+        println("text(): Have Text Promise")
+        val textResult = textPromise.await()
+        println("text(): Have Text Result: $textResult")
+        return textResult
+    }
     actual suspend fun blob(): Blob = wraps.blob().await()
 }
 

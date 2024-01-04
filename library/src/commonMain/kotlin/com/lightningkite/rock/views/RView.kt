@@ -42,4 +42,4 @@ fun <T> ViewWriter.forEach(items: Readable<List<T>>, render: ViewWriter.(T)->Uni
 fun RView<*>.reactiveScope(action: suspend ()->Unit) {
     calculationContext.reactiveScope(action)
 }
-fun RView<*>.launch(action: suspend () -> Unit) = calculationContext.launch(action)
+fun RView<*>.launch(action: suspend () -> Unit):Unit = calculationContext.launch(action)

@@ -91,23 +91,5 @@ data class Theme(
     @JsName("affirmativeDirect") inline fun affirmative() = affirmative(this)
 
     val id: String get() = hashCode().toString()
-
-    override fun hashCode(): Int {
-        var out = 0
-        out = out * 31 + title.hashCode()
-        out = out * 31 + body.hashCode()
-        out = out * 31 + elevation.hashCode()
-        out = out * 31 + cornerRadii.hashCode()
-        out = out * 31 + spacing.hashCode()
-        out = out * 31 + foreground.hashCode()
-        out = out * 31 + outline.hashCode()
-        out = out * 31 + outlineWidth.hashCode()
-        out = out * 31 + background.hashCode()
-        return out
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
 }
 

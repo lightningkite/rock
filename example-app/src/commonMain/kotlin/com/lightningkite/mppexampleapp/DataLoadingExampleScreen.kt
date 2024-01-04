@@ -25,7 +25,6 @@ object DataLoadingExampleScreen : RockScreen {
         col {
             h1 { content = "This example loads some data." }
             text { content = "It's also faking a lot of loading so you can see what it looks like." }
-            text { ::content { fetch("/").text().take(100) } }
             col {
                 forEachUpdating(data) {
                     col {
@@ -34,7 +33,7 @@ object DataLoadingExampleScreen : RockScreen {
                         text { ::content { it.await().body + f.await() } }
                     } in card
                 }
-            } in scrolls
+            } in scrolls in weight(1f)
         }
     }
 }

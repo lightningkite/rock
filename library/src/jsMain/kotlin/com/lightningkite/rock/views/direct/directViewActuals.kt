@@ -14,51 +14,51 @@ fun ViewWriter.todo(name: String) = element<HTMLSpanElement>("span") {
     innerText = name
 }
 
-internal inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
+inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
     name: String,
     crossinline themeToClass: (Theme) -> String = { DynamicCSS.theme(it) },
-    crossinline themeLogic: T.(rootTheme: Boolean, themeChanged: Boolean) -> Unit,
+    crossinline themeLogic: T.(rootTheme: Boolean, themeChanged: Boolean, virtualClasses: MutableList<String>) -> Unit,
     crossinline setup: T.() -> Unit,
 ) = element<T>(name) {
     var previousThemeClass: String? = null
-    val rootTheme = themeStack.size == 1
-    val themeGetter = themeStack.lastOrNull()
+    val rootTheme = isRoot
+    isRoot = false
     val theme2 = currentTheme
-    val themeChanged = themeJustChanged
-    themeJustChanged = false
+    val themeChanged = transitionNextView
+    transitionNextView = ViewWriter.TransitionNextView.No
 
-    if (themeGetter != null) {
-        calculationContext.reactiveScope {
-            previousThemeClass?.let { classList.remove(it) }
-            val t = theme2()
-            val base = themeToClass(t)
-            classList.add(base)
-            previousThemeClass = base
+    calculationContext.reactiveScope {
+        val virtualClasses = classList.asList().toMutableList()
+        previousThemeClass?.let { virtualClasses.remove(it) }
+        val t = theme2()
+        val base = themeToClass(t)
+        virtualClasses.add(base)
+        previousThemeClass = base
 
-            themeLogic(rootTheme, themeChanged && themeGetter() != null)
-        }
+        themeLogic(rootTheme, themeChanged != ViewWriter.TransitionNextView.No, virtualClasses)
+        className = virtualClasses.joinToString(" ")
     }
     setup()
 }
 
-fun <T : HTMLElement> ViewWriter.themedElementEditable(name: String, setup: T.() -> Unit) =
+inline fun <T : HTMLElement> ViewWriter.themedElementEditable(name: String, crossinline setup: T.() -> Unit) =
     themedElementPrivateMeta<T>(
         name = name,
         themeToClass = { DynamicCSS.themeInteractive(it) },
-        themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+        themeLogic = { rootTheme: Boolean, themeChanged: Boolean, virtualClasses: MutableList<String> ->
 
             if (!themeChanged) {
-                classList.add("sameThemeText")
-                classList.remove("inclBack")
+                virtualClasses.add("sameThemeText")
+                virtualClasses.remove("inclBack")
                 if (!rootTheme) {
-                    classList.remove("inclBorder")
+                    virtualClasses.remove("inclBorder")
                 }
             } else {
                 if (!rootTheme) {
-                    classList.add("inclBorder")
+                    virtualClasses.add("inclBorder")
                 }
-                classList.remove("sameThemeText")
-                classList.add("inclBack")
+                virtualClasses.remove("sameThemeText")
+                virtualClasses.add("inclBack")
             }
         }
     ) {
@@ -67,22 +67,22 @@ fun <T : HTMLElement> ViewWriter.themedElementEditable(name: String, setup: T.()
         setup()
     }
 
-fun <T : HTMLElement> ViewWriter.themedElementClickable(name: String, setup: T.() -> Unit) =
+inline fun <T : HTMLElement> ViewWriter.themedElementClickable(name: String, crossinline setup: T.() -> Unit) =
     themedElementPrivateMeta<T>(
         name = name,
         themeToClass = { DynamicCSS.themeInteractive(it) },
-        themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+        themeLogic = { rootTheme: Boolean, themeChanged: Boolean, virtualClasses: MutableList<String> ->
 
             if (!themeChanged) {
-                classList.remove("inclBack")
+                virtualClasses.remove("inclBack")
                 if (!rootTheme) {
-                    classList.remove("inclBorder")
+                    virtualClasses.remove("inclBorder")
                 }
             } else {
                 if (!rootTheme) {
-                    classList.add("inclBorder")
+                    virtualClasses.add("inclBorder")
                 }
-                classList.add("inclBack")
+                virtualClasses.add("inclBack")
             }
         }
     ) {
@@ -91,20 +91,20 @@ fun <T : HTMLElement> ViewWriter.themedElementClickable(name: String, setup: T.(
         setup()
     }
 
-fun <T : HTMLElement> ViewWriter.themedElement(name: String, setup: T.() -> Unit) = themedElementPrivateMeta<T>(
+inline fun <T : HTMLElement> ViewWriter.themedElement(name: String, crossinline setup: T.() -> Unit) = themedElementPrivateMeta<T>(
     name = name,
     themeToClass = { DynamicCSS.theme(it) },
-    themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+    themeLogic = { rootTheme: Boolean, themeChanged: Boolean, virtualClasses ->
         if (!themeChanged) {
-            classList.remove("inclBack")
+            virtualClasses.remove("inclBack")
             if (!rootTheme) {
-                classList.remove("inclBorder")
+                virtualClasses.remove("inclBorder")
             }
         } else {
             if (!rootTheme) {
-                classList.add("inclBorder")
+                virtualClasses.add("inclBorder")
             }
-            classList.add("inclBack")
+            virtualClasses.add("inclBack")
         }
     }
 ) {
@@ -112,23 +112,23 @@ fun <T : HTMLElement> ViewWriter.themedElement(name: String, setup: T.() -> Unit
     setup()
 }
 
-fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, setup: T.() -> Unit) =
+inline fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, crossinline setup: T.() -> Unit) =
     themedElementPrivateMeta<T>(
         name = name,
         themeToClass = { DynamicCSS.theme(it) },
-        themeLogic = { rootTheme: Boolean, themeChanged: Boolean ->
+        themeLogic = { rootTheme: Boolean, themeChanged: Boolean, virtualClasses ->
             if (!themeChanged) {
-                classList.remove("inclBack")
-                classList.remove("inclBorder")
+                virtualClasses.remove("inclBack")
+                virtualClasses.remove("inclBorder")
                 if (!rootTheme) {
-                    classList.remove("inclMargin")
+                    virtualClasses.remove("inclMargin")
                 }
             } else {
                 if (!rootTheme) {
-                    classList.add("inclBorder")
-                    classList.add("inclMargin")
+                    virtualClasses.add("inclBorder")
+                    virtualClasses.add("inclMargin")
                 }
-                classList.add("inclBack")
+                virtualClasses.add("inclBack")
             }
         }
     ) {

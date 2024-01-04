@@ -2,6 +2,8 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.FullExampleScreen
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.RecyclerViewScreen
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.VectorsTestScreen
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.WebSocketScreen
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Color
@@ -11,6 +13,7 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.icon
 
 @Routable("/")
 object RootScreen : RockScreen {
@@ -37,8 +40,8 @@ object RootScreen : RockScreen {
                     to = screen
                     row {
                         text { ::content{ screen.title.await() } } in weight(1f)
-                        image { source = Icon.chevronRight.toImageSource(Color.black) }
-                    } in marginless
+                        icon(Icon.chevronRight, "Open")
+                    }
                 } in card
 
                 linkScreen(ThemesScreen)
@@ -46,8 +49,10 @@ object RootScreen : RockScreen {
                 linkScreen(FormsScreen)
                 linkScreen(NavigationScreen)
                 linkScreen(LayoutExamplesScreen)
+                linkScreen(VectorsTestScreen)
                 linkScreen(SampleLogInScreen)
                 linkScreen(DataLoadingExampleScreen)
+                linkScreen(WebSocketScreen)
                 linkScreen(CanvasSampleScreen)
                 linkScreen(AnimationSampleScreen)
                 linkScreen(ReactivityScreen)

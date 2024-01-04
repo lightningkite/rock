@@ -26,10 +26,20 @@ kotlin {
     applyDefaultHierarchyTemplate()
 
     jvm()
+    androidTarget()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    androidTarget()
+//    ios()
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach {
+//        it.binaries.framework {
+//            baseName = "library"
+//        }
+//    }
     js {
         binaries.executable()
         browser {
@@ -67,7 +77,7 @@ kotlin {
         version = "1.0"
         summary = "Some description for a Kotlin/Native module"
         homepage = "Link to a Kotlin/Native module homepage"
-        ios.deploymentTarget = "11.0"
+        ios.deploymentTarget = "14.0"
 
         // Optional properties
         // Configure the Pod name here instead of changing the Gradle project name
@@ -102,6 +112,7 @@ dependencies {
 
 configure<RockPluginExtension> {
     this.packageName = "com.lightningkite.mppexampleapp"
+    this.iosProjectRoot = project.file("../example-app-ios/Rock Example App")
 }
 
 android {
@@ -115,10 +126,9 @@ android {
     compileOptions {
         // Flag to enable support for the new language APIs
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
-
     dependencies {
         coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     }

@@ -52,11 +52,16 @@ object CanvasSampleScreen : RockScreen {
                 rerunOn(width)
                 rerunOn(height)
                 val lines = lines.await()
+                val line = line.await()
                 redraw {
                     fillPaint = Color.white
                     clearRect(0.0, 0.0, width, height)
+                    fillPaint = Color.red
                     strokePaint = Color.black
                     lineWidth = 5.0
+
+                    font(2.rem, FontAndStyle(bold = true, italic = true))
+                    drawText("Hello world!", 0.0, height / 2, width / 2)
 
                     for (line in lines) {
                         beginPath()
@@ -66,6 +71,9 @@ object CanvasSampleScreen : RockScreen {
                         }
                         stroke()
                     }
+
+                    font(2.rem, FontAndStyle(bold = true, italic = true))
+                    drawText("Hello world!", width / 2, height / 2, width / 2)
                 }
             }
         }

@@ -12,7 +12,6 @@ data class Theme(
     val outline: Paint = Color.black,
     val outlineWidth: Dimension = 0.px,
     val background: Paint = Color.white,
-    val noMarginOnSwitch: Boolean = false,
     val hover: (Theme.() -> Theme) = {
         copy(
             background = this.background.closestColor().highlight(0.2f),

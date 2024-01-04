@@ -3,14 +3,8 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.Angle
-import com.lightningkite.rock.ViewWrapper
-import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.direct.SpacerView
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.readValue
-import platform.CoreGraphics.CGRect
-import platform.CoreGraphics.CGRectZero
 import platform.UIKit.*
 
 //inline fun <T : HTMLElement> ViewWriter.containsNext(name: String, noinline setup: T.() -> Unit): ViewWrapper =
@@ -22,56 +16,10 @@ import platform.UIKit.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = UIView
 
-private class RemovedDetectorView: UIView(CGRectZero.readValue()) {
-    var onRemove = ArrayList<()->Unit>()
-    var hasBeenActive = false
-
-    init {
-        super.setHidden(true)
-        super.setUserInteractionEnabled(false)
-    }
-
-    override fun willMoveToWindow(newWindow: UIWindow?) {
-        super.willMoveToWindow(newWindow)
-        super.setHidden(true)
-    }
-
-    override fun didMoveToWindow() {
-        if (window != null) {
-            hasBeenActive = true
-        } else if (hasBeenActive) {
-            hasBeenActive = false
-            onRemove.forEach { it() }
-            onRemove = ArrayList()
-        }
-    }
-
-    override fun setHidden(hidden: Boolean) {
-        // no, frick you, you can't see me
-        if(!hidden) return
-        super.setHidden(hidden)
-    }
-
-
-    override fun setUserInteractionEnabled(userInteractionEnabled: Boolean) {
-        // no, frick you, you can't talk to me
-        if(userInteractionEnabled) return
-        super.setUserInteractionEnabled(userInteractionEnabled)
-    }
-}
-
-private val UIView.removedDetectorView: RemovedDetectorView
-    get() {
-        return subviews.asSequence().mapNotNull { it as? RemovedDetectorView }.firstOrNull() ?: run {
-            val newOne = RemovedDetectorView()
-            addSubview(newOne)
-            newOne
-        }
-    }
-
 data class NViewCalculationContext(val native: NView): CalculationContext {
+    val onRemoveList = ArrayList<()->Unit>()
     override fun onRemove(action: () -> Unit) {
-        native.removedDetectorView.onRemove.add(action)
+        onRemoveList.add(action)
     }
 
     override fun notifyStart() {
@@ -83,14 +31,32 @@ data class NViewCalculationContext(val native: NView): CalculationContext {
     override fun notifyFailure(t: Throwable) {
         super.notifyFailure(t)
     }
+
+    fun shutdown() {
+        onRemoveList.forEach { it() }
+        onRemoveList.clear()
+    }
+}
+
+fun UIView.shutdown() {
+    UIViewCalcContext.getValue(this)?.shutdown()
+    subviews.forEach { (it as UIView).shutdown() }
+}
+
+private val UIViewCalcContext = ExtensionProperty<UIView, NViewCalculationContext>()
+val UIView.iosCalculationContext: NViewCalculationContext get() = UIViewCalcContext.getValue(this) ?: run {
+    val new = NViewCalculationContext(this)
+    UIViewCalcContext.setValue(this, new)
+    new
 }
 actual val NView.calculationContext: CalculationContext
-    get() = NViewCalculationContext(this)
+    get() = iosCalculationContext
 
 actual var NView.exists: Boolean
-    get() = throw NotImplementedError()
+    get() = !hidden
     set(value) {
         hidden = !value
+        informParentOfSizeChange()
     }
 
 actual var NView.visible: Boolean
@@ -113,7 +79,12 @@ actual var NView.nativeRotation: Angle
     }
 
 actual fun NView.clearChildren() {
-    this.subviews.toList().forEach { (it as? UIView)?.removeFromSuperview() }
+    this.subviews.toList().forEach {
+        (it as UIView).let {
+            it.removeFromSuperview()
+            it.shutdown()
+        }
+    }
 }
 actual fun NView.addChild(child: NView) {
 //    child.setTranslatesAutoresizingMaskIntoConstraints(false)

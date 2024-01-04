@@ -10,7 +10,7 @@ class PersistentProperty<T>(
     defaultValue: T,
     private val serializer: KSerializer<T>,
 ) : Writable<T> {
-    private val listeners = HashSet<() -> Unit>()
+    private val listeners = ArrayList<() -> Unit>()
 
     private var initialized = false
         private set

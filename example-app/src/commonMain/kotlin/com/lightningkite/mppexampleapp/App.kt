@@ -8,7 +8,7 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.l2.*
 
-val appTheme = Property<Theme>(MaterialLikeTheme(title = FontAndStyle(font = Resources.fontsMontserrat)))
+val appTheme = Property<Theme>(MaterialLikeTheme(primary = Color(1f, 0.2f, 0.2f, 0.2f), title = FontAndStyle(font = Resources.fontsMontserrat)))
 fun ViewWriter.app() {
 
     appNav(AutoRoutes) {
@@ -22,11 +22,7 @@ fun ViewWriter.app() {
                 NavItem("Forms", Icon.done, FormsScreen)
             )
         }
-        ::currentUser {
-            ProfileInfo(
-                UserInfo("Test User", null, Icon.person),
-            )
-        }
+        ::currentUser { UserInfo("Test User", null, Icon.person) }
 
         ::userLinks {
             listOf(
@@ -56,5 +52,6 @@ fun ViewWriter.app() {
                 }
             )
         )
+
     } in setTheme { appTheme.await() }
 }

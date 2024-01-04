@@ -25,6 +25,24 @@ class ReactivityTests {
         assertEquals((0..9).toList(), emissions)
     }
 
+    @Test fun sharedShutdownTest() {
+        var onRemoveCalled = 0
+        var scopeCalled = 0
+        val shared = shared {
+            scopeCalled++
+            onRemove { onRemoveCalled++ }
+            42
+        }
+        assertEquals(0, scopeCalled)
+        assertEquals(0, onRemoveCalled)
+        val removeListener = shared.addListener {  }
+        assertEquals(1, scopeCalled)
+        assertEquals(0, onRemoveCalled)
+        removeListener()
+        assertEquals(1, scopeCalled)
+        assertEquals(1, onRemoveCalled)
+    }
+
     @Test fun sharedTest() {
         val a = Property(1)
         val b = Property(2)

@@ -889,53 +889,59 @@ actual var TextArea.hint: String
         this@hint.native.hint = value
     }
 
+actual fun <T> Select.bind(
+    edits: Writable<T>,
+    data: suspend () -> List<T>,
+    render: (T) -> String
+) {
+}
 
-actual val Select.selected: Writable<String?>
-    get() {
-        return this@selected.native.stringNullableWritable(
-            addNativeListener = {
-                this@selected.native.onItemSelectedListener = object : OnItemSelectedListener {
-                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                        NativeListeners.listeners.get(this@selected.native)?.forEach { action -> action() }
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {}
-                }
-            },
-            getString = { this@selected.native.selectedItem.toString() },
-            setString = { value ->
-                val adapter = this@selected.native.adapter
-                val count = adapter.count
-                var counter = 0
-                while (counter < count) {
-                    val item = adapter.getItem(counter).toString()
-                    if (item == value) {
-                        break
-                    }
-                    counter++
-                }
-
-                if (counter < count) {
-                    this@selected.native.setSelection(counter)
-                }
-            }
-        )
-    }
-actual var Select.options: List<WidgetOption>
-    get() {
-        val adapter = native.adapter
-        val options = mutableListOf<WidgetOption>()
-        val count = adapter.count
-        var counter = 0
-        while (counter < count) {
-            adapter.getItem(counter)?.let { options.add(it as WidgetOption) }
-            counter++
-        }
-        return options
-    }
-    set(value) {
-        native.adapter = ArrayAdapter(native.context, android.R.layout.simple_list_item_1, value)
-    }
+//actual val Select.selected: Writable<String?>
+//    get() {
+//        return this@selected.native.stringNullableWritable(
+//            addNativeListener = {
+//                this@selected.native.onItemSelectedListener = object : OnItemSelectedListener {
+//                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+//                        NativeListeners.listeners.get(this@selected.native)?.forEach { action -> action() }
+//                    }
+//
+//                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+//                }
+//            },
+//            getString = { this@selected.native.selectedItem.toString() },
+//            setString = { value ->
+//                val adapter = this@selected.native.adapter
+//                val count = adapter.count
+//                var counter = 0
+//                while (counter < count) {
+//                    val item = adapter.getItem(counter).toString()
+//                    if (item == value) {
+//                        break
+//                    }
+//                    counter++
+//                }
+//
+//                if (counter < count) {
+//                    this@selected.native.setSelection(counter)
+//                }
+//            }
+//        )
+//    }
+//actual var Select.options: List<WidgetOption>
+//    get() {
+//        val adapter = native.adapter
+//        val options = mutableListOf<WidgetOption>()
+//        val count = adapter.count
+//        var counter = 0
+//        while (counter < count) {
+//            adapter.getItem(counter)?.let { options.add(it as WidgetOption) }
+//            counter++
+//        }
+//        return options
+//    }
+//    set(value) {
+//        native.adapter = ArrayAdapter(native.context, android.R.layout.simple_list_item_1, value)
+//    }
 
 
 actual val AutoCompleteTextField.content: Writable<String>

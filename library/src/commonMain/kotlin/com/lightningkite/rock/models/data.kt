@@ -1,5 +1,6 @@
 package com.lightningkite.rock.models
 
+import com.lightningkite.rock.FileReference
 import kotlin.jvm.JvmInline
 
 class AnimationId
@@ -28,6 +29,7 @@ data class ImageVector(
 }
 data class ImageRemote(val url: String) : ImageSource()
 class ImageRaw(val data: ByteArray) : ImageSource()
+class ImageLocal(val file: FileReference) : ImageSource()
 expect class ImageResource : ImageSource
 
 data class SizeConstraints(

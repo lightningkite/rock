@@ -184,10 +184,12 @@ actual inline var TextArea.hint: String
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSelect = HTMLElement
 @ViewDsl actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = todo("select")
-actual val Select.selected: Writable<String?> get() = Property(null)
-actual inline var Select.options: List<WidgetOption>
-    get() = TODO()
-    set(value) { }
+actual fun <T> Select.bind(
+    edits: Writable<T>,
+    data: Readable<List<T>>,
+    render: (T) -> String
+) {
+}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NAutoCompleteTextField = HTMLElement
 @ViewDsl actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = todo("autoCompleteTextField")

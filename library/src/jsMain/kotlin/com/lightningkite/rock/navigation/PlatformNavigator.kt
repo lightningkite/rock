@@ -45,9 +45,7 @@ actual class PlatformNavigator actual constructor(
     private val String.asSegments: List<String> get() = split('/').filter { it.isNotBlank() }
     private val _currentScreen = Property(run {
         val path = window.location.urlLike()
-        println(path)
-        val screen = routes.parse(path) ?: routes.fallback
-        (screen)
+        routes.parse(path) ?: routes.fallback
     })
     override val currentScreen: Readable<RockScreen>
         get() = _currentScreen

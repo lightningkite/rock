@@ -2,10 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.ImageRemote
-import com.lightningkite.rock.models.SizeConstraints
-import com.lightningkite.rock.models.WidgetOption
-import com.lightningkite.rock.models.px
+import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
@@ -76,6 +73,36 @@ object ControlsScreen : RockScreen {
                         }
                     } in critical
                 }
+            }
+
+            col {
+                h2 { content = "Checkboxes" }
+                col {
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            checkbox { }
+                        }
+                    } in withDefaultPadding
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            checkbox { }
+                        }
+                    } in card
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            checkbox { }
+                        }
+                    } in important
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            checkbox { }
+                        }
+                    } in critical
+                }
             } in card
 
             col {
@@ -94,13 +121,13 @@ object ControlsScreen : RockScreen {
 
             col {
                 h2 { content = "Drop Downs" }
-                val options = listOf("Apple", "Banana", "Crepe").map { WidgetOption(it, it) }
-                select { this.options = options } in withDefaultPadding
-                select { this.options = options } in card
-                select { this.options = options } in important
-                select { this.options = options } in critical
-                select { this.options = options } in warning
-                select { this.options = options } in danger
+                val options = shared { listOf("Apple", "Banana", "Crepe") }
+                select { bind(Property("Apple"), data = options, render = { it }) } in withDefaultPadding
+                select { bind(Property("Apple"), data = options, render = { it }) } in card
+                select { bind(Property("Apple"), data = options, render = { it }) } in important
+                select { bind(Property("Apple"), data = options, render = { it }) } in critical
+                select { bind(Property("Apple"), data = options, render = { it }) } in warning
+                select { bind(Property("Apple"), data = options, render = { it }) } in danger
             } in card
 
             col {
@@ -129,10 +156,12 @@ object ControlsScreen : RockScreen {
 
             col {
                 val number = Property(1)
+                val text = Property("text")
                 h2 { content = "Text Fields" }
                 textField { content bind number.asString() }
                 text { ::content { "Value: ${number.await()}" }}
-                textField {  } in card
+                textField { content bind text } in card
+                text { ::content { "Text: ${text.await()}" }}
                 textField {  } in important
                 textField {  } in critical
             } in card
@@ -151,8 +180,7 @@ object ControlsScreen : RockScreen {
                     repeat(5) {
                         image { source = ImageRemote("https://picsum.photos/seed/${it}/200/300") } in sizedBox(
                             SizeConstraints(
-                                maxWidth = 100.px,
-                                minWidth = 100.px
+                                width = 5.rem
                             )
                         )
                     }

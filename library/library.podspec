@@ -1,24 +1,35 @@
 Pod::Spec.new do |spec|
-    spec.name                     = 'Library'
-    spec.version                  = '1.0'
-    spec.homepage                 = 'Link to a Kotlin/Native module homepage'
+    spec.name                     = 'library'
+    spec.version                  = 'main-SNAPSHOT'
+    spec.homepage                 = ''
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Some description for a Kotlin/Native module'
-    spec.vendored_frameworks      = 'build/cocoapods/framework/Library.framework'
+    spec.summary                  = ''
+    spec.vendored_frameworks      = 'build/cocoapods/framework/library.framework'
     spec.libraries                = 'c++'
-    spec.ios.deployment_target = '11.0'
                 
+                
+                
+    if !Dir.exist?('build/cocoapods/framework/library.framework') || Dir.empty?('build/cocoapods/framework/library.framework')
+        raise "
+
+        Kotlin framework 'library' doesn't exist yet, so a proper Xcode project can't be generated.
+        'pod install' should be executed after running ':generateDummyFramework' Gradle task:
+
+            ./gradlew :library:generateDummyFramework
+
+        Alternatively, proper pod installation is performed during Gradle sync in the IDE (if Podfile location is set)"
+    end
                 
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':library',
-        'PRODUCT_MODULE_NAME' => 'Library',
+        'PRODUCT_MODULE_NAME' => 'library',
     }
                 
     spec.script_phases = [
         {
-            :name => 'Build Library',
+            :name => 'Build library',
             :execution_position => :before_compile,
             :shell_path => '/bin/sh',
             :script => <<-SCRIPT

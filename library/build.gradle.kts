@@ -166,5 +166,10 @@ standardPublishing {
             name = "Brady Svedin",
             email = "brady@lightningkite.com",
         )
+        developer(
+            id = "shanelk",
+            name = "Shane Thompson",
+            email = "shane@lightningkite.com",
+        )
     }
 }

@@ -62,6 +62,11 @@ object RootScreen : RockScreen {
                 linkScreen(RecyclerViewScreen)
                 linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })
 
+                button {
+                    text { content = "GC" }
+                    onClick { gcCheck() }
+                }
+
             } in withDefaultPadding
         } in scrolls
     }

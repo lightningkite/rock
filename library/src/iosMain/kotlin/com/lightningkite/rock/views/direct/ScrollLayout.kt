@@ -92,7 +92,6 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         var primary = padding
         var lastChildSize: Size? = null
         val view = mainSubview ?: run {
-            println("Abandon")
             return
         }
         val size = calcSizes(frame.useContents { size.local })

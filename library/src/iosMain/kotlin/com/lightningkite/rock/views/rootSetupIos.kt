@@ -56,17 +56,17 @@ fun UIViewController.setup(app: ViewWriter.()->Unit) {
             view.findFirstResponderChild()?.resignFirstResponder()
         }
 
-        init {
-            memScoped {
-                val mc = alloc<UIntVar>()
-                val list = class_copyMethodList(object_getClass(this@Observer) as ObjCClass, mc.ptr)!!
-                for(i in 0 until mc.value.toInt()) {
-                    val x: Method = list[i]!!
-                    println(platform.objc.sel_getName(method_getName(x))?.toKString())
-                }
-                nativeHeap.free(list)
-            }
-        }
+//        init {
+//            memScoped {
+//                val mc = alloc<UIntVar>()
+//                val list = class_copyMethodList(object_getClass(this@Observer) as ObjCClass, mc.ptr)!!
+//                for(i in 0 until mc.value.toInt()) {
+//                    val x: Method = list[i]!!
+//                    println(platform.objc.sel_getName(method_getName(x))?.toKString())
+//                }
+//                nativeHeap.free(list)
+//            }
+//        }
     }
     val observer: Observer = Observer()
 

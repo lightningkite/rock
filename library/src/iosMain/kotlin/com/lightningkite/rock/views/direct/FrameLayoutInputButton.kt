@@ -33,8 +33,6 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
         ), animated = false)
         onEvent(UIControlEventTouchUpInside) {
             becomeFirstResponder()
-            println("canBecomeFirstResponder: ${canBecomeFirstResponder}")
-            println("isFirstResponder: ${isFirstResponder}")
         }
     }
 

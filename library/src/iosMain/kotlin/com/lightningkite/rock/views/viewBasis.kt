@@ -16,7 +16,7 @@ import platform.UIKit.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = UIView
 
-data class NViewCalculationContext(val native: NView): CalculationContext {
+class NViewCalculationContext(): CalculationContext {
     val onRemoveList = ArrayList<()->Unit>()
     override fun onRemove(action: () -> Unit) {
         onRemoveList.add(action)
@@ -40,12 +40,22 @@ data class NViewCalculationContext(val native: NView): CalculationContext {
 
 fun UIView.shutdown() {
     UIViewCalcContext.getValue(this)?.shutdown()
+    UIViewCalcContext.setValue(this, null)
+    extensionWeight = null
+    extensionMargin = null
+    extensionPadding = null
+    extensionSizeConstraints = null
+    extensionHorizontalAlign = null
+    extensionVerticalAlign = null
+    extensionFontAndStyle = null
+    extensionTextSize = null
+    extensionMarginless = null
+    extensionViewWriter = null
     subviews.forEach { (it as UIView).shutdown() }
 }
 
-private val UIViewCalcContext = ExtensionProperty<UIView, NViewCalculationContext>()
 val UIView.iosCalculationContext: NViewCalculationContext get() = UIViewCalcContext.getValue(this) ?: run {
-    val new = NViewCalculationContext(this)
+    val new = NViewCalculationContext()
     UIViewCalcContext.setValue(this, new)
     new
 }

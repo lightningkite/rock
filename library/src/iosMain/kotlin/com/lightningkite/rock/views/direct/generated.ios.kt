@@ -163,7 +163,7 @@ actual inline var Image.description: String?
 actual typealias NTextView = UILabel
 
 @ViewDsl
-actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 2)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -174,7 +174,7 @@ actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(StyledUILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.6)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -185,7 +185,7 @@ actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(StyledUILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.4)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -196,7 +196,7 @@ actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(StyledUILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.3)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -207,7 +207,7 @@ actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(StyledUILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.2)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -218,7 +218,7 @@ actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(StyledUILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.1)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -229,7 +229,7 @@ actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(StyledUILab
 }
 
 @ViewDsl
-actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.0)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -240,7 +240,7 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(StyledUIL
 }
 
 @ViewDsl
-actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(StyledUILabel()) {
+actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 0.8)
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
@@ -265,6 +265,12 @@ actual inline var TextView.align: Align
         else -> Align.Start
     }
     set(value) {
+        native.contentMode = when (value) {
+            Align.Start -> UIViewContentMode.UIViewContentModeLeft
+            Align.Center -> UIViewContentMode.UIViewContentModeCenter
+            Align.End -> UIViewContentMode.UIViewContentModeRight
+            Align.Stretch -> UIViewContentMode.UIViewContentModeScaleAspectFit
+        }
         native.textAlignment = when (value) {
             Align.Start -> NSTextAlignmentLeft
             Align.Center -> NSTextAlignmentCenter
@@ -373,10 +379,8 @@ actual typealias NCheckbox = FrameLayoutToggleButton
 
 @ViewDsl
 actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit {
-    val checked = Property(false)
     transitionNextView = ViewWriter.TransitionNextView.Yes
     toggleButton {
-        this.checked bind checked
         icon(Icon.done, "") {
             ::visible { checked.await() }
         } in marginless
@@ -393,10 +397,8 @@ actual typealias NRadioButton = FrameLayoutToggleButton
 
 @ViewDsl
 actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit {
-    val checked = Property(false)
     transitionNextView = ViewWriter.TransitionNextView.Yes
     radioToggleButton {
-        this.checked bind checked
         icon(Icon.done, "") {
             ::visible { checked.await() }
         } in marginless
@@ -489,11 +491,10 @@ actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit = s
             date = p.value?.toNSDateComponents()?.date() ?: NSDate()
             this@element.calculationContext.onRemove(onEventNoRemove(UIControlEventValueChanged) {
                 p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).date
-                text = p.value?.toString() ?: "Pick one"
             })
         }
         setup(LocalDateField(this))
-        text = p.value?.toString() ?: "Pick one"
+        reactiveScope { text = p.await()?.toString() ?: "Pick one" }
     }
 }
 
@@ -563,11 +564,10 @@ actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = s
             date = p.value?.atDate(1970, 1, 1)?.toNSDateComponents()?.date() ?: NSDate()
             this@element.calculationContext.onRemove(onEventNoRemove(UIControlEventValueChanged) {
                 p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault()).time
-                text = p.value?.toString() ?: "Pick one"
             })
         }
         setup(LocalTimeField(this))
-        text = p.value?.toString() ?: "Pick one"
+        reactiveScope { text = p.await()?.toString() ?: "Pick one" }
     }
 }
 
@@ -605,11 +605,10 @@ actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): 
             date = p.value?.toNSDateComponents()?.date() ?: NSDate()
             this@element.calculationContext.onRemove(onEventNoRemove(UIControlEventValueChanged) {
                 p.value = this.date.toKotlinInstant().toLocalDateTime(TimeZone.currentSystemDefault())
-                text = p.value?.toString() ?: "Pick one"
             })
         }
         setup(LocalDateTimeField(this))
-        text = p.value?.toString() ?: "Pick one"
+        reactiveScope { text = p.await()?.toString() ?: "Pick one" }
     }
 }
 
@@ -642,7 +641,7 @@ actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit = stack {
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         calculationContext.onRemove {
-            extensionDelegateStrongRef = null
+            extensionStrongRef = null
         }
         setup(TextField(this))
     }
@@ -681,17 +680,17 @@ actual inline var TextField.keyboardHints: KeyboardHints
 actual var TextField.action: Action?
     get() = TODO()
     set(value) {
-        native.delegate = action?.let {
+        native.delegate = value?.let {
             val d = object : NSObject(), UITextFieldDelegateProtocol {
                 override fun textFieldShouldReturn(textField: UITextField): Boolean {
                     launch { it.onSelect() }
                     return true
                 }
             }
-            native.extensionDelegateStrongRef = d
+            native.extensionStrongRef = d
             d
         } ?: NextFocusDelegateShared
-        native.returnKeyType = when (action?.title) {
+        native.returnKeyType = when (value?.title) {
             "Emergency Call" -> UIReturnKeyType.UIReturnKeyEmergencyCall
             "Go" -> UIReturnKeyType.UIReturnKeyGo
             "Next" -> UIReturnKeyType.UIReturnKeyNext
@@ -727,7 +726,7 @@ actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit = stack {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         setup(TextArea(this))
         calculationContext.onRemove {
-            extensionDelegateStrongRef = null
+            extensionStrongRef = null
         }
     }
 }
@@ -736,6 +735,7 @@ actual val TextArea.content: Writable<String>
     get() = object : Writable<String> {
         override suspend fun awaitRaw(): String = native.text ?: ""
         override fun addListener(listener: () -> Unit): () -> Unit {
+            // TODO: Multiple listeners
             native.setDelegate(object : NSObject(), UITextViewDelegateProtocol {
                 override fun textViewDidChange(textView: UITextView) {
                     listener()
@@ -778,12 +778,9 @@ actual typealias NSelect = TextFieldInput
 actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = stack {
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
-        val p = Property<String?>(null)
-        currentValue = p
         inputView = UIPickerView().apply {
         }
         setup(Select(this))
-        text = p.value?.toString() ?: "Pick one"
     }
 }
 actual fun <T> Select.bind(
@@ -800,6 +797,7 @@ actual fun <T> Select.bind(
                 list = data.await()
                 picker.reloadAllComponents()
             }
+            reactiveScope { native.text = render(edits.await()) }
         }
 
         override fun numberOfComponentsInPickerView(pickerView: UIPickerView): NSInteger = 1L
@@ -814,13 +812,12 @@ actual fun <T> Select.bind(
             launch {
                 val item = list[didSelectRow.toInt()]
                 edits set item
-                native.text = render(item)
             }
         }
     }
     picker.setDataSource(source)
     picker.setDelegate(source)
-    picker.extensionDelegateStrongRef = source
+    picker.extensionStrongRef = source
 }
 
 //@Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -851,7 +848,7 @@ actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> U
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         calculationContext.onRemove {
-            extensionDelegateStrongRef = null
+            extensionStrongRef = null
         }
         setup(AutoCompleteTextField(this))
     }
@@ -897,7 +894,7 @@ actual var AutoCompleteTextField.action: Action?
                     return true
                 }
             }
-            native.extensionDelegateStrongRef = d
+            native.extensionStrongRef = d
             d
         } ?: NextFocusDelegateShared
         native.returnKeyType = when (action?.title) {
@@ -1010,11 +1007,16 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = eleme
         )
     )
 })) {
+    calculationContext.onRemove {
+        extensionStrongRef = null
+    }
+    backgroundColor = UIColor.clearColor
     extensionViewWriter = newViews()
     handleTheme(this, viewDraws = false)
     setup(RecyclerView(this))
 }
 
+@OptIn(ExperimentalForeignApi::class)
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = element(UICollectionView(CGRectMake(0.0, 0.0, 0.0, 0.0), run {
     val size = NSCollectionLayoutSize.sizeWithWidthDimension(
@@ -1035,6 +1037,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
         configuration.scrollDirection = UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal
     }
 })) {
+    backgroundColor = UIColor.clearColor
     extensionViewWriter = newViews()
     handleTheme(this, viewDraws = false)
     setup(RecyclerView(this))
@@ -1047,7 +1050,7 @@ actual var RecyclerView.columns: Int
     set(value) {
     }
 
-@OptIn(ExperimentalObjCName::class)
+@OptIn(ExperimentalObjCName::class, BetaInteropApi::class)
 @ExportObjCClass
 class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesProtocol {
     constructor():this(CGRectMake(0.0, 0.0, 0.0, 0.0))
@@ -1062,6 +1065,7 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
+    @OptIn(ExperimentalForeignApi::class)
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
@@ -1120,7 +1124,7 @@ actual fun <T> RecyclerView.children(
     }
     native.setDataSource(source)
     native.setDelegate(source)
-    native.extensionDelegateStrongRef = source
+    native.extensionStrongRef = source
 }
 
 @ViewModifierDsl3

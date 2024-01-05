@@ -9,6 +9,7 @@ import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
 import platform.UIKit.*
+import platform.darwin.sel_registerName
 import kotlin.math.max
 
 //private val UIViewLayoutParams = ExtensionProperty<UIView, LayoutParams>()
@@ -24,4 +25,13 @@ class FrameLayoutButton: UIButton(CGRectZero.readValue()), UIViewWithSizeOverrid
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
+
+//    init {
+//        addTarget(this, sel_registerName("test"), UIControlEventTouchUpInside)
+//    }
+//
+//    @ObjCAction
+//    fun test() {
+//        println("test")
+//    }
 }

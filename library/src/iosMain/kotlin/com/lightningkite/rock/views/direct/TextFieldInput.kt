@@ -27,7 +27,6 @@ class TextFieldInput: UITextField(CGRectZero.readValue()) {
         inputAccessoryView = toolbar
         onEvent(UIControlEventTouchUpInside) {
             becomeFirstResponder()
-            println("I am a first responder! $isFirstResponder $canBecomeFirstResponder ${this.canBecomeFirstResponder()} $canResignFirstResponder")
         }
     }
 

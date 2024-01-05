@@ -134,6 +134,21 @@ android {
     }
 }
 
+kotlin {
+    targets
+        .matching { it is org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget }
+        .configureEach {
+            this as org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
+            compilations.getByName("main") {
+                this.kotlinOptions {
+//                    this.freeCompilerArgs += "-Xruntime-logs=gc=info"
+//                    this.freeCompilerArgs += "-Xallocator=mimalloc"
+                }
+            }
+        }
+}
+
 //tasks.getByName<KotlinWebpack>("jsBrowserProductionWebpack") {
 //    this.args
 //}

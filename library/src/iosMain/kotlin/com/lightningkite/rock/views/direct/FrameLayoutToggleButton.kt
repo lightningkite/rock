@@ -28,10 +28,12 @@ class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()), UIViewWithSizeO
 
     var allowUnselect = true
     var on: Boolean = false
+        set(value) {
+            field = value
+            sendActionsForControlEvents(UIControlEventValueChanged)
+        }
     init {
-        println("Setup")
         onEvent(UIControlEventTouchUpInside) {
-            println("TOUCH UP INSIDE!!! $on $allowUnselect")
             if(!on || allowUnselect) {
                 on = !on
                 selected = on

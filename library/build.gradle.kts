@@ -125,6 +125,10 @@ kotlin {
                 val objcAddition by cinterops.creating {
                     defFile(project.file("src/iosMain/def/objcAddition.def"))
                 }
+                this.kotlinOptions {
+//                    this.freeCompilerArgs += "-Xruntime-logs=gc=info"
+//                    this.freeCompilerArgs += "-Xallocator=mimalloc"
+                }
             }
         }
 }

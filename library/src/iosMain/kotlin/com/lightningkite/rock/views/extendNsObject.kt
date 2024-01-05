@@ -13,40 +13,40 @@ import platform.objc.objc_AssociationPolicy
 import platform.objc.objc_getAssociatedObject
 import platform.objc.objc_setAssociatedObject
 import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.identityHashCode
 import kotlin.native.ref.WeakReference
 import kotlin.properties.ReadWriteProperty
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
-class ExtensionProperty<A: NSObject, B>: ReadWriteProperty<A, B?> {
-    @OptIn(ExperimentalForeignApi::class)
-    val key = NSValue.valueWithPointer((Random.nextLong().toString() as NSString).UTF8String)
-    @OptIn(ExperimentalForeignApi::class)
-    override fun getValue(thisRef: A, property: KProperty<*>): B? = com.lightningkite.rock.objc.getAssociatedObjectWithKey(thisRef, key) as? B
-    @OptIn(ExperimentalForeignApi::class)
-    override fun setValue(thisRef: A, property: KProperty<*>, value: B?) = com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, value)
-    @OptIn(ExperimentalForeignApi::class)
-    fun getValue(thisRef: A): B? = com.lightningkite.rock.objc.getAssociatedObjectWithKey(thisRef, key) as? B
-    @OptIn(ExperimentalForeignApi::class)
-    fun setValue(thisRef: A, value: B?) = com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, value)
+class ExtensionData(
+    val reference: WeakReference<*>,
+    val map: HashMap<Any, Any?> = HashMap()
+) {
+    @OptIn(ExperimentalNativeApi::class)
+    companion object {
+        val all = HashMap<Int, ExtensionData>()
+        fun get(item: Any): ExtensionData? = all[item.identityHashCode()]
+        fun getOrPut(item: Any): ExtensionData = all.getOrPut(item.identityHashCode()) {
+            ExtensionData(WeakReference(item))
+        }
+        fun clean() {
+            all.entries.removeAll { (key, value) ->
+                (value.reference.get() == null)
+            }
+        }
+    }
 }
 
-@OptIn(ExperimentalNativeApi::class)
-class ExtensionPropertyWeak<A: NSObject, B: Any>: ReadWriteProperty<A, B?> {
-    @OptIn(ExperimentalForeignApi::class)
-    val key = NSValue.valueWithPointer((Random.nextLong().toString() as NSString).UTF8String)
-    @OptIn(ExperimentalForeignApi::class)
-    override fun getValue(thisRef: A, property: KProperty<*>): B? = (com.lightningkite.rock.objc.getAssociatedObjectWithKey(thisRef, key) as? WeakReference<B>)?.value
-    @OptIn(ExperimentalForeignApi::class)
-    override fun setValue(thisRef: A, property: KProperty<*>, value: B?) = value?.let {
-        com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, WeakReference(value))
-    } ?: run { com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, null) }
-    @OptIn(ExperimentalForeignApi::class)
-    fun getValue(thisRef: A): B? = (com.lightningkite.rock.objc.getAssociatedObjectWithKey(thisRef, key) as? WeakReference<B>)?.value
-    @OptIn(ExperimentalForeignApi::class)
-    fun setValue(thisRef: A, value: B?) = value?.let {
-        com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, WeakReference(value))
-    } ?: run { com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, null) }
+class ExtensionProperty<A: NSObject, B>: ReadWriteProperty<A, B?> {
+    val myData = HashMap<A, B>(5000)
+    override fun getValue(thisRef: A, property: KProperty<*>): B? = getValue(thisRef)
+    override fun setValue(thisRef: A, property: KProperty<*>, value: B?) = setValue(thisRef, value)
+    fun getValue(thisRef: A): B? = myData[thisRef]
+    fun setValue(thisRef: A, value: B?) {
+        if(value == null) myData.remove(thisRef)
+        else myData[thisRef] = value
+    }
 }
 
 private val UIViewWeight = ExtensionProperty<UIView, Float>()
@@ -67,9 +67,6 @@ var UIView.extensionHorizontalAlign: Align? by UIViewHorizontalAlign
 private val UIViewVerticalAlign = ExtensionProperty<UIView, Align>()
 var UIView.extensionVerticalAlign: Align? by UIViewVerticalAlign
 
-private val UIViewDelegateStrongRef = ExtensionProperty<UIView, NSObject>()
-var UIView.extensionDelegateStrongRef: NSObject? by UIViewDelegateStrongRef
-
 private val UIViewFontAndStyle = ExtensionProperty<UIView, FontAndStyle>()
 var UIView.extensionFontAndStyle: FontAndStyle? by UIViewFontAndStyle
 
@@ -82,7 +79,7 @@ var UIView.extensionMarginless: Boolean? by UIViewMarginless
 private val UIViewWriter = ExtensionProperty<UIView, ViewWriter>()
 var UIView.extensionViewWriter: ViewWriter? by UIViewWriter
 
-
 private val NSObjectStrongRefHolder = ExtensionProperty<NSObject, NSObject>()
 var NSObject.extensionStrongRef: NSObject? by NSObjectStrongRefHolder
 
+val UIViewCalcContext = ExtensionProperty<UIView, NViewCalculationContext>()

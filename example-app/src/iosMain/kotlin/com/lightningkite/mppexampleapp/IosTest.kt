@@ -1,24 +1,143 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.contains
+import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.delay
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.*
+import com.lightningkite.rock.reactive.CalculationContextStack
+import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.*
-import kotlin.random.Random
+import kotlinx.cinterop.ExperimentalForeignApi
+import platform.CoreGraphics.CGRectMake
+import platform.UIKit.UIView
+import platform.darwin.NSObject
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.identityHashCode
+import kotlin.native.runtime.GC
+import kotlin.native.runtime.NativeRuntimeApi
 
+@OptIn(ExperimentalForeignApi::class)
+class CustomUIView: UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
+}
+
+@OptIn(ExperimentalForeignApi::class)
+class KObj: NSObject() {
+    val r = CGRectMake(0.0, 0.0, 0.0, 0.0)
+    val dataBlock = ByteArray(1024) { 0 }
+}
+
+@OptIn(ExperimentalStdlibApi::class, NativeRuntimeApi::class)
+fun getUsage(): Long {
+    GC.collect()
+    ExtensionData.clean()
+    GC.collect()
+    return GC.lastGCInfo!!.memoryUsageAfter["heap"]!!.totalObjectsSizeBytes
+}
+
+@OptIn(ExperimentalForeignApi::class, ExperimentalNativeApi::class)
 fun ViewWriter.iosTest() {
-    val theme = M3Theme(
-        foreground = Color.white,
-        backgroundAdjust = 0.5f,
-        primary = Color.blue.toHSV().copy(saturation = 0.5f, value = 0.5f).toRGB(),
-        secondary = Color.green.toHSV().copy(saturation = 0.5f, value = 0.5f).toRGB(),
-    )
+    fun leakTest(label: String, doAction: ()->Unit) {
+        println("--- LEAK TEST $label ----")
+        var total = 0L
+        doAction()
+        repeat(10000) { iter ->
+            val start = getUsage()
+            val extBefore = ExtensionData.all.size
+            doAction()
+            val after = getUsage()
+            val extAfter = ExtensionData.all.size
+            if(extAfter != extBefore) {
+                println("${extAfter - extBefore} extension item change")
+            }
+            (after - start).let {
+                total += it
+                if(it == 0L) {
+                    if(iter % 1000 == 0) print('.')
+                } else println("Used ${it.toString().padStart(8, ' ')} bytes")
+            }
+        }
+        println("---")
+        println("Total usage: ${total.toString().padStart(8, ' ')}")
+    }
+
+//    leakTest {
+//        val v = UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))
+//        currentView.addChild(v)
+//        v.removeFromSuperview()
+//    }
+    repeat(1000) {
+        leakTest("Custom No Add") {
+            val v = CustomUIView()
+            val sub = CustomUIView()
+            v.addSubview(sub)
+        }
+    }
+    leakTest("Manual Custom") {
+        val v = CustomUIView()
+        currentView.addChild(v)
+        v.removeFromSuperview()
+    }
+    leakTest("Manual") {
+        val v = UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))
+        currentView.addChild(v)
+        CalculationContextStack.useIn(v.calculationContext) {
+
+        }
+        v.removeFromSuperview()
+        v.shutdown()
+    }
+
     col {
-        button { text { content = "Test" } }
-    } in setTheme {
-        theme
+        col {
+            leakTest("Vanilla") {
+                element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
+                }
+                currentView.clearChildren()
+            }
+            leakTest("Text") {
+                text { content = "test" }
+                currentView.clearChildren()
+            }
+            leakTest("Vanilla with child") {
+                element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
+                    element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
+                    }
+                }
+                currentView.clearChildren()
+            }
+            leakTest("Extended") {
+                element(CustomUIView()) {
+                }
+                currentView.clearChildren()
+            }
+            leakTest("Extended with child") {
+                element(CustomUIView()) {
+                    element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
+                    }
+                }
+                currentView.clearChildren()
+            }
+            leakTest("Stack") {
+                stack { element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
+                } }
+                currentView.clearChildren()
+            }
+        }
+        button {
+            val counter = Property(1)
+            text {
+                launch {
+                    while (true) {
+                        content = counter.value.toString()
+                        delay(1000L)
+                        counter.value++
+                    }
+                }
+            }
+            onClick {
+                println(clockMillis())
+                gcCheck()
+            }
+        }
     }
 }

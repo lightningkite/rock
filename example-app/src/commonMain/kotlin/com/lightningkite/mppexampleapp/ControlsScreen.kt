@@ -7,6 +7,7 @@ import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
+import kotlinx.datetime.*
 
 @Routable("controls")
 object ControlsScreen : RockScreen {
@@ -37,10 +38,10 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Toggle Buttons" }
                 row {
                     space {} in weight(1f)
-                    toggleButton { text { content = "Sample" } }
-                    toggleButton { text { content = "Card" } } in card
-                    toggleButton { text { content = "Important" } } in important
-                    toggleButton { text { content = "Critical" } } in critical
+                    toggleButton { checked bind booleanContent; text { content = "Sample" } }
+                    toggleButton { checked bind booleanContent; text { content = "Card" } } in card
+                    toggleButton { checked bind booleanContent; text { content = "Important" } } in important
+                    toggleButton { checked bind booleanContent; text { content = "Critical" } } in critical
                     space {} in weight(1f)
                 } in scrollsHorizontally
             } in card
@@ -51,25 +52,25 @@ object ControlsScreen : RockScreen {
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { }
+                            switch { checked bind booleanContent; }
                         }
                     } in withDefaultPadding
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { }
+                            switch { checked bind booleanContent; }
                         }
                     } in card
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { }
+                            switch { checked bind booleanContent; }
                         }
                     } in important
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            switch { }
+                            switch { checked bind booleanContent; }
                         }
                     } in critical
                 }
@@ -81,25 +82,25 @@ object ControlsScreen : RockScreen {
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            checkbox { }
+                            checkbox { checked bind booleanContent }
                         }
                     } in withDefaultPadding
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            checkbox { }
+                            checkbox { checked bind booleanContent }
                         }
                     } in card
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            checkbox { }
+                            checkbox { checked bind booleanContent }
                         }
                     } in important
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
-                            checkbox { }
+                            checkbox { checked bind booleanContent }
                         }
                     } in critical
                 }
@@ -122,36 +123,40 @@ object ControlsScreen : RockScreen {
             col {
                 h2 { content = "Drop Downs" }
                 val options = shared { listOf("Apple", "Banana", "Crepe") }
-                select { bind(Property("Apple"), data = options, render = { it }) } in withDefaultPadding
-                select { bind(Property("Apple"), data = options, render = { it }) } in card
-                select { bind(Property("Apple"), data = options, render = { it }) } in important
-                select { bind(Property("Apple"), data = options, render = { it }) } in critical
-                select { bind(Property("Apple"), data = options, render = { it }) } in warning
-                select { bind(Property("Apple"), data = options, render = { it }) } in danger
+                val value = Property("Apple")
+                select { bind(value, data = options, render = { it }) } in withDefaultPadding
+                select { bind(value, data = options, render = { it }) } in card
+                select { bind(value, data = options, render = { it }) } in important
+                select { bind(value, data = options, render = { it }) } in critical
+                select { bind(value, data = options, render = { it }) } in warning
+                select { bind(value, data = options, render = { it }) } in danger
             } in card
 
             col {
+                val date = Property<LocalDate?>(null)
                 h2 { content = "Date Fields" }
-                localDateField {  }
-                localDateField {  } in card
-                localDateField {  } in important
-                localDateField {  } in critical
+                localDateField { content bind date }
+                localDateField { content bind date } in card
+                localDateField { content bind date } in important
+                localDateField { content bind date } in critical
             } in card
 
             col {
+                val date = Property<LocalTime?>(null)
                 h2 { content = "Time Fields" }
-                localTimeField {  }
-                localTimeField {  } in card
-                localTimeField {  } in important
-                localTimeField {  } in critical
+                localTimeField { content bind date }
+                localTimeField { content bind date } in card
+                localTimeField { content bind date } in important
+                localTimeField { content bind date } in critical
             } in card
 
             col {
+                val date = Property<LocalDateTime?>(null)
                 h2 { content = "Date Time Fields" }
-                localDateTimeField {  }
-                localDateTimeField {  } in card
-                localDateTimeField {  } in important
-                localDateTimeField {  } in critical
+                localDateTimeField { content bind date }
+                localDateTimeField { content bind date } in card
+                localDateTimeField { content bind date } in important
+                localDateTimeField { content bind date } in critical
             } in card
 
             col {
@@ -162,16 +167,17 @@ object ControlsScreen : RockScreen {
                 text { ::content { "Value: ${number.await()}" }}
                 textField { content bind text } in card
                 text { ::content { "Text: ${text.await()}" }}
-                textField {  } in important
-                textField {  } in critical
+                textField { content bind text } in important
+                textField { content bind text } in critical
             } in card
 
             col {
+                val text = Property("Longer form text\n with newlines goes here")
                 h2 { content = "Text Areas" }
-                textArea {  }
-                textArea {  } in card
-                textArea {  } in important
-                textArea {  } in critical
+                textArea { content bind text }
+                textArea { content bind text } in card
+                textArea { content bind text } in important
+                textArea { content bind text } in critical
             } in card
 
             col {

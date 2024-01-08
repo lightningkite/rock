@@ -11,6 +11,7 @@ import com.lightningkite.rock.reactive.*
  */
 class ViewWriter(
     parent: NView?,
+    val context: NContext = parent?.nContext ?: throw IllegalArgumentException(),
     private val startDepth: Int = 0,
 ) {
     val depth: Int get() = stack.size - 1 + startDepth
@@ -38,7 +39,7 @@ class ViewWriter(
      * Creates a copy of the [ViewWriter] with no root view.
      * Used for view containers that need their contents removed and replaced later.
      */
-    fun newViews(): ViewWriter = ViewWriter(null, startDepth = depth).also {
+    fun newViews(): ViewWriter = ViewWriter(null, context = currentView.nContext, startDepth = depth).also {
         it.addons.putAll(this.addons)
         it.currentTheme = currentTheme
         it.isRoot = isRoot

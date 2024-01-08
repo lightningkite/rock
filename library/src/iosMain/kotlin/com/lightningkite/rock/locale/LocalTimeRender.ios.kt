@@ -1,0 +1,29 @@
+package com.lightningkite.rock.locale
+
+import kotlinx.datetime.*
+
+actual fun LocalDate.renderToString(
+    size: RenderSize,
+    includeWeekday: Boolean,
+    includeYear: Boolean,
+    includeEra: Boolean
+): String = this.toString()
+
+actual fun LocalTime.renderToString(size: RenderSize): String = this.toString()
+actual fun LocalDateTime.renderToString(
+    size: RenderSize,
+    includeWeekday: Boolean,
+    includeYear: Boolean,
+    includeEra: Boolean
+): String = this.toString()
+
+actual fun Instant.renderToString(
+    size: RenderSize,
+    zone: TimeZone,
+    includeWeekday: Boolean,
+    includeYear: Boolean,
+    includeEra: Boolean
+): String = this.toString()
+
+actual fun TimeZone.renderToString(size: RenderSize): String = this.toString()
+actual fun DayOfWeek.renderToString(size: RenderSize): String = this.toString()

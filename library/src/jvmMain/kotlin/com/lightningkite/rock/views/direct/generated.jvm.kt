@@ -207,7 +207,7 @@ actual inline var AutoCompleteTextField.suggestions: List<String>
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSwapView = HTMLElement
 @ViewDsl actual fun ViewWriter.swapView(setup: SwapView.() -> Unit): Unit = todo("swapView")
 @ViewDsl actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = todo("swapViewDialog")
-actual fun SwapView.swap(transition: ScreenTransition, createNewView: ()->Unit): Unit = TODO()
+actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.()->Unit): Unit = TODO()
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NWebView = HTMLElement
 @ViewDsl actual fun ViewWriter.webView(setup: WebView.() -> Unit): Unit = todo("webView")

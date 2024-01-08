@@ -277,7 +277,7 @@ fun <T: NView> ViewWriter.handleTheme(
                 }
             }
             view.background = gradientDrawable
-            view.elevation = if (borders) 0f else theme.elevation.value
+            view.elevation = if (borders) theme.elevation.value else 0f
             background(theme)
         } else {
             view.background = null

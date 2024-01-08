@@ -15,6 +15,7 @@ actual typealias NSwapView = HTMLDivElement
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
     classList.add("rock-swap")
+    this.asDynamic().__ROCK_ViewWriter__ = split()
     setup(SwapView(this))
 }
 
@@ -26,7 +27,8 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedE
     setup(SwapView(this))
 }
 
-actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit): Unit {
+actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
+    val vw = this.asDynamic().__ROCK_ViewWriter__ as ViewWriter
     native.asDynamic().__ROCK__next = null
     val alreadyChanging = native.asDynamic().__ROCK__swapping as? Boolean
     if (alreadyChanging == true) {
@@ -48,7 +50,7 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
                 }
             }, 250)
         }
-    createNewView()
+    createNewView(vw)
     (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
         native.hidden = false
         newView.style.animation = "${keyframeName}-enter 0.25s"
@@ -58,7 +60,7 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: () -> Unit
         native.hidden = true
     }
     native.asDynamic().__ROCK__swapping = false
-    (native.asDynamic().__ROCK__next as? Pair<ScreenTransition, () -> Unit>)?.let {
+    (native.asDynamic().__ROCK__next as? Pair<ScreenTransition, ViewWriter.() -> Unit>)?.let {
         swap(it.first, it.second)
     }
 }

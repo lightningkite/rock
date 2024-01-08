@@ -138,7 +138,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
     }
     compileOptions {
         isCoreLibraryDesugaringEnabled = true

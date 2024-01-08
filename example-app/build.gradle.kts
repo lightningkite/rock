@@ -121,7 +121,7 @@ android {
     compileSdk = 31
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 26
     }
     compileOptions {
         // Flag to enable support for the new language APIs

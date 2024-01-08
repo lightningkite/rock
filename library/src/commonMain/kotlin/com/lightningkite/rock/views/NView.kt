@@ -13,6 +13,9 @@ import com.lightningkite.rock.reactive.reactiveScope
  */
 expect open class NView
 
+expect class NContext
+expect val NView.nContext: NContext
+
 expect val NView.calculationContext: CalculationContext
 expect var NView.nativeRotation: Angle
 expect var NView.opacity: Double

@@ -16,4 +16,4 @@ value class SwapView(override val native: NSwapView) : RView<NSwapView>
 expect fun ViewWriter.swapView(setup: SwapView.() -> Unit = {}): Unit
 @ViewDsl
 expect fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit = {}): Unit
-expect fun SwapView.swap(transition: ScreenTransition = ScreenTransition.Fade, createNewView: ()->Unit): Unit
+expect fun SwapView.swap(transition: ScreenTransition = ScreenTransition.Fade, createNewView: ViewWriter.()->Unit): Unit

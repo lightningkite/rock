@@ -93,7 +93,7 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 @ViewModifierDsl3
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
-        wrapNext(ScrollView(this.currentView.context)) {
+        wrapNext(ScrollView(this.context)) {
             layoutParams = ViewGroup.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.MATCH_PARENT
@@ -105,7 +105,7 @@ actual val ViewWriter.scrolls: ViewWrapper
 @ViewModifierDsl3
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
-        wrapNext(HorizontalScrollView(this.currentView.context)) {
+        wrapNext(HorizontalScrollView(this.context)) {
             layoutParams = ViewGroup.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.MATCH_PARENT
@@ -116,7 +116,7 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
 
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
-    wrapNext(FrameLayout(this.currentView.context)) {
+    wrapNext(FrameLayout(this.context)) {
         layoutParams = ViewGroup.LayoutParams(
             /* width = */ constraints.width?.value?.toInt() ?: ActionBar.LayoutParams.WRAP_CONTENT,
             /* height = */ constraints.height?.value?.toInt() ?: ActionBar.LayoutParams.WRAP_CONTENT

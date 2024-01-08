@@ -15,7 +15,7 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWrite
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
-        native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.VERTICAL, false)
+        native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         setup()
     }
 }
@@ -23,7 +23,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
-        native.layoutManager = LinearLayoutManager(currentView.context, LinearLayoutManager.HORIZONTAL, false)
+        native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         setup()
     }
 }
@@ -31,7 +31,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
-        native.layoutManager = GridLayoutManager(currentView.context, 3)
+        native.layoutManager = GridLayoutManager(context, 3)
         setup()
     }
 }

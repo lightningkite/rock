@@ -10,7 +10,7 @@ fun <T: NView, W: RView<T>> ViewWriter.viewElement(
     wrapper: (T) -> W,
     setup: W.() -> Unit,
 ) {
-    val native = factory(currentView.context)
+    val native = factory(context)
     val wrapped = wrapper(native)
     element(native) {
         setup(wrapped)

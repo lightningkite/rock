@@ -12,6 +12,8 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.Orientation
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.RoundRectShape
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
@@ -66,11 +68,16 @@ import com.lightningkite.rock.models.Paint as RockPaint
 @ViewDsl
 actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {
     viewElement(factory = ::NSeparator, wrapper = ::Separator) {
-        native.updateLayoutParams {
+        native.lparams.run {
             width = LayoutParams.MATCH_PARENT
             height = (2 * native.resources.displayMetrics.density).toInt()
         }
-        applyTheme(native, viewDraws = false)
+        handleTheme(native) { it, v ->
+            v.background = ColorDrawable(it.foreground.closestColor().colorInt())
+            v.alpha = 0.25f
+        }
+        native.minimumWidth = 1
+        native.minimumHeight = 1
         setup(this)
     }
 }
@@ -129,9 +136,7 @@ actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) = viewElement(
     factory = ::FrameLayout,
     wrapper = ::ContainingView
 ) {
-    applyTheme(native, viewDraws = false) { theme, view ->
-        view.background = colorDrawable(theme.background.colorInt())
-    }
+    handleTheme(native, viewDraws = false)
     setup(this)
 }
 
@@ -140,7 +145,7 @@ actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.VERTICAL
-        applyTheme(l, viewDraws = false)
+        handleTheme(l, viewDraws = false)
         setup(ContainingView(l))
     }
 }
@@ -150,7 +155,7 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.HORIZONTAL
-        applyTheme(l, viewDraws = false)
+        handleTheme(l, viewDraws = false)
         setup(ContainingView(l))
     }
 }
@@ -159,7 +164,7 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
 actual fun ViewWriter.button(setup: Button.() -> Unit) {
     viewElement(factory = ::FrameLayout, wrapper = ::ContainingView) {
         val frame = native as FrameLayout
-        applyTheme(frame)
+        handleTheme(frame, viewDraws = false)
         setup(Button(frame))
     }
 }
@@ -168,7 +173,7 @@ fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
         androidText.textSize = textSize
-        applyTheme(native, foreground = applyTextColorFromTheme)
+        handleTheme(native, foreground = applyTextColorFromTheme)
         setup(TextView(androidText))
     }
 
@@ -177,7 +182,7 @@ fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) =
         val androidText = native
         androidText.textSize = textSize
         androidText.setTypeface(androidText.typeface, Typeface.BOLD)
-        applyTheme(native, foreground = applyTextColorFromTheme)
+        handleTheme(native, foreground = applyTextColorFromTheme)
         setup(TextView(androidText))
     }
 
@@ -285,7 +290,7 @@ actual var Image.source: ImageSource
                             )
                         )
                     )
-                } catch(ex: Exception) {
+                } catch (ex: Exception) {
                     native.setImageResource(R.drawable.baseline_broken_image_24)
                 }
                 val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
@@ -297,7 +302,9 @@ actual var Image.source: ImageSource
                 native.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
                     override fun onViewAttachedToWindow(v: View) {}
 
-                    override fun onViewDetachedFromWindow(v: View) { nativeView = null }
+                    override fun onViewDetachedFromWindow(v: View) {
+                        nativeView = null
+                    }
                 })
 
                 LoadRemoteImageScope.bitmapFromUrl(value.url, onBitmapLoaded = { bitmap ->
@@ -336,6 +343,7 @@ actual var Image.source: ImageSource
 //                        path
 //                    }
 //                )
+//                native.setImageDrawable(drawable)
                 native.setImageDrawable(
                     ContextCompat.getDrawable(
                         native.context,
@@ -513,25 +521,40 @@ actual val Switch.checked: Writable<Boolean>
     }
 
 val NView.selected: Writable<Boolean>
-    get() {
-        return object : Writable<Boolean> {
-            override fun addListener(listener: () -> Unit): () -> Unit {
-                NativeListeners.listeners.addListener(this@selected, listener)
-                this@selected.setOnClickListener { _ ->
-                    NativeListeners.listeners.get(this@selected)?.forEach { action -> action() }
-                }
-                return this@selected.removeListener(listener)
+    get() = object : Writable<Boolean> {
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            NativeListeners.listeners.addListener(this@selected, listener)
+            this@selected.setOnClickListener { _ ->
+                NativeListeners.listeners.get(this@selected)?.forEach { action -> action() }
             }
+            return this@selected.removeListener(listener)
+        }
 
-            override suspend fun awaitRaw(): Boolean {
-                return this@selected.isSelected
-            }
+        override suspend fun awaitRaw(): Boolean {
+            return this@selected.isSelected
+        }
 
-            override suspend fun set(value: Boolean) {
-                this@selected.isSelected = value
-            }
+        override suspend fun set(value: Boolean) {
+            this@selected.isSelected = value
         }
     }
+
+val NView.hovered: Readable<Boolean>
+    get() = object : Readable<Boolean> {
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            return {}
+//            NativeListeners.listeners.addListener(this@hovered, listener)
+//            this@hovered.setOnHoverListener { v, _ ->
+//                NativeListeners.listeners.get(v)?.forEach { action -> action() }
+//            }
+//            return this@hovered.removeListener(listener)
+        }
+
+        override suspend fun awaitRaw(): Boolean {
+            return this@hovered.isHovered
+        }
+    }
+
 
 actual var ToggleButton.enabled: Boolean
     get() {
@@ -580,7 +603,7 @@ actual var LocalDateField.action: Action?
     }
 actual var LocalDateField.range: ClosedRange<LocalDate>?
     get() {
-        return native.minDate.toKotlinDate().rangeTo(native.maxDate.toKotlinDate())
+        return native.minDate.toKotlinLocalDate().rangeTo(native.maxDate.toKotlinLocalDate())
     }
     set(value) {
         if (value == null) {
@@ -591,7 +614,29 @@ actual var LocalDateField.range: ClosedRange<LocalDate>?
         }
     }
 actual val LocalDateField.content: Writable<LocalDate?>
-    get() = TODO()
+    get() {
+        return object : Writable<LocalDate?> {
+            override fun addListener(listener: () -> Unit): () -> Unit {
+                NativeListeners.listeners.addListener(this@content.native, listener)
+                this@content.native.addTextChangedListener {
+                    NativeListeners.listeners.get(this@content.native)?.forEach { action -> action() }
+                }
+                return this@content.native.removeListener(listener)
+            }
+
+            override suspend fun awaitRaw(): LocalDate? {
+                return this@content.native.localDate.toKotlinLocalDate()
+            }
+
+            override suspend fun set(value: LocalDate?) {
+                if (value == null) {
+                    this@content.native.setText("")
+                } else {
+                    this@content.native.localDate = value?.toJavaLocalDate() ?: java.time.LocalDate.now()
+                }
+            }
+        }
+    }
 
 actual val LocalTimeField.content: Writable<LocalTime?>
     get() {
@@ -683,8 +728,8 @@ actual var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     get() {
         val minDate: java.time.LocalDateTime = this@range.native.minDate
         val maxDate: java.time.LocalDateTime = this@range.native.maxDate
-        val min = minDate.toKotlinDateTime()
-        val max = maxDate.toKotlinDateTime()
+        val min = minDate.toKotlinLocalDateTime()
+        val max = maxDate.toKotlinLocalDateTime()
         return min.rangeTo(max)
     }
     set(value) {
@@ -891,7 +936,7 @@ actual var TextArea.hint: String
 
 actual fun <T> Select.bind(
     edits: Writable<T>,
-    data: suspend () -> List<T>,
+    data: Readable<List<T>>,
     render: (T) -> String
 ) {
 }
@@ -1042,10 +1087,9 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWrite
 
 fun View.setPaddingAll(padding: Int) = setPadding(padding, padding, padding, padding)
 fun View.setMarginAll(margin: Int) {
-    Timber.d("SET MARGIN ALL: $margin for view $this")
-    (layoutParams as? MarginLayoutParams)?.setMargins(margin)
+    (lparams as? MarginLayoutParams)?.setMargins(margin)
 }
-private fun colorDrawable(color: Int): ColorDrawable = ColorDrawable(color)
+
 private fun RockPaint.colorInt(): Int = closestColor().toInt()
 private fun CornerRadii.toFloatArray(): FloatArray {
     return floatArrayOf(
@@ -1060,10 +1104,6 @@ private fun CornerRadii.toFloatArray(): FloatArray {
     )
 }
 
-private fun noCorners(): FloatArray {
-    return floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f)
-}
-
 private fun LinearGradient.orientation(): Orientation {
     return when (angle.degrees.toInt()) {
         in 0..90 -> GradientDrawable.Orientation.LEFT_RIGHT
@@ -1074,111 +1114,141 @@ private fun LinearGradient.orientation(): Orientation {
     }
 }
 
-private fun View.noBorderElevationOrCorners() {
-    setMarginAll(0)
-    (background as? GradientDrawable)?.cornerRadii = noCorners()
-    elevation = 0f
-    invalidate()
-}
-
 val applyTextColorFromTheme: (Theme, AndroidTextView) -> Unit = { theme, textView ->
     textView.setTextColor(theme.foreground.colorInt())
 }
 
-fun <T : View>ViewWriter.applyTheme(
+fun <T: NView> ViewWriter.handleTheme(
     view: T,
-    id: String = UUID.randomUUID().toString(),
     viewDraws: Boolean = true,
     background: (Theme) -> Unit = {},
     backgroundRemove: () -> Unit = {},
     foreground: (Theme, T) -> Unit = { _, _  -> },
 ) {
+    val transition = transitionNextView
+    transitionNextView = ViewWriter.TransitionNextView.No
+    val currentTheme = currentTheme
+    val isRoot = isRoot
+    this.isRoot = false
 
-    val rootTheme = themeStack.size == 1
-    val themeGetter = themeStack.lastOrNull() ?: { null }
-    val theme2 = currentTheme
-    val themeChanged = themeJustChanged
-    themeJustChanged = false
+    view.calculationContext.reactiveScope {
+        val theme = currentTheme()
 
-    calculationContext.reactiveScope {
-//        Timber.d("THEME JUST CHANGED!!!!")
-        Timber.d("SET BACKGROUND ON $id")
-        val theme = theme2()
-        val useBackground = themeChanged && themeGetter() != null
-        if (rootTheme) {
-            view.noBorderElevationOrCorners()
-            return@reactiveScope
+        val viewMarginless = viewPropertiesMap[view] ?: false
+
+        val shouldTransition = when (transition) {
+            ViewWriter.TransitionNextView.No -> false
+            ViewWriter.TransitionNextView.Yes -> true
+            is ViewWriter.TransitionNextView.Maybe -> transition.logic()
         }
+        val mightTransition = transition != ViewWriter.TransitionNextView.No
+        val useBackground = shouldTransition
+        val usePadding = (viewDraws || (mightTransition && !isRoot))
+        val useMargins = (viewDraws || mightTransition) && !viewMarginless
 
-        if (viewDraws) {
-            view.setMarginAll(theme.spacing.value.toInt())
-        }
+        val borders = !viewMarginless && shouldTransition
 
-        if (useBackground || viewDraws && !rootTheme) {
-            view.setPaddingAll(theme.spacing.value.toInt())
+        if (useMargins) {
             view.setMarginAll(theme.spacing.value.toInt())
         } else {
             view.setMarginAll(0)
+        }
+        if (usePadding) {
+            view.setPaddingAll(theme.spacing.value.toInt())
+        } else {
             view.setPaddingAll(0)
-            view.invalidate()
         }
 
         if (useBackground) {
-            var nativeProperties: ViewProperty? = view.tag as? ViewProperty
-//
-            val tagId = view.tag as? String ?: ""
-            if (tagId.isNotEmpty()) {
-                nativeProperties = viewPropertiesMap[tagId]
-            }
-
             val gradientDrawable = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                val containsMarginLess = nativeProperties?.properties?.contains(ViewProperties.MARGINLESS) ?: false
-                if (!containsMarginLess) {
-                    cornerRadii = theme.cornerRadii.toFloatArray()
+                if (borders) {
+                    cornerRadii = floatArrayOf(
+                        theme.cornerRadii.topLeft.value,
+                        theme.cornerRadii.topLeft.value,
+                        theme.cornerRadii.topRight.value,
+                        theme.cornerRadii.topRight.value,
+                        theme.cornerRadii.bottomLeft.value,
+                        theme.cornerRadii.bottomLeft.value,
+                        theme.cornerRadii.bottomRight.value,
+                        theme.cornerRadii.bottomRight.value
+                    )
                     setStroke(theme.outlineWidth.value.toInt(), theme.outline.colorInt())
                 }
 
-                when(theme.background) {
+                when (theme.background) {
                     is Color -> {
                         colors = intArrayOf(theme.background.colorInt(), theme.background.colorInt())
                     }
+
                     is LinearGradient -> {
                         colors = theme.background.stops.map { it.color.toInt() }.toIntArray()
                         orientation = theme.background.orientation()
                         gradientType = GradientDrawable.LINEAR_GRADIENT
                     }
+
                     is RadialGradient -> {
                         colors = theme.background.stops.map { it.color.toInt() }.toIntArray()
                         gradientType = GradientDrawable.RADIAL_GRADIENT
                     }
                 }
             }
-
             view.background = gradientDrawable
+            view.elevation = if (borders) 0f else theme.elevation.value
             background(theme)
         } else {
+            view.background = null
             backgroundRemove()
         }
         foreground(theme, view)
     }
 }
 
-private val viewPropertiesMap: WeakHashMap<String, ViewProperty> = WeakHashMap()
 
-data class ViewProperty(val properties: List<ViewProperties>)
-enum class ViewProperties {
-    MARGINLESS
+inline fun ViewWriter.handleThemeControl(
+    view: View,
+    crossinline checked: suspend () -> Boolean = { false },
+    setup: () -> Unit
+) {
+//    view.hi
+//    view.setOnHoverListener { view, motionEvent -> }
+//    val s = view.stateReadable
+    val hovered = view.hovered
+    withThemeGetter({
+        if (checked()) return@withThemeGetter it().selected()
+        val isHovered = hovered.await()
+        when {
+//            state and UIControlStateDisabled != 0UL -> it().disabled()
+//            state and UIControlStateHighlighted != 0UL -> it().down()
+            isHovered -> it().hover()
+            else -> it()
+        }
+    }) {
+        if (transitionNextView == ViewWriter.TransitionNextView.No) {
+            transitionNextView = ViewWriter.TransitionNextView.Maybe {
+                if (checked()) return@Maybe true
+                val isHovered = hovered.await()
+                when {
+//                    state and UIControlStateDisabled != 0UL -> true
+//                    state and UIControlStateHighlighted != 0UL -> true
+                    isHovered -> true
+                    else -> false
+                }
+            }
+        }
+        handleTheme(view, viewDraws = false)
+        setup()
+    }
 }
 
+
+private val viewPropertiesMap: WeakHashMap<View, Boolean> = WeakHashMap()
+
+@ViewModifierDsl3
 actual val ViewWriter.marginless: ViewWrapper
     get() {
-        afterNextElementSetup {
-            val idTag = UUID.randomUUID().toString()
-            this.tag = idTag
-            viewPropertiesMap[idTag] = ViewProperty(listOf(ViewProperties.MARGINLESS))
-
-            this.noBorderElevationOrCorners()
+        beforeNextElementSetup {
+            viewPropertiesMap[this] = true
         }
         return ViewWrapper
     }
@@ -1224,7 +1294,7 @@ private fun alignmentToGravity(alignment: Align, isVertical: Boolean): Int {
 @ViewModifierDsl3
 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
     beforeNextElementSetup {
-        val params = this.layoutParams as ViewGroup.LayoutParams
+        val params = this.lparams
         val horizontalGravity = alignmentToGravity(horizontal, isVertical = false)
         val verticalGravity = alignmentToGravity(vertical, isVertical = true)
         if (params is LinearLayout.LayoutParams)
@@ -1238,8 +1308,6 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
         if (vertical == Align.Stretch) {
             params.height = LayoutParams.MATCH_PARENT
         }
-
-        this.layoutParams = params
     }
     return ViewWrapper
 }
@@ -1282,7 +1350,7 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
 @ViewDsl
 actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit) {
     return viewElement(factory = ::ProgressBar, wrapper = ::ActivityIndicator) {
-        applyTheme(native)
+        handleTheme(native)
         setup(this)
     }
 }
@@ -1294,7 +1362,7 @@ actual fun ViewWriter.link(setup: Link.() -> Unit) {
     return viewElement(factory = ::LinkFrameLayout, wrapper = ::Link) {
         native.navigator = navigator
         linkCounter++
-        applyTheme(native, "LinkView: $linkCounter")
+        handleTheme(native, viewDraws = false)
         setup(this)
     }
 }
@@ -1302,9 +1370,10 @@ actual fun ViewWriter.link(setup: Link.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit) {
     return viewElement(factory = ::ImageView, wrapper = ::Image) {
-        applyTheme(native) { theme, view ->
+        handleTheme(native) { theme, view ->
             afterNextElementSetup {
-                view.drawable?.colorFilter = PorterDuffColorFilter(theme.foreground.colorInt(), PorterDuff.Mode.MULTIPLY)
+                view.drawable?.colorFilter =
+                    PorterDuffColorFilter(theme.foreground.colorInt(), PorterDuff.Mode.MULTIPLY)
             }
         }
         setup(this)
@@ -1314,7 +1383,10 @@ actual fun ViewWriter.image(setup: Image.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.space(setup: Space.() -> Unit) {
     return viewElement(factory = ::NSpace, wrapper = ::Space) {
-        applyTheme(native)
+        handleTheme(native)  { it, native ->
+            native.minimumWidth = it.spacing.value.toInt()
+            native.minimumHeight = it.spacing.value.toInt()
+        }
         setup(this)
     }
 }
@@ -1324,10 +1396,11 @@ actual fun ViewWriter.space(
     setup: Space.() -> Unit,
 ) {
     return viewElement(factory = ::View, wrapper = ::Space) {
-        applyTheme(native) { theme, view, ->
-            view.setPaddingAll((theme.spacing.value * multiplier).toInt())
-            setup(this)
+        handleTheme(native)  { it, native ->
+            native.minimumWidth = it.spacing.value.times(multiplier).toInt()
+            native.minimumHeight = it.spacing.value.times(multiplier).toInt()
         }
+        setup(this)
     }
 }
 
@@ -1342,7 +1415,7 @@ actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
     return viewElement(factory = ::AndroidCheckbox, wrapper = ::Checkbox) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme(native)
         setup(this)
     }
 }
@@ -1350,7 +1423,7 @@ actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit) {
     return viewElement(factory = ::AndroidRadioButton, wrapper = ::RadioButton) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme(native)
         setup(this)
     }
 }
@@ -1358,7 +1431,7 @@ actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.switch(setup: Switch.() -> Unit) {
     return viewElement(factory = ::SwitchCompat, wrapper = ::Switch) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme(native)
         setup(this)
     }
 }
@@ -1366,7 +1439,7 @@ actual fun ViewWriter.switch(setup: Switch.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit) {
     return viewElement(factory = ::FrameLayout, wrapper = ::ToggleButton) {
-        applyTheme(native)
+        handleTheme(native)
         setup(this)
     }
 }
@@ -1374,7 +1447,7 @@ actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit) {
     return viewElement(factory = ::AndroidDateField, wrapper = ::LocalDateField) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
         setup()
     }
 }
@@ -1382,7 +1455,7 @@ actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit) {
     return viewElement(factory = ::AndroidTimeField, wrapper = ::LocalTimeField) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
         setup()
     }
 }
@@ -1390,7 +1463,7 @@ actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit) {
     return viewElement(factory = ::AndroidDateTimeField, wrapper = ::LocalDateTimeField) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
         setup()
     }
 }
@@ -1398,7 +1471,7 @@ actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit) {
     return viewElement(factory = ::AppCompatToggleButton, wrapper = ::RadioToggleButton) {
-        applyTheme(native)
+        handleTheme(native)
         setup(this)
     }
 }
@@ -1407,7 +1480,7 @@ actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.textField(setup: TextField.() -> Unit) {
     return viewElement(factory = ::EditText, wrapper = ::TextField) {
-        applyTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
+        handleTheme<AndroidTextView>(native, foreground = applyTextColorFromTheme)
         setup(this)
     }
 }

@@ -34,4 +34,3 @@ object WebSocketScreen : RockScreen {
     }
 }
 
-//wss://ws.hammerprice.cs.lightningkite.com/multiplex?jwt=refresh%2FUser%2F0d2fa4f8-7f97-4c4d-b527-d451d79990b9%3AZBatf%2FhXpzMm07zRRfLdL5I4OiAgo0x8

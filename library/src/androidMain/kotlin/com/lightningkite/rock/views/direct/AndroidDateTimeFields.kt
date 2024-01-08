@@ -7,7 +7,14 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.updateLayoutParams
+import kotlinx.datetime.*
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinLocalDateTime
 import java.time.*
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlin.math.max
@@ -47,11 +54,11 @@ class AndroidDateField : AppCompatEditText {
             if (hasFocus) {
                 DatePickerDialog(context).apply {
                     setOnDateSetListener { _, year, month, dayOfMonth ->
-                        localDate = LocalDate.of(year, month, dayOfMonth)
+                        localDate = LocalDate.of(year, month + 1, dayOfMonth)
                     }
                 }.apply {
-                    this.datePicker.minDate = minDate.milliseconds
-                    this.datePicker.maxDate = maxDate.milliseconds
+                    this.datePicker.minDate = minDate.toKotlinLocalDate().atTime(kotlinx.datetime.LocalTime(12, 0)).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                    this.datePicker.maxDate = maxDate.toKotlinLocalDate().atTime(kotlinx.datetime.LocalTime(12, 0)).toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
                     show()
                 }
             }
@@ -92,28 +99,6 @@ class AndroidTimeField : AppCompatEditText {
     }
 }
 
-fun LocalDateTime.toKotlinDateTime(): kotlinx.datetime.LocalDateTime {
-    return kotlinx.datetime.LocalDateTime(this.year, this.month, this.dayOfMonth, this.hour, this.minute, this.second)
-}
-
-fun LocalTime.toKotlinTime(): kotlinx.datetime.LocalTime {
-    return kotlinx.datetime.LocalTime(this.hour, this.minute, this.second, this.nano)
-}
-
-private val LocalDateTime.milliseconds: Long
-    get() {
-        val seconds = this.toEpochSecond(ZoneOffset.of(ZoneId.systemDefault().toString()))
-        return seconds * 1000
-    }
-
-private val LocalDate.milliseconds: Long
-    get() {
-        return LocalDateTime.of(this.year, this.month, this.dayOfMonth, 0, 0, 0).milliseconds
-    }
-
-fun LocalDate.toKotlinDate(): kotlinx.datetime.LocalDate {
-    return kotlinx.datetime.LocalDate(this.year, this.month, this.dayOfMonth)
-}
 class AndroidDateTimeField : AppCompatEditText {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
@@ -142,11 +127,11 @@ class AndroidDateTimeField : AppCompatEditText {
             if (hasFocus) {
                 DatePickerDialog(context).apply {
                     setOnDateSetListener { _, year, month, dayOfMonth ->
-                        dateTime = LocalDateTime.of(year, month, dayOfMonth, 0, 0, 0)
+                        dateTime = LocalDateTime.of(year, month + 1, dayOfMonth, 0, 0, 0)
                     }
                 }.apply {
-                    this.datePicker.minDate = minDate.milliseconds
-                    this.datePicker.maxDate = maxDate.milliseconds
+                    this.datePicker.minDate = minDate.toKotlinLocalDateTime().toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
+                    this.datePicker.maxDate = maxDate.toKotlinLocalDateTime().toInstant(TimeZone.currentSystemDefault()).toEpochMilliseconds()
                     show()
                 }
             }

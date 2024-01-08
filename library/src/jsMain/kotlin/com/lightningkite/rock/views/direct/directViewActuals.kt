@@ -35,7 +35,12 @@ inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
         virtualClasses.add(base)
         previousThemeClass = base
 
-        themeLogic(rootTheme, themeChanged != ViewWriter.TransitionNextView.No, virtualClasses)
+        val changed = when(themeChanged) {
+            is ViewWriter.TransitionNextView.Maybe -> themeChanged.logic()
+            ViewWriter.TransitionNextView.No -> false
+            ViewWriter.TransitionNextView.Yes -> true
+        }
+        themeLogic(rootTheme, changed, virtualClasses)
         className = virtualClasses.joinToString(" ")
     }
     setup()

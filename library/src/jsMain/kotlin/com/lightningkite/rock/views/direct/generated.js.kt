@@ -60,6 +60,7 @@ actual typealias NLink = HTMLAnchorElement
 @ViewDsl
 actual fun ViewWriter.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
     this.asDynamic().__ROCK__navigator = navigator
+    style.display = "block"
     setup(Link(this))
 }
 
@@ -87,7 +88,10 @@ actual typealias NExternalLink = HTMLAnchorElement
 
 @ViewDsl
 actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) =
-    themedElementClickable<NExternalLink>("a") { setup(ExternalLink(this)) }
+    themedElementClickable<NExternalLink>("a") {
+        style.display = "block"
+        setup(ExternalLink(this))
+    }
 
 actual inline var ExternalLink.to: String
     get() = native.href

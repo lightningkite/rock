@@ -1,10 +1,14 @@
 package com.lightningkite.rock
 
+import android.os.Handler
+import android.os.Looper
 import java.util.*
 import kotlin.concurrent.schedule
 
+private val handler = Handler(Looper.getMainLooper())
+
+internal fun globalPost(action: ()->Unit) = handler.post(action)
 internal actual fun afterTimeout(milliseconds: Long, action: () -> Unit): () -> Unit {
-    return { Timer().schedule(milliseconds) {
-        action()
-    } }
+    handler.postDelayed(action, milliseconds)
+    return { handler.removeCallbacks(action) }
 }

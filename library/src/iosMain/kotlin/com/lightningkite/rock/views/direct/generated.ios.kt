@@ -36,6 +36,7 @@ actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit = element(UIV
         alpha = 0.25
     }
     extensionSizeConstraints = SizeConstraints(minWidth = 1.px, minHeight = 1.px)
+    setup(Separator(this))
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")

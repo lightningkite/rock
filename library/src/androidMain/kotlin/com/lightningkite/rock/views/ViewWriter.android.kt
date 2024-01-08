@@ -1,16 +1,20 @@
 package com.lightningkite.rock.views
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
+import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.WebSocket
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
+import java.lang.ref.WeakReference
 
 /**
  * A native view in the underlying view system.
@@ -26,6 +30,13 @@ object AndroidAppContext {
     var ktorClient: HttpClient = HttpClient() {
         install(WebSockets)
     }
+    var activityCtxRef: WeakReference<RockActivity>? = null
+    var activityCtx: RockActivity?
+        get() = activityCtxRef?.get()
+        set(value) { activityCtxRef = WeakReference(value) }
+
+    fun startActivityForResult(intent: Intent, options: Bundle? = null, onResult: (Int, Intent?)->Unit) = activityCtx?.startActivityForResult(intent = intent, options = options, onResult = onResult)
+    fun requestPermissions(vararg permissions: String, onResult: (RockActivity.PermissionResult)->Unit) = activityCtx?.requestPermissions(permissions = permissions, onResult = onResult)
 }
 
 private val View.removeListeners: HashMap<Int, () -> Unit>

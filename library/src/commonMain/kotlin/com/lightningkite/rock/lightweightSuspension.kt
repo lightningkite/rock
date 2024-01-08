@@ -10,10 +10,11 @@ suspend fun <T> suspendCoroutineCancellable(start: (Continuation<T>)->()->Unit):
     val result: T = try {
         val context = coroutineContext
         suspendCoroutine<T> {
-            context[CancellationState.Key]!!.waitingOn = it
-            canceller = start(SingleThreadContinuation(it) {
+            val st = SingleThreadContinuation(it) {
                 context[CancellationState.Key]!!.waitingOn = null
-            })
+            }
+            context[CancellationState.Key]!!.waitingOn = st
+            canceller = start(st)
         }
     } catch(e: CancelledException) {
         canceller?.invoke()

@@ -116,9 +116,6 @@ actual class RequestResponse(val wraps: HttpResponse) {
     }
 }
 
-actual class Blob(val data: NSData, val type: String = "application/octet-stream")
-actual class FileReference(val provider: NSItemProvider, val suggestedType: UTType? = null)
-
 actual fun websocket(url: String): WebSocket {
     return WebSocketWrapper(url)
 }
@@ -217,6 +214,9 @@ class WebSocketWrapper(val url: String) : WebSocket {
         onClose.add(action)
     }
 }
+
+actual class Blob(val data: NSData, val type: String = "application/octet-stream")
+actual class FileReference(val provider: NSItemProvider, val suggestedType: UTType? = null)
 
 fun String.nsdata(): NSData? =
     NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)

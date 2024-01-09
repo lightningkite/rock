@@ -19,16 +19,16 @@ fun retryWebsocket(
     fun reset() {
         currentWebSocket = websocket(url).also {
             it.onOpen {
-                onOpenList.forEach { l -> l() }
+                onOpenList.toList().forEach { l -> l() }
             }
             it.onMessage {
-                onMessageList.forEach { l -> l(it) }
+                onMessageList.toList().forEach { l -> l(it) }
             }
             it.onBinaryMessage {
-                onBinaryMessageList.forEach { l -> l(it) }
+                onBinaryMessageList.toList().forEach { l -> l(it) }
             }
             it.onClose {
-                onCloseList.forEach { l -> l(it) }
+                onCloseList.toList().forEach { l -> l(it) }
             }
             it.onOpen {
                 lastConnect = clockMillis()

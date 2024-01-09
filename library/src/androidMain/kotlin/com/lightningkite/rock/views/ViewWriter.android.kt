@@ -7,14 +7,17 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.view.children
 import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.WebSocket
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
+import com.lightningkite.rock.views.direct.addListener
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
 import java.lang.ref.WeakReference
+import java.util.WeakHashMap
 
 /**
  * A native view in the underlying view system.
@@ -39,12 +42,16 @@ object AndroidAppContext {
     fun requestPermissions(vararg permissions: String, onResult: (RockActivity.PermissionResult)->Unit) = activityCtx?.requestPermissions(permissions = permissions, onResult = onResult)
 }
 
-private val View.removeListeners: HashMap<Int, () -> Unit>
-    get() = HashMap()
+private val ViewRemoveListeners = WeakHashMap<View, ArrayList<()->Unit>>()
+
+fun View.shutdown() {
+    ViewRemoveListeners[this]?.forEach { it() }
+    ViewRemoveListeners.remove(this)
+}
 
 data class NViewCalculationContext(val native: View): CalculationContext {
     override fun onRemove(action: () -> Unit) {
-        native.removeListeners[action.hashCode()] = action
+        ViewRemoveListeners.getOrPut(native) { ArrayList() }.add(action)
     }
 
     override fun notifyStart() {
@@ -97,6 +104,7 @@ actual var NView.visible: Boolean
 
 actual fun NView.clearChildren() {
     if (this !is ViewGroup) throw RuntimeException("clearChildren can only be called on Android ViewGroups")
+    this.children.forEach { it.shutdown() }
     (this as ViewGroup).removeAllViews()
 }
 

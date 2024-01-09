@@ -10,6 +10,7 @@ import com.lightningkite.rock.models.ScreenTransition
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.lparams
+import com.lightningkite.rock.views.shutdown
 import java.util.WeakHashMap
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -39,14 +40,12 @@ actual fun SwapView.swap(
     native.viewWriter.createNewView()
     val newView = native.viewWriter.rootCreated
     newView?.layoutParams = FrameLayout.LayoutParams(native.lparams.width, native.lparams.height)
-    println("newView: $newView")
-    println("newView.parent: ${newView?.parent}")
     TransitionManager.beginDelayedTransition(native, TransitionSet().apply {
         oldView?.let { transition.exit?.addTarget(it) }
         newView?.let { transition.enter?.addTarget(it) }
         transition.enter?.let { addTransition(it) }
         transition.exit?.let { addTransition(it) }
     })
-    oldView?.let { oldNN -> native.removeView(oldNN) }
+    oldView?.let { oldNN -> native.removeView(oldNN); oldNN.shutdown() }
     newView?.let { native.addView(it) }
 }

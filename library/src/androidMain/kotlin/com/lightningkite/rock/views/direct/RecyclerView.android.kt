@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
@@ -9,15 +10,15 @@ import com.lightningkite.rock.reactive.Property
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.reactiveScope
+import com.lightningkite.rock.views.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NRecyclerView = AndroidRecyclerView
+actual class NRecyclerView(context: Context): AndroidRecyclerView(context) {
+    lateinit var viewWriter: ViewWriter
+}
 
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {
-    native.adapter = object : ObservableRVA<T>({ 0 }, { _, obs -> render(obs) }) {
+    native.adapter = object : ObservableRVA<T>(this, { 0 }, { _, obs -> render(obs) }) {
         init {
             reactiveScope {
                 val new = items.await().toList()
@@ -30,7 +31,8 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWrite
 
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
-    viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
+    viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
+        native.viewWriter = newViews()
         native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         setup()
     }
@@ -38,7 +40,8 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
-    viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
+    viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
+        native.viewWriter = newViews()
         native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         setup()
     }
@@ -46,7 +49,8 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
-    viewElement(factory = ::AndroidRecyclerView, wrapper = ::RecyclerView) {
+    viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
+        native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 3)
         setup()
     }
@@ -60,10 +64,12 @@ actual var RecyclerView.columns: Int
 
 
 internal open class ObservableRVA<T>(
+    val recyclerView: RecyclerView,
     val determineType: (T)->Int,
-    val makeView: (Int, Readable<T>) -> View
+    val makeView: ViewWriter.(Int, Readable<T>) -> Unit
 ): AndroidRecyclerView.Adapter<AndroidRecyclerView.ViewHolder>() {
     var lastPublished: List<T> = listOf()
+    val viewWriter = recyclerView.native.viewWriter
 
     override fun getItemViewType(position: Int): Int {
         return determineType(lastPublished[position])
@@ -71,9 +77,10 @@ internal open class ObservableRVA<T>(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AndroidRecyclerView.ViewHolder {
         val event = LateInitProperty<T>()
-        val subview = makeView(viewType, event)
-//        subview.setRemovedCondition(removeCondition)
+        viewWriter.makeView(viewType, event)
+        val subview = viewWriter.rootCreated!!
         subview.tag = event
+        recyclerView.native.calculationContext.onRemove { subview.shutdown() }
         return object : AndroidRecyclerView.ViewHolder(subview) {}
     }
 

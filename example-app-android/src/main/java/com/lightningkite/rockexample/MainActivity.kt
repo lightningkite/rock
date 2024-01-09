@@ -9,6 +9,7 @@ import com.lightningkite.rock.views.*
 class MainActivity : RockActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        codeCacheDir.setReadOnly()
         val frame = FrameLayout(this)
         setContentView(frame)
         ViewWriter(frame).app()

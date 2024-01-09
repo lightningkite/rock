@@ -22,7 +22,7 @@ fun ViewWriter.navigatorViewDialog() {
     val n = navigator
     this.swapViewDialog {
         reactiveScope {
-            val screen = navigator.currentScreen.await()
+            val screen = n.dialog.currentScreen.await()
             this@swapViewDialog.swap {
                 this.navigator = n.dialog
                 if (screen != null)

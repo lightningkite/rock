@@ -10,7 +10,10 @@ actual typealias NButton = HTMLButtonElement
 
 @ViewDsl
 actual fun ViewWriter.button(setup: Button.() -> Unit): Unit =
-    themedElementClickable<NButton>("button") { setup(Button(this)) }
+    themedElementClickable<NButton>("button") {
+        classList.add("rock-stack")
+        setup(Button(this))
+    }
 
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
     native.onclick = { launchGlobal(action) }

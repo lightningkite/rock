@@ -15,6 +15,7 @@ actual typealias NLink = HTMLAnchorElement
 actual fun ViewWriter.link(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
     this.asDynamic().__ROCK__navigator = navigator
     style.display = "block"
+    classList.add("rock-stack")
     setup(Link(this))
 }
 

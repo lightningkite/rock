@@ -287,14 +287,14 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 image {
                     val currentTheme = currentTheme
                     ::source {
-                        appNav.currentUser?.profileImage ?: Icon.person.toImageSource(
+                        appNav.currentUserProperty.await()?.profileImage ?: Icon.person.toImageSource(
                             currentTheme().foreground
                         )
                     }
                     description = "User icon"
                 }
                 text {
-                    content = appNav.currentUser?.name ?: "No user"
+                    ::content { appNav.currentUserProperty.await()?.name ?: "No user" }
                 } in gravity(
                     Align.Center,
                     Align.Center

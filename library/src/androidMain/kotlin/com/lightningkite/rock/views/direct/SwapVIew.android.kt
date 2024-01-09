@@ -2,12 +2,14 @@ package com.lightningkite.rock.views.direct
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.lightningkite.rock.models.ScreenTransition
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.lparams
 import java.util.WeakHashMap
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -36,6 +38,7 @@ actual fun SwapView.swap(
     native.viewWriter.rootCreated = null
     native.viewWriter.createNewView()
     val newView = native.viewWriter.rootCreated
+    newView?.layoutParams = FrameLayout.LayoutParams(native.lparams.width, native.lparams.height)
     println("newView: $newView")
     println("newView.parent: ${newView?.parent}")
     TransitionManager.beginDelayedTransition(native, TransitionSet().apply {

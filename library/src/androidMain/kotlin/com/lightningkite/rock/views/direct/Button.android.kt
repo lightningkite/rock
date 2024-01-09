@@ -12,8 +12,9 @@ actual typealias NButton = FrameLayout
 actual fun ViewWriter.button(setup: Button.() -> Unit) {
     viewElement(factory = ::FrameLayout, wrapper = ::ContainingView) {
         val frame = native as FrameLayout
-        handleTheme(frame, viewDraws = false)
-        setup(Button(frame))
+        handleThemeControl(frame) {
+            setup(Button(frame))
+        }
     }
 }
 

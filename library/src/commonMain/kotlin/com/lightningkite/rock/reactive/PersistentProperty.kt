@@ -18,8 +18,8 @@ class PersistentProperty<T>(
     private var once: T = defaultValue
         private set(value) {
             field = value
-            listeners.toList().forEach { it() }
             PlatformStorage.set(key, Json.encodeToString(serializer, value))
+            listeners.toList().forEach { it() }
         }
 
     override suspend infix fun set(value: T) {

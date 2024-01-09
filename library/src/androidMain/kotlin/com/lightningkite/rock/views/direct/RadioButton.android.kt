@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import android.widget.RadioButton as AndroidRadioButton

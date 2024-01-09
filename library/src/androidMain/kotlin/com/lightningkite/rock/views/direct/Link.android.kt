@@ -37,7 +37,6 @@ actual var Link.newTab: Boolean
 actual fun ViewWriter.link(setup: Link.() -> Unit) {
     return viewElement(factory = ::LinkFrameLayout, wrapper = ::Link) {
         native.navigator = navigator
-        linkCounter++
         handleTheme(native, viewDraws = false)
         setup(this)
     }

@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import android.widget.CheckBox as AndroidCheckBox
 import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 

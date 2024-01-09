@@ -2,7 +2,10 @@
 
 package com.lightningkite.rock.views.direct
 
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.StateListDrawable
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.*
@@ -19,23 +22,10 @@ import android.widget.TextView as AndroidTextView
 import com.lightningkite.rock.models.Paint as RockPaint
 
 
-fun NView.removeListener(listener: () -> Unit): () -> Unit = {
-    val key = this
-    NativeListeners.listeners.removeListener(key, listener)
-    if (NativeListeners.listeners.get(key)?.isEmpty() == true) {
-        NativeListeners.listeners.removeKey(key)
-    }
-}
-
-
 val NView.selected: Writable<Boolean>
     get() = object : Writable<Boolean> {
         override fun addListener(listener: () -> Unit): () -> Unit {
-            NativeListeners.listeners.addListener(this@selected, listener)
-            this@selected.setOnClickListener { _ ->
-                NativeListeners.listeners.get(this@selected)?.forEach { action -> action() }
-            }
-            return this@selected.removeListener(listener)
+            return addListener(View::setOnClickListener, { View.OnClickListener { it() } }, listener)
         }
 
         override suspend fun awaitRaw(): Boolean {
@@ -50,12 +40,7 @@ val NView.selected: Writable<Boolean>
 val NView.hovered: Readable<Boolean>
     get() = object : Readable<Boolean> {
         override fun addListener(listener: () -> Unit): () -> Unit {
-            return {}
-//            NativeListeners.listeners.addListener(this@hovered, listener)
-//            this@hovered.setOnHoverListener { v, _ ->
-//                NativeListeners.listeners.get(v)?.forEach { action -> action() }
-//            }
-//            return this@hovered.removeListener(listener)
+            return addListener(View::setOnHoverListener, { View.OnHoverListener { _, _ -> it(); true } }, listener)
         }
 
         override suspend fun awaitRaw(): Boolean {
@@ -64,6 +49,7 @@ val NView.hovered: Readable<Boolean>
     }
 
 
+// TODO
 private object ViewActions {
     val actions: MutableMap<Int, Action> = mutableMapOf()
 }
@@ -76,56 +62,6 @@ internal fun View.setAction(action: Action?) {
         ViewActions.actions.remove(hashCode())
     }
 }
-
-//Not certain what to do here.  my first thought is to use a tag to hold the range for the time picker
-//however unlikely someone could decide to set a custom tag on the native
-// view which would then mess up the functionality.
-
-
-fun View.stringWritable(
-    addNativeListener: () -> Unit,
-    getString: () -> String,
-    setString: (String) -> Unit,
-): Writable<String> {
-    return object : Writable<String> {
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            NativeListeners.listeners.addListener(this@stringWritable, listener)
-            addNativeListener()
-            return this@stringWritable.removeListener(listener)
-        }
-
-        override suspend fun awaitRaw(): String {
-            return getString()
-        }
-
-        override suspend fun set(value: String) {
-            setString(value)
-        }
-    }
-}
-
-fun View.stringNullableWritable(
-    addNativeListener: () -> Unit,
-    getString: () -> String,
-    setString: (String) -> Unit,
-): Writable<String?> {
-    return object : Writable<String?> {
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            NativeListeners.listeners.addListener(this@stringNullableWritable, listener)
-            addNativeListener()
-            return this@stringNullableWritable.removeListener(listener)
-        }
-
-        override suspend fun awaitRaw(): String? {
-            return getString()
-        }
-
-        override suspend fun set(value: String?) {
-            setString(value ?: "")
-        }
-    }
-}
-
 
 //actual val Select.selected: Writable<String?>
 //    get() {
@@ -176,9 +112,9 @@ fun View.stringNullableWritable(
 
 
 fun View.addLayoutChangeListener(listener: () -> Unit): () -> Unit {
-    NativeListeners.listeners.addListener(this, listener)
-    this.addOnLayoutChangeListener /* listener = */ { _, _, _, _, _, _, _, _, _ -> listener() }
-    return removeListener(listener)
+    val l = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> listener() }
+    this.addOnLayoutChangeListener(l)
+    return { this.removeOnLayoutChangeListener(l) }
 }
 
 fun View.setPaddingAll(padding: Int) = setPadding(padding, padding, padding, padding)
@@ -234,48 +170,7 @@ fun <T: NView> ViewWriter.handleTheme(
         }
 
         if (useBackground) {
-            val gradientDrawable = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                if (borders) {
-                    cornerRadii = floatArrayOf(
-                        theme.cornerRadii.topLeft.value,
-                        theme.cornerRadii.topLeft.value,
-                        theme.cornerRadii.topRight.value,
-                        theme.cornerRadii.topRight.value,
-                        theme.cornerRadii.bottomLeft.value,
-                        theme.cornerRadii.bottomLeft.value,
-                        theme.cornerRadii.bottomRight.value,
-                        theme.cornerRadii.bottomRight.value
-                    )
-                    setStroke(theme.outlineWidth.value.toInt(), theme.outline.colorInt())
-                }
-
-                when (theme.background) {
-                    is Color -> {
-                        colors = intArrayOf(theme.background.colorInt(), theme.background.colorInt())
-                    }
-
-                    is LinearGradient -> {
-                        colors = theme.background.stops.map { it.color.toInt() }.toIntArray()
-                        orientation = when((theme.background.angle angleTo Angle.zero).turns.times(8).roundToInt()) {
-                            -3 -> GradientDrawable.Orientation.BL_TR
-                            -2 -> GradientDrawable.Orientation.BOTTOM_TOP
-                            -1 -> GradientDrawable.Orientation.BR_TL
-                            0 -> GradientDrawable.Orientation.LEFT_RIGHT
-                            1 -> GradientDrawable.Orientation.TL_BR
-                            2 -> GradientDrawable.Orientation.TOP_BOTTOM
-                            3 -> GradientDrawable.Orientation.TR_BL
-                            else -> GradientDrawable.Orientation.LEFT_RIGHT
-                        }
-                        gradientType = GradientDrawable.LINEAR_GRADIENT
-                    }
-
-                    is RadialGradient -> {
-                        colors = theme.background.stops.map { it.color.toInt() }.toIntArray()
-                        gradientType = GradientDrawable.RADIAL_GRADIENT
-                    }
-                }
-            }
+            val gradientDrawable = theme.backgroundDrawable(borders)
             view.background = gradientDrawable
             view.elevation = if (borders) theme.elevation.value else 0f
             background(theme)
@@ -287,15 +182,58 @@ fun <T: NView> ViewWriter.handleTheme(
     }
 }
 
+private fun Theme.backgroundDrawable(
+    borders: Boolean
+): GradientDrawable {
+    return GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        if (borders) {
+            cornerRadii = floatArrayOf(
+                this@backgroundDrawable.cornerRadii.topLeft.value,
+                this@backgroundDrawable.cornerRadii.topLeft.value,
+                this@backgroundDrawable.cornerRadii.topRight.value,
+                this@backgroundDrawable.cornerRadii.topRight.value,
+                this@backgroundDrawable.cornerRadii.bottomLeft.value,
+                this@backgroundDrawable.cornerRadii.bottomLeft.value,
+                this@backgroundDrawable.cornerRadii.bottomRight.value,
+                this@backgroundDrawable.cornerRadii.bottomRight.value
+            )
+            setStroke(outlineWidth.value.toInt(), outline.colorInt())
+        }
+
+        when (this@backgroundDrawable.background) {
+            is Color -> {
+                colors = intArrayOf(this@backgroundDrawable.background.colorInt(), this@backgroundDrawable.background.colorInt())
+            }
+
+            is LinearGradient -> {
+                colors = background.stops.map { it.color.toInt() }.toIntArray()
+                orientation = when ((background.angle angleTo Angle.zero).turns.times(8).roundToInt()) {
+                    -3 -> GradientDrawable.Orientation.BL_TR
+                    -2 -> GradientDrawable.Orientation.BOTTOM_TOP
+                    -1 -> GradientDrawable.Orientation.BR_TL
+                    0 -> GradientDrawable.Orientation.LEFT_RIGHT
+                    1 -> GradientDrawable.Orientation.TL_BR
+                    2 -> GradientDrawable.Orientation.TOP_BOTTOM
+                    3 -> GradientDrawable.Orientation.TR_BL
+                    else -> GradientDrawable.Orientation.LEFT_RIGHT
+                }
+                gradientType = GradientDrawable.LINEAR_GRADIENT
+            }
+
+            is RadialGradient -> {
+                colors = background.stops.map { it.color.toInt() }.toIntArray()
+                gradientType = GradientDrawable.RADIAL_GRADIENT
+            }
+        }
+    }
+}
 
 inline fun ViewWriter.handleThemeControl(
     view: View,
-    crossinline checked: suspend () -> Boolean = { false },
+    noinline checked: suspend () -> Boolean = { false },
     setup: () -> Unit
 ) {
-//    view.hi
-//    view.setOnHoverListener { view, motionEvent -> }
-//    val s = view.stateReadable
     val hovered = view.hovered
     withThemeGetter({
         if (checked()) return@withThemeGetter it().selected()
@@ -323,8 +261,5 @@ inline fun ViewWriter.handleThemeControl(
         setup()
     }
 }
-
-
-var linkCounter = 0;
 
 

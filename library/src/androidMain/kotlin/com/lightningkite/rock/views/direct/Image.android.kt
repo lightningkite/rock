@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.lightningkite.rock.R
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.views.LoadRemoteImageScope
+import com.lightningkite.rock.views.Path.PathDrawable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import timber.log.Timber
@@ -77,27 +78,7 @@ actual var Image.source: ImageSource
             }
 
             is ImageVector -> {
-//                val drawable = VectorDrawableCreator.getVectorDrawable(
-//                    context = native.context,
-//                    width = value.width.value.toInt(),
-//                    height = value.height.value.toInt(),
-//                    viewportWidth = value.viewBoxWidth.toFloat(),
-//                    viewportHeight = value.viewBoxHeight.toFloat(),
-//                    paths = value.paths.map {
-//                        val path = VectorDrawableCreator.PathData(
-//                            it.path,
-//                            it.fillColor?.closestColor()?.toInt() ?: 0
-//                        )
-//                        path
-//                    }
-//                )
-//                native.setImageDrawable(drawable)
-                native.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        native.context,
-                        android.R.drawable.ic_dialog_alert
-                    )
-                )
+                native.setImageDrawable(PathDrawable(value))
             }
 
             else -> {

@@ -23,12 +23,13 @@ actual fun ViewWriter.swapView(setup: SwapView.() -> Unit): Unit = themedElement
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
     classList.add("rock-swap")
     classList.add("dialog")
+    this.asDynamic().__ROCK_ViewWriter__ = split()
     hidden = true
     setup(SwapView(this))
 }
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
-    val vw = this.asDynamic().__ROCK_ViewWriter__ as ViewWriter
+    val vw = native.asDynamic().__ROCK_ViewWriter__ as ViewWriter
     native.asDynamic().__ROCK__next = null
     val alreadyChanging = native.asDynamic().__ROCK__swapping as? Boolean
     if (alreadyChanging == true) {

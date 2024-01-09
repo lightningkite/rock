@@ -1,6 +1,8 @@
 package com.lightningkite.rock.views.direct
 
 import android.graphics.Typeface
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.CompoundButton
@@ -107,33 +109,31 @@ actual var TextView.textSize: Dimension
     }
 val CompoundButton.checked: Writable<Boolean>
     get() {
-        return object : Writable<Boolean> {
-            override fun addListener(listener: () -> Unit): () -> Unit {
-                NativeListeners.listeners.addListener(this@checked, listener)
-                this@checked.setOnCheckedChangeListener { _, _ ->
-                    NativeListeners.listeners.get(this@checked)?.forEach { action -> action() }
-                }
-                return this@checked.removeListener(listener)
-            }
-
-            override suspend fun awaitRaw(): Boolean {
-                return this@checked.isChecked
-            }
-
-            override suspend fun set(value: Boolean) {
-                this@checked.isChecked = value
-            }
+        return object : EquatableByRef("checked", this), Writable<Boolean> {
+            override fun addListener(listener: () -> Unit): () -> Unit =
+                addListener(CompoundButton::setOnCheckedChangeListener, { CompoundButton.OnCheckedChangeListener { _, _ -> listener() } }, listener)
+            override suspend fun awaitRaw(): Boolean = this@checked.isChecked
+            override suspend fun set(value: Boolean) { this@checked.isChecked = value }
         }
     }
 val android.widget.TextView.content: Writable<String>
     get() {
-        return this@content.stringWritable(
-            addNativeListener = {
-                this@content.addTextChangedListener { _ ->
-                    NativeListeners.listeners.get(this@content)?.forEach { action -> action() }
+        return object : EquatableByRef("content", this), Writable<String> {
+            override fun addListener(listener: () -> Unit): () -> Unit {
+                val watcher = object: TextWatcher {
+                    override fun afterTextChanged(s: Editable?) { listener() }
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 }
-            },
-            getString = { this@content.text.toString() },
-            setString = { value -> this@content.text = value }
-        )
+                addTextChangedListener(watcher)
+                return { removeTextChangedListener(watcher) }
+            }
+            override suspend fun awaitRaw(): String = this@content.text?.toString() ?: ""
+            override suspend fun set(value: String) { this@content.text = value }
+        }
     }
+
+abstract class EquatableByRef(val key: String, val ref: Any) {
+    override fun hashCode(): Int = key.hashCode() + ref.hashCode()
+    override fun equals(other: Any?): Boolean = other is EquatableByRef && this.key == other.key && this.ref == other.ref
+}

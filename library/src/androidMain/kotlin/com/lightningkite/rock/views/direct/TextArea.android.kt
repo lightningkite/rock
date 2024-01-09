@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import android.widget.EditText
+import android.widget.TextView
 import com.lightningkite.rock.models.KeyboardHints
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.ViewDsl
@@ -30,5 +31,8 @@ actual var TextArea.hint: String
 
 @ViewDsl
 actual fun ViewWriter.textArea(setup: TextArea.() -> Unit) {
-    return viewElement(factory = ::EditText, wrapper = ::TextArea, setup = setup)
+    return viewElement(factory = ::EditText, wrapper = ::TextArea, setup = {
+        handleTheme<TextView>(native, foreground = applyTextColorFromTheme)
+        setup(this)
+    })
 }

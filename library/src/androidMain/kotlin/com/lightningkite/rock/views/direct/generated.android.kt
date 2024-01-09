@@ -128,12 +128,12 @@ val applyTextColorFromTheme: (Theme, AndroidTextView) -> Unit = { theme, textVie
     textView.setTextColor(theme.foreground.colorInt())
 }
 
-fun <T: NView> ViewWriter.handleTheme(
+inline fun <T: NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
-    background: (Theme) -> Unit = {},
-    backgroundRemove: () -> Unit = {},
-    foreground: (Theme, T) -> Unit = { _, _  -> },
+    crossinline background: (Theme) -> Unit = {},
+    crossinline backgroundRemove: () -> Unit = {},
+    crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
 ) {
     val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
@@ -182,7 +182,7 @@ fun <T: NView> ViewWriter.handleTheme(
     }
 }
 
-private fun Theme.backgroundDrawable(
+fun Theme.backgroundDrawable(
     borders: Boolean
 ): GradientDrawable {
     return GradientDrawable().apply {
@@ -229,9 +229,12 @@ private fun Theme.backgroundDrawable(
     }
 }
 
-inline fun ViewWriter.handleThemeControl(
-    view: View,
+inline fun <T: View> ViewWriter.handleThemeControl(
+    view: T,
     noinline checked: suspend () -> Boolean = { false },
+    crossinline background: (Theme) -> Unit = {},
+    crossinline backgroundRemove: () -> Unit = {},
+    crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
     setup: () -> Unit
 ) {
     val hovered = view.hovered
@@ -257,7 +260,7 @@ inline fun ViewWriter.handleThemeControl(
                 }
             }
         }
-        handleTheme(view, viewDraws = false)
+        handleTheme(view, false, background, backgroundRemove, foreground)
         setup()
     }
 }

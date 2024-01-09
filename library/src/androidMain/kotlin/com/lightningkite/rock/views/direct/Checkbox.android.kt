@@ -1,5 +1,8 @@
 package com.lightningkite.rock.views.direct
 
+import android.R
+import android.content.res.ColorStateList
+import androidx.core.widget.CompoundButtonCompat
 import android.widget.CheckBox as AndroidCheckBox
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
@@ -24,7 +27,16 @@ actual val Checkbox.checked: Writable<Boolean>
 @ViewDsl
 actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
     return viewElement(factory = ::AndroidCheckBox, wrapper = ::Checkbox) {
-        handleTheme(native)
+        handleTheme(native) { it, radio ->
+            CompoundButtonCompat.setButtonTintList(
+                radio, ColorStateList(
+                    arrayOf<IntArray>(intArrayOf(-R.attr.state_checked), intArrayOf(R.attr.state_checked)), intArrayOf(
+                        it.foreground.closestColor().copy(alpha = 0.5f).colorInt(),
+                        it.foreground.colorInt()
+                    )
+                )
+            )
+        }
         setup(this)
     }
 }

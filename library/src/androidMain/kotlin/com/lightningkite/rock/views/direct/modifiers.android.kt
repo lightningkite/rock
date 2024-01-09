@@ -16,7 +16,7 @@ import com.lightningkite.rock.views.*
 import java.util.*
 
 
-internal val viewIsMarginless: WeakHashMap<View, Boolean> = WeakHashMap()
+val viewIsMarginless: WeakHashMap<View, Boolean> = WeakHashMap()
 
 @ViewModifierDsl3
 actual val ViewWriter.marginless: ViewWrapper

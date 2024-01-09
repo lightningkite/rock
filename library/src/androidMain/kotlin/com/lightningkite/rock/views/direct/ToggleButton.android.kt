@@ -32,8 +32,8 @@ actual val ToggleButton.checked: Writable<Boolean>
 @ViewDsl
 actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit) {
     return viewElement(factory = ::NToggleButton, wrapper = ::ToggleButton) {
-        handleThemeControl(native, { checked.await() }, {
+        handleThemeControl(native, { checked.await() }){
             setup(this)
-        })
+        }
     }
 }

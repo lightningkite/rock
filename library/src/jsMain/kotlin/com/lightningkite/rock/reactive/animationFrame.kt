@@ -1,10 +1,8 @@
 package com.lightningkite.rock.reactive
 
-import com.lightningkite.rock.GeolocationCoordinates
-import com.lightningkite.rock.models.WindowInfo
+import com.lightningkite.rock.models.WindowStatistics
 import kotlinx.browser.document
 import kotlinx.browser.window
-import org.w3c.dom.Window
 import org.w3c.dom.events.Event
 
 actual object AnimationFrame: Listenable {
@@ -25,8 +23,8 @@ actual object AnimationFrame: Listenable {
         }
     }
 }
-actual object WindowInfo: Readable<WindowInfo> by Property(
-    WindowInfo(
+actual object WindowInfo: Readable<WindowStatistics> by Property(
+    WindowStatistics(
         width = window.innerWidth,
         height = window.innerHeight,
         density = 1f

@@ -9,7 +9,7 @@ actual typealias DrawingContext2D = CanvasRenderingContext2D
 //actual typealias TextAlign = CanvasTextAlign
 
 actual fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean) = arc(x, y, radius, startAngle, endAngle, anticlockwise)
-actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double, maxWidth: Double):Unit = fillText(text, x, y, maxWidth)
+actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double):Unit = fillText(text, x, y)
 actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle) {
     font = "${if(value.bold) "bold " else ""}${if(value.italic) "italic " else ""}${size.value}/${value.lineSpacingMultiplier} ${value.font.cssFontFamilyName}"
 }
@@ -45,3 +45,7 @@ actual var DrawingContext2D.fillPaint: Paint
     }
 actual val DrawingContext2D.width: Double get() = canvas.width.toDouble()
 actual val DrawingContext2D.height: Double get() = canvas.height.toDouble()
+
+actual fun DrawingContext2D.clear() {
+    clearRect(0.0, 0.0, width, height)
+}

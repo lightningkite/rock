@@ -1,6 +1,6 @@
 package com.lightningkite.rock.models
 
-data class WindowInfo(
+data class WindowStatistics(
     val width: Int,
     val height: Int,
     val density: Float,

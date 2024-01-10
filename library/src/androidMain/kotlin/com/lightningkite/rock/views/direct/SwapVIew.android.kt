@@ -39,7 +39,7 @@ actual fun SwapView.swap(
     native.viewWriter.rootCreated = null
     native.viewWriter.createNewView()
     val newView = native.viewWriter.rootCreated
-    newView?.layoutParams = FrameLayout.LayoutParams(native.lparams.width, native.lparams.height)
+    newView?.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,  ViewGroup.LayoutParams.MATCH_PARENT)
     TransitionManager.beginDelayedTransition(native, TransitionSet().apply {
         oldView?.let { transition.exit?.addTarget(it) }
         newView?.let { transition.enter?.addTarget(it) }

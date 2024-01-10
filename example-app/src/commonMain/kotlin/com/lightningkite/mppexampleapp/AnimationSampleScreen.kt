@@ -47,13 +47,13 @@ object AnimationSampleScreen : RockScreen {
                 val diff = now - last
                 last = now
                 val line = line.await()
+                x += diff * 0.1
                 redraw {
+                    x %= width
                     fillPaint = Color.white
                     clearRect(0.0, 0.0, width, height)
                     strokePaint = Color.black
                     lineWidth = 5.0
-                    x += diff * 0.1
-                    x %= width
                     beginPath()
                     moveTo(x, 0.0)
                     lineTo(x, height)

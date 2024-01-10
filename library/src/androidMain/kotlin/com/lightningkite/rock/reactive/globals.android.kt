@@ -1,37 +1,78 @@
 package com.lightningkite.rock.reactive
 
-import com.lightningkite.rock.models.WindowInfo
+import com.lightningkite.rock.models.WindowStatistics
 
 actual object AnimationFrame : Listenable {
+    fun frame() {
+        listeners.toList().forEach { it() }
+    }
+
+    private val listeners = ArrayList<()->Unit>()
     override fun addListener(listener: () -> Unit): () -> Unit {
-        TODO("Not yet implemented")
+        listeners.add(listener)
+        return { listeners.remove(listener) }
     }
 }
 
-actual object WindowInfo: Readable<WindowInfo> {
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        TODO("Not yet implemented")
-    }
+actual object WindowInfo: Readable<WindowStatistics> {
+    private val listeners = ArrayList<() -> Unit>()
+    var value: WindowStatistics = WindowStatistics(1920, 1080, 1f)
+        set(value) {
+            field = value
+            listeners.toList().forEach { it() }
+        }
 
-    override suspend fun awaitRaw(): WindowInfo {
-        TODO("Not yet implemented")
+    override suspend fun awaitRaw(): WindowStatistics = value
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return {
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
+        }
     }
 }
 
 actual object InForeground: Readable<Boolean> {
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        TODO("Not yet implemented")
-    }
+    private val listeners = ArrayList<() -> Unit>()
+    var value: Boolean = false
+        set(value) {
+            field = value
+            listeners.toList().forEach { it() }
+        }
 
-    override suspend fun awaitRaw(): Boolean {
-        TODO("Not yet implemented")
+    override suspend fun awaitRaw(): Boolean = value
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return {
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
+        }
     }
 }
 
 actual object SoftInputOpen : Readable<Boolean> {
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        return {}
-    }
+    private val listeners = ArrayList<() -> Unit>()
+    var value: Boolean = false
+        set(value) {
+            field = value
+            listeners.toList().forEach { it() }
+        }
 
-    override suspend fun awaitRaw(): Boolean = false
+    override suspend fun awaitRaw(): Boolean = value
+
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return {
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
+        }
+    }
 }

@@ -1,7 +1,7 @@
 package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.afterTimeout
-import com.lightningkite.rock.models.WindowInfo
+import com.lightningkite.rock.models.WindowStatistics
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.UIKit.UIScreen
@@ -25,8 +25,8 @@ actual object AnimationFrame: Listenable {
     }
 }
 @OptIn(ExperimentalForeignApi::class)
-actual object WindowInfo: Readable<WindowInfo> by Property(
-    WindowInfo(
+actual object WindowInfo: Readable<WindowStatistics> by Property(
+    WindowStatistics(
         width = UIScreen.mainScreen.bounds.useContents { size.width }.toInt(),
         height = UIScreen.mainScreen.bounds.useContents { size.height }.toInt(),
         density = UIScreen.mainScreen.scale.toFloat()

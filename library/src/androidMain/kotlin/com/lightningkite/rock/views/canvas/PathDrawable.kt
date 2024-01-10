@@ -316,7 +316,7 @@ class DrawingResources() {
     val arcMatrix2: Matrix = Matrix()
 }
 
-private fun DrawingResources.drawArc(
+fun DrawingResources.drawArc(
     path: Path, lastX: Float, lastY: Float, x: Float, y: Float, radiusX: Float, radiusY: Float, theta: Float,
     largeArcFlag: Boolean, sweepFlag: Boolean
 ) {

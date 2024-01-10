@@ -1,14 +1,22 @@
 package com.lightningkite.rock
 
+import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.lightningkite.rock.models.WindowStatistics
 import com.lightningkite.rock.navigation.RockNavigator
+import com.lightningkite.rock.reactive.AnimationFrame
+import com.lightningkite.rock.reactive.SoftInputOpen
+import com.lightningkite.rock.reactive.WindowInfo
 import com.lightningkite.rock.views.AndroidAppContext
 import timber.log.Timber
 
@@ -17,6 +25,11 @@ abstract class RockActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowInfo.value = WindowStatistics(
+            resources.displayMetrics.widthPixels,
+            resources.displayMetrics.heightPixels,
+            resources.displayMetrics.density,
+        )
         AndroidAppContext.applicationCtx = this.applicationContext
         Timber.plant(Timber.DebugTree())
     }
@@ -54,5 +67,68 @@ abstract class RockActivity : AppCompatActivity() {
             onPermissions[requestCode]?.invoke(PermissionResult(permissions.indices.associate { permissions[it] to grantResults[it] }))
             onPermissions.remove(requestCode)
         }
+    }
+
+    private var animator: ValueAnimator? = null
+    private var suppressKeyboardChange = false
+    private val keyboardTreeObs: ViewTreeObserver.OnGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+        val rect = Rect()
+        window.decorView.getWindowVisibleDisplayFrame(rect)
+        val keyboardHeight = resources.displayMetrics.heightPixels - rect.bottom
+        if (keyboardHeight.toFloat() > resources.displayMetrics.heightPixels * 0.15f) {
+            suppressKeyboardChange = true
+            SoftInputOpen.value = true
+            suppressKeyboardChange = false
+        } else {
+            afterTimeout(30L) {
+                suppressKeyboardChange = true
+                SoftInputOpen.value = false
+                suppressKeyboardChange = false
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        animator = ValueAnimator().apply {
+            setIntValues(0, 100)
+            duration = 10000L
+            repeatCount = ValueAnimator.INFINITE
+            repeatMode = ValueAnimator.RESTART
+            var last = System.currentTimeMillis()
+            addUpdateListener {
+                AnimationFrame.frame()
+            }
+            start()
+        }
+
+        this.findViewById<View>(android.R.id.content).viewTreeObserver.addOnGlobalLayoutListener(keyboardTreeObs)
+//        keyboardSubscriber = ApplicationAccess.softInputActive.subscribe {
+//            if (!suppressKeyboardChange) {
+//                view.post {
+//                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//                    if (it) {
+//                        if (currentFocus == null) {
+//                            FocusFinder.getInstance().findNextFocus(view as ViewGroup, view, View.FOCUS_DOWN)
+//                        }
+//                        currentFocus?.let {
+//                            imm.showSoftInput(it, 0)
+//                        }
+//                    } else {
+//                        imm.hideSoftInputFromWindow(view.windowToken, 0)
+//                    }
+//                }
+//            }
+//        }
+    }
+
+    override fun onPause() {
+        this.findViewById<View>(android.R.id.content).viewTreeObserver.removeOnGlobalLayoutListener(keyboardTreeObs)
+//        keyboardSubscriber?.dispose()
+//        keyboardSubscriber = null
+        animator?.pause()
+        animator = null
+        super.onPause()
     }
 }

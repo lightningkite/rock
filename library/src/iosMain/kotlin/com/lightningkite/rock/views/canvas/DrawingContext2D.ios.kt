@@ -25,7 +25,6 @@ actual abstract class DrawingContext2D {
 
     //    actual abstract fun setTransform(transform: dynamic)
     actual abstract fun resetTransform()
-    actual abstract var globalAlpha: Double
     actual abstract var globalCompositeOperation: String
     actual abstract var imageSmoothingEnabled: Boolean
 
@@ -39,11 +38,6 @@ actual abstract class DrawingContext2D {
 //  actual abstract   fun createLinearGradient(x0: Double, y0: Double, x1: Double, y1: Double): CanvasGradient
 //  actual abstract   fun createRadialGradient(x0: Double, y0: Double, r0: Double, x1: Double, y1: Double, r1: Double): CanvasGradient
 //  actual abstract   fun createPattern(image: CanvasImageSource, repetition: String): CanvasPattern?
-    actual abstract var shadowOffsetX: Double
-    actual abstract var shadowOffsetY: Double
-    actual abstract var shadowBlur: Double
-    actual abstract var shadowColor: String
-    actual abstract var filter: String
     actual abstract fun clearRect(x: Double, y: Double, w: Double, h: Double)
     actual abstract fun fillRect(x: Double, y: Double, w: Double, h: Double)
     actual abstract fun strokeRect(x: Double, y: Double, w: Double, h: Double)
@@ -136,28 +130,10 @@ class DrawingContext2DImpl(val wraps: CGContextRef, val width: Double, val heigh
 
     override fun resetTransform() = TODO()
 
-    override var globalAlpha: Double
-        get() = TODO("Not yet implemented")
-        set(value) {}
     override var globalCompositeOperation: String
         get() = TODO("Not yet implemented")
         set(value) {}
     override var imageSmoothingEnabled: Boolean
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var shadowOffsetX: Double
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var shadowOffsetY: Double
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var shadowBlur: Double
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var shadowColor: String
-        get() = TODO("Not yet implemented")
-        set(value) {}
-    override var filter: String
         get() = TODO("Not yet implemented")
         set(value) {}
 
@@ -195,19 +171,19 @@ class DrawingContext2DImpl(val wraps: CGContextRef, val width: Double, val heigh
     override fun bezierCurveTo(cp1x: Double, cp1y: Double, cp2x: Double, cp2y: Double, x: Double, y: Double) =
         CGContextAddCurveToPoint(wraps, cp1x, cp1y, cp2x, cp2y, x, y)
 
-    override fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double) = arcTo(
-        x1, y1, x2, y2, radius, radius, 0.0
-    )
-
-    override fun arcTo(
-        x1: Double,
-        y1: Double,
-        x2: Double,
-        y2: Double,
-        radiusX: Double,
-        radiusY: Double,
-        rotation: Double
-    ) = TODO()
+//    override fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double) = arcTo(
+//        x1, y1, x2, y2, radius, radius, 0.0
+//    )
+//
+//    override fun arcTo(
+//        x1: Double,
+//        y1: Double,
+//        x2: Double,
+//        y2: Double,
+//        radiusX: Double,
+//        radiusY: Double,
+//        rotation: Double
+//    ) = TODO()
 
     override fun rect(x: Double, y: Double, w: Double, h: Double) = CGContextAddRect(wraps, CGRectMake(x, y, w, h))
 
@@ -217,7 +193,7 @@ class DrawingContext2DImpl(val wraps: CGContextRef, val width: Double, val heigh
 }
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun DrawingContext2D.drawCircle(
+actual fun DrawingContext2D.appendArc(
     x: Double,
     y: Double,
     radius: Double,

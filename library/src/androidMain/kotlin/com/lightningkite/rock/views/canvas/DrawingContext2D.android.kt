@@ -50,14 +50,8 @@ actual abstract class DrawingContext2D(val canvas: Canvas) {
     )
 
     actual abstract fun resetTransform()
-    actual abstract var globalAlpha: Double
     actual abstract var globalCompositeOperation: String
     actual abstract var imageSmoothingEnabled: Boolean
-    actual abstract var shadowOffsetX: Double
-    actual abstract var shadowOffsetY: Double
-    actual abstract var shadowBlur: Double
-    actual abstract var shadowColor: String
-    actual abstract var filter: String
     actual abstract fun clearRect(x: Double, y: Double, w: Double, h: Double)
     actual abstract fun fillRect(x: Double, y: Double, w: Double, h: Double)
     actual abstract fun strokeRect(x: Double, y: Double, w: Double, h: Double)
@@ -81,23 +75,23 @@ actual abstract class DrawingContext2D(val canvas: Canvas) {
         y: Double
     )
 
-    actual abstract fun arcTo(
-        x1: Double,
-        y1: Double,
-        x2: Double,
-        y2: Double,
-        radius: Double
-    )
-
-    actual abstract fun arcTo(
-        x1: Double,
-        y1: Double,
-        x2: Double,
-        y2: Double,
-        radiusX: Double,
-        radiusY: Double,
-        rotation: Double
-    )
+//    actual abstract fun arcTo(
+//        x1: Double,
+//        y1: Double,
+//        x2: Double,
+//        y2: Double,
+//        radius: Double
+//    )
+//
+//    actual abstract fun arcTo(
+//        x1: Double,
+//        y1: Double,
+//        x2: Double,
+//        y2: Double,
+//        radiusX: Double,
+//        radiusY: Double,
+//        rotation: Double
+//    )
 
     actual abstract fun rect(x: Double, y: Double, w: Double, h: Double)
 
@@ -158,31 +152,10 @@ class DrawingContext2DImpl(canvas: Canvas): DrawingContext2D(canvas) {
     override fun resetTransform() {
         canvas.setMatrix(Matrix())
     }
-    override var globalAlpha: Double
-        get() {
-            return 1.0
-        }
-        set(value) {
-        }
     override var globalCompositeOperation: String
         get() = TODO()
         set(value) {}
     override var imageSmoothingEnabled: Boolean
-        get() = TODO()
-        set(value) {}
-    override var shadowOffsetX: Double
-        get() = TODO()
-        set(value) {}
-    override var shadowOffsetY: Double
-        get() = TODO()
-        set(value) {}
-    override var shadowBlur: Double
-        get() = TODO()
-        set(value) {}
-    override var shadowColor: String
-        get() = TODO()
-        set(value) {}
-    override var filter: String
         get() = TODO()
         set(value) {}
     override fun clearRect(x: Double, y: Double, w: Double, h: Double) {
@@ -243,23 +216,27 @@ class DrawingContext2DImpl(canvas: Canvas): DrawingContext2D(canvas) {
         currentPath.addRect(x.toFloat(), y.toFloat(), (x + w).toFloat(), (y + h).toFloat(), Path.Direction.CCW)
     }
 
-    override fun arcTo(
-        x1: Double,
-        y1: Double,
-        x2: Double,
-        y2: Double,
-        radius: Double
-    ){}
-
-    override fun arcTo(
-        x1: Double,
-        y1: Double,
-        x2: Double,
-        y2: Double,
-        radiusX: Double,
-        radiusY: Double,
-        rotation: Double
-    ){}
+//    override fun arcTo(
+//        x1: Double,
+//        y1: Double,
+//        x2: Double,
+//        y2: Double,
+//        radius: Double
+//    ){
+//        currentPath.addArc()
+//    }
+//
+//    override fun arcTo(
+//        x1: Double,
+//        y1: Double,
+//        x2: Double,
+//        y2: Double,
+//        radiusX: Double,
+//        radiusY: Double,
+//        rotation: Double
+//    ){
+//        currentPath.addArc()
+//    }
 }
 
 actual fun DrawingContext2D.fill() {
@@ -285,7 +262,7 @@ actual val DrawingContext2D.width: Double
 actual val DrawingContext2D.height: Double
     get() = canvas.height.toDouble()
 
-actual fun DrawingContext2D.drawCircle(
+actual fun DrawingContext2D.appendArc(
     x: Double,
     y: Double,
     radius: Double,

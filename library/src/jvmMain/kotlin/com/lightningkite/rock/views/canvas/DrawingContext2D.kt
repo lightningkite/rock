@@ -13,7 +13,6 @@ actual abstract class DrawingContext2D {
     actual abstract fun setTransform(a: Double, b: Double, c: Double, d: Double, e: Double, f: Double)
     //    actual abstract fun setTransform(transform: dynamic)
     actual abstract fun resetTransform()
-    actual abstract var globalAlpha: Double
     actual abstract var globalCompositeOperation: String
     actual abstract var imageSmoothingEnabled: Boolean
     //  actual abstract   var imageSmoothingQuality: ImageSmoothingQuality
@@ -26,11 +25,6 @@ actual abstract class DrawingContext2D {
 //  actual abstract   fun createLinearGradient(x0: Double, y0: Double, x1: Double, y1: Double): CanvasGradient
 //  actual abstract   fun createRadialGradient(x0: Double, y0: Double, r0: Double, x1: Double, y1: Double, r1: Double): CanvasGradient
 //  actual abstract   fun createPattern(image: CanvasImageSource, repetition: String): CanvasPattern?
-    actual abstract var shadowOffsetX: Double
-    actual abstract var shadowOffsetY: Double
-    actual abstract var shadowBlur: Double
-    actual abstract var shadowColor: String
-    actual abstract var filter: String
     actual abstract fun clearRect(x: Double, y: Double, w: Double, h: Double)
     actual abstract fun fillRect(x: Double, y: Double, w: Double, h: Double)
     actual abstract fun strokeRect(x: Double, y: Double, w: Double, h: Double)
@@ -88,14 +82,14 @@ actual abstract class DrawingContext2D {
     actual abstract fun lineTo(x: Double, y: Double)
     actual abstract fun quadraticCurveTo(cpx: Double, cpy: Double, x: Double, y: Double)
     actual abstract fun bezierCurveTo(cp1x: Double, cp1y: Double, cp2x: Double, cp2y: Double, x: Double, y: Double)
-    actual abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
-    actual abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radiusX: Double, radiusY: Double, rotation: Double)
+//    actual abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
+//    actual abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radiusX: Double, radiusY: Double, rotation: Double)
     actual abstract fun rect(x: Double, y: Double, w: Double, h: Double)
 //    actual abstract fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 //    actual abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
-actual fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean): Unit = TODO()
+actual fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean): Unit = TODO()
 actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double):Unit = TODO()
 actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle):Unit = TODO()
 actual fun DrawingContext2D.textAlign(alignment: TextAlign):Unit = TODO()

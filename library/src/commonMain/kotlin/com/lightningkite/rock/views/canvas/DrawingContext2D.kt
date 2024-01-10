@@ -2,7 +2,6 @@ package com.lightningkite.rock.views.canvas
 
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.FontAndStyle
-import com.lightningkite.rock.models.Paint
 
 enum class TextAlign{
     start, end, left, right, center
@@ -19,7 +18,7 @@ expect abstract class DrawingContext2D {
     abstract fun setTransform(a: Double, b: Double, c: Double, d: Double, e: Double, f: Double)
 //    abstract fun setTransform(transform: dynamic)
     abstract fun resetTransform()
-    abstract var globalAlpha: Double
+//    abstract var globalAlpha: Double
     abstract var globalCompositeOperation: String
     abstract var imageSmoothingEnabled: Boolean
 //  abstract   var imageSmoothingQuality: ImageSmoothingQuality
@@ -32,11 +31,11 @@ expect abstract class DrawingContext2D {
 //  abstract   fun createLinearGradient(x0: Double, y0: Double, x1: Double, y1: Double): CanvasGradient
 //  abstract   fun createRadialGradient(x0: Double, y0: Double, r0: Double, x1: Double, y1: Double, r1: Double): CanvasGradient
 //  abstract   fun createPattern(image: CanvasImageSource, repetition: String): CanvasPattern?
-    abstract var shadowOffsetX: Double
-    abstract var shadowOffsetY: Double
-    abstract var shadowBlur: Double
-    abstract var shadowColor: String
-    abstract var filter: String
+//    abstract var shadowOffsetX: Double
+//    abstract var shadowOffsetY: Double
+//    abstract var shadowBlur: Double
+//    abstract var shadowColor: String
+//    abstract var filter: String
     abstract fun clearRect(x: Double, y: Double, w: Double, h: Double)
     abstract fun fillRect(x: Double, y: Double, w: Double, h: Double)
     abstract fun strokeRect(x: Double, y: Double, w: Double, h: Double)
@@ -94,14 +93,14 @@ expect abstract class DrawingContext2D {
     abstract fun lineTo(x: Double, y: Double)
     abstract fun quadraticCurveTo(cpx: Double, cpy: Double, x: Double, y: Double)
     abstract fun bezierCurveTo(cp1x: Double, cp1y: Double, cp2x: Double, cp2y: Double, x: Double, y: Double)
-    abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
-    abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radiusX: Double, radiusY: Double, rotation: Double)
+//    abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
+//    abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radiusX: Double, radiusY: Double, rotation: Double)
     abstract fun rect(x: Double, y: Double, w: Double, h: Double)
 //    abstract fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 //    abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
-expect fun DrawingContext2D.drawCircle(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
+expect fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 expect fun DrawingContext2D.drawText(text: String, x: Double, y: Double)
 expect fun DrawingContext2D.font(size: Dimension, value: FontAndStyle)
 expect fun DrawingContext2D.textAlign(alignment: TextAlign)

@@ -67,14 +67,10 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         val navigator = PlatformNavigator(routes)
         this@appNav.navigator = navigator
         swapView {
-            reactiveScope {
-                val viewMaker = appNavFactory
-                    .await()
-
-                swap {
-                    viewMaker.invoke(this, setup)
-                }
-            }
+            swapping(
+                current = { appNavFactory.await() },
+                views = { it(this, setup) }
+            )
         } in marginless
         stack {
             val nav = navigator.dialog

@@ -28,38 +28,27 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedE
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
     val vw = native.asDynamic().__ROCK_ViewWriter__ as ViewWriter
-    native.asDynamic().__ROCK__next = null
-    val alreadyChanging = native.asDynamic().__ROCK__swapping as? Boolean
-    if (alreadyChanging == true) {
-        native.asDynamic().__ROCK__next = transition to createNewView
-        return
-    }
-    native.asDynamic().__ROCK__swapping = true
     val keyframeName = DynamicCSS.transition(transition)
     val previousLast = native.lastElementChild
     native.children.let { (0 until it.length).map { i -> it.get(i) } }.filterIsInstance<HTMLElement>()
         .forEach { view ->
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
-            view.style.animation = "${keyframeName}-exit 0.25s"
+            view.style.animation = "${keyframeName}-exit 0.25s forwards"
             val parent = view.parentElement
             window.setTimeout({
                 if (view.parentElement == parent) {
                     native.removeChild(view)
                 }
-            }, 250)
+            }, 240)
         }
     createNewView(vw)
     (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
         native.hidden = false
-        newView.style.animation = "${keyframeName}-enter 0.25s"
+        newView.style.animation = "${keyframeName}-enter 0.25s forwards"
         newView.style.marginLeft = "auto"
         newView.style.marginRight = "auto"
     } ?: run {
         native.hidden = true
-    }
-    native.asDynamic().__ROCK__swapping = false
-    (native.asDynamic().__ROCK__next as? Pair<ScreenTransition, ViewWriter.() -> Unit>)?.let {
-        swap(it.first, it.second)
     }
 }

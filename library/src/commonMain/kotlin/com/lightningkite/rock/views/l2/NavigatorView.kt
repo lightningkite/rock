@@ -7,27 +7,27 @@ import com.lightningkite.rock.views.direct.*
 
 fun ViewWriter.navigatorView(navigator: RockNavigator) {
     this.swapView {
-        reactiveScope {
-            val screen = navigator.currentScreen.await()
-            this@swapView.swap {
+        this@swapView.swapping(
+            current = { navigator.currentScreen.await() },
+            views = { screen ->
                 this.navigator = navigator
                 if (screen != null)
                     with(screen) { render() }
             }
-        }
+        )
     }
 }
 
 fun ViewWriter.navigatorViewDialog() {
     val n = navigator
     this.swapViewDialog {
-        reactiveScope {
-            val screen = n.dialog.currentScreen.await()
-            this@swapViewDialog.swap {
+        this@swapViewDialog.swapping(
+            current = { n.dialog.currentScreen.await() },
+            views = { screen ->
                 this.navigator = n.dialog
                 if (screen != null)
                     with(screen) { render() }
             }
-        }
+        )
     }
 }

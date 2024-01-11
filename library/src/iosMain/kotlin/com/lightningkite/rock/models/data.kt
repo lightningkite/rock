@@ -11,7 +11,7 @@ actual val Int.rem: Dimension
     get() = Dimension(this.toDouble() * UIFont.systemFontSize)
 
 actual val Double.rem: Dimension
-    get() = Dimension(this * 8)
+    get() = Dimension(this * UIFont.systemFontSize)
 
 actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension(this.value.plus(other.value))
 actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimension(this.value.minus(other.value))

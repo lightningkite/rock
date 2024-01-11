@@ -8,5 +8,5 @@ actual fun NView.removeNView(child: NView) {
 }
 
 actual fun NView.listNViews(): List<NView> {
-    return subview.map { it as UIView }
+    return subviews.map { it as UIView }
 }

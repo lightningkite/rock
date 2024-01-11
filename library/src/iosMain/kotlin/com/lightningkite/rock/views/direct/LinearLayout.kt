@@ -118,7 +118,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         }.map {
             if(it.primary < -0.001) {
                 if(totalWeight == 0f) throw IllegalStateException("View in LL has weight ${-it.primary} but total weight is ${totalWeight}")
-                it.primary = (-it.primary / totalWeight) * remaining.primary
+                it.primary = ((-it.primary / totalWeight) * remaining.primary).coerceAtLeast(0.0)
             }
             it
         }

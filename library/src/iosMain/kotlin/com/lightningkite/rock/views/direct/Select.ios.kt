@@ -57,5 +57,5 @@ actual fun <T> Select.bind(
     }
     picker.setDataSource(source)
     picker.setDelegate(source)
-    picker.extensionStrongRef = source
+    native.extensionStrongRef = source
 }

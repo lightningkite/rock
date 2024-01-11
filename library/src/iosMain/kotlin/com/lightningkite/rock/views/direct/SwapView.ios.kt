@@ -16,6 +16,7 @@ actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) = element(FrameLayout
 
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element(FrameLayout()) {
+    extensionViewWriter = this@swapViewDialog.split()
     handleTheme(this, viewDraws = false)
     hidden = true
     setup(SwapView(this))

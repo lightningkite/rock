@@ -41,15 +41,16 @@ fun ViewWriter.handleTheme(
     view.calculationContext.reactiveScope {
         val theme = currentTheme()
 
-        val shouldTransition = when(transition) {
+        val viewMarginless = view.extensionMarginless ?: false
+        val shouldTransition = when (transition) {
             ViewWriter.TransitionNextView.No -> false
             ViewWriter.TransitionNextView.Yes -> true
             is ViewWriter.TransitionNextView.Maybe -> transition.logic()
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = (viewDraws || (mightTransition && !isRoot))
-        val useMargins = (viewDraws || mightTransition) && !(view.extensionMarginless ?: false)
+        val usePadding = mightTransition && !isRoot
+        val useMargins = (viewDraws || mightTransition) && !viewMarginless
 
         val borders = !(view.extensionMarginless ?: false) && shouldTransition
 

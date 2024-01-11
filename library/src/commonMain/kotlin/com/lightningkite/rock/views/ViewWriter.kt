@@ -174,6 +174,7 @@ class ViewWriter(
         calculationContext.reactiveScope {
             val itemList = items.await()
             if(currentViews.size < itemList.size) {
+                println("Adding ${itemList.size - currentViews.size} views")
                 repeat(itemList.size - currentViews.size) {
                     val newProp = Property(itemList[currentViews.size])
                     split.render(newProp)

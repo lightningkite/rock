@@ -19,35 +19,36 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
-class ExtensionData(
-    val reference: WeakReference<*>,
-    val map: HashMap<Any, Any?> = HashMap()
-) {
-    @OptIn(ExperimentalNativeApi::class)
+class ExtensionProperty<A: NSObject, B>: ReadWriteProperty<A, B?> {
     companion object {
-        val all = HashMap<Int, ExtensionData>()
-        fun get(item: Any): ExtensionData? = all[item.identityHashCode()]
-        fun getOrPut(item: Any): ExtensionData = all.getOrPut(item.identityHashCode()) {
-            ExtensionData(WeakReference(item))
-        }
-        fun clean() {
-            all.entries.removeAll { (key, value) ->
-                (value.reference.get() == null)
+        val storage = HashMap<Any, HashMap<ExtensionProperty<*, *>, Any?>>()
+        fun remove(key: Any) = storage.remove(key)
+        fun debug() {
+            for((key, value) in storage) {
+                if(key is UIView) {
+                    if(key.window == null) println("Warning! $key is detatched but still holds external storage")
+                }
             }
         }
     }
-}
-
-class ExtensionProperty<A: NSObject, B>: ReadWriteProperty<A, B?> {
-    val myData = HashMap<A, B>(5000)
     override fun getValue(thisRef: A, property: KProperty<*>): B? = getValue(thisRef)
     override fun setValue(thisRef: A, property: KProperty<*>, value: B?) = setValue(thisRef, value)
-    fun getValue(thisRef: A): B? = myData[thisRef]
+    @Suppress("UNCHECKED_CAST")
+    fun getValue(thisRef: A): B? = storage.get(thisRef)?.get(this) as B
     fun setValue(thisRef: A, value: B?) {
-        if(value == null) myData.remove(thisRef)
-        else myData[thisRef] = value
+        storage.getOrPut(thisRef) { HashMap() }.put(this, value)
     }
 }
+//class ExtensionProperty<A: NSObject, B>: ReadWriteProperty<A, B?> {
+//@OptIn(ExperimentalForeignApi::class)
+//override fun getValue(thisRef: A, property: KProperty<*>): B? = getValue(thisRef)
+//@OptIn(ExperimentalForeignApi::class)
+//override fun setValue(thisRef: A, property: KProperty<*>, value: B?) = setValue(thisRef, value)
+//@OptIn(ExperimentalForeignApi::class)
+//fun getValue(thisRef: A): B? = com.lightningkite.rock.objc.getAssociatedObjectWithKey(thisRef, key) as? B
+//@OptIn(ExperimentalForeignApi::class)
+//fun setValue(thisRef: A, value: B?) = com.lightningkite.rock.objc.setAssociatedObjectWithKey(thisRef, key, value)
+//}
 
 private val UIViewWeight = ExtensionProperty<UIView, Float>()
 var UIView.extensionWeight: Float? by UIViewWeight

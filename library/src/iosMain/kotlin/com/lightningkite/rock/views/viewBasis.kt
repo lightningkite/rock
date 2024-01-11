@@ -40,17 +40,7 @@ class NViewCalculationContext(): CalculationContext {
 
 fun UIView.shutdown() {
     UIViewCalcContext.getValue(this)?.shutdown()
-    UIViewCalcContext.setValue(this, null)
-    extensionWeight = null
-    extensionMargin = null
-    extensionPadding = null
-    extensionSizeConstraints = null
-    extensionHorizontalAlign = null
-    extensionVerticalAlign = null
-    extensionFontAndStyle = null
-    extensionTextSize = null
-    extensionMarginless = null
-    extensionViewWriter = null
+    ExtensionProperty.remove(this)
     subviews.forEach { (it as UIView).shutdown() }
 }
 

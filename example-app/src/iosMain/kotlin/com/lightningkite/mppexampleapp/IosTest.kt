@@ -74,12 +74,12 @@ fun ViewWriter.iosTest() {
     }
     leakTest("Manual Custom") {
         val v = CustomUIView()
-        currentView.addChild(v)
+        currentView.addNView(v)
         v.removeFromSuperview()
     }
     leakTest("Manual") {
         val v = UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))
-        currentView.addChild(v)
+        currentView.addNView(v)
         CalculationContextStack.useIn(v.calculationContext) {
 
         }
@@ -92,35 +92,35 @@ fun ViewWriter.iosTest() {
             leakTest("Vanilla") {
                 element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
                 }
-                currentView.clearChildren()
+                currentView.clearNViews()
             }
             leakTest("Text") {
                 text { content = "test" }
-                currentView.clearChildren()
+                currentView.clearNViews()
             }
             leakTest("Vanilla with child") {
                 element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
                     element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
                     }
                 }
-                currentView.clearChildren()
+                currentView.clearNViews()
             }
             leakTest("Extended") {
                 element(CustomUIView()) {
                 }
-                currentView.clearChildren()
+                currentView.clearNViews()
             }
             leakTest("Extended with child") {
                 element(CustomUIView()) {
                     element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
                     }
                 }
-                currentView.clearChildren()
+                currentView.clearNViews()
             }
             leakTest("Stack") {
                 stack { element(UIView(CGRectMake(0.0, 0.0, 0.0, 0.0))) {
                 } }
-                currentView.clearChildren()
+                currentView.clearNViews()
             }
         }
         button {

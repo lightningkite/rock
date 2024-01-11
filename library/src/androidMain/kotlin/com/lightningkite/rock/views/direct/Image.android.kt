@@ -20,9 +20,7 @@ import timber.log.Timber
 actual typealias NImage = ImageView
 
 actual var Image.source: ImageSource
-    get() {
-        return native.tag as ImageResource
-    }
+    get() = TODO()
     set(value) {
         native.tag = value
         when (value) {
@@ -73,8 +71,8 @@ actual var Image.source: ImageSource
             }
 
             is ImageResource -> {
-                Timber.d("HITHER AND THITHER IMAGE RESOURCE")
-                native.setImageDrawable(value.drawable)
+                Timber.d("HITHER AND THITHER IMAGE RESOURCE ${value.resource}")
+                native.setImageResource(value.resource)
             }
 
             is ImageVector -> {
@@ -120,12 +118,7 @@ actual var Image.description: String?
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit) {
     return viewElement(factory = ::ImageView, wrapper = ::Image) {
-        handleTheme(native) { theme, view ->
-            afterNextElementSetup {
-                view.drawable?.colorFilter =
-                    PorterDuffColorFilter(theme.foreground.colorInt(), PorterDuff.Mode.MULTIPLY)
-            }
-        }
+        handleTheme(native, viewDraws = true)
         setup(this)
     }
 }

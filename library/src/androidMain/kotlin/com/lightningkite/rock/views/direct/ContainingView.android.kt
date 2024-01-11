@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import android.graphics.drawable.GradientDrawable
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -25,6 +26,7 @@ actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.VERTICAL
+        l.gravity = Gravity.CENTER_HORIZONTAL
         handleTheme(l, viewDraws = false)
         setup(ContainingView(l))
     }
@@ -35,6 +37,7 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.HORIZONTAL
+        l.gravity = Gravity.CENTER_VERTICAL
         handleTheme(l, viewDraws = false)
         setup(ContainingView(l))
     }

@@ -18,9 +18,9 @@ object SampleLogInScreen : RockScreen {
         val password = Property("")
         stack {
             image {
-                source = Resources.imagesMammoth
+                source = Resources.imagesSolera
                 scaleType = ImageScaleType.Crop
-                opacity = 0.5
+//                opacity = 0.5
             } in marginless
             col {
                 space {} in weight(1f)
@@ -55,7 +55,7 @@ object SampleLogInScreen : RockScreen {
                             }
                         }
                     } in important
-                } in card in sizedBox(SizeConstraints(maxWidth = 50.rem))
+                } in card in sizedBox(SizeConstraints(maxWidth = 50.rem)) in gravity(Align.Center, Align.Center)
                 space {} in weight(1f)
             } in scrolls in withDefaultPadding
         } in marginless

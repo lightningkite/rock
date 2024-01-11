@@ -32,4 +32,4 @@ actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(
 )
 
 actual sealed class ImageSource actual constructor()
-actual class ImageResource(val drawable: Drawable) : ImageSource()
+actual class ImageResource(val resource: Int) : ImageSource()

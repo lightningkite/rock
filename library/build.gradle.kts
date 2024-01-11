@@ -20,6 +20,7 @@ val ktorVersion = "2.3.7"
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     androidTarget {
+        publishLibraryVariants("release", "debug")
         compilations.all {
             kotlinOptions {
                 jvmTarget = "17"

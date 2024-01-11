@@ -122,22 +122,24 @@ actual object Resources {
                         }.joinToString("") {
                             "<string>$it</string>"
                         }
-                        if(original.contains("<key>UIAppFonts</key>")) {
-                            outPlist.writeText(original
-                                .substringBefore("<key>UIAppFonts</key>") +
-                                    "<key>UIAppFonts</key><array>" +
-                                    uiAppFontsContent +
-                                    "</array>" +
-                                    original.substringAfter("<key>UIAppFonts</key>")
-                                        .substringAfter("</array>")
+                        if (original.contains("<key>UIAppFonts</key>")) {
+                            outPlist.writeText(
+                                original
+                                    .substringBefore("<key>UIAppFonts</key>") +
+                                        "<key>UIAppFonts</key><array>" +
+                                        uiAppFontsContent +
+                                        "</array>" +
+                                        original.substringAfter("<key>UIAppFonts</key>")
+                                            .substringAfter("</array>")
                             )
                         } else {
-                            outPlist.writeText(original
-                                .substringBefore("</dict>\n</plist>") +
-                                    "<key>UIAppFonts</key><array>" +
-                                    uiAppFontsContent +
-                                    "</array>\n" +
-                                    "</dict>\n</plist>"
+                            outPlist.writeText(
+                                original
+                                    .substringBefore("</dict>\n</plist>") +
+                                        "<key>UIAppFonts</key><array>" +
+                                        uiAppFontsContent +
+                                        "</array>\n" +
+                                        "</dict>\n</plist>"
                             )
                         }
                     }
@@ -181,6 +183,7 @@ actual object Resources {
                                         "italic = ${r.italic?.postScriptName.str()}, " +
                                         "bold = ${r.bold?.postScriptName.str()}, " +
                                         "boldItalic = ${r.boldItalic?.postScriptName.str()})  // ${r}"
+
                                 is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"${it.key}\")"
                                 is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = TODO()"
                                 else -> ""
@@ -201,11 +204,106 @@ actual object Resources {
             }
         }
 
+        tasks.create("androidResources").apply {
+            dependsOn("commonResources")
+            group = "build"
+            val outKt = project.file("src/androidMain/kotlin/ResourcesActual.kt")
+            outputs.file(outKt)
+            val resourceFolder = project.file("src/commonMain/resources")
+            inputs.files(resourceFolder)
+            val androidResFolder = project.file("src/androidMain/res")
+
+            doLast {
+                val resources = resourceFolder.resources()
+                    .entries
+                    .sortedBy { it.key }
+                val androidDrawableFolder = androidResFolder.resolve("drawable-xhdpi").also { it.mkdirs() }
+                resources.forEach { (key, value) ->
+                    if(value !is Resource.Image) return@forEach
+                    val destFile = androidDrawableFolder.resolve(key.snakeCase() + "." + value.source.extension)
+                    value.source.copyTo(destFile, overwrite = true)
+                }
+                val androidFontFolder = androidResFolder.resolve("font").also { it.mkdirs() }
+                resources.forEach { (key, value) ->
+                    if(value !is Resource.Font) return@forEach
+                    val xmlFile = androidFontFolder.resolve(key.snakeCase() + ".xml")
+                    val variants = listOfNotNull(
+                        value.normal.let {
+                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_normal." + it.source.extension)
+                            it.source.copyTo(destFile, overwrite = true)
+                            """
+                            <font
+                                android:fontStyle="normal"
+                                android:fontWeight="400"
+                                android:font="@font/${destFile.nameWithoutExtension}" />
+                            """.trimIndent()
+                        },
+                        value.bold?.let {
+                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_bold." + it.source.extension)
+                            it.source.copyTo(destFile, overwrite = true)
+                            """
+                            <font
+                                android:fontStyle="normal"
+                                android:fontWeight="700"
+                                android:font="@font/${destFile.nameWithoutExtension}" />
+                            """.trimIndent()
+                        },
+                        value.italic?.let {
+                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_italic." + it.source.extension)
+                            it.source.copyTo(destFile, overwrite = true)
+                            """
+                            <font
+                                android:fontStyle="italic"
+                                android:fontWeight="400"
+                                android:font="@font/${destFile.nameWithoutExtension}" />
+                            """.trimIndent()
+                        },
+                        value.boldItalic?.let {
+                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_bold_italic." + it.source.extension)
+                            it.source.copyTo(destFile, overwrite = true)
+                            """
+                            <font
+                                android:fontStyle="italic"
+                                android:fontWeight="700"
+                                android:font="@font/${destFile.nameWithoutExtension}" />
+                            """.trimIndent()
+                        }
+                    )
+                    xmlFile.writeText("""
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android">
+${variants.joinToString("\n")}
+</font-family>
+                    """.trim())
+                }
+                val lines = resources
+                    .joinToString("\n    ") {
+                        when (val r = it.value) {
+                            is Resource.Font -> "actual val ${r.name}: Font = AndroidAppContext.applicationCtx.resources.getFont(R.font.${it.key.snakeCase()})"
+                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(R.drawable.${it.key.snakeCase()})"
+                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = TODO()"
+                            else -> ""
+                        }
+                    }
+                outKt.writeText(
+                    """
+package ${ext.packageName}
+
+import com.lightningkite.rock.models.*
+import com.lightningkite.rock.views.AndroidAppContext
+
+actual object Resources {
+    $lines
+}
+        """.trimIndent())
+            }
+        }
+
         Unit
     }
 }
 
-fun String?.str() = if(this == null) "null" else "\"$this\""
+fun String?.str() = if (this == null) "null" else "\"$this\""
 
 
 sealed class Resource {
@@ -224,6 +322,7 @@ sealed class Resource {
             val fontSubFamily: String,
             val postScriptName: String,
         )
+
         val files get() = listOfNotNull(normal, bold, italic, boldItalic)
     }
 
@@ -243,7 +342,7 @@ fun File.resources(): Map<String, Resource> {
         when (relativeFile.extension) {
             "png", "jpg" -> out[name] = Resource.Image(name, file, relativeFile)
             "otf", "ttf" -> {
-                val font = when(relativeFile.extension) {
+                val font = when (relativeFile.extension) {
                     "otf" -> OTFParser().parse(file)
                     "ttf" -> TTFParser().parse(file)
                     else -> throw IllegalArgumentException()
@@ -251,7 +350,8 @@ fun File.resources(): Map<String, Resource> {
                 val sf = Resource.Font.SubFont(
                     source = file,
                     relativeFile = relativeFile,
-                    fontSuperFamily = font.naming.getName(16, 1, 0, 0) ?: font.naming.nameRecords.find { it.nameId == 16 }?.string ?: "",
+                    fontSuperFamily = font.naming.getName(16, 1, 0, 0)
+                        ?: font.naming.nameRecords.find { it.nameId == 16 }?.string ?: "",
                     fontFamily = font.naming.fontFamily,
                     fontSubFamily = font.naming.fontSubFamily,
                     postScriptName = font.naming.postScriptName,

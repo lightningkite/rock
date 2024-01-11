@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -56,31 +57,35 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     return ViewWrapper
 }
 
-private fun alignmentToGravity(alignment: Align, isVertical: Boolean): Int {
-    return when (alignment) {
-        Align.Start -> Gravity.START
-        Align.Center -> if (isVertical) Gravity.CENTER_VERTICAL else Gravity.CENTER_HORIZONTAL
-        Align.End -> Gravity.END
-        else -> Gravity.START
-    }
-}
 
 @ViewModifierDsl3
 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
-    beforeNextElementSetup {
+    afterNextElementSetup {
         val params = this.lparams
-        val horizontalGravity = alignmentToGravity(horizontal, isVertical = false)
-        val verticalGravity = alignmentToGravity(vertical, isVertical = true)
+        val horizontalGravity = when (horizontal) {
+            Align.Start -> Gravity.START
+            Align.Center -> Gravity.CENTER_HORIZONTAL
+            Align.End -> Gravity.END
+            else -> Gravity.CENTER_HORIZONTAL
+        }
+        val verticalGravity = when (vertical) {
+            Align.Start -> Gravity.TOP
+            Align.Center -> Gravity.CENTER_VERTICAL
+            Align.End -> Gravity.BOTTOM
+            else -> Gravity.CENTER_VERTICAL
+        }
         if (params is LinearLayout.LayoutParams)
             params.gravity = horizontalGravity or verticalGravity
         else if (params is FrameLayout.LayoutParams)
             params.gravity = horizontalGravity or verticalGravity
-        if (horizontal == Align.Stretch) {
+        else
+            println("Unknown layout params kind ${params::class.qualifiedName}; I am ${this::class.qualifiedName}")
+        if (horizontal == Align.Stretch && (this.parent as? LinearLayout)?.orientation != LinearLayout.HORIZONTAL) {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
         } else if(params.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT
         }
-        if (vertical == Align.Stretch) {
+        if (vertical == Align.Stretch && (this.parent as? LinearLayout)?.orientation != LinearLayout.VERTICAL) {
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
         } else if(params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT
@@ -93,6 +98,7 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
         wrapNext(ScrollView(this.context)) {
+            isFillViewport = true
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -105,6 +111,7 @@ actual val ViewWriter.scrolls: ViewWrapper
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         wrapNext(HorizontalScrollView(this.context)) {
+            isFillViewport = true
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -115,12 +122,21 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
 
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
-    wrapNext(FrameLayout(this.context)) {
-        layoutParams = ViewGroup.LayoutParams(
-            /* width = */ constraints.width?.value?.toInt() ?: ViewGroup.LayoutParams.WRAP_CONTENT,
-            /* height = */ constraints.height?.value?.toInt() ?: ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-    }
+//    if(constraints.maxHeight != null || constraints.maxWidth != null) {
+//        wrapNext(FrameLayout(this.context)) {
+//            layoutParams = ViewGroup.LayoutParams(
+//                /* width = */ constraints.width?.value?.toInt() ?: ViewGroup.LayoutParams.WRAP_CONTENT,
+//                /* height = */ constraints.height?.value?.toInt() ?: ViewGroup.LayoutParams.WRAP_CONTENT
+//            )
+//        }
+//    } else {
+        beforeNextElementSetup {
+            constraints.minHeight?.let { minimumHeight = it.value.toInt() }
+            constraints.minWidth?.let { minimumWidth = it.value.toInt() }
+            constraints.width?.let { lparams.width = it.value.toInt() }
+            constraints.height?.let { lparams.height = it.value.toInt() }
+        }
+//    }
     return ViewWrapper
 }
 

@@ -97,16 +97,16 @@ actual abstract class DrawingContext2D {
     actual abstract fun lineTo(x: Double, y: Double)
     actual abstract fun quadraticCurveTo(cpx: Double, cpy: Double, x: Double, y: Double)
     actual abstract fun bezierCurveTo(cp1x: Double, cp1y: Double, cp2x: Double, cp2y: Double, x: Double, y: Double)
-    actual abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
-    actual abstract fun arcTo(
-        x1: Double,
-        y1: Double,
-        x2: Double,
-        y2: Double,
-        radiusX: Double,
-        radiusY: Double,
-        rotation: Double
-    )
+//    actual abstract fun arcTo(x1: Double, y1: Double, x2: Double, y2: Double, radius: Double)
+//    actual abstract fun arcTo(
+//        x1: Double,
+//        y1: Double,
+//        x2: Double,
+//        y2: Double,
+//        radiusX: Double,
+//        radiusY: Double,
+//        rotation: Double
+//    )
 
     actual abstract fun rect(x: Double, y: Double, w: Double, h: Double)
 //    actual abstract fun arc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)

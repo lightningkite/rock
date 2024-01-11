@@ -29,8 +29,7 @@ fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
         androidText.textSize = textSize
-        androidText.setTypeface(androidText.typeface, Typeface.BOLD)
-        handleTheme(native, foreground = applyTextColorFromTheme)
+        handleTheme(native, foreground = applyTextColorFromThemeHeader)
         setup(TextView(androidText))
     }
 

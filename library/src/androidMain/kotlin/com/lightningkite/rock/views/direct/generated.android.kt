@@ -2,6 +2,7 @@
 
 package com.lightningkite.rock.views.direct
 
+import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
@@ -110,8 +111,27 @@ fun View.setMarginAll(margin: Int) {
 
 internal fun RockPaint.colorInt(): Int = closestColor().toInt()
 
+val applyTextColorFromThemeHeader: (Theme, AndroidTextView) -> Unit = { theme, textView ->
+    textView.setTextColor(theme.foreground.colorInt())
+    textView.setTypeface(theme.title.font, when {
+        !theme.title.bold && !theme.title.italic -> Typeface.NORMAL
+        !theme.title.bold && theme.title.italic -> Typeface.ITALIC
+        theme.title.bold && !theme.title.italic -> Typeface.BOLD
+        theme.title.bold && theme.title.italic -> Typeface.BOLD_ITALIC
+        else -> Typeface.NORMAL
+    })
+    textView.isAllCaps = theme.title.allCaps
+}
 val applyTextColorFromTheme: (Theme, AndroidTextView) -> Unit = { theme, textView ->
     textView.setTextColor(theme.foreground.colorInt())
+    textView.setTypeface(theme.body.font, when {
+        !theme.body.bold && !theme.body.italic -> Typeface.NORMAL
+        !theme.body.bold && theme.body.italic -> Typeface.ITALIC
+        theme.body.bold && !theme.body.italic -> Typeface.BOLD
+        theme.body.bold && theme.body.italic -> Typeface.BOLD_ITALIC
+        else -> Typeface.NORMAL
+    })
+    textView.isAllCaps = theme.body.allCaps
 }
 
 inline fun <T: NView> ViewWriter.handleTheme(

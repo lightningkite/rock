@@ -145,7 +145,7 @@ class ViewWriter(
      */
     fun <T : NView> element(initialElement: T, setup: T.() -> Unit) {
         initialElement.apply {
-            stack.lastOrNull()?.addChild(this) ?: run { rootCreated = this }
+            stack.lastOrNull()?.addNView(this) ?: run { rootCreated = this }
             val beforeCopy =
                 if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
             beforeNextElementSetupList = ArrayList()
@@ -160,7 +160,7 @@ class ViewWriter(
             }
             while (toPop > 0) {
                 val item = stack.removeLast()
-                stack.lastOrNull()?.addChild(item) ?: run { rootCreated = item }
+                stack.lastOrNull()?.addNView(item) ?: run { rootCreated = item }
                 toPop--
             }
 //            wrapperToDoList.clear()
@@ -168,18 +168,30 @@ class ViewWriter(
     }
 
     fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewWriter.(Readable<T>) -> Unit) {
-        // TODO: Faster version
-        return with(split()) {
-            calculationContext.reactiveScope {
-                stack.last().clearChildren()
-                repeat(5) {
-                    render(Never)
+        val split = split()
+        val currentViews = ArrayList<Property<T>>()
+        val currentView = currentView
+        calculationContext.reactiveScope {
+            val itemList = items.await()
+            if(currentViews.size < itemList.size) {
+                repeat(itemList.size - currentViews.size) {
+                    val newProp = Property(itemList[currentViews.size])
+                    split.render(newProp)
+                    currentViews.add(newProp)
                 }
-                val data = items.await()
-                stack.last().clearChildren()
-                data.forEach {
-                    render(Constant(it))
+            }/* else if(currentViews.size > itemList.size) {
+                currentView.listNViews().takeLast(currentViews.size - itemList.size).forEach {
+                    currentView.removeNView(it)
+                    currentViews.removeLast()
                 }
+            }*/
+            val children = currentView.listNViews()
+            for(index in itemList.indices) {
+                children[index].exists = true
+                currentViews[index].value = itemList[index]
+            }
+            for(index in itemList.size..<currentViews.size) {
+                children[index].exists = false
             }
         }
     }

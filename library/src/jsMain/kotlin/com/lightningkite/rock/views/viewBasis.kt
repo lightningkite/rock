@@ -64,10 +64,10 @@ actual var NView.nativeRotation: Angle
         style.transform = "rotate(${value.turns}turn)"
     }
 
-actual fun NView.clearChildren() {
+actual fun NView.clearNViews() {
     innerHTML = ""
 }
-actual fun NView.addChild(child: NView) {
+actual fun NView.addNView(child: NView) {
     appendChild(child)
 }
 

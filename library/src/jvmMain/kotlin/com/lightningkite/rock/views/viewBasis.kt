@@ -34,9 +34,9 @@ actual var NView.nativeRotation: Angle
         TODO()
     }
 
-actual fun NView.clearChildren() {
+actual fun NView.clearNViews() {
     TODO()
 }
-actual fun NView.addChild(child: NView) {
+actual fun NView.addNView(child: NView) {
     TODO()
 }

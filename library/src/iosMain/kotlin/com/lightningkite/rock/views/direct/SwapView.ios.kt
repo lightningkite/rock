@@ -22,7 +22,7 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element
 }
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
-    native.clearChildren()
+    native.clearNViews()
     createNewView(native.extensionViewWriter!!)
     native.hidden = native.subviews.all { (it as UIView).hidden }
 }

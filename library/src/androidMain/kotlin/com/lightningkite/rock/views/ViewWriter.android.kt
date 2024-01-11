@@ -102,13 +102,13 @@ actual var NView.visible: Boolean
         }
     }
 
-actual fun NView.clearChildren() {
+actual fun NView.clearNViews() {
     if (this !is ViewGroup) throw RuntimeException("clearChildren can only be called on Android ViewGroups")
     this.children.forEach { it.shutdown() }
     (this as ViewGroup).removeAllViews()
 }
 
-actual fun NView.addChild(child: NView) {
+actual fun NView.addNView(child: NView) {
     if (this !is ViewGroup) throw RuntimeException("addChild can only be called on Android ViewGroups")
     (this as ViewGroup).addView(child)
 }

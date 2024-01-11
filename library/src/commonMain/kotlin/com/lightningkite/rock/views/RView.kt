@@ -32,7 +32,7 @@ var RView<*>.visible: Boolean
 
 fun <T> ViewWriter.forEach(items: Readable<List<T>>, render: ViewWriter.(T)->Unit) = with(split()) {
     calculationContext.reactiveScope {
-        currentView.clearChildren()
+        currentView.clearNViews()
         items.await().forEach {
             render(it)
         }

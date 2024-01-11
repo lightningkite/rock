@@ -13,6 +13,11 @@ infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object: Writabl
         if(value) this@equalTo.set(target)
     }
 }
+infix fun <T> Writable<T>.equalToDynamic(value: suspend ()->T): Writable<Boolean> = shared {
+    await() == value()
+}.withWrite {
+    if(it) set(value())
+}
 
 
 infix fun <T> Writable<T>.bind(master: Writable<T>) {

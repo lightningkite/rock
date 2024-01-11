@@ -47,8 +47,12 @@ actual val ViewWriter.withDefaultPadding: ViewWrapper
 actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         try {
-            this.updateLayoutParams {
-                (this as LinearLayout.LayoutParams).weight = amount
+            val lp = (lparams as LinearLayout.LayoutParams)
+            lp.weight = amount
+            if((this.parent as LinearLayout).orientation == LinearLayout.HORIZONTAL) {
+                lp.width = 0
+            } else {
+                lp.height = 0
             }
         } catch (ex: Throwable) {
             throw RuntimeException("Weight is only available within a column or row.")
@@ -99,10 +103,10 @@ actual val ViewWriter.scrolls: ViewWrapper
     get() {
         wrapNext(ScrollView(this.context)) {
             isFillViewport = true
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+        }
+        beforeNextElementSetup {
+//            lparams.width = ViewGroup.LayoutParams.MATCH_PARENT
+//            lparams.height = ViewGroup.LayoutParams.MATCH_PARENT
         }
         return ViewWrapper
     }
@@ -112,10 +116,10 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         wrapNext(HorizontalScrollView(this.context)) {
             isFillViewport = true
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
+        }
+        beforeNextElementSetup {
+//            lparams.width = ViewGroup.LayoutParams.MATCH_PARENT
+//            lparams.height = ViewGroup.LayoutParams.MATCH_PARENT
         }
         return ViewWrapper
     }

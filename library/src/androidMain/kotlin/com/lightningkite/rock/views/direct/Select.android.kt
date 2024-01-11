@@ -18,6 +18,7 @@ import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.launch
 import com.lightningkite.rock.views.reactiveScope
 import java.util.*
+import com.lightningkite.rock.models.rem
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual class NSelect(context: Context): AppCompatSpinner(context) {
@@ -53,6 +54,7 @@ actual fun <T> Select.bind(
         }
     }
     native.adapter = adapter
+    native.minimumHeight = 4.rem.value.toInt()
     native.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onNothingSelected(parent: AdapterView<*>?) {
 

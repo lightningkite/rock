@@ -27,12 +27,12 @@ kotlin {
             }
         }
         dependencies {
-            implementation("androidx.transition:transition:1.4.1")
-            implementation("androidx.cardview:cardview:1.0.0")
-            implementation("com.jakewharton.timber:timber:5.0.1")
-            implementation("io.ktor:ktor-client-core:$ktorVersion")
-            implementation("io.ktor:ktor-client-cio:$ktorVersion")
-            implementation("io.ktor:ktor-client-websockets:$ktorVersion")
+            api("androidx.transition:transition:1.4.1")
+            api("androidx.cardview:cardview:1.0.0")
+            api("com.jakewharton.timber:timber:5.0.1")
+            api("io.ktor:ktor-client-core:$ktorVersion")
+            api("io.ktor:ktor-client-cio:$ktorVersion")
+            api("io.ktor:ktor-client-websockets:$ktorVersion")
         }
     }
     jvm()
@@ -70,8 +70,8 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.6.1")
-                implementation("androidx.recyclerview:recyclerview:1.3.2")
+                api("androidx.appcompat:appcompat:1.6.1")
+                api("androidx.recyclerview:recyclerview:1.3.2")
             }
         }
 

@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import android.widget.FrameLayout
+import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.launch
@@ -12,6 +13,8 @@ actual typealias NButton = FrameLayout
 actual fun ViewWriter.button(setup: Button.() -> Unit) {
     viewElement(factory = ::FrameLayout, wrapper = ::ContainingView) {
         val frame = native as FrameLayout
+        native.minimumWidth = 2.rem.value.toInt()
+        native.minimumHeight = 2.rem.value.toInt()
         handleThemeControl(frame) {
             setup(Button(frame))
         }

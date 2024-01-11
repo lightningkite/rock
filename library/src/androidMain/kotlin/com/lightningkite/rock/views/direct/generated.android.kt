@@ -159,10 +159,10 @@ inline fun <T: NView> ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = (viewDraws || (mightTransition && !isRoot))
+        val usePadding = mightTransition && !isRoot
         val useMargins = (viewDraws || mightTransition) && !viewMarginless
 
-        val borders = !viewMarginless && shouldTransition
+        val borders = !viewMarginless
 
         if (useMargins) {
             view.setMarginAll(theme.spacing.value.toInt())

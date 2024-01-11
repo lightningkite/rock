@@ -3,6 +3,7 @@ package com.lightningkite.rock.views.direct
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.CompoundButton
@@ -11,6 +12,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -20,7 +22,7 @@ actual typealias NTextView = AndroidTextView
 fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
-        androidText.textSize = textSize
+        androidText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
         handleTheme(native, foreground = applyTextColorFromTheme)
         setup(TextView(androidText))
     }
@@ -28,21 +30,20 @@ fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
 fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
-        androidText.textSize = textSize
+        androidText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
         handleTheme(native, foreground = applyTextColorFromThemeHeader)
         setup(TextView(androidText))
     }
 
 object TextSizes {
-    var h1 = 26f
-    var h2 = 24f
-    var h3 = 22f
-    var h4 = 20f
-    var h5 = 18f
-    var h6 = 16f
-    var defaultHeader = 20f
-    var body = 16f
-    var subtext = 14f
+    val h1: Float get() = 2.rem.value
+    val h2: Float get() = 1.6.rem.value
+    val h3: Float get() = 1.4.rem.value
+    val h4: Float get() = 1.3.rem.value
+    val h5: Float get() = 1.2.rem.value
+    val h6: Float get() = 1.1.rem.value
+    val body: Float get() = 1.rem.value
+    val subtext: Float get() = 0.8.rem.value
 }
 
 @ViewDsl
@@ -104,7 +105,7 @@ actual var TextView.textSize: Dimension
         return Dimension(native.textSize)
     }
     set(value) {
-        native.textSize = value.value.toFloat()
+        native.setTextSize(TypedValue.COMPLEX_UNIT_PX, value.value.toFloat())
     }
 val CompoundButton.checked: Writable<Boolean>
     get() {

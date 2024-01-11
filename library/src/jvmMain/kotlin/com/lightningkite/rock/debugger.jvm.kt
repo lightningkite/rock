@@ -9,3 +9,6 @@ actual fun gc(): GCInfo {
         GCInfo(totalMemory() - freeMemory())
     }
 }
+
+actual fun assertMainThread() {
+}

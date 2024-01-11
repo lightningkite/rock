@@ -7,6 +7,7 @@ import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
+import com.lightningkite.rock.views.centered
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.setTheme
 
@@ -15,6 +16,49 @@ object LayoutExamplesScreen : RockScreen {
     override fun ViewWriter.render() {
         col {
             h1 { content = "Sampling" }
+
+            col {
+                h2 { content = "Max Size / Image Interaction" }
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/1920/1080")
+                } in sizedBox(
+                    SizeConstraints(
+                        maxHeight = 10.rem
+                    )
+                )
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                } in sizedBox(
+                    SizeConstraints(
+                        maxHeight = 10.rem
+                    )
+                )
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                } in sizedBox(
+                    SizeConstraints(
+                        height = 10.rem
+                    )
+                )
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                    scaleType = ImageScaleType.Crop
+                } in sizedBox(
+                    SizeConstraints(
+                        width = 10.rem,
+                        height = 10.rem
+                    )
+                )  in centered
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                    scaleType = ImageScaleType.Fit
+                } in sizedBox(
+                    SizeConstraints(
+                        width = 10.rem,
+                        height = 10.rem
+                    )
+                )  in centered
+            } in card
 
             col {
                 h2 { content = "Stack Layout" }
@@ -45,7 +89,12 @@ object LayoutExamplesScreen : RockScreen {
                     for (v in aligns) {
                         text { content = "$v" } in gravity(Align.Stretch, v)
                     }
-                    stack { text { content = "Weight 1" } in gravity(Align.Center, Align.Center) } in weight(1f)
+                    stack {
+                        text { content = "Weight 1" } in gravity(
+                            Align.Center,
+                            Align.Center
+                        )
+                    } in weight(1f)
                     for (v in aligns) {
                         text { content = "$v" } in gravity(Align.Stretch, v)
                     }
@@ -58,7 +107,8 @@ object LayoutExamplesScreen : RockScreen {
                 row {
                     forEachUpdating(
                         shared {
-                            (1..(countString.await().toIntOrNull() ?: 1).coerceAtMost(100)).map { "Item $it" }
+                            (1..(countString.await().toIntOrNull()
+                                ?: 1).coerceAtMost(100)).map { "Item $it" }
                         }
                     ) {
                         text { ::content.invoke { it.await() } }
@@ -84,11 +134,19 @@ fun ViewWriter.componentDemo() {
             h3 { content = "Without cards" }
             label { content = "First Name"; textField { hint = "Bill" } }
             label { content = "Last Name"; textField { hint = "Murray" } }
-            label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } }
+            label {
+                content = "Password"; textField {
+                this.keyboardHints = KeyboardHints.password
+            }
+            }
             h3 { content = "With cards" }
             label { content = "First Name"; textField { hint = "Bill" } in card }
             label { content = "Last Name"; textField { hint = "Murray" } in card }
-            label { content = "Password"; textField { this.keyboardHints = KeyboardHints.password } in card }
+            label {
+                content = "Password"; textField {
+                this.keyboardHints = KeyboardHints.password
+            } in card
+            }
         } in card
 
     } in scrolls in setTheme { currentTheme.await() } in marginless

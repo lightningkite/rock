@@ -25,9 +25,13 @@ object RecyclerViewScreen : RockScreen {
                         expanded.value = 0
                     }
                 }
-                text {
-                    content = "More content"
+                col {
                     ::exists { expanded.await() == 0 }
+                    text("More Content")
+                    text("More Content")
+                    text("More Content")
+                    text("More Content")
+                    text("More Content")
                 }
             }
             recyclerView {
@@ -42,9 +46,13 @@ object RecyclerViewScreen : RockScreen {
                                 expanded.value = it.await()
                             }
                         }
-                        text {
-                            content = "More content"
+                        col {
                             ::exists { expanded.await() == it.await() }
+                            text("More Content")
+                            text("More Content")
+                            text("More Content")
+                            text("More Content")
+                            text("More Content")
                         }
                     }
                 }

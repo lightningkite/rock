@@ -2,6 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.delay
+import com.lightningkite.rock.gc
 import com.lightningkite.rock.reactive.CalculationContextStack
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewWriter
@@ -29,8 +30,6 @@ class KObj: NSObject() {
 @OptIn(ExperimentalStdlibApi::class, NativeRuntimeApi::class)
 fun getUsage(): Long {
     GC.collect()
-    ExtensionData.clean()
-    GC.collect()
     return GC.lastGCInfo!!.memoryUsageAfter["heap"]!!.totalObjectsSizeBytes
 }
 
@@ -42,13 +41,8 @@ fun ViewWriter.iosTest() {
         doAction()
         repeat(10000) { iter ->
             val start = getUsage()
-            val extBefore = ExtensionData.all.size
             doAction()
             val after = getUsage()
-            val extAfter = ExtensionData.all.size
-            if(extAfter != extBefore) {
-                println("${extAfter - extBefore} extension item change")
-            }
             (after - start).let {
                 total += it
                 if(it == 0L) {
@@ -70,6 +64,7 @@ fun ViewWriter.iosTest() {
             val v = CustomUIView()
             val sub = CustomUIView()
             v.addSubview(sub)
+            v.shutdown()
         }
     }
     leakTest("Manual Custom") {
@@ -136,7 +131,7 @@ fun ViewWriter.iosTest() {
             }
             onClick {
                 println(clockMillis())
-                gcCheck()
+                gc()
             }
         }
     }

@@ -10,6 +10,3 @@ actual class CustomComponent {
 
 actual fun ViewWriter.customComponent(setup: CustomComponent.() -> Unit) {
 }
-
-actual fun gcCheck() {
-}

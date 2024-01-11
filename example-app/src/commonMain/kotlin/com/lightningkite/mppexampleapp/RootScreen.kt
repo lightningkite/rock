@@ -6,6 +6,7 @@ import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.VectorsTe
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.WebSocketScreen
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
+import com.lightningkite.rock.gc
 import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
@@ -64,7 +65,7 @@ object RootScreen : RockScreen {
 
                 button {
                     text { content = "GC" }
-                    onClick { gcCheck() }
+                    onClick { gc() }
                 }
 
             } in withDefaultPadding

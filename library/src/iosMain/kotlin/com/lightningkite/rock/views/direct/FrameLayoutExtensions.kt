@@ -18,7 +18,7 @@ fun UIView.frameLayoutLayoutSubviews() {
     var padding = extensionPadding ?: 0.0
     subviews.zip(frameLayoutCalcSizes(frame.useContents { size.local })) { view, size ->
         view as UIView
-        if(view.hidden) return@zip
+        if (view.hidden) return@zip
         val m = view.extensionMargin ?: 0.0
         val h = view.extensionHorizontalAlign ?: Align.Stretch
         val v = view.extensionVerticalAlign ?: Align.Stretch
@@ -35,7 +35,8 @@ fun UIView.frameLayoutLayoutSubviews() {
             Align.Center -> (mySize.height - size.height) / 2
         }
         val widthSize = if (h == Align.Stretch) mySize.width - m * 2 - padding * 2 else size.width
-        val heightSize = if (v == Align.Stretch) mySize.height - m * 2 - padding * 2 else size.height
+        val heightSize =
+            if (v == Align.Stretch) mySize.height - m * 2 - padding * 2 else size.height
         val oldSize = view.bounds.useContents { this.size.width to this.size.height }
         view.setFrame(
             CGRectMake(
@@ -45,7 +46,7 @@ fun UIView.frameLayoutLayoutSubviews() {
                 heightSize,
             )
         )
-        if(oldSize.first != widthSize || oldSize.second != heightSize) {
+        if (oldSize.first != widthSize || oldSize.second != heightSize) {
             view.layoutSubviews()
         }
     }
@@ -74,20 +75,7 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
     return subviews.map {
         it as UIView
         if(it.hidden) return@map Size(0.0, 0.0)
-//        if(
-//            it.extensionHorizontalAlign.let { it == null || it == Align.Stretch} &&
-//            it.extensionVerticalAlign.let { it == null || it == Align.Stretch}
-//        ) {
-//            return@map size.copy().apply {
-//                val const = (it.extensionMargin ?: 0.0) + (this@frameLayoutCalcSizes.extensionPadding ?: 0.0)
-//                width -= const * 2
-//                height -= const * 2
-//            }
-//        }
-//        it.extensionSizeConstraints?.takeIf { it.width != null && it.height != null }?.let {
-//            return@map Size(width = it.width!!.value, height = it.height!!.value)
-//        }
-        val required = it.sizeThatFits(remaining.objc).local
+        val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
         it.extensionSizeConstraints?.let {
             it.maxWidth?.let { required.width = required.width.coerceAtMost(it.value) }
             it.maxHeight?.let { required.height = required.height.coerceAtMost(it.value) }
@@ -107,7 +95,7 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
     }
 }
 
-fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?){
+fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?) {
     val it = child ?: return
 //    if(it.hidden) return
 //    if(
@@ -124,8 +112,10 @@ fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?){
 
 data class Size(var width: Double = 0.0, var height: Double = 0.0, var margin: Double = 0.0) {
 }
+
 @OptIn(ExperimentalForeignApi::class)
 val Size.objc get() = CGSizeMake(width, height)
 val CGSize.local get() = Size(width, height)
+
 @OptIn(ExperimentalForeignApi::class)
 val CValue<CGSize>.local get() = useContents { local }

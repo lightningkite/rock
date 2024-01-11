@@ -61,7 +61,13 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
 
         var totalWeight = 0f
         return mainSubview?.let {
-            val required = it.sizeThatFits(remaining.objc).local
+            val required = it.sizeThatFits2(
+                CGSizeMake(
+                    if (horizontal) 10000.0 else remaining.secondary,
+                    if (horizontal) remaining.secondary else 10000.0
+                ),
+                it.extensionSizeConstraints
+            ).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }

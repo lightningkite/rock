@@ -53,7 +53,10 @@ actual inline var Image.scaleType: ImageScaleType
     set(value) {
         when (value) {
             ImageScaleType.Fit -> native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
-            ImageScaleType.Crop -> native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFill
+            ImageScaleType.Crop -> {
+                native.clipsToBounds = true
+                native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFill
+            }
             ImageScaleType.Stretch -> native.contentMode = UIViewContentMode.UIViewContentModeScaleToFill
             ImageScaleType.NoScale -> native.contentMode = UIViewContentMode.UIViewContentModeCenter
         }

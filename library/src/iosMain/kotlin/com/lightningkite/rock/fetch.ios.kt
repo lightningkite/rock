@@ -74,6 +74,7 @@ suspend fun backToMainThread() {
         })
         return@suspendCoroutineCancellable {}
     }
+    assertMainThread()
 }
 
 actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders =
@@ -126,9 +127,13 @@ class WebSocketWrapper(val url: String) : WebSocket {
     val sending = Channel<Frame>(10)
     var stayOn = true
     val onOpen = ArrayList<() -> Unit>()
+    init { onOpen.add { assertMainThread() } }
     val onClose = ArrayList<(Short) -> Unit>()
+    init { onClose.add { assertMainThread() } }
     val onMessage = ArrayList<(String) -> Unit>()
+    init { onMessage.add { assertMainThread() } }
     val onBinaryMessage = ArrayList<(Blob) -> Unit>()
+    init { onBinaryMessage.add { assertMainThread() } }
 
     init {
         launchGlobal {

@@ -7,14 +7,8 @@ import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
-import objcnames.classes.Protocol
 import platform.CoreGraphics.*
-import platform.Foundation.NSCoder
-import platform.QuartzCore.CALayer
-import platform.QuartzCore.CATransform3D
 import platform.UIKit.*
-import platform.darwin.NSInteger
-import platform.darwin.NSUInteger
 import kotlin.math.max
 
 //private val UIViewLayoutParams = ExtensionProperty<UIView, LayoutParams>()
@@ -93,7 +87,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 //                    return@map Size(primary = (-w).toDouble(), secondary = remaining.secondary, margin = m)
 //                }
 //            }
-            val required = it.sizeThatFits(remaining.objc).local
+            val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }

@@ -9,15 +9,15 @@ import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ExportObjCClass
+import kotlinx.cinterop.useContents
 import platform.CoreGraphics.CGPoint
 import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
+import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSCoder
 import platform.Foundation.NSIndexPath
 import platform.UIKit.*
-import platform.UIKit.NSCollectionLayoutGroup.Companion.horizontalGroupWithLayoutSize
-import platform.UIKit.NSCollectionLayoutGroup.Companion.verticalGroupWithLayoutSize
 import platform.darwin.NSInteger
 import platform.darwin.NSObject
 import platform.objc.object_getClass
@@ -38,7 +38,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = eleme
         ), run {
             val size = NSCollectionLayoutSize.sizeWithWidthDimension(
                 width = NSCollectionLayoutDimension.fractionalWidthDimension(1.0),
-                heightDimension = NSCollectionLayoutDimension.estimatedDimension(50.0),
+                heightDimension = NSCollectionLayoutDimension.estimatedDimension(1000.0),
             )
             UICollectionViewCompositionalLayout(
                 NSCollectionLayoutSection.sectionWithGroup(
@@ -73,7 +73,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
             0.0
         ), run {
             val size = NSCollectionLayoutSize.sizeWithWidthDimension(
-                width = NSCollectionLayoutDimension.estimatedDimension(50.0),
+                width = NSCollectionLayoutDimension.estimatedDimension(500.0),
                 heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension(1.0),
             )
             UICollectionViewCompositionalLayout(
@@ -108,22 +108,91 @@ actual var RecyclerView.columns: Int
 @OptIn(ExperimentalObjCName::class, BetaInteropApi::class, ExperimentalForeignApi::class)
 @ExportObjCClass
 class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesProtocol {
+    var vertical = true
     constructor():this(CGRectMake(0.0, 0.0, 0.0, 0.0))
+
     @OverrideInit
     constructor(frame: CValue<CGRect>):super(frame = frame)
+
     @OverrideInit
     constructor(coder: NSCoder):super(coder = coder)
+
+    init {
+
+    }
+
     val data = LateInitProperty<T>()
     var ready = false
     override fun subviewDidChangeSizing(view: UIView?) {
         frameLayoutSubviewDidChangeSizing(view)
-        generateSequence(this as UIView) { it.superview }.filterIsInstance<UICollectionView>().firstOrNull()?.collectionViewLayout?.invalidateLayout()
+        // Remeasure self
+        if(lastInputHeight != -1.0) {
+            val size = sizeThatFits(CGSizeMake(lastInputWidth, lastInputHeight))
+            if(size.useContents { width } != lastWidth || size.useContents { height } != lastHeight) {
+                lastWidth = size.useContents { width }
+                lastHeight = size.useContents { height }
+                generateSequence(this as UIView) { it.superview }.filterIsInstance<UICollectionView>().firstOrNull()?.collectionViewLayout?.invalidateLayout()
+            }
+        }
     }
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
+
+    fun setNeedsNewMeasure() {
+        println("Invalidated")
+        lastWidth = -1.0
+        lastInputWidth = -1.0
+        lastHeight = -1.0
+        lastInputHeight = -1.0
+    }
+
+    var lastInputWidth = -1.0
+    var lastWidth = -1.0
+    var lastInputHeight = -1.0
+    var lastHeight = -1.0
+
+    override fun preferredLayoutAttributesFittingAttributes(layoutAttributes: UICollectionViewLayoutAttributes): UICollectionViewLayoutAttributes {
+        var widthMeasured = lastWidth
+        var heightMeasured = lastHeight
+        if(lastInputWidth != layoutAttributes.size.useContents { width } || lastInputHeight != layoutAttributes.size.useContents { height }) {
+            val size = sizeThatFits(layoutAttributes.size)
+            widthMeasured = size.useContents { width }
+            heightMeasured = size.useContents { height }
+            println("Remeasured to $widthMeasured x $heightMeasured")
+            lastWidth = widthMeasured
+            lastHeight = heightMeasured
+            lastInputWidth = layoutAttributes.size.useContents { width }
+            lastInputHeight = layoutAttributes.size.useContents { height }
+        } else {
+            println("Reusing $widthMeasured x $heightMeasured")
+        }
+        if(layoutAttributes.frame.useContents { size.width } != widthMeasured || layoutAttributes.frame.useContents { size.height } != heightMeasured) {
+            layoutAttributes.frame = CGRectMake(
+                layoutAttributes.frame.useContents { origin.x },
+                layoutAttributes.frame.useContents { origin.y },
+                widthMeasured,
+                heightMeasured,
+            )
+        }
+        return layoutAttributes
+    }
+
     @OptIn(ExperimentalForeignApi::class)
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
+        return frameLayoutSizeThatFits(size)
+//        if(vertical)  {
+//            return frameLayoutSizeThatFits(CGSizeMake(
+//                size.useContents { width },
+//                1000.0,
+//            ))
+//        } else {
+//            return frameLayoutSizeThatFits(CGSizeMake(
+//                1000.0,
+//                size.useContents { height },
+//            ))
+//        }
+    }
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
         return super.hitTest(point, withEvent).takeUnless { it == this }
@@ -168,6 +237,8 @@ actual fun <T> RecyclerView.children(
 //            }
             list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
                 cell.data.value = it
+                println("Invalidating due to changing item cell represents")
+                cell.setNeedsNewMeasure()
             }
             if(!cell.ready) {
                 val vw = native.extensionViewWriter ?: throw IllegalStateException("No view writer attached")

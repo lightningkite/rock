@@ -6,5 +6,3 @@ expect class CustomComponent {
     var src: String
 }
 expect fun ViewWriter.customComponent(setup: CustomComponent.()->Unit)
-
-expect fun gcCheck()

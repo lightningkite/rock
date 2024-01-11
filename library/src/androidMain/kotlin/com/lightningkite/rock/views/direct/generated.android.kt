@@ -49,20 +49,6 @@ val NView.hovered: Readable<Boolean>
     }
 
 
-// TODO
-private object ViewActions {
-    val actions: MutableMap<Int, Action> = mutableMapOf()
-}
-
-internal val View.getAction: Action? get() = ViewActions.actions[hashCode()]
-internal fun View.setAction(action: Action?) {
-    if (action != null) {
-        ViewActions.actions[hashCode()] = action
-    } else {
-        ViewActions.actions.remove(hashCode())
-    }
-}
-
 //actual val Select.selected: Writable<String?>
 //    get() {
 //        return this@selected.native.stringNullableWritable(

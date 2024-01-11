@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import android.text.InputType
+import android.view.KeyEvent
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.widget.doAfterTextChanged
@@ -9,8 +10,10 @@ import com.lightningkite.rock.models.KeyboardCase
 import com.lightningkite.rock.models.KeyboardHints
 import com.lightningkite.rock.models.KeyboardType
 import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.views.ViewAction
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.launch
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NTextField = EditText
@@ -91,10 +94,17 @@ actual var TextField.keyboardHints: KeyboardHints
     }
 actual var TextField.action: Action?
     get() {
-        return native.getAction
+        return ViewAction[native]
     }
     set(value) {
-        native.setAction(value)
+        ViewAction[native] = value
+        native.setImeActionLabel(value?.title, KeyEvent.KEYCODE_ENTER)
+        native.setOnEditorActionListener { v, actionId, event ->
+            launch {
+                value?.onSelect?.invoke()
+            }
+            value != null
+        }
     }
 actual var TextField.hint: String
     get() {

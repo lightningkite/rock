@@ -6,13 +6,11 @@ import android.content.res.Resources
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import androidx.core.view.children
 import com.lightningkite.rock.RockActivity
-import com.lightningkite.rock.WebSocket
+import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
-import com.lightningkite.rock.views.direct.addListener
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
@@ -43,10 +41,12 @@ object AndroidAppContext {
 }
 
 private val ViewRemoveListeners = WeakHashMap<View, ArrayList<()->Unit>>()
+internal val ViewAction = WeakHashMap<View, Action>()
 
 fun View.shutdown() {
     ViewRemoveListeners[this]?.forEach { it() }
     ViewRemoveListeners.remove(this)
+    ViewAction.remove(this)
 }
 
 data class NViewCalculationContext(val native: View): CalculationContext {

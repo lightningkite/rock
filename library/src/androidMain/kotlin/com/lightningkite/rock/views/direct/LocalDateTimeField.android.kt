@@ -3,8 +3,6 @@ package com.lightningkite.rock.views.direct
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.view.View
-import android.widget.TextView
-import androidx.core.widget.addTextChangedListener
 import com.lightningkite.rock.locale.renderToString
 import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.reactive.Property
@@ -13,6 +11,7 @@ import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.ViewAction
 import kotlinx.datetime.*
 import java.util.WeakHashMap
 
@@ -106,24 +105,24 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
 
 actual var LocalDateField.action: Action?
     get() {
-        return native.getAction
+        return ViewAction[native]
     }
     set(value) {
-        native.setAction(value)
+        ViewAction[native] = value
     }
 actual var LocalTimeField.action: Action?
     get() {
-        return native.getAction
+        return ViewAction[native]
     }
     set(value) {
-        native.setAction(value)
+        ViewAction[native] = value
     }
 actual var LocalDateTimeField.action: Action?
     get() {
-        return native.getAction
+        return ViewAction[native]
     }
     set(value) {
-        native.setAction(value)
+        ViewAction[native] = value
     }
 
 @ViewDsl

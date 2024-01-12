@@ -38,6 +38,9 @@ var ViewWriter.navigator by viewWriterAddonLateInit<RockNavigator>()
     transitionNextView = ViewWriter.TransitionNextView.Yes
     return themeModifier { val e = it(); calculate(e) ?: e }
 }
+@ViewModifierDsl3 inline fun ViewWriter.tweakTheme(crossinline calculate: suspend (Theme)->Theme?): ViewWrapper {
+    return themeModifier { val e = it(); calculate(e) ?: e }
+}
 @ViewModifierDsl3 val ViewWriter.card: ViewWrapper get() = themeFromLast { it }
 @ViewModifierDsl3 val ViewWriter.dialog: ViewWrapper get() = themeFromLast { it.dialog() }
 @ViewModifierDsl3 val ViewWriter.hover: ViewWrapper get() = themeFromLast { it.hover() }

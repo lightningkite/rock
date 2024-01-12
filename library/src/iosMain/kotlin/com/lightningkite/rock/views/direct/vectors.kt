@@ -4,6 +4,7 @@ import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.ImageVector
 import com.lightningkite.rock.models.LinearGradient
 import com.lightningkite.rock.models.RadialGradient
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.views.toUiColor
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
@@ -293,9 +294,9 @@ private fun CGMutablePathRef.render(pathData: String, translateX: CGFloat = 0.0,
 @OptIn(ExperimentalForeignApi::class)
 fun ImageVector.caLayer(): CALayer {
     val layer = CALayer()
-    layer.bounds = CGRectMake(0.0, 0.0, width.value, height.value)
-    val scaleX = this.width.value / this.viewBoxWidth
-    val scaleY = this.height.value / this.viewBoxHeight
+    layer.bounds = CGRectMake(0.0, 0.0, width.px, height.px)
+    val scaleX = this.width.px / this.viewBoxWidth
+    val scaleY = this.height.px / this.viewBoxHeight
     val translateX = -this.viewBoxMinX.toDouble()
     val translateY = -this.viewBoxMinY.toDouble()
     for(path in paths) {
@@ -353,7 +354,7 @@ fun ImageVector.caLayer(): CALayer {
 
 @OptIn(ExperimentalForeignApi::class)
 fun ImageVector.render(): UIImage {
-    UIGraphicsBeginImageContext(CGSizeMake(width.value, height.value))
+    UIGraphicsBeginImageContext(CGSizeMake(width.px, height.px))
     try {
         with(UIGraphicsGetCurrentContext()) {
             caLayer().renderInContext(this)

@@ -52,7 +52,7 @@ fun ViewWriter.handleTheme(
         val usePadding = mightTransition && !isRoot
         val useMargins = (viewDraws || mightTransition) && !viewMarginless
 
-        val borders = !(view.extensionMarginless ?: false) && shouldTransition
+        val borders = !viewMarginless
 
         if(useMargins) {
             view.extensionMargin = theme.spacing.value

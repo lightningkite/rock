@@ -13,12 +13,21 @@ actual typealias NSpace = UIView
 
 @ViewDsl
 actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = element(UIView()) {
+    handleTheme(this) {
+        extensionSizeConstraints = SizeConstraints(
+            minHeight = it.spacing,
+            minWidth = it.spacing
+        )
+    }
     setup(Space(this))
 }
 
 actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit = element(UIView()) {
     handleTheme(this) {
-        extensionSizeConstraints = SizeConstraints(minHeight = it.spacing * multiplier)
+        extensionSizeConstraints = SizeConstraints(
+            minHeight = it.spacing * multiplier,
+            minWidth = it.spacing * multiplier
+        )
     }
     setup(Space(this))
 }

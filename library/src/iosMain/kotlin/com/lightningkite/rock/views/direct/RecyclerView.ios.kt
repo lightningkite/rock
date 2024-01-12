@@ -140,7 +140,6 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
         set(value) { extensionPadding = value }
 
     fun setNeedsNewMeasure() {
-        println("Invalidated")
         lastWidth = -1.0
         lastInputWidth = -1.0
         lastHeight = -1.0
@@ -159,13 +158,13 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
             val size = sizeThatFits(layoutAttributes.size)
             widthMeasured = size.useContents { width }
             heightMeasured = size.useContents { height }
-            println("Remeasured to $widthMeasured x $heightMeasured")
+//            println("Remeasured to $widthMeasured x $heightMeasured")
             lastWidth = widthMeasured
             lastHeight = heightMeasured
             lastInputWidth = layoutAttributes.size.useContents { width }
             lastInputHeight = layoutAttributes.size.useContents { height }
         } else {
-            println("Reusing $widthMeasured x $heightMeasured")
+//            println("Reusing $widthMeasured x $heightMeasured")
         }
         if(layoutAttributes.frame.useContents { size.width } != widthMeasured || layoutAttributes.frame.useContents { size.height } != heightMeasured) {
             layoutAttributes.frame = CGRectMake(
@@ -237,7 +236,6 @@ actual fun <T> RecyclerView.children(
 //            }
             list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
                 cell.data.value = it
-                println("Invalidating due to changing item cell represents")
                 cell.setNeedsNewMeasure()
             }
             if(!cell.ready) {

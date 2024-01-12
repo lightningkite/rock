@@ -7,6 +7,8 @@ actual typealias DimensionRaw = Double
 actual val Int.px: Dimension
     get() = Dimension(this.toDouble() / UIScreen.mainScreen.scale)
 
+val Dimension.px: Double  get() = this.value * UIScreen.mainScreen.scale
+
 actual val Int.rem: Dimension
     get() = Dimension(this.toDouble() * UIFont.systemFontSize)
 

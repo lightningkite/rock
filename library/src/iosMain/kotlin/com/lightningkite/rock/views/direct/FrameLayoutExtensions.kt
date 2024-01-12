@@ -86,8 +86,8 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
         }
         val m = it.extensionMargin ?: 0.0
         required.margin = m
-        required.width = required.width.coerceAtLeast(0.0)
-        required.height = required.height.coerceAtLeast(0.0)
+        required.width = required.width.coerceAtLeast(0.0)//.coerceAtMost(size.width - 2 * m)
+        required.height = required.height.coerceAtLeast(0.0)//.coerceAtMost(size.height - 2 * m)
 
         remaining.width = remaining.width.coerceAtLeast(required.width + 2 * m)
         remaining.height = remaining.height.coerceAtLeast(required.height + 2 * m)

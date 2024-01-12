@@ -11,6 +11,7 @@ import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.lparams
 import com.lightningkite.rock.views.shutdown
+import com.lightningkite.rock.views.visible
 import java.util.WeakHashMap
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -28,7 +29,11 @@ actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit) {
-
+    return viewElement(factory = ::NSwapView, wrapper = ::SwapView, setup = {
+        native.viewWriter = newViews()
+        native.visibility = View.GONE
+        setup(this)
+    })
 }
 
 actual fun SwapView.swap(
@@ -48,4 +53,6 @@ actual fun SwapView.swap(
     })
     oldView?.let { oldNN -> native.removeView(oldNN); oldNN.shutdown() }
     newView?.let { native.addView(it) }
+    if(newView == null) native.visibility = View.GONE
+    else native.visibility = View.VISIBLE
 }

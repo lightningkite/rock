@@ -89,9 +89,9 @@ actual abstract class DrawingContext2D {
 //    actual abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
-actual fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean): Unit = TODO()
+actual fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Angle, endAngle: Angle, anticlockwise: Boolean): Unit = TODO()
 actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double):Unit = TODO()
-actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle):Unit = TODO()
+actual fun DrawingContext2D.font(size: Double, value: FontAndStyle):Unit = TODO()
 actual fun DrawingContext2D.textAlign(alignment: TextAlign):Unit = TODO()
 actual fun DrawingContext2D.fill(): Unit = TODO()
 actual fun DrawingContext2D.fillEvenOdd(): Unit = TODO()

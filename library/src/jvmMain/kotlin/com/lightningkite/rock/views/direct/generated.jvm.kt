@@ -223,14 +223,6 @@ actual inline var WebView.content: String
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NCanvas = HTMLElement
 @ViewDsl actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = todo("canvas")
-actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit = TODO()
-actual val Canvas.width: Readable<Double> get() = Property(0.0)
-actual val Canvas.height: Readable<Double> get() = Property(0.0)
-actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit = TODO()
-actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit = TODO()
-actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit = TODO()
-actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit = TODO()
-
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRecyclerView = HTMLElement
 @ViewDsl actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
 @ViewDsl actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")

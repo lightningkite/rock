@@ -197,8 +197,8 @@ actual fun DrawingContext2D.appendArc(
     x: Double,
     y: Double,
     radius: Double,
-    startAngle: Double,
-    endAngle: Double,
+    startAngle: Angle,
+    endAngle: Angle,
     anticlockwise: Boolean
 ): Unit {
     CGContextAddArc(
@@ -206,8 +206,8 @@ actual fun DrawingContext2D.appendArc(
         x,
         y,
         radius,
-        startAngle,
-        endAngle,
+        startAngle.radians.toDouble(),
+        endAngle.radians.toDouble(),
         if (anticlockwise) 0 else 1
     )
 }
@@ -241,16 +241,30 @@ actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double): Unit {
             )
         }
     )
-//    val size = (text as NSString).sizeWithAttributes(attrs)
-    (text as NSString).drawInRect(
-        CGRectMake(x, y, 500.0, 500.0),
+    val ns = (text as NSString)
+    val sizeTaken = ns.sizeWithAttributes(attrs).useContents { width }
+    val height = font.lineHeight
+    var dx = x
+    var dy = y
+    when((this as DrawingContext2DImpl).textAlign) {
+        TextAlign.start, TextAlign.left -> {}
+        TextAlign.end, TextAlign.right -> {
+            dx -= sizeTaken
+        }
+        TextAlign.center -> {
+            dx -= sizeTaken / 2
+        }
+    }
+    dy -= height
+    (text as NSString).drawAtPoint(
+        CGPointMake(dx, dy),
         withAttributes = attrs
     )
 }
 
-actual fun DrawingContext2D.font(size: Dimension, value: FontAndStyle): Unit {
+actual fun DrawingContext2D.font(size: Double, value: FontAndStyle): Unit {
     (this as DrawingContext2DImpl).font =
-        value.font.get(size.value, if (value.bold) UIFontWeightBold else UIFontWeightRegular, value.italic)
+        value.font.get(size, if (value.bold) UIFontWeightBold else UIFontWeightRegular, value.italic)
 }
 
 actual fun DrawingContext2D.textAlign(alignment: TextAlign): Unit {

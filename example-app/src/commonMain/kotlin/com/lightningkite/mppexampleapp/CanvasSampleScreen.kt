@@ -15,67 +15,60 @@ object CanvasSampleScreen : RockScreen {
 
     override fun ViewWriter.render() = stack {
         canvas {
-            var x: Double = 0.0
-            val lines = Property(ArrayList<ArrayList<Point>>())
-            val line = Property<ArrayList<Point>?>(null)
-            val pointersDown = Property(setOf<Int>())
-            onPointerDown { id, x, y, width, height ->
-                launch {
-                    pointersDown modify { it + id }
-                    val new = ArrayList<Point>()
-                    line set new
-                    lines modify { it.add(new); it }
-                }
-            }
-            onPointerUp { id, x, y, width, height ->
-                launch {
-                    pointersDown modify { it - id }
-                    line set null
-                }
-            }
-            onPointerCancel { id, x, y, width, height ->
-                launch {
-                    pointersDown modify { it - id }
-                    line set null
-                }
-            }
-            onPointerMove { id, x, y, width, height ->
-                launch {
-                    if (id in pointersDown.await()) {
-                        line.await()?.add(Point(x, y))
-                        line set line.await()
-                    }
-                }
-            }
-            var last = clockMillis()
-            reactiveScope {
-                rerunOn(width)
-                rerunOn(height)
-                val lines = lines.await()
-                val line = line.await()
-                println("Redraw set")
-                redraw {
-                    println("Redrawing")
-                    clear()
-                    fillPaint = Color.red
-                    strokePaint = Color.black
-                    lineWidth = 5.0
+            delegate = object: CanvasDelegate() {
+                val lines = ArrayList<ArrayList<Point>>()
+                var line: ArrayList<Point>? = (null)
+                val pointersDown = mutableSetOf<Int>()
 
-                    font(2.rem, FontAndStyle(bold = true, italic = true))
-                    drawText("Hello world!", 0.0, height / 2)
+                override fun draw(context: DrawingContext2D) {
+                    with(context) {
+                        clear()
+                        fillPaint = Color.red
+                        strokePaint = Color.black
+                        lineWidth = 5.0
 
-                    for (line in lines) {
-                        beginPath()
-                        moveTo(line.firstOrNull()?.x ?: 0.0, line.firstOrNull()?.y ?: 0.0)
-                        for (point in line) {
-                            lineTo(point.x, point.y)
+                        for (line in lines) {
+                            beginPath()
+                            moveTo(line.firstOrNull()?.x ?: 0.0, line.firstOrNull()?.y ?: 0.0)
+                            for (point in line) {
+                                lineTo(point.x, point.y)
+                            }
+                            stroke()
                         }
-                        stroke()
                     }
-
-                    font(2.rem, FontAndStyle(bold = true, italic = true))
-                    drawText("Hello world!", width / 2, height / 2)
                 }
+
+                override fun onPointerCancel(id: Int, x: Double, y: Double, width: Double, height: Double): Boolean {
+                    pointersDown.remove(id)
+                    line = null
+                    invalidate()
+                    return true
+                }
+
+                override fun onPointerMove(id: Int, x: Double, y: Double, width: Double, height: Double): Boolean {
+                    if (id in pointersDown) {
+                        line?.add(Point(x, y))
+                    }
+                    invalidate()
+                    return true
+                }
+
+                override fun onPointerDown(id: Int, x: Double, y: Double, width: Double, height: Double): Boolean {
+                    pointersDown.add(id)
+                    val new = ArrayList<Point>()
+                    line = new
+                    lines.add(new)
+                    invalidate()
+                    return true
+                }
+
+                override fun onPointerUp(id: Int, x: Double, y: Double, width: Double, height: Double): Boolean {
+                    pointersDown.remove(id)
+                    line = null
+                    invalidate()
+                    return true
+                }
+
             }
         }
     }

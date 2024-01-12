@@ -4,55 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.*
-import android.view.accessibility.AccessibilityManager
 import android.widget.FrameLayout
-import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import com.lightningkite.rock.views.canvas.DrawingContext2DImpl
 import kotlin.math.min
-
-actual fun Canvas.redraw(action: DrawingContext2D.() -> Unit): Unit {
-    native.renderFun = action
-}
-actual val Canvas.width: Readable<Double>
-    get() {
-        return object : Readable<Double> {
-            override fun addListener(listener: () -> Unit): () -> Unit {
-                return this@width.native.addLayoutChangeListener(listener)
-            }
-
-            override suspend fun awaitRaw(): Double {
-                return this@width.native.width.toDouble()
-            }
-        }
-    }
-actual val Canvas.height: Readable<Double>
-    get() {
-        return object : Readable<Double> {
-            override fun addListener(listener: () -> Unit): () -> Unit {
-                return this@height.native.addLayoutChangeListener(listener)
-            }
-
-            override suspend fun awaitRaw(): Double {
-                return this@height.native.height.toDouble()
-            }
-        }
-    }
-
-actual fun Canvas.onPointerDown(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
-    native.onPointerDown.add(action)
-}
-actual fun Canvas.onPointerMove(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
-    native.onPointerMove.add(action)
-}
-actual fun Canvas.onPointerCancel(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
-    native.onPointerCancel.add(action)
-}
-actual fun Canvas.onPointerUp(action: (id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit): Unit {
-    native.onPointerUp.add(action)
-}
 
 @ViewDsl
 actual fun ViewWriter.canvas(setup: Canvas.() -> Unit) {
@@ -65,6 +22,15 @@ actual class NCanvas @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
+
+    var delegate: CanvasDelegate? = null
+        set(value) {
+            field?.invalidate = {}
+            field = value
+            field?.invalidate = {
+                this.invalidate()
+            }
+        }
 
     init {
         println("NCanvas init")
@@ -80,19 +46,29 @@ actual class NCanvas @JvmOverloads constructor(
         var id: Int
     )
 
-    var renderFun: DrawingContext2D.()->Unit = {}
-        set(value) {
-            field = value
-            invalidate()
-        }
-
     @SuppressLint("UseSparseArrays")
     private val touches = HashMap<Int, Touch>()
 
-    val onPointerDown = ArrayList<(id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit>()
-    val onPointerMove = ArrayList<(id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit>()
-    val onPointerCancel = ArrayList<(id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit>()
-    val onPointerUp = ArrayList<(id: Int, x: Double, y: Double, width: Double, height: Double) -> Unit>()
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        return delegate?.onKeyDown(keyCode) ?: false
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
+        return delegate?.onKeyUp(keyCode) ?: false
+    }
+
+    override fun onGenericMotionEvent(event: MotionEvent): Boolean {
+        if(event.source and InputDevice.SOURCE_CLASS_POINTER != 0) {
+            if(event.action == MotionEvent.ACTION_SCROLL) {
+                return delegate?.onWheel(
+                    event.getAxisValue(MotionEvent.AXIS_HSCROLL).toDouble(),
+                    event.getAxisValue(MotionEvent.AXIS_VSCROLL).toDouble(),
+                    event.getAxisValue(MotionEvent.AXIS_SCROLL).toDouble(),
+                ) ?: false
+            }
+        }
+        return super.onGenericMotionEvent(event)
+    }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         var takenCareOf = true
@@ -105,7 +81,7 @@ actual class NCanvas @JvmOverloads constructor(
                     id = pointerId
                 )
                 touches[pointerId] = touch
-                onPointerDown.forEach { it(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble()) }
+                delegate?.onPointerDown(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -115,7 +91,7 @@ actual class NCanvas @JvmOverloads constructor(
                     if (touch != null) {
                         touch.x = event.getX(pointerIndex)
                         touch.y = event.getY(pointerIndex)
-                        onPointerMove.forEach { it(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble()) }
+                        delegate?.onPointerMove(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())
                     }
                 }
             }
@@ -129,7 +105,7 @@ actual class NCanvas @JvmOverloads constructor(
                 val pointerId = event.getPointerId(event.actionIndex)
                 val touch = touches.remove(pointerId)
                 if (touch != null) {
-                    onPointerUp.forEach { it(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble()) }
+                    delegate?.onPointerUp(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())
                 }
             }
         }
@@ -138,9 +114,8 @@ actual class NCanvas @JvmOverloads constructor(
 
     private val metrics = context.resources.displayMetrics
     override fun onDraw(canvas: android.graphics.Canvas) {
-        println("ondraw")
         super.onDraw(canvas)
-        renderFun(DrawingContext2DImpl(canvas))
+        delegate?.draw(DrawingContext2DImpl(canvas))
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -167,4 +142,37 @@ actual class NCanvas @JvmOverloads constructor(
             height
         )
     }
+}
+
+actual var Canvas.delegate: CanvasDelegate?
+    get() = native.delegate
+    set(value) { native.delegate = value }
+
+actual typealias KeyCode = Int
+actual object KeyCodes {
+    actual val left: KeyCode get() = KeyEvent.KEYCODE_DPAD_LEFT
+    actual val right: KeyCode get() = KeyEvent.KEYCODE_DPAD_RIGHT
+    actual val up: KeyCode get() = KeyEvent.KEYCODE_DPAD_UP
+    actual val down: KeyCode get() = KeyEvent.KEYCODE_DPAD_DOWN
+    actual fun letter(char: Char): KeyCode = KeyEvent.KEYCODE_A + char.code
+    actual fun num(digit: Int): KeyCode = KeyEvent.KEYCODE_0 + digit
+    actual fun numpad(digit: Int): KeyCode = KeyEvent.KEYCODE_NUMPAD_0 + digit
+    actual val space: KeyCode get() = KeyEvent.KEYCODE_SPACE
+    actual val enter: KeyCode get() = KeyEvent.KEYCODE_ENTER
+    actual val tab: KeyCode get() = KeyEvent.KEYCODE_TAB
+    actual val escape: KeyCode get() = KeyEvent.KEYCODE_ESCAPE
+    actual val leftCtrl: KeyCode get() = KeyEvent.KEYCODE_CTRL_LEFT
+    actual val rightCtrl: KeyCode get() = KeyEvent.KEYCODE_CTRL_RIGHT
+    actual val leftShift: KeyCode get() = KeyEvent.KEYCODE_SHIFT_LEFT
+    actual val rightShift: KeyCode get() = KeyEvent.KEYCODE_SHIFT_RIGHT
+    actual val leftAlt: KeyCode get() = KeyEvent.KEYCODE_ALT_LEFT
+    actual val rightAlt: KeyCode get() = KeyEvent.KEYCODE_ALT_RIGHT
+    actual val equals: KeyCode get() = KeyEvent.KEYCODE_EQUALS
+    actual val dash: KeyCode get() = KeyEvent.KEYCODE_MINUS
+    actual val backslash: KeyCode get() = KeyEvent.KEYCODE_BACKSLASH
+    actual val leftBrace: KeyCode get() = KeyEvent.KEYCODE_LEFT_BRACKET
+    actual val rightBrace: KeyCode get() = KeyEvent.KEYCODE_RIGHT_BRACKET
+    actual val semicolon: KeyCode get() = KeyEvent.KEYCODE_SEMICOLON
+    actual val comma: KeyCode get() = KeyEvent.KEYCODE_COMMA
+    actual val period: KeyCode get() = KeyEvent.KEYCODE_PERIOD
 }

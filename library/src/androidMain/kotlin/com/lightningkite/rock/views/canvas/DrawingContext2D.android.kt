@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.FontAndStyle
@@ -266,8 +267,8 @@ actual fun DrawingContext2D.appendArc(
     x: Double,
     y: Double,
     radius: Double,
-    startAngle: Double,
-    endAngle: Double,
+    startAngle: Angle,
+    endAngle: Angle,
     anticlockwise: Boolean
 ) {
     currentPath.addArc(
@@ -275,8 +276,8 @@ actual fun DrawingContext2D.appendArc(
         (y - radius).toFloat(),
         (x + radius).toFloat(),
         (y + radius).toFloat(),
-        startAngle.toFloat(),
-        (endAngle - startAngle).toFloat()
+        startAngle.degrees,
+        (endAngle - startAngle).degrees
     )
 }
 
@@ -294,11 +295,11 @@ actual fun DrawingContext2D.drawText(
 }
 
 actual fun DrawingContext2D.font(
-    size: Dimension,
+    size: Double,
     value: FontAndStyle
 ) {
-    //TODO
-//    fillPaint.setTypeface(value.font.)
+    fillPaintObj.setTypeface(value.font)
+    fillPaintObj.textSize = size.toFloat()
 }
 
 actual fun DrawingContext2D.textAlign(alignment: TextAlign) {

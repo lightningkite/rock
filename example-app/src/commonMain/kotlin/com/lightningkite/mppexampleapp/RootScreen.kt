@@ -7,7 +7,6 @@ import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.WebSocket
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.gc
-import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
@@ -55,7 +54,7 @@ object RootScreen : RockScreen {
                 linkScreen(DataLoadingExampleScreen)
                 linkScreen(WebSocketScreen)
                 linkScreen(CanvasSampleScreen)
-                linkScreen(AnimationSampleScreen)
+                linkScreen(PongSampleScreen)
                 linkScreen(ReactivityScreen)
                 linkScreen(DialogSamplesScreen)
                 linkScreen(ExternalServicesScreen)

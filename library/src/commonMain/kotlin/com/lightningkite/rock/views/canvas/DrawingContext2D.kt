@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.canvas
 
+import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.FontAndStyle
 
@@ -100,9 +101,9 @@ expect abstract class DrawingContext2D {
 //    abstract fun ellipse(x: Double, y: Double, radiusX: Double, radiusY: Double, rotation: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
 }
 
-expect fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Double, endAngle: Double, anticlockwise: Boolean)
+expect fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Angle, endAngle: Angle, anticlockwise: Boolean)
 expect fun DrawingContext2D.drawText(text: String, x: Double, y: Double)
-expect fun DrawingContext2D.font(size: Dimension, value: FontAndStyle)
+expect fun DrawingContext2D.font(size: Double, value: FontAndStyle)
 expect fun DrawingContext2D.textAlign(alignment: TextAlign)
 expect fun DrawingContext2D.clear()
 expect fun DrawingContext2D.fill()

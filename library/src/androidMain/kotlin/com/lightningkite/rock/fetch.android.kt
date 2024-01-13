@@ -36,44 +36,55 @@ actual suspend fun fetch(
     headers: HttpHeaders,
     body: RequestBody?
 ): RequestResponse {
-    val response = client.request(url) {
-        this.method = when (method) {
-            HttpMethod.GET -> io.ktor.http.HttpMethod.Get
-            HttpMethod.POST -> io.ktor.http.HttpMethod.Post
-            HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
-            HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
-            HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
-        }
-        this.headers {
-            for ((key, values) in headers.map) {
-                for (value in values) append(key, value)
+    try {
+        val response = client.request(url) {
+            this.method = when (method) {
+                HttpMethod.GET -> io.ktor.http.HttpMethod.Get
+                HttpMethod.POST -> io.ktor.http.HttpMethod.Post
+                HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
+                HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
+                HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
             }
-        }
-        when (body) {
-            is RequestBodyBlob -> {
-                contentType(ContentType.parse(body.content.type))
-                setBody(body.content.data)
+            this.headers {
+                for ((key, values) in headers.map) {
+                    for (value in values) append(key, value)
+                }
             }
+            when (body) {
+                is RequestBodyBlob -> {
+                    contentType(ContentType.parse(body.content.type))
+                    setBody(body.content.data)
+                }
 
-            is RequestBodyFile -> {
-                val length = AndroidAppContext.applicationCtx.contentResolver.openAssetFileDescriptor(body.content.uri, "r")?.use {
-                    it.length
-                } ?: -1L
-                val type = AndroidAppContext.applicationCtx.contentResolver.getType(body.content.uri) ?: "application/octet-stream"
-                contentType(ContentType.parse(type))
-                setBody(AndroidAppContext.applicationCtx.contentResolver.openInputStream(body.content.uri)!!.toByteReadChannel())
-            }
+                is RequestBodyFile -> {
+                    val length =
+                        AndroidAppContext.applicationCtx.contentResolver.openAssetFileDescriptor(body.content.uri, "r")
+                            ?.use {
+                                it.length
+                            } ?: -1L
+                    val type = AndroidAppContext.applicationCtx.contentResolver.getType(body.content.uri)
+                        ?: "application/octet-stream"
+                    contentType(ContentType.parse(type))
+                    setBody(
+                        AndroidAppContext.applicationCtx.contentResolver.openInputStream(body.content.uri)!!
+                            .toByteReadChannel()
+                    )
+                }
 
-            is RequestBodyText -> {
-                contentType(ContentType.parse(body.type))
-                setBody(body.content)
-            }
+                is RequestBodyText -> {
+                    contentType(ContentType.parse(body.type))
+                    setBody(body.content)
+                }
 
-            null -> {}
+                null -> {}
+            }
         }
+        backToMainThread()
+        return RequestResponse(response)
+    } catch(e: Exception) {
+        backToMainThread()
+        throw e
     }
-    backToMainThread()
-    return RequestResponse(response)
 }
 
 suspend fun backToMainThread() {

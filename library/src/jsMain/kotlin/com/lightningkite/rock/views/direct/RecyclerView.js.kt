@@ -1,9 +1,12 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.dom.HTMLElement
+import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.get
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = HTMLDivElement
@@ -44,4 +47,30 @@ actual fun <T> RecyclerView.children(
 ): Unit {
     val writer = this.native.asDynamic().__viewWriter as ViewWriter
     writer.forEachUpdating(items, render)
+}
+
+actual fun RecyclerView.scrollToIndex(
+    index: Int,
+    align: Align?,
+    animate: Boolean
+) {
+    this.native.children.let {
+        (0 until it.length).map { index -> it.get(index) }.filterIsInstance<org.w3c.dom.HTMLElement>().getOrNull(index)?.let {
+            val d: dynamic = js("{}")
+            d.behavior = if(animate) "smooth" else "instant"
+            d.inline = when(align) {
+                Align.Start -> "start"
+                Align.Center -> "center"
+                Align.End -> "end"
+                else -> "nearest"
+            }
+            d.block = when(align) {
+                Align.Start -> "start"
+                Align.Center -> "center"
+                Align.End -> "end"
+                else -> "nearest"
+            }
+            it.scrollIntoView(d)
+        } ?: console.warn("No item with index $index found")
+    }
 }

@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views
 
+import com.lightningkite.rock.models.Align
 import platform.UIKit.*
 
 actual fun NView.removeNView(child: NView) {

@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.*
+import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
@@ -14,37 +15,40 @@ object RecyclerViewScreen : RockScreen {
     override fun ViewWriter.render() {
         var expanded = Property(-1)
         val items = Property((1..100).toList())
+        var recyclerView: RecyclerView? = null
         col {
-            col {
-                text { ::content { "Item 0" } }
-                button {
-                    text {
-                        ::content { if(expanded.await() == 0) "Expanded" else "Expand" }
-                    }
-                    onClick {
-                        expanded.value = 0
+            row {
+                for(align in Align.values()) {
+                    expanding - button {
+                        text("50${align.name.substring(0, 1)}n")
+                        onClick { recyclerView?.scrollToIndex(50, align, false) }
                     }
                 }
-                col {
-                    ::exists { expanded.await() == 0 }
-                    text("More Content")
-                    text("More Content")
-                    text("More Content")
-                    text("More Content")
-                    text("More Content")
+            }
+            row {
+                for(align in Align.values()) {
+                    expanding - button {
+                        text("50${align.name.substring(0, 1)}a")
+                        onClick { recyclerView?.scrollToIndex(50, align, true) }
+                    }
                 }
             }
             recyclerView {
+                recyclerView = this
                 children(items) {
                     col {
-                        text { ::content { "Item ${it.await()}" } }
-                        button {
-                            text {
-                                ::content { if(expanded.await() == it.await()) "Expanded" else "Expand" }
+                        row {
+                            expanding - text { ::content { "Item ${it.await()}" } }
+                            button {
+                                text {
+                                    ::content { if (expanded.await() == it.await()) "Expanded" else "Expand" }
+                                }
+                                onClick {
+                                    expanded.value = it.await()
+                                }
                             }
-                            onClick {
-                                expanded.value = it.await()
-                            }
+                        } in themeFromLast { theme ->
+                            if(it.await() == 51) theme.important() else theme
                         }
                         col {
                             ::exists { expanded.await() == it.await() }

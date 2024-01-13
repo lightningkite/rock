@@ -1,19 +1,20 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
+import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.reactive.LateInitProperty
-import com.lightningkite.rock.reactive.Property
-import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.*
+import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
+
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class NRecyclerView(context: Context): AndroidRecyclerView(context) {
+actual class NRecyclerView(context: Context) : AndroidRecyclerView(context) {
     lateinit var viewWriter: ViewWriter
 }
 
@@ -65,9 +66,9 @@ actual var RecyclerView.columns: Int
 
 internal open class ObservableRVA<T>(
     val recyclerView: RecyclerView,
-    val determineType: (T)->Int,
+    val determineType: (T) -> Int,
     val makeView: ViewWriter.(Int, Readable<T>) -> Unit
-): AndroidRecyclerView.Adapter<AndroidRecyclerView.ViewHolder>() {
+) : AndroidRecyclerView.Adapter<AndroidRecyclerView.ViewHolder>() {
     var lastPublished: List<T> = listOf()
     val viewWriter = recyclerView.native.viewWriter
 
@@ -79,6 +80,12 @@ internal open class ObservableRVA<T>(
         val event = LateInitProperty<T>()
         viewWriter.makeView(viewType, event)
         val subview = viewWriter.rootCreated!!
+        subview.layoutParams = AndroidRecyclerView.LayoutParams(
+            if ((recyclerView.native.layoutManager as? LinearLayoutManager)?.orientation == LinearLayoutManager.VERTICAL)
+                AndroidRecyclerView.LayoutParams.MATCH_PARENT else AndroidRecyclerView.LayoutParams.WRAP_CONTENT,
+            if ((recyclerView.native.layoutManager as? LinearLayoutManager)?.orientation == LinearLayoutManager.HORIZONTAL)
+                AndroidRecyclerView.LayoutParams.MATCH_PARENT else AndroidRecyclerView.LayoutParams.WRAP_CONTENT,
+        )
         subview.tag = event
         recyclerView.native.calculationContext.onRemove { subview.shutdown() }
         return object : AndroidRecyclerView.ViewHolder(subview) {}
@@ -92,5 +99,42 @@ internal open class ObservableRVA<T>(
             println("Failed to find property to update")
             null
         })?.value = (lastPublished[position])
+    }
+}
+
+actual fun RecyclerView.scrollToIndex(
+    index: Int,
+    align: Align?,
+    animate: Boolean
+) {
+    if (animate) {
+        when (val lm = native.layoutManager ?: return) {
+            is LinearLayoutManager -> if (align == null) lm.smoothScrollToPosition(
+                native,
+                AndroidRecyclerView.State(),
+                index
+            ) else lm.startSmoothScroll(AlignSmoothScroller(native.context, align).also { it.targetPosition = index })
+
+            else -> lm.smoothScrollToPosition(native, AndroidRecyclerView.State(), index)
+        }
+    } else {
+        when (val lm = native.layoutManager ?: return) {
+            is LinearLayoutManager -> if (align == null) lm.scrollToPosition(index)
+            else lm.scrollToPositionWithOffset(index, native.height / 2)
+
+            else -> lm.scrollToPosition(index)
+        }
+    }
+}
+
+
+private class AlignSmoothScroller(context: Context, val align: Align?) : LinearSmoothScroller(context) {
+    override fun calculateDtToFit(viewStart: Int, viewEnd: Int, boxStart: Int, boxEnd: Int, snapPreference: Int): Int {
+        return when (align) {
+            Align.Start -> boxStart - viewStart
+            Align.Center -> boxStart + (boxEnd - boxStart) / 2 - (viewStart + (viewEnd - viewStart) / 2)
+            Align.End -> boxStart + (boxEnd - boxStart) - (viewStart + (viewEnd - viewStart))
+            else -> boxStart + (boxEnd - boxStart) / 2 - (viewStart + (viewEnd - viewStart) / 2)
+        }
     }
 }

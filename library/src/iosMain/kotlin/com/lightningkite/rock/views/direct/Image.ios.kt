@@ -29,6 +29,7 @@ actual inline var Image.source: ImageSource
             }
 
             is ImageRemote -> {
+                native.image = null
                 launch {
                     native.image = UIImage(data = fetch(value.url).blob().data)
                     native.informParentOfSizeChange()

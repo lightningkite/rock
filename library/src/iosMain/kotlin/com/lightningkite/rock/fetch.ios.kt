@@ -27,49 +27,56 @@ actual suspend fun fetch(
     headers: HttpHeaders,
     body: RequestBody?
 ): RequestResponse {
-    val response = client.request(url) {
-        this.method = when (method) {
-            HttpMethod.GET -> io.ktor.http.HttpMethod.Get
-            HttpMethod.POST -> io.ktor.http.HttpMethod.Post
-            HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
-            HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
-            HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
-        }
-        this.headers {
-            for ((key, values) in headers.map) {
-                for (value in values) append(key, value)
+    try {
+        val response = client.request(url) {
+            this.method = when (method) {
+                HttpMethod.GET -> io.ktor.http.HttpMethod.Get
+                HttpMethod.POST -> io.ktor.http.HttpMethod.Post
+                HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
+                HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
+                HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
             }
-        }
-        when (body) {
-            is RequestBodyBlob -> {
-                contentType(ContentType.parse(body.content.type))
-                setBody(body.content.data.toByteArray())
-            }
-
-            is RequestBodyFile -> {
-                val mime = body.content.suggestedType ?: (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
-                contentType(ContentType.parse(mime.preferredMIMEType!!))
-                body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
-                    if(error != null) throw Exception(error?.description)
-                    setBody(data!!.toByteArray())
+            this.headers {
+                for ((key, values) in headers.map) {
+                    for (value in values) append(key, value)
                 }
             }
+            when (body) {
+                is RequestBodyBlob -> {
+                    contentType(ContentType.parse(body.content.type))
+                    setBody(body.content.data.toByteArray())
+                }
 
-            is RequestBodyText -> {
-                contentType(ContentType.parse(body.type))
-                setBody(body.content)
+                is RequestBodyFile -> {
+                    val mime = body.content.suggestedType
+                        ?: (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
+                    contentType(ContentType.parse(mime.preferredMIMEType!!))
+                    body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
+                        if (error != null) throw Exception(error?.description)
+                        setBody(data!!.toByteArray())
+                    }
+                }
+
+                is RequestBodyText -> {
+                    contentType(ContentType.parse(body.type))
+                    setBody(body.content)
+                }
+
+                null -> {}
             }
-
-            null -> {}
         }
+        backToMainThread()
+        return RequestResponse(response)
+    } catch(e: Exception) {
+        backToMainThread()
+        throw e
     }
-    backToMainThread()
-    return RequestResponse(response)
 }
 
 suspend fun backToMainThread() {
     suspendCoroutineCancellable<Unit> {
         dispatch_async(queue = dispatch_get_main_queue(), block = {
+            println("backToMainThread: ${NSThread.isMainThread}")
             it.resume(Unit)
         })
         return@suspendCoroutineCancellable {}

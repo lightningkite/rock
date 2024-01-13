@@ -8,6 +8,7 @@ import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
+import platform.QuartzCore.CATextLayer
 import platform.UIKit.*
 import kotlin.math.max
 
@@ -24,6 +25,13 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         set(value) { extensionPadding = value }
 
 //    init { setUserInteractionEnabled(false) }
+
+//    val debugLayer = CATextLayer().apply {
+//        layer.addSublayer(this)
+//        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
+//        fontSize = 8.0
+//        foregroundColor = UIColor.redColor.CGColor
+//    }
 
     override fun subviewDidChangeSizing(view: UIView?) {
         val it = view ?: return
@@ -52,10 +60,10 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     val UIView.secondaryAlign get() = if(horizontal) extensionVerticalAlign else extensionHorizontalAlign
 
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
-        val size = size.local
+        val sizeLocal = size.local
         val measuredSize = Size()
 
-        val sizes = calcSizes(size)
+        val sizes = calcSizes(sizeLocal)
         measuredSize.primary += padding
         for (size in sizes) {
             measuredSize.primary += size.primary + size.margin * 2
@@ -63,6 +71,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         }
         measuredSize.primary += padding
 
+//        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()}" }
         return measuredSize.objc
     }
 
@@ -155,5 +164,4 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
         return super.hitTest(point, withEvent).takeUnless { it == this }
     }
-
 }

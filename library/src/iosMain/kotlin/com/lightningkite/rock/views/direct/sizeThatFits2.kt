@@ -15,8 +15,8 @@ import kotlin.math.max
 @OptIn(ExperimentalForeignApi::class)
 fun UIView.sizeThatFits2(size: CValue<CGSize>, sizeConstraints: SizeConstraints?): CValue<CGSize> {
     val newSize = sizeConstraints?.let {
-        var width =  size.useContents { width }
-        var height =  size.useContents { height }
+        var width = size.useContents { width }
+        var height = size.useContents { height }
         it.maxWidth?.let { width = width.coerceAtMost(it.value) }
         it.maxHeight?.let { height = height.coerceAtMost(it.value) }
         it.minWidth?.let { width = width.coerceAtLeast(it.value) }

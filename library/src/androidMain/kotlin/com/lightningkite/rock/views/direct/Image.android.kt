@@ -45,23 +45,12 @@ actual var Image.source: ImageSource
             }
 
             is ImageRemote -> {
-                var nativeView: ImageView? = native
-                native.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-                    override fun onViewAttachedToWindow(v: View) {}
-
-                    override fun onViewDetachedFromWindow(v: View) {
-                        nativeView = null
-                    }
-                })
+                native.setImageDrawable(null)
 
                 LoadRemoteImageScope.bitmapFromUrl(value.url, onBitmapLoaded = { bitmap ->
                     Handler(Looper.getMainLooper()).post {
                         Timber.d("REMOTE IMAGE SET DRAWABLE")
-                        if (nativeView != null) {
-                            nativeView!!.setImageDrawable(BitmapDrawable(nativeView!!.resources, bitmap))
-                        } else {
-                            bitmap.recycle()
-                        }
+                        native.setImageDrawable(BitmapDrawable(native.resources, bitmap))
                     }
                 }) {
                     Handler(Looper.getMainLooper()).post {

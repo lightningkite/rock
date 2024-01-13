@@ -24,6 +24,7 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         set(value) { extensionPadding = value }
 
     override fun subviewDidChangeSizing(view: UIView?) {
+        setNeedsLayout()
     }
 
     data class Size(var primary: Double = 0.0, var secondary: Double = 0.0, var margin: Double = 0.0) {
@@ -45,7 +46,7 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         val size = size.local
         val measuredSize = Size()
 
-        val subsize = calcSizes(size)
+        val subsize = calcSizes(size, true)
         measuredSize.primary += padding
         measuredSize.primary += subsize.primary + subsize.margin * 2
         measuredSize.secondary = max(measuredSize.secondary, subsize.secondary + padding * 2 + subsize.margin * 2)
@@ -54,19 +55,21 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         return measuredSize.objc
     }
 
-    fun calcSizes(size: Size): Size {
+    fun calcSizes(size: Size, unbound: Boolean): Size {
         val remaining = size.copy()
         remaining.primary -= padding * 2
         remaining.secondary -= padding * 2
 
         var totalWeight = 0f
         return mainSubview?.let {
+            val remainingPrimary = if(unbound) 10000.0 else remaining.primary
             val required = it.sizeThatFits2(
                 CGSizeMake(
-                    if (horizontal) 10000.0 else remaining.secondary,
-                    if (horizontal) remaining.secondary else 10000.0
+                    if (horizontal) remainingPrimary else remaining.secondary,
+                    if (horizontal) remaining.secondary else remainingPrimary
                 ),
-                it.extensionSizeConstraints
+                null
+//                it.extensionSizeConstraints
             ).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
@@ -96,12 +99,10 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
     override fun layoutSubviews() {
         val mySize = bounds.useContents { size.local }
         var primary = padding
-        var lastChildSize: Size? = null
         val view = mainSubview ?: run {
             return
         }
-        val size = calcSizes(frame.useContents { size.local })
-        lastChildSize = size
+        val size = calcSizes(frame.useContents { size.local }, false)
         val m = view.extensionMargin ?: 0.0
         val ps = primary + m
         val a = view.secondaryAlign ?: Align.Stretch

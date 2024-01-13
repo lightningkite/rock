@@ -5,6 +5,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.*
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.CoreGraphics.CGAffineTransformRotate
 import platform.UIKit.*
 
 //inline fun <T : HTMLElement> ViewWriter.containsNext(name: String, noinline setup: T.() -> Unit): ViewWrapper =
@@ -74,8 +75,8 @@ actual var NView.opacity: Double
 actual var NView.nativeRotation: Angle
     get() = throw NotImplementedError()
     set(value) {
-        TODO()
-//        style.transform = "rotate(${value.turns}turn)"
+        val rotation = CGAffineTransformRotate(this.transform, value.radians.toDouble())
+        transform = rotation
     }
 
 actual fun NView.clearNViews() {

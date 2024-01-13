@@ -9,6 +9,7 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.NestedScrollView
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.PopoverPreferredDirection
@@ -101,7 +102,7 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 @ViewModifierDsl3
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
-        wrapNext(ScrollView(this.context)) {
+        wrapNext(NestedScrollView(this.context)) {
             isFillViewport = true
         }
         beforeNextElementSetup {

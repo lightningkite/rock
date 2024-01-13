@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.ActionBar
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -12,13 +14,16 @@ import com.lightningkite.rock.views.lparams
 @ViewDsl
 actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit {
     viewElement(factory = ::NSeparator, wrapper = ::Separator) {
-        native.lparams.run {
-            width = ActionBar.LayoutParams.MATCH_PARENT
-            height = (2 * native.resources.displayMetrics.density).toInt()
-        }
         handleTheme(native) { it, v ->
             v.background = ColorDrawable(it.foreground.closestColor().colorInt())
             v.alpha = 0.25f
+            val size = it.outlineWidth.value.coerceAtMost(1f).toInt()
+            (v.parent as? LinearLayout)?.let {
+                v.lparams.run {
+                    width = if(it.orientation == LinearLayout.HORIZONTAL) size else ViewGroup.LayoutParams.MATCH_PARENT
+                    height = if(it.orientation == LinearLayout.HORIZONTAL) ViewGroup.LayoutParams.MATCH_PARENT else size
+                }
+            }
         }
         native.minimumWidth = 1
         native.minimumHeight = 1

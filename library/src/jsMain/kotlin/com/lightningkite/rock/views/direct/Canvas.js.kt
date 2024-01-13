@@ -20,28 +20,42 @@ actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanva
     val c = Canvas(this)
     setup(c)
     tabIndex = 1
-    onkeydown = { ev: KeyboardEvent -> c.delegate?.onKeyDown(ev.code) }
-    onkeyup = { ev: KeyboardEvent -> c.delegate?.onKeyUp(ev.code) }
-    onwheel = { ev: WheelEvent -> c.delegate?.onWheel(ev.deltaX, ev.deltaY, ev.deltaZ) }
+    onkeydown = { event: KeyboardEvent ->
+        if(c.delegate?.onKeyDown(event.code) == true)
+            event.preventDefault()
+    }
+    onkeyup = { event: KeyboardEvent ->
+        if(c.delegate?.onKeyUp(event.code) == true)
+            event.preventDefault()
+    }
+    onwheel = { event: WheelEvent ->
+        if(c.delegate?.onWheel(event.deltaX, event.deltaY, event.deltaZ) == true)
+            event.preventDefault()
+    }
     onpointerdown = { event ->
         val b = getBoundingClientRect()
-        c.delegate?.onPointerDown(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height)
+        if(c.delegate?.onPointerDown(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height) == true)
+            event.preventDefault()
     }
     onpointermove = { event ->
         val b = getBoundingClientRect()
-        c.delegate?.onPointerMove(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height)
+        if(c.delegate?.onPointerMove(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height) == true)
+            event.preventDefault()
     }
     onpointerup = { event ->
         val b = getBoundingClientRect()
-        c.delegate?.onPointerUp(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height)
+        if(c.delegate?.onPointerUp(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height) == true)
+            event.preventDefault()
     }
     onpointercancel = { event ->
         val b = getBoundingClientRect()
-        c.delegate?.onPointerCancel(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height)
+        if(c.delegate?.onPointerCancel(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height) == true)
+            event.preventDefault()
     }
     onpointerleave = { event ->
         val b = getBoundingClientRect()
-        c.delegate?.onPointerCancel(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height)
+        if(c.delegate?.onPointerCancel(event.pointerId, event.pageX - b.x, event.pageY - b.y, b.width, b.height) == true)
+            event.preventDefault()
     }
     ResizeObserver { _, _ ->
         if (width != scrollWidth || height != scrollHeight) {
@@ -49,6 +63,7 @@ actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanva
             height = scrollHeight
         }
         c.delegate?.onResize(scrollWidth.toDouble(), scrollHeight.toDouble())
+        c.delegate?.invalidate?.invoke()
     }.observe(this)
 }
 
@@ -58,6 +73,7 @@ actual var Canvas.delegate: CanvasDelegate?
         this.native.asDynamic().__ROCK_delegate__ = value
         value?.let { value ->
             value.invalidate = {
+                console.log("Rendering")
                 native.getContext("2d").apply {
                     this as DrawingContext2D
                     this.lineCap = CanvasLineCap.ROUND

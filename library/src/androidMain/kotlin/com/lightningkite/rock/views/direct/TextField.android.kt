@@ -66,22 +66,19 @@ var EditText.keyboardHints: KeyboardHints
     set(value) {
         val n = this
         val inputType = when (value.type) {
-            KeyboardType.Decimal -> {
-                InputType.TYPE_CLASS_NUMBER
-            }
-
+            KeyboardType.Integer -> InputType.TYPE_CLASS_NUMBER
+            KeyboardType.Decimal -> InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
             KeyboardType.Text -> {
                 when (value.case) {
                     KeyboardCase.Words -> InputType.TYPE_TEXT_FLAG_CAP_WORDS
                     KeyboardCase.Letters -> InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
                     KeyboardCase.Sentences -> InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
-                    else -> InputType.TYPE_CLASS_TEXT
-                }
+                    else -> 0
+                } or InputType.TYPE_CLASS_TEXT
             }
 
-            KeyboardType.Integer -> InputType.TYPE_CLASS_NUMBER
             KeyboardType.Phone -> InputType.TYPE_CLASS_PHONE
-            KeyboardType.Email -> InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            KeyboardType.Email -> InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         }
         n.inputType = inputType
     }

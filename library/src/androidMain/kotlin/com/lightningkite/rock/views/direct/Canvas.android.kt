@@ -71,7 +71,8 @@ actual class NCanvas @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        var takenCareOf = true
+        parent.requestDisallowInterceptTouchEvent(true)
+        var takenCareOf = false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
                 val pointerId = event.getPointerId(event.actionIndex)
@@ -81,7 +82,7 @@ actual class NCanvas @JvmOverloads constructor(
                     id = pointerId
                 )
                 touches[pointerId] = touch
-                delegate?.onPointerDown(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())
+                delegate?.onPointerDown(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())?.let { takenCareOf = takenCareOf || it }
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -91,7 +92,7 @@ actual class NCanvas @JvmOverloads constructor(
                     if (touch != null) {
                         touch.x = event.getX(pointerIndex)
                         touch.y = event.getY(pointerIndex)
-                        delegate?.onPointerMove(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())
+                        delegate?.onPointerMove(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())?.let { takenCareOf = takenCareOf || it }
                     }
                 }
             }
@@ -105,7 +106,7 @@ actual class NCanvas @JvmOverloads constructor(
                 val pointerId = event.getPointerId(event.actionIndex)
                 val touch = touches.remove(pointerId)
                 if (touch != null) {
-                    delegate?.onPointerUp(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())
+                    delegate?.onPointerUp(touch.id, touch.x.toDouble(), touch.y.toDouble(), width.toDouble(), height.toDouble())?.let { takenCareOf = takenCareOf || it }
                 }
             }
         }

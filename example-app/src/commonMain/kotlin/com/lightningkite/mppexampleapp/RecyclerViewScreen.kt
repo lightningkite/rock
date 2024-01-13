@@ -20,16 +20,16 @@ object RecyclerViewScreen : RockScreen {
             row {
                 for(align in Align.values()) {
                     expanding - button {
-                        text("50${align.name.substring(0, 1)}n")
-                        onClick { recyclerView?.scrollToIndex(50, align, false) }
+                        subtext("Jump ${align.name}")
+                        onClick { recyclerView?.scrollToIndex(49, align, false) }
                     }
                 }
             }
             row {
                 for(align in Align.values()) {
                     expanding - button {
-                        text("50${align.name.substring(0, 1)}a")
-                        onClick { recyclerView?.scrollToIndex(50, align, true) }
+                        subtext("Scroll ${align.name}")
+                        onClick { recyclerView?.scrollToIndex(49, align, true) }
                     }
                 }
             }

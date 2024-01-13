@@ -17,14 +17,17 @@ actual var ExternalLink.to: String
     set(value) {
         native.tag = UUID.randomUUID() to value
         native.setOnClickListener { view ->
-            val intent = Intent().apply {
-                action = Intent.ACTION_VIEW
-                categories.add(Intent.CATEGORY_APP_BROWSER)
-                data = Uri.parse(value)
-            }
-            view.context.packageManager.resolveActivity(intent, intent.flags)?.let {
-                view.context.startActivity(intent)
-            }
+            val url = if(!value.startsWith("http")) "http://$value" else value
+            val temp = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            view.context.startActivity(temp)
+//            val intent = Intent().apply {
+//                action = Intent.ACTION_VIEW
+//                categories?.add(Intent.CATEGORY_APP_BROWSER)
+//                data = Uri.parse(value)
+//            }
+//            view.context.packageManager.resolveActivity(intent, intent.flags)?.let {
+//                view.context.startActivity(intent)
+//            }
         }
     }
 actual var ExternalLink.newTab: Boolean

@@ -15,7 +15,7 @@ object LoadRemoteImageScope : CoroutineScope {
     override val coroutineContext = Job()
     fun bitmapFromUrl(url: String, onBitmapLoaded: (Bitmap) -> Unit, onError: (Exception) -> Unit) {
         launch {
-            val androidURL = URL(url)
+            val androidURL = try{ URL(url) } catch (e:Exception){ onError(e); return@launch }
             val connection = androidURL.openConnection() as HttpURLConnection
             try {
                 connection.inputStream.use { inputStream ->

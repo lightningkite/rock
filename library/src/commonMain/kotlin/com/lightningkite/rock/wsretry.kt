@@ -22,7 +22,7 @@ fun retryWebsocket(
                 onOpenList.toList().forEach { l -> l() }
             }
             it.onMessage {
-                onMessageList.toList().forEach { l -> l(it) }
+                if (it.isNotBlank()) onMessageList.toList().forEach { l -> l(it) }
             }
             it.onBinaryMessage {
                 onBinaryMessageList.toList().forEach { l -> l(it) }
@@ -36,9 +36,21 @@ fun retryWebsocket(
             }
             it.onClose {
                 currentDelay *= 2
-                if(connected.value && clockMillis() - lastConnect > 60_000.0) currentDelay = baseDelay
+                if (connected.value && clockMillis() - lastConnect > 60_000.0) currentDelay = baseDelay
                 connected.value = false
             }
+
+            val pings = launchGlobal {
+                while(true){
+                    delay(30_000)
+                    it.send(" ")
+                }
+            }
+
+            onCloseList.add {
+                pings.cancel()
+            }
+
         }
     }
 
@@ -108,7 +120,7 @@ interface RetryWebsocket : WebSocket, TypedWebSocket<String, String> {
 }
 
 
-interface TypedWebSocket<SEND, RECEIVE>: ResourceUse {
+interface TypedWebSocket<SEND, RECEIVE> : ResourceUse {
     val connected: Readable<Boolean>
 
     fun close(code: Short, reason: String)
@@ -157,6 +169,7 @@ fun <SEND, RECEIVE> RetryWebsocket.typed(
 ): TypedWebSocket<SEND, RECEIVE> = object : TypedWebSocket<SEND, RECEIVE> {
     override val connected: Readable<Boolean>
         get() = this@typed.connected
+
     override fun start(): () -> Unit = this@typed.start()
     override fun close(code: Short, reason: String) = this@typed.close(code, reason)
     override fun onOpen(action: () -> Unit) = this@typed.onOpen(action)

@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.reactive.LateInitProperty
 import com.lightningkite.rock.reactive.Readable
@@ -251,4 +252,21 @@ actual fun <T> RecyclerView.children(
     native.setDataSource(source)
     native.setDelegate(source)
     native.extensionStrongRef = source
+}
+
+actual fun RecyclerView.scrollToIndex(
+    index: Int,
+    align: Align?,
+    animate: Boolean
+) {
+   native.scrollToItemAtIndexPath(
+       NSIndexPath.indexPathForRow(index.toLong(), 0L),
+       when(align) {
+           Align.Start -> UICollectionViewScrollPositionLeft or UICollectionViewScrollPositionTop
+           Align.Center -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
+           Align.End -> UICollectionViewScrollPositionRight or UICollectionViewScrollPositionBottom
+           else -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
+       },
+       animate
+   )
 }

@@ -76,7 +76,6 @@ actual suspend fun fetch(
 suspend fun backToMainThread() {
     suspendCoroutineCancellable<Unit> {
         dispatch_async(queue = dispatch_get_main_queue(), block = {
-            println("backToMainThread: ${NSThread.isMainThread}")
             it.resume(Unit)
         })
         return@suspendCoroutineCancellable {}

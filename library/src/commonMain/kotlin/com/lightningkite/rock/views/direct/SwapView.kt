@@ -23,6 +23,7 @@ inline fun <T> SwapView.swapping(
     val queue = ArrayList<T>()
     var alreadySwapping = false
     reactiveScope {
+        println("swapping scope running")
         val c = current()
         queue.add(c)
         if(alreadySwapping) {
@@ -31,7 +32,11 @@ inline fun <T> SwapView.swapping(
         alreadySwapping = true
         while(queue.isNotEmpty()) {
             val next = queue.removeAt(0)
-            swap(transition(next)) { views(next) }
+            try {
+                swap(transition(next)) { views(next) }
+            } catch(e: Exception) {
+                e.printStackTrace()
+            }
         }
         alreadySwapping = false
     }

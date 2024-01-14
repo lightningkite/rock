@@ -18,7 +18,7 @@ object DataLoadingExampleScreen : RockScreen {
 
     override fun ViewWriter.render() {
         val data = shared {
-            delay(1000)
+            delay(5000)
             val response: RequestResponse = fetch("https://jsonplaceholder.typicode.com/posts")
             Json.decodeFromString<List<Post>>(response.text())
         }
@@ -28,7 +28,7 @@ object DataLoadingExampleScreen : RockScreen {
             col {
                 forEachUpdating(data) {
                     col {
-                        val f = shared { delay(Random.nextLong(0, 1000)); "" }
+                        val f = shared { delay(Random.nextLong(0, 5000)); "" }
                         h3 { ::content { it.await().title + f.await() } }
                         text { ::content { it.await().body + f.await() } }
                     } in card

@@ -30,6 +30,7 @@ button, input, textarea, select {
     outline-width: 0;
     font: unset;
     color: unset;
+    text-align: start;
 }
 
 input.sameThemeText, textarea.sameThemeText {
@@ -206,11 +207,31 @@ input:focus textarea:focus {
     }
 }
 
-.loading {
+p.loading:not(.inclBack), h1.loading:not(.inclBack), h2.loading:not(.inclBack), h3.loading:not(.inclBack), h4.loading:not(.inclBack), h5.loading:not(.inclBack), h6.loading:not(.inclBack), img.loading:not(.inclBack), input.loading:not(.inclBack), select.loading:not(.inclBack), textarea.loading:not(.inclBack) {
     min-height: 1em;
     background: color-mix(in srgb, currentColor, transparent 70%) !important;
     animation: flickerAnimation 2s infinite !important;
     animation-timing-function: linear;
+}
+
+button.loading {
+    position: relative;
+}
+button.loading:before {
+    content: "";
+    position: absolute;
+    top: calc(50% - 20px);
+    left: calc(50% - 20px);
+    width: 32px !important;
+    height: 32px !important;
+    opacity: 0.5 !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-style: solid !important;
+    border-color: var(--foreground) var(--foreground) var(--foreground) transparent !important;
+    border-width: 6px !important;
+    border-radius: 50% !important;
+    animation: spin 2s infinite linear !important;
 }
 
 .clickable {
@@ -334,6 +355,7 @@ iframe#webpack-dev-server-client-overlay {
 .scroll-vertical > * {
     max-height: unset;
 }
+
 .scroll-vertical {
     overflow-y: auto;
 }
@@ -341,9 +363,11 @@ iframe#webpack-dev-server-client-overlay {
 .scroll-horizontal > * {
     max-width: unset;
 }
+
 .scroll-horizontal {
     overflow-x: auto;
 }
+
 ::-webkit-scrollbar {
     background: #0000;
 }

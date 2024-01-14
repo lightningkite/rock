@@ -1,16 +1,16 @@
 package com.lightningkite.rock.reactive
 
-import com.lightningkite.rock.Cancellable
-import com.lightningkite.rock.CancelledException
-import com.lightningkite.rock.debugger
+import com.lightningkite.rock.*
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.startCoroutine
 import kotlin.reflect.KMutableProperty0
 
 interface CalculationContext {
     fun notifyStart() {}
-    fun notifySuccess() {}
-    fun notifyFailure(t: Throwable) {
-        t.printStackTrace()
-        debugger()
+    fun notifyComplete(result: Result<Unit>) {
+        result.onFailure { if(it !is CancelledException) it.printStackTrace() }
     }
     fun onRemove(action: () -> Unit)
     companion object {
@@ -26,6 +26,34 @@ interface CalculationContext {
         override fun cancel() {
             onRemoveSet.forEach { it() }
             onRemoveSet.clear()
+        }
+    }
+    abstract class WithLoadTracking: CalculationContext {
+
+        var loadShown: Boolean = false
+            private set
+        var loadCount = 0
+            set(value) {
+                field = value
+                if(value == 0 && loadShown) {
+                    loadShown = false
+                    hideLoad()
+                } else if(value > 0 && !loadShown) {
+                    loadShown = true
+                    showLoad()
+                }
+            }
+        abstract fun showLoad()
+        abstract fun hideLoad()
+
+        override fun notifyStart() {
+            super.notifyStart()
+            loadCount++
+        }
+
+        override fun notifyComplete(result: Result<Unit>) {
+            loadCount--
+            super.notifyComplete(result)
         }
     }
 }

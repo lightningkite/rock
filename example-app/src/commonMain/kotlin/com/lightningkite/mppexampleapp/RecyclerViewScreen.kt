@@ -48,7 +48,7 @@ object RecyclerViewScreen : RockScreen {
                                 }
                             }
                         } in themeFromLast { theme ->
-                            if(it.await() == 51) theme.important() else theme
+                            if(it.await() == 50) theme.important() else theme
                         }
                         col {
                             ::exists { expanded.await() == it.await() }

@@ -1,9 +1,6 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.FullExampleScreen
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.RecyclerViewScreen
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.VectorsTestScreen
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.WebSocketScreen
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.*
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.gc
@@ -52,6 +49,7 @@ object RootScreen : RockScreen {
                 linkScreen(VectorsTestScreen)
                 linkScreen(SampleLogInScreen)
                 linkScreen(DataLoadingExampleScreen)
+                linkScreen(LoadAnimationTestScreen)
                 linkScreen(WebSocketScreen)
                 linkScreen(CanvasSampleScreen)
                 linkScreen(PongSampleScreen)

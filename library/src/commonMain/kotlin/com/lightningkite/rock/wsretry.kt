@@ -110,7 +110,6 @@ fun retryWebsocket(
         }
 
         override fun notifyStart() {}
-        override fun notifySuccess() {}
         override fun onRemove(action: () -> Unit) {
         }
     }

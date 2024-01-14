@@ -2,6 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
+import com.lightningkite.rock.delay
 import com.lightningkite.rock.fetch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
@@ -50,9 +51,8 @@ object SampleLogInScreen : RockScreen {
                     button {
                         h6 { content = "Log In" }
                         onClick {
-                            launch {
-                                fakeLogin(email)
-                            }
+                            delay(1000)
+                            fakeLogin(email)
                         }
                     } in important
                 } in card in sizedBox(SizeConstraints(maxWidth = 50.rem)) in gravity(Align.Center, Align.Center)

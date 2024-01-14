@@ -1,8 +1,10 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.launchGlobal
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
 import org.w3c.dom.HTMLButtonElement
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -16,7 +18,13 @@ actual fun ViewWriter.button(setup: Button.() -> Unit): Unit =
     }
 
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
-    native.onclick = { launchGlobal(action) }
+    native.onclick = {
+        native.calculationContext.launchManualCancel {
+            native.disabled = true
+            action()
+            native.disabled = false
+        }
+    }
 }
 
 actual inline var Button.enabled: Boolean

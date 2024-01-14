@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views
 
+import com.lightningkite.rock.Cancellable
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Theme
@@ -18,27 +19,6 @@ inline fun <T : HTMLElement> ViewWriter.element(name: String, noinline setup: T.
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = HTMLElement
-
-data class NViewCalculationContext(val native: NView): CalculationContext {
-    override fun onRemove(action: () -> Unit) {
-        native.removeListeners.add(action)
-    }
-
-    override fun notifyStart() {
-        native.classList.add("loading")
-    }
-
-    override fun notifySuccess() {
-        native.classList.remove("loading")
-    }
-
-    override fun notifyFailure(t: Throwable) {
-        native.classList.remove("loading")
-        super.notifyFailure(t)
-    }
-}
-actual val NView.calculationContext: CalculationContext
-    get() = NViewCalculationContext(this)
 
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()
@@ -91,21 +71,40 @@ private object RemoveListeners {
     }
 
     private fun shutdown(element: HTMLElement) {
-        element.removeListenersMaybe?.let {
-            it.forEach { it() }
-            it.clear()
-        }
+        element.calculationContextMaybe?.cancel()
         for(child in element.childNodes.asList()) {
             if(child is HTMLElement) shutdown(child)
         }
     }
 }
 
-private val HTMLElement.removeListeners: MutableList<() -> Unit>
-    get() = removeListenersMaybe ?: run {
-        val newList = ArrayList<() -> Unit>()
-        this.asDynamic()[RemoveListeners.symbol] = newList
-        newList
+
+data class NViewCalculationContext(val native: NView): CalculationContext.WithLoadTracking(), Cancellable {
+    val removeListeners = ArrayList<()->Unit>()
+    override fun cancel() {
+        removeListeners.removeAll { it(); true }
     }
-private val HTMLElement.removeListenersMaybe: MutableList<() -> Unit>?
-    get() = this.asDynamic()[RemoveListeners.symbol] as? MutableList<() -> Unit>
+
+    override fun onRemove(action: () -> Unit) {
+        removeListeners.add(action)
+    }
+
+    override fun showLoad() {
+        native.classList.add("loading")
+    }
+
+    override fun hideLoad() {
+        native.classList.remove("loading")
+    }
+}
+private val CalculationContextSymbol = js("Symbol('CalculationContextSymbol')")
+val NView.calculationContextMaybe: NViewCalculationContext?
+    get() = this.asDynamic()[CalculationContextSymbol] as? NViewCalculationContext
+actual val NView.calculationContext: CalculationContext
+    get() {
+        return this.asDynamic()[CalculationContextSymbol] as? NViewCalculationContext ?: run {
+            val new = NViewCalculationContext(this)
+            this.asDynamic()[CalculationContextSymbol] = new
+            return new
+        }
+    }

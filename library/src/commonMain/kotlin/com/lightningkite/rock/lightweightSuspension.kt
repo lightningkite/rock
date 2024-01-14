@@ -155,18 +155,49 @@ fun launchGlobal(action: suspend () -> Unit): Cancellable {
 }
 
 fun CalculationContext.launch(action: suspend () -> Unit) {
-    val cancel = launchGlobal {
-        this.notifyStart()
-        try {
-            action()
-            notifySuccess()
-        } catch(e: Exception) {
-            if(e !is CancelledException) {
-                notifyFailure(e)
-            } else {
-                notifySuccess()
+    val context: CoroutineContext = EmptyCoroutineContext.childCancellation()
+    var done = false
+    var loadStarted = false
+    action.startCoroutine(object : Continuation<Unit> {
+        override val context: CoroutineContext = context
+        // called when a coroutine ends. do nothing.
+        override fun resumeWith(result: Result<Unit>) {
+            done = true
+            if(loadStarted) {
+                notifyComplete(result)
             }
         }
+    })
+    if(!done) {
+        // start load
+        loadStarted = true
+        notifyStart()
     }
-    this.onRemove { cancel.cancel() }
+    this.onRemove { context.cancel() }
+}
+
+fun CalculationContext.launchManualCancel(action: suspend () -> Unit): Cancellable {
+    val context: CoroutineContext = EmptyCoroutineContext.childCancellation()
+    var done = false
+    var loadStarted = false
+    action.startCoroutine(object : Continuation<Unit> {
+        override val context: CoroutineContext = context
+        // called when a coroutine ends. do nothing.
+        override fun resumeWith(result: Result<Unit>) {
+            done = true
+            if(loadStarted) {
+                notifyComplete(result)
+            }
+        }
+    })
+    if(!done) {
+        // start load
+        loadStarted = true
+        notifyStart()
+    }
+    return object: Cancellable {
+        override fun cancel() {
+            context.cancel()
+        }
+    }
 }

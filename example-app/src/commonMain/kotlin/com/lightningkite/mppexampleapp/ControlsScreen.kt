@@ -2,6 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
+import com.lightningkite.rock.delay
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
@@ -24,12 +25,12 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Buttons" }
                 row {
                     space {} in weight(1f)
-                    button { text { content = "Sample" } }
-                    button { text { content = "Card" } } in card
-                    button { text { content = "Important" } } in important
-
-                    button { text { content = "Warning" } } in warning
-                    button { text { content = "Danger" } } in danger
+                    button { onClick { delay(1000L) }; text { content = "Sample" } }
+                    button { onClick { delay(1000L) }; text { content = "Card" } } in card
+                    button { onClick { delay(1000L) }; text { content = "Important" } } in important
+                    button { onClick { delay(1000L) }; text { content = "Critical" } } in critical
+                    button { onClick { delay(1000L) }; text { content = "Warning" } } in warning
+                    button { onClick { delay(1000L) }; text { content = "Danger" } } in danger
                     space {} in weight(1f)
                 } in scrollsHorizontally
             } in card

@@ -1,7 +1,9 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
 import com.lightningkite.rock.views.launch
 import org.w3c.dom.HTMLDivElement
 
@@ -22,5 +24,5 @@ actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Un
     )
 
 actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit {
-    native.onclick = { launch { action() } }
+    native.onclick = { native.calculationContext.launchManualCancel(action) }
 }

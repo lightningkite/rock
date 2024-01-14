@@ -47,12 +47,17 @@ class LateInitProperty<T>(): Writable<T>, ReadWriteProperty<Any?, T> {
         }
     private var ready: Boolean = false
 
+    fun unset() {
+        ready = false
+        listeners.toList().forEach { it() }
+    }
+
     override suspend infix fun set(value: T) {
         this.value = value
     }
 
     override suspend fun awaitRaw(): T {
-        if (ready) return value as T
+        if (ready) return _value as T
         else return suspendCoroutineCancellable<T> { queued.add(it); return@suspendCoroutineCancellable { queued.remove(it) } }
     }
 
@@ -119,7 +124,7 @@ fun CalculationContext.use(resourceUse: ResourceUse) {
     onRemove { x() }
 }
 
-fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
+fun CalculationContext.reactiveScope(onLoad: (()->Unit)? = null, action: suspend () -> Unit) {
     var run: () -> Unit = {}
     val data = ReactiveScopeData {
         run()
@@ -127,16 +132,23 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
     val name = Random.nextInt(1000000)
     var previousContext: CoroutineContext? = null
     run = run@{
-        notifyStart()
         val context: CoroutineContext = EmptyCoroutineContext.childCancellation() + data
         previousContext?.cancel()
         previousContext = context
         data.latestPass.clear()
+
+        var done = false
+        var loadStarted = false
+
         action.startCoroutine(object : Continuation<Unit> {
             override val context: CoroutineContext = context
 
             // called when a coroutine ends. do nothing.
             override fun resumeWith(result: Result<Unit>) {
+                done = true
+                if(loadStarted) {
+                    notifyComplete(result)
+                }
                 if(previousContext !== context) return
                 for (entry in data.removers.entries.toList()) {
                     if (entry.key !in data.latestPass) {
@@ -144,18 +156,15 @@ fun CalculationContext.reactiveScope(action: suspend () -> Unit) {
                         data.removers.remove(entry.key)
                     }
                 }
-                if(result.isSuccess) notifySuccess()
-                else result.exceptionOrNull()?.let {
-                    if(it !is CancelledException) {
-                        notifyFailure(it)
-                    }
-                }
-                result.onFailure { ex: Throwable ->
-                    if(ex is CancelledException) return@onFailure
-                    ex.printStackTrace()
-                }
             }
         })
+
+        if(!done) {
+            // start load
+            loadStarted = true
+            notifyStart()
+            onLoad?.invoke()
+        }
     }
     run()
     this.onRemove {
@@ -188,9 +197,6 @@ suspend fun <T> Readable<T>.await(): T {
 fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
     val removers = ArrayList<()->Unit>()
     val ctx = object: CalculationContext {
-        override fun notifyStart() {}
-        override fun notifySuccess() {}
-        override fun notifyFailure(t: Throwable) { t.printStackTrace() }
         override fun onRemove(action: () -> Unit) {
             removers.add(action)
         }

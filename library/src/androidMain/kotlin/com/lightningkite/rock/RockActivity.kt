@@ -31,6 +31,7 @@ abstract class RockActivity : AppCompatActivity() {
             resources.displayMetrics.density,
         )
         AndroidAppContext.applicationCtx = this.applicationContext
+        AndroidAppContext.activityCtx = this
         Timber.plant(Timber.DebugTree())
     }
 

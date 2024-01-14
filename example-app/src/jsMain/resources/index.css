@@ -217,7 +217,7 @@ p.loading:not(.inclBack), h1.loading:not(.inclBack), h2.loading:not(.inclBack), 
 button.loading {
     position: relative;
 }
-button.loading:before {
+button.loading:after {
     content: "";
     position: absolute;
     top: calc(50% - 20px);

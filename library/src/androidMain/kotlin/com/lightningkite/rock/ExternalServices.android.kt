@@ -3,6 +3,8 @@ package com.lightningkite.rock
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import com.lightningkite.rock.views.AndroidAppContext
@@ -45,8 +47,9 @@ actual object ExternalServices {
         mimeTypes: List<String>,
         onResult: (List<FileReference>) -> Unit,
     ) {
-        AndroidAppContext.requestPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE) {
-            if (!it.accepted) return@requestPermissions onResult(listOf())
+
+        val permsHandler: (RockActivity.PermissionResult) -> Unit = {
+            if (!it.accepted) onResult(listOf())
 
             val type = mimeTypes.joinToString(",")
 
@@ -76,14 +79,36 @@ actual object ExternalServices {
                 }
             }
         }
+
+        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+            val permissions = buildList {
+                if (mimeTypes.any { it.startsWith("image") }) add(android.Manifest.permission.READ_MEDIA_IMAGES)
+                if (mimeTypes.any { it.startsWith("video") }) add(android.Manifest.permission.READ_MEDIA_VIDEO)
+                if (mimeTypes.any { it.startsWith("audio") }) add(android.Manifest.permission.READ_MEDIA_AUDIO)
+            }.toTypedArray()
+            AndroidAppContext.requestPermissions(*permissions, onResult = permsHandler)
+        } else {
+            AndroidAppContext.requestPermissions(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                onResult = permsHandler
+            )
+        }
     }
 
     actual fun requestCaptureSelf(
         mimeTypes: List<String>,
         onResult: (FileReference?) -> Unit,
     ) {
-        if(mimeTypes.all { it.startsWith("image/") }) requestImageCamera(true, MediaStore.ACTION_IMAGE_CAPTURE, onResult)
-        else if(mimeTypes.all { it.startsWith("video/") }) requestImageCamera(true, MediaStore.ACTION_VIDEO_CAPTURE, onResult)
+        if (mimeTypes.all { it.startsWith("image/") }) requestImageCamera(
+            true,
+            MediaStore.ACTION_IMAGE_CAPTURE,
+            onResult
+        )
+        else if (mimeTypes.all { it.startsWith("video/") }) requestImageCamera(
+            true,
+            MediaStore.ACTION_VIDEO_CAPTURE,
+            onResult
+        )
         else System.err.println("Captures besides images and video not supported yet. Requested $mimeTypes")
     }
 
@@ -91,8 +116,16 @@ actual object ExternalServices {
         mimeTypes: List<String>,
         onResult: (FileReference?) -> Unit,
     ) {
-        if(mimeTypes.all { it.startsWith("image/") }) requestImageCamera(false, MediaStore.ACTION_IMAGE_CAPTURE, onResult)
-        else if(mimeTypes.all { it.startsWith("video/") }) requestImageCamera(false, MediaStore.ACTION_VIDEO_CAPTURE, onResult)
+        if (mimeTypes.all { it.startsWith("image/") }) requestImageCamera(
+            false,
+            MediaStore.ACTION_IMAGE_CAPTURE,
+            onResult
+        )
+        else if (mimeTypes.all { it.startsWith("video/") }) requestImageCamera(
+            false,
+            MediaStore.ACTION_VIDEO_CAPTURE,
+            onResult
+        )
         else System.err.println("Captures besides images and video not supported yet. Requested $mimeTypes")
     }
 
@@ -107,7 +140,7 @@ actual object ExternalServices {
             .let { FileProvider.getUriForFile(AndroidAppContext.applicationCtx, fileProviderAuthority, it) }
 
         AndroidAppContext.requestPermissions(android.Manifest.permission.CAMERA) {
-            if(!it.accepted) return@requestPermissions onResult(null)
+            if (!it.accepted) return@requestPermissions onResult(null)
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, file)
             if (front) {

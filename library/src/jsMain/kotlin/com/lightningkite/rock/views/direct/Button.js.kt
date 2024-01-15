@@ -18,11 +18,17 @@ actual fun ViewWriter.button(setup: Button.() -> Unit): Unit =
     }
 
 actual fun Button.onClick(action: suspend () -> Unit): Unit {
+    var virtualDisable: Boolean = false
     native.onclick = {
-        native.calculationContext.launchManualCancel {
-            native.disabled = true
-            action()
-            native.disabled = false
+        if(!virtualDisable) {
+            native.calculationContext.launchManualCancel {
+                try {
+                    virtualDisable = true
+                    action()
+                } finally {
+                    virtualDisable = false
+                }
+            }
         }
     }
 }

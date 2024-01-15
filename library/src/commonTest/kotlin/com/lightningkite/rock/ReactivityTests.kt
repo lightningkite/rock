@@ -151,9 +151,12 @@ fun testContext(action: CalculationContext.()->Unit): Cancellable {
         override fun onRemove(action: () -> Unit) {
             onRemoveSet.add(action)
         }
-        override fun notifyFailure(t: Throwable) {
-            t.printStackTrace()
-            error = t
+
+        override fun notifyComplete(result: Result<Unit>) {
+            result.onFailure { t ->
+                t.printStackTrace()
+                error = t
+            }
         }
     }) {
         action()

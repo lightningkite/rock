@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
+import com.lightningkite.rock.Cancellable
 import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
+import com.lightningkite.rock.reactive.Property
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
@@ -40,32 +42,40 @@ object AndroidAppContext {
     fun requestPermissions(vararg permissions: String, onResult: (RockActivity.PermissionResult)->Unit) = activityCtx?.requestPermissions(permissions = permissions, onResult = onResult)
 }
 
-private val ViewRemoveListeners = WeakHashMap<View, ArrayList<()->Unit>>()
+private val ViewCalculationContexts = WeakHashMap<View, NViewCalculationContext>()
 internal val ViewAction = WeakHashMap<View, Action>()
 
 fun View.shutdown() {
-    ViewRemoveListeners[this]?.forEach { it() }
-    ViewRemoveListeners.remove(this)
+    ViewCalculationContexts[this]?.cancel()
+    ViewCalculationContexts.remove(this)
     ViewAction.remove(this)
 }
 
-data class NViewCalculationContext(val native: View): CalculationContext {
+data class NViewCalculationContext(val native: View): CalculationContext.WithLoadTracking(), Cancellable {
+    val onRemove = ArrayList<()->Unit>()
+    override fun cancel() {
+        onRemove.forEach { it() }
+        onRemove.clear()
+    }
     override fun onRemove(action: () -> Unit) {
-        ViewRemoveListeners.getOrPut(native) { ArrayList() }.add(action)
+        onRemove.add(action)
     }
 
-    override fun notifyStart() {
-
+    val loading = Property(false)
+    override fun hideLoad() {
+        loading.value = false
     }
-    override fun notifySuccess() {  }
 
-    override fun notifyFailure(t: Throwable) {
-
+    override fun showLoad() {
+        loading.value = true
     }
 }
 
+val NView.maybeCalculationContext: NViewCalculationContext?
+    get() = ViewCalculationContexts.get(this)
+
 actual val NView.calculationContext: CalculationContext
-    get() = NViewCalculationContext(this)
+    get() = ViewCalculationContexts.getOrPut(this) { NViewCalculationContext(this) }
 
 actual var NView.nativeRotation: Angle
     get() = Angle(rotation / Angle.DEGREES_PER_CIRCLE)

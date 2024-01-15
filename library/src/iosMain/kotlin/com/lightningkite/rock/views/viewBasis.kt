@@ -26,11 +26,8 @@ class NViewCalculationContext(): CalculationContext {
     override fun notifyStart() {
     }
 
-    override fun notifySuccess() {
-    }
-
-    override fun notifyFailure(t: Throwable) {
-        super.notifyFailure(t)
+    override fun notifyComplete(result: Result<Unit>) {
+        super.notifyComplete(result)
     }
 
     fun shutdown() {

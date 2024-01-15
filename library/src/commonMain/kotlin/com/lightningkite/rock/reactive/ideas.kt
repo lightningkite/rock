@@ -124,7 +124,8 @@ fun CalculationContext.use(resourceUse: ResourceUse) {
     onRemove { x() }
 }
 
-fun CalculationContext.reactiveScope(onLoad: (()->Unit)? = null, action: suspend () -> Unit) {
+fun CalculationContext.reactiveScope(action: suspend () -> Unit) = reactiveScope(null, action)
+fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> Unit) {
     var run: () -> Unit = {}
     val data = ReactiveScopeData {
         run()
@@ -208,13 +209,13 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
         var listening = false
         var queued = ArrayList<Continuation<T>>()
         override suspend fun awaitRaw(): T = if(ready) {
-//            println("$this: Ready answer")
+            println("$this: Ready answer")
             exception?.let { throw it } ?: value as T
         } else if(listening) {
-//            println("$this: Already listening; queue")
+            println("$this: Already listening; queue")
             suspendCoroutineCancellable<T> { queued.add(it); { queued.remove(it) } }
         } else {
-//            println("$this: Nobody listening; action")
+            println("$this: Nobody listening; action")
             action(ctx)
         }
 

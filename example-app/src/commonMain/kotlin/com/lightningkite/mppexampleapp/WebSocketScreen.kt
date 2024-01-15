@@ -21,7 +21,9 @@ object WebSocketScreen : RockScreen {
             button {
                 text("Send junk")
                 onClick {
+                    println("Preparing to send...")
                     socket.await().send("From Rock (Kotlin): ${clockMillis()}")
+                    println("Sent!")
                 }
             }
             button {

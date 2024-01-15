@@ -83,9 +83,16 @@ class RouterGeneration(
                                                 else -> {}
                                             }
                                         }
-                                        if (routable.source.classKind == ClassKind.OBJECT)
+                                        if (routable.source.classKind == ClassKind.OBJECT) {
                                             appendLine("${routable.source.simpleName!!.asString()}")
-                                        else {
+                                            appendLine(".apply {")
+                                            tab {
+                                                for (qp in routable.queryParameters) {
+                                                    appendLine("UrlProperties.decodeFromStringMap<${qp.type.toKotlin()}>(\"${qp.qpName}\", it.parameters)?.let { this.${qp.name}.value = it }")
+                                                }
+                                            }
+                                            appendLine("}")
+                                        }else {
                                             appendLine("${routable.source.simpleName!!.asString()}(")
                                             tab {
                                                 for ((index, part) in route.withIndex()) {

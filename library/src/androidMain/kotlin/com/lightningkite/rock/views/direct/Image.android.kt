@@ -68,6 +68,10 @@ actual var Image.source: ImageSource
                 native.setImageDrawable(PathDrawable(value))
             }
 
+            is ImageLocal -> {
+                native.setImageURI(value.file.uri)
+            }
+
             else -> {
                 throw RuntimeException("Android View Tag is not an Image Source")
             }

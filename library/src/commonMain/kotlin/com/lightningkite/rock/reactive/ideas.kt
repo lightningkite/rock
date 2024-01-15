@@ -45,7 +45,8 @@ class LateInitProperty<T>(): Writable<T>, ReadWriteProperty<Any?, T> {
             old.forEach { it.resume(value) }
             listeners.toList().forEach { it() }
         }
-    private var ready: Boolean = false
+    var ready: Boolean = false
+        private set
 
     fun unset() {
         ready = false

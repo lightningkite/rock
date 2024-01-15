@@ -123,16 +123,26 @@ actual class RequestResponse(val wraps: HttpResponse) {
     actual val status: Short get() = wraps.status.value.toShort()
     actual val ok: Boolean get() = wraps.status.isSuccess()
     actual suspend fun text(): String {
-        val result = wraps.bodyAsText()
-        backToMainThread()
-        return result
+        try {
+            val result = wraps.bodyAsText()
+            backToMainThread()
+            return result
+        } catch(e: Exception) {
+            backToMainThread()
+            throw e
+        }
     }
 
     actual suspend fun blob(): Blob {
-        val result = wraps.body<ByteArray>()
-            .let { Blob(it, wraps.contentType()?.toString() ?: "application/octet-stream") }
-        backToMainThread()
-        return result
+        try {
+            val result = wraps.body<ByteArray>()
+                .let { Blob(it, wraps.contentType()?.toString() ?: "application/octet-stream") }
+            backToMainThread()
+            return result
+        } catch(e: Exception) {
+            backToMainThread()
+            throw e
+        }
     }
 }
 

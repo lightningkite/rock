@@ -67,7 +67,7 @@ actual suspend fun fetch(
         }
         backToMainThread()
         return RequestResponse(response)
-    } catch(e: Exception) {
+    } catch (e: Exception) {
         backToMainThread()
         throw e
     }
@@ -110,16 +110,26 @@ actual class RequestResponse(val wraps: HttpResponse) {
     actual val status: Short get() = wraps.status.value.toShort()
     actual val ok: Boolean get() = wraps.status.isSuccess()
     actual suspend fun text(): String {
-        val result = wraps.bodyAsText()
-        backToMainThread()
-        return result
+        try {
+            val result = wraps.bodyAsText()
+            backToMainThread()
+            return result
+        } catch (e: Exception) {
+            backToMainThread()
+            throw e
+        }
     }
 
     actual suspend fun blob(): Blob {
-        val result = wraps.body<ByteArray>()
-            .let { Blob(it.toNSData(), wraps.contentType()?.toString() ?: "application/octet-stream") }
-        backToMainThread()
-        return result
+        try {
+            val result = wraps.body<ByteArray>()
+                .let { Blob(it.toNSData(), wraps.contentType()?.toString() ?: "application/octet-stream") }
+            backToMainThread()
+            return result
+        } catch (e: Exception) {
+            backToMainThread()
+            throw e
+        }
     }
 }
 
@@ -133,13 +143,28 @@ class WebSocketWrapper(val url: String) : WebSocket {
     val sending = Channel<Frame>(10)
     var stayOn = true
     val onOpen = ArrayList<() -> Unit>()
-    init { onOpen.add { assertMainThread() } }
+
+    init {
+        onOpen.add { assertMainThread() }
+    }
+
     val onClose = ArrayList<(Short) -> Unit>()
-    init { onClose.add { assertMainThread() } }
+
+    init {
+        onClose.add { assertMainThread() }
+    }
+
     val onMessage = ArrayList<(String) -> Unit>()
-    init { onMessage.add { assertMainThread() } }
+
+    init {
+        onMessage.add { assertMainThread() }
+    }
+
     val onBinaryMessage = ArrayList<(Blob) -> Unit>()
-    init { onBinaryMessage.add { assertMainThread() } }
+
+    init {
+        onBinaryMessage.add { assertMainThread() }
+    }
 
     init {
         launchGlobal {

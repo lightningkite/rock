@@ -57,11 +57,11 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val spacing = SpacingItemDecoration(0)
-        native.addItemDecoration(spacing)
-        handleTheme(native, viewDraws = false) { theme, view ->
-            spacing.spacing = theme.spacing.value.toInt()
-        }
+//        val spacing = SpacingItemDecoration(0)
+//        native.addItemDecoration(spacing)
+//        handleTheme(native, viewDraws = false) { theme, view ->
+//            spacing.spacing = theme.spacing.value.toInt()
+//        }
         setup()
     }
 }
@@ -71,11 +71,11 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        val spacing = SpacingItemDecoration(0)
-        native.addItemDecoration(spacing)
-        handleTheme(native, viewDraws = false) { theme, view ->
-            spacing.spacing = theme.spacing.value.toInt()
-        }
+//        val spacing = SpacingItemDecoration(0)
+//        native.addItemDecoration(spacing)
+//        handleTheme(native, viewDraws = false) { theme, view ->
+//            spacing.spacing = theme.spacing.value.toInt()
+//        }
         setup()
     }
 }
@@ -85,11 +85,11 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 3)
-        val spacing = SpacingItemDecoration(0)
-        native.addItemDecoration(spacing)
-        handleTheme(native, viewDraws = false) { theme, view ->
-            spacing.spacing = theme.spacing.value.toInt()
-        }
+//        val spacing = SpacingItemDecoration(0)
+//        native.addItemDecoration(spacing)
+//        handleTheme(native, viewDraws = false) { theme, view ->
+//            spacing.spacing = theme.spacing.value.toInt()
+//        }
         setup()
     }
 }

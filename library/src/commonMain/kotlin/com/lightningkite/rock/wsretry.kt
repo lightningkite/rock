@@ -1,6 +1,7 @@
 package com.lightningkite.rock
 
 import com.lightningkite.rock.reactive.*
+import kotlinx.datetime.Clock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
@@ -16,6 +17,7 @@ fun retryWebsocket(
     val onMessageList = ArrayList<(String) -> Unit>()
     val onBinaryMessageList = ArrayList<(Blob) -> Unit>()
     val onCloseList = ArrayList<(Short) -> Unit>()
+    var lastPong = clockMillis()
     fun reset() {
         currentWebSocket = websocket(url).also {
             it.onOpen {
@@ -23,6 +25,7 @@ fun retryWebsocket(
             }
             it.onMessage {
                 if (it.isNotBlank()) onMessageList.toList().forEach { l -> l(it) }
+                else lastPong = clockMillis()
             }
             it.onBinaryMessage {
                 onBinaryMessageList.toList().forEach { l -> l(it) }
@@ -43,6 +46,7 @@ fun retryWebsocket(
             val pings = launchGlobal {
                 while(true){
                     delay(30_000)
+                    if(lastPong < clockMillis() - 60_000) it.close((-1).toShort(), "Server did not respond to two consecutive pings.")
                     it.send(" ")
                 }
             }

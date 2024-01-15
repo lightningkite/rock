@@ -11,6 +11,7 @@ actual typealias NTextView = UILabel
 @ViewDsl
 actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 2)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
@@ -22,6 +23,7 @@ actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.6)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
@@ -33,6 +35,7 @@ actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.4)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
@@ -44,6 +47,7 @@ actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.3)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
@@ -55,6 +59,7 @@ actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.2)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
@@ -66,6 +71,7 @@ actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.1)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
@@ -77,6 +83,7 @@ actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.0)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
@@ -88,6 +95,7 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()
 @ViewDsl
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 0.8)
+    numberOfLines = 0
     handleTheme(this) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body

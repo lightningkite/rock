@@ -96,7 +96,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 //                    return@map Size(primary = (-w).toDouble(), secondary = remaining.secondary, margin = m)
 //                }
 //            }
-            val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
+            val required = it.sizeThatFits2(remaining.copy(remaining.primary * 2, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }

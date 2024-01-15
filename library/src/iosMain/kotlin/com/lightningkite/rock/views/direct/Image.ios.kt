@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.backToMainThread
 import com.lightningkite.rock.fetch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.toNSData
@@ -8,6 +9,8 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageView
 import platform.UIKit.UIViewContentMode
 import platform.UIKit.accessibilityLabel
+import platform.UniformTypeIdentifiers.UTTypeImage
+import platform.UniformTypeIdentifiers.loadDataRepresentationForContentType
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NImage = UIImageView
@@ -46,6 +49,22 @@ actual inline var Image.source: ImageSource
                 native.informParentOfSizeChange()
             }
 
+            is ImageLocal -> {
+                native.image = null
+                value.file.provider.loadDataRepresentationForContentType(
+                    value.file.suggestedType ?: UTTypeImage
+                ) { data, err ->
+                    if (data != null) {
+                        //TODO There has to be a better way to handle this. This lambda is run on a background thread.
+                        launch {
+                            backToMainThread()
+                            native.image = UIImage(data = data)
+                            native.informParentOfSizeChange()
+                        }
+                    }
+                }
+            }
+
             else -> {}
         }
     }
@@ -58,6 +77,7 @@ actual inline var Image.scaleType: ImageScaleType
                 native.clipsToBounds = true
                 native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFill
             }
+
             ImageScaleType.Stretch -> native.contentMode = UIViewContentMode.UIViewContentModeScaleToFill
             ImageScaleType.NoScale -> native.contentMode = UIViewContentMode.UIViewContentModeCenter
         }

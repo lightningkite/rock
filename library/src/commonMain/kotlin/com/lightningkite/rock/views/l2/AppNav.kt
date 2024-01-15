@@ -64,7 +64,10 @@ val ViewWriter.appNavFactory by viewWriterAddon<Property<ViewWriter.(AppNav.() -
 
 fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
     stack {
-        val navigator = PlatformNavigator(routes)
+        println("Referencing PlatformNavigator")
+        val navigator = PlatformNavigator
+        println("Initializing routes")
+        PlatformNavigator.routes = routes
         this@appNav.navigator = navigator
         swapView {
             swapping(

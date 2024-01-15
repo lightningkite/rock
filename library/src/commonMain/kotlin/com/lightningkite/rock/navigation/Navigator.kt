@@ -9,28 +9,37 @@ interface RockNavigator {
     val canGoBack: Readable<Boolean>
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
-    fun goBack()
-    fun dismiss()
+    fun reset(screen: RockScreen)
+    fun goBack(): Boolean
+    fun dismiss(): Boolean
     val direction: Direction?
     enum class Direction { Back, Neutral, Forward }
 }
 
-class LocalNavigator(override val routes: Routes, dialog: RockNavigator? = null): RockNavigator {
+class LocalNavigator(val routesGetter: ()->Routes, dialog: RockNavigator? = null): RockNavigator {
+    constructor(routes: Routes, dialog: RockNavigator? = null):this({routes}, dialog)
+    override val routes: Routes by lazy { routesGetter() }
     override val dialog: RockNavigator = dialog ?: this
     override var direction: RockNavigator.Direction? = null
-        private set
-    val stack = Property(listOf((routes.parse(UrlLikePath.EMPTY) ?: routes.fallback)))
+        protected set
+    val stack = Property<List<RockScreen>>(listOf())
     override val canGoBack: Readable<Boolean>
         get() = shared { stack.await().size > 1 }
     override val currentScreen: Readable<RockScreen?>
         get() = shared { stack.await().lastOrNull() }
-    override fun goBack() {
+    override fun goBack(): Boolean {
         direction = RockNavigator.Direction.Back
-        if(stack.value.size > 1) stack.value = stack.value.dropLast(1)
+        if(stack.value.size > 1) {
+            stack.value = stack.value.dropLast(1)
+            return true
+        } else return false
     }
-    override fun dismiss() {
+    override fun dismiss(): Boolean {
         direction = RockNavigator.Direction.Back
-        if(stack.value.isNotEmpty()) stack.value = stack.value.dropLast(1)
+        if(stack.value.isNotEmpty()) {
+            stack.value = stack.value.dropLast(1)
+            return true
+        } else return false
     }
     override fun navigate(screen: RockScreen) {
         direction = RockNavigator.Direction.Forward
@@ -40,8 +49,12 @@ class LocalNavigator(override val routes: Routes, dialog: RockNavigator? = null)
         direction = RockNavigator.Direction.Neutral
         stack.value = stack.value.dropLast(1).plus(screen)
     }
+    override fun reset(screen: RockScreen) {
+        direction = RockNavigator.Direction.Neutral
+        stack.value = listOf(screen)
+    }
 }
 
-expect class PlatformNavigator(
-    routes: Routes
-) : RockNavigator
+expect object PlatformNavigator : RockNavigator {
+    override var routes: Routes
+}

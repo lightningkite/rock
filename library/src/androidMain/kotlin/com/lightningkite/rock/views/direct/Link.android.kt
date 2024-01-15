@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.RockActivity
+import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewDsl
@@ -16,7 +17,7 @@ actual var Link.to: RockScreen
     get() {
         val rockScreen: RockScreen
         runBlocking {
-            rockScreen = (native.context as RockActivity).navigator.currentScreen.await()!!
+            rockScreen = PlatformNavigator.currentScreen.await()!!
         }
         return rockScreen
     }

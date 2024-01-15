@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.lightningkite.rock.models.WindowStatistics
+import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.reactive.AnimationFrame
 import com.lightningkite.rock.reactive.SoftInputOpen
@@ -21,8 +22,6 @@ import com.lightningkite.rock.views.AndroidAppContext
 import timber.log.Timber
 
 abstract class RockActivity : AppCompatActivity() {
-    open lateinit var navigator: RockNavigator
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowInfo.value = WindowStatistics(
@@ -131,5 +130,11 @@ abstract class RockActivity : AppCompatActivity() {
         animator?.pause()
         animator = null
         super.onPause()
+    }
+
+    override fun onBackPressed() {
+        if(!PlatformNavigator.goBack()) {
+            super.onBackPressed()
+        }
     }
 }

@@ -11,17 +11,35 @@ import org.w3c.dom.PopStateEvent
 import org.w3c.dom.ScrollRestoration
 import org.w3c.dom.url.URLSearchParams
 
-actual class PlatformNavigator actual constructor(
-    override val routes: Routes
-) : RockNavigator {
+actual object PlatformNavigator : RockNavigator {
+
+    private lateinit var _routes: Routes
+    actual override var routes: Routes
+        get() = _routes
+        set(value) {
+            _routes = value
+            if(_currentScreen.value is RockScreen.Empty) {
+                _currentScreen.value = routes.parse(window.location.urlLike()) ?: routes.fallback
+            }
+            CalculationContext.NeverEnds.reactiveScope {
+                currentScreen.await().let {
+                    val rendered = value.render(it)
+                    rendered?.listenables?.forEach { rerunOn(it) }
+                    rendered?.urlLikePath?.let {
+                        if(window.location.urlLike() != it) {
+                            window.history.replaceState(currentIndex, "", it.render())
+                        }
+                    }
+                }
+            }
+        }
+
     private fun Location.urlLike() = UrlLikePath(
         segments = pathname.split('/').filter { it.isNotBlank() },
         parameters = search.trimStart('?').split('&').filter { it.isNotBlank() }.associate { it.substringBefore('=') to decodeURIComponent(it.substringAfter('=')) }
     )
 
-    override val dialog: RockNavigator = LocalNavigator(routes).also {
-        it.stack.value = listOf()
-    }
+    override val dialog: RockNavigator = LocalNavigator({ routes })
 
     private var nextIndex: Int = 1
     private val currentIndexProp = Property(0)
@@ -43,30 +61,13 @@ actual class PlatformNavigator actual constructor(
     }
 
     private val String.asSegments: List<String> get() = split('/').filter { it.isNotBlank() }
-    private val _currentScreen = Property(run {
-        val path = window.location.urlLike()
-        routes.parse(path) ?: routes.fallback
-    })
+    private val _currentScreen = Property<RockScreen>(RockScreen.Empty)
     override val currentScreen: Readable<RockScreen>
         get() = _currentScreen
     override val canGoBack: Readable<Boolean>
         get() = shared {
             currentIndexProp.await() > 0
         }
-
-    init {
-        CalculationContext.NeverEnds.reactiveScope {
-            currentScreen.await().let {
-                val rendered = routes.render(it)
-                rendered?.listenables?.forEach { rerunOn(it) }
-                rendered?.urlLikePath?.let {
-                    if(window.location.urlLike() != it) {
-                        window.history.replaceState(currentIndex, "", it.render())
-                    }
-                }
-            }
-        }
-    }
 
     override var direction: RockNavigator.Direction? = null
         private set
@@ -107,11 +108,18 @@ actual class PlatformNavigator actual constructor(
         navigate(screen, pushState = false)
     }
 
-    override fun goBack() {
-        window.history.go(-1)
+    override fun reset(screen: RockScreen) {
+        direction = RockNavigator.Direction.Neutral
+        navigate(screen, pushState = false)
     }
 
-    override fun dismiss() {
+    override fun goBack(): Boolean {
         window.history.go(-1)
+        return true
+    }
+
+    override fun dismiss(): Boolean {
+        window.history.go(-1)
+        return true
     }
 }

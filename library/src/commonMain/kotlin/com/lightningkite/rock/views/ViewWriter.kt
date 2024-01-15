@@ -167,14 +167,14 @@ class ViewWriter(
         }
     }
 
-    fun <T> forEachUpdating(items: Readable<List<T>>, render: ViewWriter.(Readable<T>) -> Unit) {
+    fun <T> forEachUpdating(items: Readable<List<T>>, placeholdersWhileLoading: Int = 5, render: ViewWriter.(Readable<T>) -> Unit) {
         val split = split()
         val currentViews = ArrayList<LateInitProperty<T>>()
         val currentView = currentView
-        val fakes = 5
         calculationContext.reactiveScope(onLoad = {
-            if(currentViews.size < fakes) {
-                repeat(fakes - currentViews.size) {
+            if(placeholdersWhileLoading <= 0) return@reactiveScope
+            if(currentViews.size < placeholdersWhileLoading) {
+                repeat(placeholdersWhileLoading - currentViews.size) {
                     val newProp = LateInitProperty<T>()
                     split.render(newProp)
                     currentViews.add(newProp)
@@ -186,11 +186,11 @@ class ViewWriter(
                 }
             }*/
             val children = currentView.listNViews()
-            for(index in 0 until fakes) {
+            for(index in 0 until placeholdersWhileLoading) {
                 children[index].exists = true
                 currentViews[index].unset()
             }
-            for(index in fakes..<currentViews.size) {
+            for(index in placeholdersWhileLoading..<currentViews.size) {
                 children[index].exists = false
             }
         }) {

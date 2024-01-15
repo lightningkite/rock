@@ -46,7 +46,7 @@ actual fun <T> RecyclerView.children(
     render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit {
     val writer = this.native.asDynamic().__viewWriter as ViewWriter
-    writer.forEachUpdating(items, render)
+    writer.forEachUpdating(items, render = render)
 }
 
 actual fun RecyclerView.scrollToIndex(

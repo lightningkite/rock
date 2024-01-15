@@ -2,6 +2,8 @@ package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.*
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
@@ -31,6 +33,11 @@ object RecyclerViewScreen : RockScreen {
                         subtext("Scroll ${align.name}")
                         onClick { recyclerView?.scrollToIndex(49, align, true) }
                     }
+                }
+            }
+            sizedBox(SizeConstraints(height = 4.rem)) - horizontalRecyclerView {
+                children(items) {
+                    important - stack { text { ::content { it.await().toString() } } }
                 }
             }
             recyclerView {

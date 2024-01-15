@@ -88,8 +88,10 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
                     )
                 )
             ).apply {
-                configuration.scrollDirection =
-                    UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal
+                configuration = configuration.apply {
+                    scrollDirection =
+                        UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal
+                }
             }
         })
 ) {
@@ -109,7 +111,6 @@ actual var RecyclerView.columns: Int
 @OptIn(ExperimentalObjCName::class, BetaInteropApi::class, ExperimentalForeignApi::class)
 @ExportObjCClass
 class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesProtocol {
-    var vertical = true
     constructor():this(CGRectMake(0.0, 0.0, 0.0, 0.0))
 
     @OverrideInit
@@ -181,17 +182,6 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
     @OptIn(ExperimentalForeignApi::class)
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
         return frameLayoutSizeThatFits(size)
-//        if(vertical)  {
-//            return frameLayoutSizeThatFits(CGSizeMake(
-//                size.useContents { width },
-//                1000.0,
-//            ))
-//        } else {
-//            return frameLayoutSizeThatFits(CGSizeMake(
-//                1000.0,
-//                size.useContents { height },
-//            ))
-//        }
     }
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {

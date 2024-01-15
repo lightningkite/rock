@@ -72,6 +72,7 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.recyclerview:recyclerview:1.3.2")
+                api("com.google.android.material:material:1.11.0")
             }
         }
 

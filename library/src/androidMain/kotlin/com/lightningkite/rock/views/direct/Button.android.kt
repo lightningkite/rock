@@ -1,10 +1,11 @@
 package com.lightningkite.rock.views.direct
 
 import android.widget.FrameLayout
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.lightningkite.rock.models.rem
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.launch
+import com.lightningkite.rock.reactive.await
+import com.lightningkite.rock.reactive.invoke
+import com.lightningkite.rock.views.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NButton = FrameLayout
@@ -15,8 +16,17 @@ actual fun ViewWriter.button(setup: Button.() -> Unit) {
         val frame = native as FrameLayout
         native.minimumWidth = 2.rem.value.toInt()
         native.minimumHeight = 2.rem.value.toInt()
+        val l = native.androidCalculationContext.loading
         handleThemeControl(frame) {
             setup(Button(frame))
+//            LinearProgressIndicator(context).apply {
+//                this.colo
+//            }
+            activityIndicator {
+                ::exists.invoke { l.await() }
+                native.minimumWidth = 0
+                native.minimumHeight = 0
+            }
         }
     }
 }

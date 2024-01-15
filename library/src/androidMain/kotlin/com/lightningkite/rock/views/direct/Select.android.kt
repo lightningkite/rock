@@ -13,12 +13,9 @@ import androidx.appcompat.widget.AppCompatSpinner
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.launch
-import com.lightningkite.rock.views.reactiveScope
 import java.util.*
 import com.lightningkite.rock.models.rem
+import com.lightningkite.rock.views.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual class NSelect(context: Context): AppCompatSpinner(context) {
@@ -41,8 +38,10 @@ actual fun <T> Select.bind(
                 (convertView as TextView).text = render(list[position])
                 return convertView
             } else {
-                native.viewWriter.text {
-                    content = render(list[position])
+                with(native.viewWriter) {
+                    withDefaultPadding - text {
+                        content = render(list[position])
+                    }
                 }
                 return native.viewWriter.rootCreated!!.also {
                     it.layoutParams = ViewGroup.LayoutParams(
@@ -95,7 +94,7 @@ actual fun <T> Select.bind(
 @ViewDsl
 actual fun ViewWriter.select(setup: Select.() -> Unit) {
     return viewElement(factory = ::NSelect, wrapper = ::Select, setup = {
-        handleThemeControl(native, background = {
+        handleThemeControl(native, viewLoads = true, background = {
             native.setPopupBackgroundDrawable(it.backgroundDrawable(true))
         }) {
             native.viewWriter = newViews()

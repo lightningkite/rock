@@ -2,6 +2,8 @@
 
 package com.lightningkite.rock.views.direct
 
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
@@ -9,6 +11,7 @@ import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.StateListDrawable
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.animation.Animation
 import android.widget.*
 import androidx.core.view.setMargins
 import com.lightningkite.rock.models.*
@@ -137,6 +140,7 @@ val applyTextColorFromTheme: (Theme, AndroidTextView) -> Unit = { theme, textVie
 inline fun <T: NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
+    viewLoads: Boolean = false,
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
@@ -146,11 +150,13 @@ inline fun <T: NView> ViewWriter.handleTheme(
     val currentTheme = currentTheme
     val isRoot = isRoot
     this.isRoot = false
+    var animator: ValueAnimator? = null
 
     view.calculationContext.reactiveScope {
         val theme = currentTheme()
 
         val viewMarginless = viewIsMarginless[view] ?: false
+        val viewForcePadding = viewHasPadding[view] ?: false
 
         val shouldTransition = when (transition) {
             ViewWriter.TransitionNextView.No -> false
@@ -159,7 +165,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = mightTransition && !isRoot
+        val usePadding = mightTransition && !isRoot || viewForcePadding
         val useMargins = (viewDraws || mightTransition) && !viewMarginless
 
         val borders = !viewMarginless
@@ -175,14 +181,45 @@ inline fun <T: NView> ViewWriter.handleTheme(
             view.setPaddingAll(0)
         }
 
-        if (useBackground) {
+        // TODO: Animate background change?
+        if(viewLoads && view.androidCalculationContext.loading.await()) {
+
             val gradientDrawable = theme.backgroundDrawable(borders)
+            val animation = ValueAnimator.ofFloat(0f, 1f)
+
+            animation.setDuration(1000)
+            animation.repeatMode = ValueAnimator.REVERSE
+            animation.repeatCount = Animation.INFINITE
+
+            val originalColors = gradientDrawable.colors?.map { Color.fromInt(it) } ?: listOf()
+            val currentColors = originalColors.map { it.toInt() }.toIntArray()
+            animation.addUpdateListener { it: ValueAnimator ->
+                for(index in originalColors.indices) currentColors[index] = originalColors[index].highlight(it.animatedFraction * 0.1f + 0.05f).toInt()
+                gradientDrawable.colors = currentColors
+            }
+
+            animation.start()
+            animator = animation
             view.background = gradientDrawable
-            view.elevation = if (borders) theme.elevation.value else 0f
-            background(theme)
+            view.elevation = if (useBackground && borders) theme.elevation.value else 0f
+            if (useBackground) {
+                background(theme)
+            } else {
+                backgroundRemove()
+            }
         } else {
-            view.background = null
-            backgroundRemove()
+            animator?.removeAllListeners()
+            animator?.cancel()
+            animator = null
+            if (useBackground) {
+                val gradientDrawable = theme.backgroundDrawable(borders)
+                view.background = gradientDrawable
+                view.elevation = if (borders) theme.elevation.value else 0f
+                background(theme)
+            } else {
+                view.background = null
+                backgroundRemove()
+            }
         }
         foreground(theme, view)
     }
@@ -237,6 +274,7 @@ fun Theme.backgroundDrawable(
 
 inline fun <T: View> ViewWriter.handleThemeControl(
     view: T,
+    viewLoads: Boolean = false,
     noinline checked: suspend () -> Boolean = { false },
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
@@ -248,6 +286,7 @@ inline fun <T: View> ViewWriter.handleThemeControl(
         if (checked()) return@withThemeGetter it().selected()
         val isHovered = hovered.await()
         when {
+            // TODO: State control
 //            state and UIControlStateDisabled != 0UL -> it().disabled()
 //            state and UIControlStateHighlighted != 0UL -> it().down()
             isHovered -> it().hover()
@@ -266,7 +305,7 @@ inline fun <T: View> ViewWriter.handleThemeControl(
                 }
             }
         }
-        handleTheme(view, false, background, backgroundRemove, foreground)
+        handleTheme(view, false, viewLoads, background, backgroundRemove, foreground)
         setup()
     }
 }

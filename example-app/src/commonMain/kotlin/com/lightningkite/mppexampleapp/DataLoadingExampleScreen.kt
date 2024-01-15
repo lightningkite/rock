@@ -8,6 +8,8 @@ import com.lightningkite.rock.reactive.shared
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.expanding
+import com.lightningkite.rock.views.minus
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
@@ -25,15 +27,15 @@ object DataLoadingExampleScreen : RockScreen {
         col {
             h1 { content = "This example loads some data." }
             text { content = "It's also faking a lot of loading so you can see what it looks like." }
-            col {
-                forEachUpdating(data) {
+            expanding - recyclerView {
+                children(data) {
                     col {
                         val f = shared { delay(Random.nextLong(0, 5000)); "" }
                         h3 { ::content { it.await().title + f.await() } }
                         text { ::content { it.await().body + f.await() } }
                     } in card
                 }
-            } in scrolls in weight(1f)
+            }
         }
     }
 }

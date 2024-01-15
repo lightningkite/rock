@@ -74,6 +74,9 @@ data class NViewCalculationContext(val native: View): CalculationContext.WithLoa
 val NView.maybeCalculationContext: NViewCalculationContext?
     get() = ViewCalculationContexts.get(this)
 
+val NView.androidCalculationContext: NViewCalculationContext
+    get() = ViewCalculationContexts.getOrPut(this) { NViewCalculationContext(this) }
+
 actual val NView.calculationContext: CalculationContext
     get() = ViewCalculationContexts.getOrPut(this) { NViewCalculationContext(this) }
 

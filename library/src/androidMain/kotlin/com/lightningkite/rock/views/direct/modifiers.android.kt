@@ -19,6 +19,7 @@ import java.util.*
 
 
 val viewIsMarginless: WeakHashMap<View, Boolean> = WeakHashMap()
+val viewHasPadding: WeakHashMap<View, Boolean> = WeakHashMap()
 
 @ViewModifierDsl3
 actual val ViewWriter.marginless: ViewWrapper
@@ -33,13 +34,7 @@ actual val ViewWriter.marginless: ViewWrapper
 actual val ViewWriter.withDefaultPadding: ViewWrapper
     get() {
         beforeNextElementSetup {
-            val padding = (AndroidAppContext.density * 8).toInt()
-            this.setPadding(
-                padding,
-                padding,
-                padding,
-                padding
-            )
+            viewHasPadding[this] = true
         }
         return ViewWrapper
     }
@@ -56,7 +51,7 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
                 lp.height = 0
             }
         } catch (ex: Throwable) {
-            throw RuntimeException("Weight is only available within a column or row.")
+            throw RuntimeException("Weight is only available within a column or row, but the parent is a ${parent?.let {it::class.simpleName}}")
         }
     }
     return ViewWrapper
@@ -105,10 +100,6 @@ actual val ViewWriter.scrolls: ViewWrapper
         wrapNext(NestedScrollView(this.context)) {
             isFillViewport = true
         }
-        beforeNextElementSetup {
-//            lparams.width = ViewGroup.LayoutParams.MATCH_PARENT
-//            lparams.height = ViewGroup.LayoutParams.MATCH_PARENT
-        }
         return ViewWrapper
     }
 
@@ -117,10 +108,6 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         wrapNext(HorizontalScrollView(this.context)) {
             isFillViewport = true
-        }
-        beforeNextElementSetup {
-//            lparams.width = ViewGroup.LayoutParams.MATCH_PARENT
-//            lparams.height = ViewGroup.LayoutParams.MATCH_PARENT
         }
         return ViewWrapper
     }

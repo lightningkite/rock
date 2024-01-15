@@ -1,10 +1,13 @@
 package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp
 
+import com.lightningkite.mppexampleapp.Resources
 import com.lightningkite.rock.*
+import com.lightningkite.rock.models.ImageScaleType
+import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.card
+import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -19,7 +22,7 @@ object LoadAnimationTestScreen : RockScreen {
             val loading = LateInitProperty<String>()
             val writable = Property<String>("")
             h1 { content = "Loading animation testing" }
-            col {
+            expanding - scrolls - col {
                 row {
                     button {
                         text("Load")
@@ -30,8 +33,16 @@ object LoadAnimationTestScreen : RockScreen {
                         onClick { loading.unset() }
                     }
                 }
-                button {
+                important - button {
                     text("Do action")
+                    onClick { delay(5000) }
+                }
+                important - button {
+                    col {
+                        text("Big do action")
+                        text("with multiple text lines")
+                        text("wow")
+                    }
                     onClick { delay(5000) }
                 }
                 text { ::content { loading.await() } }
@@ -45,7 +56,11 @@ object LoadAnimationTestScreen : RockScreen {
                 select { bind(writable, shared { loading.await().let(::listOf) }, { it }) }
                 textField { content bind loading.withWrite {  } }
                 textArea { content bind loading.withWrite {  } }
-            } in scrolls in weight(1f)
+                sizedBox(SizeConstraints(height = 5.rem)) - image {
+                    ::source { loading.await(); Resources.imagesSolera }
+                    scaleType = ImageScaleType.Fit
+                }
+            }
         }
     }
 }

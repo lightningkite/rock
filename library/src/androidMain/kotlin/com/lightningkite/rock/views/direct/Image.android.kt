@@ -107,7 +107,7 @@ actual var Image.description: String?
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit) {
     return viewElement(factory = ::ImageView, wrapper = ::Image) {
-        handleTheme(native, viewDraws = true)
+        handleTheme(native, viewDraws = true, viewLoads = true)
         setup(this)
     }
 }

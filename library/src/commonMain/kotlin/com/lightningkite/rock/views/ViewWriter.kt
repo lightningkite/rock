@@ -126,6 +126,7 @@ class ViewWriter(
      */
     @Suppress("UNCHECKED_CAST")
     fun <T : NView> wrapNext(element: T, setup: T.() -> Unit): ViewWrapper {
+        stack.lastOrNull()?.addNView(element) ?: run { rootCreated = element }
         stack.add(element)
         val beforeCopy = if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
         beforeNextElementSetupList = ArrayList()
@@ -160,7 +161,6 @@ class ViewWriter(
             }
             while (toPop > 0) {
                 val item = stack.removeLast()
-                stack.lastOrNull()?.addNView(item) ?: run { rootCreated = item }
                 toPop--
             }
 //            wrapperToDoList.clear()

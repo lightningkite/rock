@@ -1,6 +1,8 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
+import android.graphics.Rect
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,6 +11,7 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.reactive.LateInitProperty
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
+import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 
@@ -19,14 +22,33 @@ actual class NRecyclerView(context: Context) : AndroidRecyclerView(context) {
 }
 
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {
-    native.adapter = object : ObservableRVA<T>(this, { 0 }, { _, obs -> render(obs) }) {
+    native.adapter = object : ObservableRVA<T>(this, 5, { 0 }, { _, obs -> render(obs) }) {
         init {
-            reactiveScope {
+            native.calculationContext.reactiveScope(onLoad = {
+                loading = true
+                notifyDataSetChanged()
+            }) {
                 val new = items.await().toList()
+                loading = false
                 lastPublished = new
-                this.notifyDataSetChanged()
+                notifyDataSetChanged()
             }
         }
+    }
+}
+
+
+class SpacingItemDecoration(var spacing: Int) : AndroidRecyclerView.ItemDecoration() {
+    override fun getItemOffsets(
+        outRect: Rect,
+        view: View,
+        parent: androidx.recyclerview.widget.RecyclerView,
+        state: androidx.recyclerview.widget.RecyclerView.State
+    ) {
+        outRect.left = spacing
+        outRect.top = spacing
+        outRect.bottom = spacing
+        outRect.right = spacing
     }
 }
 
@@ -35,6 +57,11 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val spacing = SpacingItemDecoration(0)
+        native.addItemDecoration(spacing)
+        handleTheme(native, viewDraws = false) { theme, view ->
+            spacing.spacing = theme.spacing.value.toInt()
+        }
         setup()
     }
 }
@@ -44,6 +71,11 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        val spacing = SpacingItemDecoration(0)
+        native.addItemDecoration(spacing)
+        handleTheme(native, viewDraws = false) { theme, view ->
+            spacing.spacing = theme.spacing.value.toInt()
+        }
         setup()
     }
 }
@@ -53,6 +85,11 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 3)
+        val spacing = SpacingItemDecoration(0)
+        native.addItemDecoration(spacing)
+        handleTheme(native, viewDraws = false) { theme, view ->
+            spacing.spacing = theme.spacing.value.toInt()
+        }
         setup()
     }
 }
@@ -66,14 +103,17 @@ actual var RecyclerView.columns: Int
 
 internal open class ObservableRVA<T>(
     val recyclerView: RecyclerView,
+    val placeholderCount: Int = 5,
     val determineType: (T) -> Int,
     val makeView: ViewWriter.(Int, Readable<T>) -> Unit
 ) : AndroidRecyclerView.Adapter<AndroidRecyclerView.ViewHolder>() {
     var lastPublished: List<T> = listOf()
     val viewWriter = recyclerView.native.viewWriter
+    var loading: Boolean = false
 
     override fun getItemViewType(position: Int): Int {
-        return determineType(lastPublished[position])
+        return if(loading) 0
+        else determineType(lastPublished[position])
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AndroidRecyclerView.ViewHolder {
@@ -91,14 +131,18 @@ internal open class ObservableRVA<T>(
         return object : AndroidRecyclerView.ViewHolder(subview) {}
     }
 
-    override fun getItemCount(): Int = lastPublished.size
+    override fun getItemCount(): Int = if(loading) placeholderCount else lastPublished.size
 
     @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: AndroidRecyclerView.ViewHolder, position: Int) {
-        (holder.itemView.tag as? LateInitProperty<T> ?: run {
+        val prop = (holder.itemView.tag as? LateInitProperty<T> ?: run {
             println("Failed to find property to update")
             null
-        })?.value = (lastPublished[position])
+        })
+        if(loading)
+            prop?.unset()
+        else
+            prop?.value = (lastPublished[position])
     }
 }
 

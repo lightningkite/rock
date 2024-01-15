@@ -23,7 +23,7 @@ fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
         androidText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-        handleTheme(native, foreground = applyTextColorFromTheme)
+        handleTheme(native, viewLoads = true, foreground = applyTextColorFromTheme)
         setup(TextView(androidText))
     }
 
@@ -31,7 +31,7 @@ fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
         androidText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-        handleTheme(native, foreground = applyTextColorFromThemeHeader)
+        handleTheme(native, viewLoads = true, foreground = applyTextColorFromThemeHeader)
         setup(TextView(androidText))
     }
 

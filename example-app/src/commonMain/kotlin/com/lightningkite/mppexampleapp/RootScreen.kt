@@ -11,11 +11,12 @@ import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.icon
+import com.lightningkite.rock.views.minus
 
 @Routable("/")
 object RootScreen : RockScreen {
     override fun ViewWriter.render() {
-        col {
+        scrolls - col {
             col {
                 h1 { content = "Beautiful by default." }
                 separator()
@@ -66,6 +67,6 @@ object RootScreen : RockScreen {
                 }
 
             } in withDefaultPadding
-        } in scrolls
+        }
     }
 }

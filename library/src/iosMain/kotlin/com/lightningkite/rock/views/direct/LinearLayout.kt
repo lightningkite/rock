@@ -26,12 +26,12 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 
 //    init { setUserInteractionEnabled(false) }
 
-//    val debugLayer = CATextLayer().apply {
-//        layer.addSublayer(this)
-//        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
-//        fontSize = 8.0
-//        foregroundColor = UIColor.redColor.CGColor
-//    }
+    val debugLayer = CATextLayer().apply {
+        layer.addSublayer(this)
+        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
+        fontSize = 8.0
+        foregroundColor = UIColor.redColor.CGColor
+    }
 
     override fun subviewDidChangeSizing(view: UIView?) {
         val it = view ?: return
@@ -71,7 +71,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         }
         measuredSize.primary += padding
 
-//        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()}" }
+        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()}" }
         return measuredSize.objc
     }
 
@@ -82,21 +82,22 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         remaining.secondary -= padding * 2
 
         var totalWeight = 0f
-        return subviews.map {
+
+        val out = arrayOfNulls<Size?>(subviews.size)
+
+        subviews.forEachIndexed { index, it ->
             it as UIView
-            if(it.hidden) return@map Size(0.0, 0.0)
-//            it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
-//                remaining.primary -= it.primary!!.value
-//                return@map Size(primary = it.primary!!.value, secondary = it.secondary!!.value)
-//            }
+            if(it.hidden) {
+                out[index] = Size(0.0, 0.0)
+                return@forEachIndexed
+            }
             val m = it.extensionMargin ?: 0.0
-//            it.extensionWeight?.let { w ->
-//                if(w > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
-//                    totalWeight += w
-//                    return@map Size(primary = (-w).toDouble(), secondary = remaining.secondary, margin = m)
-//                }
-//            }
-            val required = it.sizeThatFits2(remaining.copy(remaining.primary * 2, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
+            it.extensionWeight?.let {
+                totalWeight += it
+                remaining.primary -= 2 * m
+                return@forEachIndexed
+            }
+            val required = it.sizeThatFits2(Size(remaining.primary - m * 2, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
@@ -108,23 +109,30 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             required.margin = m
             required.primary = required.primary.coerceAtLeast(0.0)
             required.secondary = required.secondary.coerceAtLeast(0.0)
-
-            remaining.secondary = remaining.secondary
-            it.extensionWeight?.let { w ->
-                totalWeight += w
-                required.primary = (-w).toDouble()
-            } ?: run {
-                remaining.primary -= required.primary
-            }
-            remaining.primary -= m * 2
-            required
-        }.map {
-            if(it.primary < -0.001) {
-                if(totalWeight == 0f) throw IllegalStateException("View in LL has weight ${-it.primary} but total weight is ${totalWeight}")
-                it.primary = ((-it.primary / totalWeight) * remaining.primary).coerceAtLeast(0.0)
-            }
-            it
+            remaining.primary -= required.primary
+            remaining.primary -= 2 * m
+            out[index] = required
         }
+
+        subviews.forEachIndexed { index, it ->
+            it as UIView
+            if(out[index] != null) return@forEachIndexed
+            val m = it.extensionMargin ?: 0.0
+            val w = it.extensionWeight!!.toDouble()
+            val available = ((w / totalWeight) * remaining.primary).coerceAtLeast(0.0)
+            val required = it.sizeThatFits2(Size(available, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
+            it.extensionSizeConstraints?.let {
+                it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
+                it.secondaryMin?.let { required.secondary = required.secondary.coerceAtLeast(it.value) }
+                it.secondary?.let { required.secondary = it.value }
+            }
+            required.margin = m
+            required.primary = available
+            required.secondary = required.secondary.coerceAtLeast(0.0)
+            out[index] = required
+        }
+
+        return out.map { it!! }
     }
 
     override fun layoutSubviews() {

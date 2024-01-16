@@ -17,7 +17,7 @@ actual typealias NImage = UIImageView
 
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit): Unit = element(NImage()) {
-    handleTheme(this, viewDraws = true)
+    handleTheme(this, viewDraws = true, viewLoads = true)
     this.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
     setup(Image(this))
 }

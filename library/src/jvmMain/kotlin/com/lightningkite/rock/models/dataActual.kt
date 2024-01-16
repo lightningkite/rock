@@ -10,6 +10,12 @@ actual val Int.rem: Dimension
 actual val Double.rem: Dimension
     get() = Dimension("${this}rem")
 
+actual val Int.dp: Dimension
+    get() = Dimension("${this}px")
+
+actual val Double.dp: Dimension
+    get() = Dimension("${this}px")
+
 actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension("calc(${this.value} + ${other.value})")
 actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimension("calc(${this.value} - ${other.value})")
 actual inline operator fun Dimension.times(other: Float): Dimension = Dimension("calc(${this.value} * ${other})")

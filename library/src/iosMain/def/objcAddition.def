@@ -36,4 +36,5 @@ CGRect cgRectValue(NSValue* key) {
 
 @protocol UIViewWithSizeOverrides
 - (void)subviewDidChangeSizing:(UIView*)view;
+// - (CGSize)sizeThatFitsV2WithWidth:(CGFloat)width height:(CGFloat)forceHeight minWidth:(CGFloat)minWidth maxWidth:(CGFloat)minWidth minHeight:(CGFloat)minWidth maxHeight:(CGFloat)minWidth;
 @end

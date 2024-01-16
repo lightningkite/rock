@@ -18,6 +18,10 @@ actual val Int.rem: Dimension
     get() = Dimension((this * AndroidAppContext.oneRem))
 actual val Double.rem: Dimension
     get() = Dimension((this.toFloat() * AndroidAppContext.oneRem))
+actual val Int.dp: Dimension
+    get() = Dimension((this * AndroidAppContext.density))
+actual val Double.dp: Dimension
+    get() = Dimension((this.toFloat() * AndroidAppContext.density))
 
 actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension(this.value + other.value)
 actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimension(this.value - other.value)

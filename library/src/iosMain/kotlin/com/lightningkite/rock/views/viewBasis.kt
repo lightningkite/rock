@@ -2,6 +2,7 @@
 
 package com.lightningkite.rock.views
 
+import com.lightningkite.rock.Cancellable
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.*
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -17,27 +18,28 @@ import platform.UIKit.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = UIView
 
-class NViewCalculationContext(): CalculationContext {
-    val onRemoveList = ArrayList<()->Unit>()
+class NViewCalculationContext(): CalculationContext.WithLoadTracking(), Cancellable {
+    val onRemove = ArrayList<()->Unit>()
+    override fun cancel() {
+        onRemove.forEach { it() }
+        onRemove.clear()
+    }
     override fun onRemove(action: () -> Unit) {
-        onRemoveList.add(action)
+        onRemove.add(action)
     }
 
-    override fun notifyStart() {
+    val loading = Property(false)
+    override fun hideLoad() {
+        loading.value = false
     }
 
-    override fun notifyComplete(result: Result<Unit>) {
-        super.notifyComplete(result)
-    }
-
-    fun shutdown() {
-        onRemoveList.forEach { it() }
-        onRemoveList.clear()
+    override fun showLoad() {
+        loading.value = true
     }
 }
 
 fun UIView.shutdown() {
-    UIViewCalcContext.getValue(this)?.shutdown()
+    UIViewCalcContext.getValue(this)?.cancel()
     ExtensionProperty.remove(this)
     subviews.forEach { (it as UIView).shutdown() }
 }

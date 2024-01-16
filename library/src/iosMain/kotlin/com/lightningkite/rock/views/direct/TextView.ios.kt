@@ -1,7 +1,6 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.*
 import com.lightningkite.rock.views.*
 import platform.UIKit.*
 
@@ -11,8 +10,12 @@ actual typealias NTextView = UILabel
 @ViewDsl
 actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 2)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 2.0 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 2.0).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
         it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -23,8 +26,12 @@ actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.6)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 1.6 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 1.6).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
         it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -35,8 +42,12 @@ actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.4)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 1.4 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 1.4).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
         it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -47,8 +58,12 @@ actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.3)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 1.3 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 1.3).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
         it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -59,8 +74,12 @@ actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.2)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 1.2 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 1.2).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
         it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -71,8 +90,12 @@ actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.1)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 1.1 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 1.1).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.title
         it.title.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -83,8 +106,12 @@ actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 @ViewDsl
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 1.0)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 1.0 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 1.0).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
         it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }
@@ -95,8 +122,12 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()
 @ViewDsl
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(UIFont.systemFontSize * 0.8)
+//    extensionSizeConstraints = SizeConstraints(
+//        minWidth = (UIFont.systemFontSize * 0.8 * 4).dp,
+//        minHeight = (UIFont.systemFontSize * 0.8).dp,
+//    )
     numberOfLines = 0
-    handleTheme(this) {
+    handleTheme(this, viewLoads = true) {
         this.textColor = it.foreground.closestColor().toUiColor()
         this.extensionFontAndStyle = it.body
         it.body.let { this.font = it.font.get(font.pointSize, if (it.bold) UIFontWeightBold else UIFontWeightRegular, it.italic) }

@@ -17,7 +17,7 @@ actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit = stack {
     element(UITextField()) {
         smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
-        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        handleTheme(this, viewLoads = true) { textColor = it.foreground.closestColor().toUiColor() }
         calculationContext.onRemove {
             extensionStrongRef = null
         }

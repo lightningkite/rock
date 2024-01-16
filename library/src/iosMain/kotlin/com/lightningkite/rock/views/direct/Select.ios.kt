@@ -15,6 +15,7 @@ actual typealias NSelect = TextFieldInput
 
 @ViewDsl
 actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = stack {
+    handleTheme(native, viewLoads = true)
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         inputView = UIPickerView().apply {

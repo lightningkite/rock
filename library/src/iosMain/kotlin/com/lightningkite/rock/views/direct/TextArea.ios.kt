@@ -16,7 +16,7 @@ actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit = stack {
     element(UITextView()) {
         smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo
-        handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
+        handleTheme(this, viewLoads = true) { textColor = it.foreground.closestColor().toUiColor() }
         setup(TextArea(this))
         calculationContext.onRemove {
             extensionStrongRef = null

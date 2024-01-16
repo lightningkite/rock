@@ -118,7 +118,9 @@ expect class DimensionRaw
 value class Dimension(val value: DimensionRaw)
 expect val Int.px: Dimension
 expect val Int.rem: Dimension
+expect val Int.dp: Dimension
 expect val Double.rem: Dimension
+expect val Double.dp: Dimension
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 expect inline operator fun Dimension.minus(other: Dimension): Dimension
 expect inline operator fun Dimension.times(other: Float): Dimension

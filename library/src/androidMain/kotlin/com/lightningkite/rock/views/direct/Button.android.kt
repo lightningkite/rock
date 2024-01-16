@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import android.widget.FrameLayout
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.invoke
@@ -32,8 +33,16 @@ actual fun ViewWriter.button(setup: Button.() -> Unit) {
 }
 
 actual fun Button.onClick(action: suspend () -> Unit) {
+    var virtualDisable: Boolean = false
     native.setOnClickListener { view ->
-        launch { action() }
+        view.calculationContext.launchManualCancel {
+            try {
+                virtualDisable = true
+                action()
+            } finally {
+                virtualDisable = false
+            }
+        }
     }
 }
 

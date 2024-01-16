@@ -69,13 +69,18 @@ fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
 
 @OptIn(ExperimentalForeignApi::class)
 private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
+    val padding = extensionPadding ?: 0.0
 //        let size = padding.shrinkSize(size)
-    val remaining = size.copy()
+//    val remaining = size.copy()
+    val remaining = size.copy(width = size.width - 2 * padding, height = size.height * 2 * padding)
 
     return subviews.map {
         it as UIView
         if(it.hidden) return@map Size(0.0, 0.0)
-        val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
+        val m = it.extensionMargin ?: 0.0
+//        val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
+//         TODO: This line is more accurate
+        val required = it.sizeThatFits2(remaining.copy(width = remaining.width - 2 * m, height = remaining.height - 2 * m).objc, it.extensionSizeConstraints).local
         it.extensionSizeConstraints?.let {
             it.maxWidth?.let { required.width = required.width.coerceAtMost(it.value) }
             it.maxHeight?.let { required.height = required.height.coerceAtMost(it.value) }
@@ -84,7 +89,6 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
             it.width?.let { required.width = it.value }
             it.height?.let { required.height = it.value }
         }
-        val m = it.extensionMargin ?: 0.0
         required.margin = m
         required.width = required.width.coerceAtLeast(0.0)//.coerceAtMost(size.width - 2 * m)
         required.height = required.height.coerceAtLeast(0.0)//.coerceAtMost(size.height - 2 * m)

@@ -10,6 +10,7 @@ import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
 import platform.Foundation.NSURL
+import platform.QuartzCore.CATextLayer
 import platform.UIKit.*
 import platform.objc.sel_registerName
 import kotlin.math.max
@@ -25,8 +26,16 @@ class NativeLink: UIButton(CGRectZero.readValue()) {
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
+    val debugLayer = CATextLayer().apply {
+        layer.addSublayer(this)
+        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
+        fontSize = 8.0
+        foregroundColor = UIColor.redColor.CGColor
+    }
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
-        return frameLayoutSizeThatFits(size)
+        return frameLayoutSizeThatFits(size).also {
+        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + it.useContents { "${width.toInt()} x ${height.toInt()}" }
+    }
     }
 
     override fun layoutSubviews() {

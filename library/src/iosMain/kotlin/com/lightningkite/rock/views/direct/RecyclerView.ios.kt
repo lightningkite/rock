@@ -5,6 +5,7 @@ import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.reactive.LateInitProperty
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
+import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CValue
@@ -125,7 +126,9 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
 
     val data = LateInitProperty<T>()
     var ready = false
+    var suppressRemeasure = false
     override fun subviewDidChangeSizing(view: UIView?) {
+        if(suppressRemeasure) return
         frameLayoutSubviewDidChangeSizing(view)
         // Remeasure self
         if(lastInputHeight != -1.0) {
@@ -199,13 +202,19 @@ actual fun <T> RecyclerView.children(
         altCellRef.forEach { it.shutdown() }
         altCellRef.clear()
     }
+    val placeholders = 5
     @Suppress("DIFFERENT_NAMES_FOR_THE_SAME_PARAMETER_IN_SUPERTYPES", "RETURN_TYPE_MISMATCH_ON_INHERITANCE", "MANY_INTERFACES_MEMBER_NOT_IMPLEMENTED")
     val source = object: NSObject(), UICollectionViewDelegateProtocol, UICollectionViewDataSourceProtocol {
         var list: List<T> = listOf()
+        var loading: Boolean = false
 
         init {
-            reactiveScope {
+            native.calculationContext.reactiveScope(onLoad = {
+//                loading = true
+//                native.reloadData()
+            }) {
                 list = items.await()
+                loading = false
                 native.reloadData()
             }
         }
@@ -225,9 +234,18 @@ actual fun <T> RecyclerView.children(
 //                }
 //                vw.rootCreated as? ObsUICollectionViewCell<T> ?: throw IllegalStateException("No view created")
 //            }
-            list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
-                cell.data.value = it
+            if(loading) {
+                cell.suppressRemeasure = true
+                cell.data.unset()
                 cell.setNeedsNewMeasure()
+                cell.suppressRemeasure = false
+            } else {
+                list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
+                    cell.suppressRemeasure = true
+                    cell.data.value = it
+                    cell.setNeedsNewMeasure()
+                    cell.suppressRemeasure = false
+                }
             }
             if(!cell.ready) {
                 val vw = native.extensionViewWriter ?: throw IllegalStateException("No view writer attached")
@@ -237,7 +255,7 @@ actual fun <T> RecyclerView.children(
             return cell
         }
 
-        override fun collectionView(collectionView: UICollectionView, numberOfItemsInSection: NSInteger): NSInteger = list.size.toLong()
+        override fun collectionView(collectionView: UICollectionView, numberOfItemsInSection: NSInteger): NSInteger = if(loading) placeholders.toLong() else list.size.toLong()
     }
     native.setDataSource(source)
     native.setDelegate(source)

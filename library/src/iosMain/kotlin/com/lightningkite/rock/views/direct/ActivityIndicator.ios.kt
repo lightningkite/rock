@@ -16,6 +16,6 @@ actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Un
         handleTheme(this) {
             this.color = it.foreground.closestColor().toUiColor()
         }
-        extensionSizeConstraints = SizeConstraints(minWidth = 2.rem, minHeight = 2.rem)
+        extensionSizeConstraints = SizeConstraints(minWidth = 1.rem, minHeight = 1.rem)
         setup(ActivityIndicator(this))
     }

@@ -1,6 +1,5 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.SizeConstraints
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -10,20 +9,19 @@ import platform.CoreGraphics.CGSizeMake
 import platform.UIKit.UIImageView
 import platform.UIKit.UIScreen
 import platform.UIKit.UIView
-import kotlin.math.max
 
 @OptIn(ExperimentalForeignApi::class)
 fun UIView.sizeThatFits2(size: CValue<CGSize>, sizeConstraints: SizeConstraints?): CValue<CGSize> {
     val newSize = sizeConstraints?.let {
-        var width = size.useContents { width }
-        var height = size.useContents { height }
-        it.maxWidth?.let { width = width.coerceAtMost(it.value) }
-        it.maxHeight?.let { height = height.coerceAtMost(it.value) }
-        it.minWidth?.let { width = width.coerceAtLeast(it.value) }
-        it.minHeight?.let { height = height.coerceAtLeast(it.value) }
-        it.width?.let { width = it.value }
-        it.height?.let { height = it.value }
-        CGSizeMake(width, height)
+        var w = size.useContents { width }
+        var h = size.useContents { height }
+        it.maxWidth?.let { w = w.coerceAtMost(it.value) }
+        it.maxHeight?.let { h = h.coerceAtMost(it.value) }
+        it.minWidth?.let { w = w.coerceAtLeast(it.value) }
+        it.minHeight?.let { h = h.coerceAtLeast(it.value) }
+        it.width?.let { w = it.value }
+        it.height?.let { h = it.value }
+        CGSizeMake(w, h)
     } ?: size
     return if(this is UIImageView) {
         this.image?.size?.useContents {

@@ -8,6 +8,8 @@ import com.lightningkite.rock.reactive.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGAffineTransformRotate
 import platform.UIKit.*
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.ref.WeakReference
 
 //inline fun <T : HTMLElement> ViewWriter.containsNext(name: String, noinline setup: T.() -> Unit): ViewWrapper =
 //    wrapNext<T>(document.createElement(name) as T, setup)
@@ -18,7 +20,9 @@ import platform.UIKit.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NView = UIView
 
+@OptIn(ExperimentalNativeApi::class)
 class NViewCalculationContext(): CalculationContext.WithLoadTracking(), Cancellable {
+
     val onRemove = ArrayList<()->Unit>()
     override fun cancel() {
         onRemove.forEach { it() }

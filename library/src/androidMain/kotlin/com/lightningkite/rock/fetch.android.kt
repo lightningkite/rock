@@ -213,19 +213,17 @@ class WebSocketWrapper(val url: String) : WebSocket {
 
     override fun close(code: Short, reason: String) {
         stayOn = false
-        launchGlobal {
-            closeReason.send(CloseReason(code, reason))
-            closeReason.close()
-            sending.close()
-        }
+        closeReason.trySend(CloseReason(code, reason))
+        closeReason.close()
+        sending.close()
     }
 
     override fun send(data: String) {
-        launchGlobal { sending.send(Frame.Text(data)) }
+        sending.trySend(Frame.Text(data))
     }
 
     override fun send(data: Blob) {
-        launchGlobal { sending.send(Frame.Binary(false, data.data)) }
+        sending.trySend(Frame.Binary(false, data.data))
     }
 
     override fun onOpen(action: () -> Unit) {

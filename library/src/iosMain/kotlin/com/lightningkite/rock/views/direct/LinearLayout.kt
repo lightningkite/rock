@@ -26,12 +26,15 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 
 //    init { setUserInteractionEnabled(false) }
 
-    val debugLayer = CATextLayer().apply {
-        layer.addSublayer(this)
-        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
-        fontSize = 8.0
-        foregroundColor = UIColor.redColor.CGColor
-    }
+//    val debugLayer = CATextLayer().apply {
+//        layer.addSublayer(this)
+//        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
+//        fontSize = 8.0
+//        foregroundColor = UIColor.redColor.CGColor
+//    }
+    var debugDescriptionInfo: String = ""
+    var debugDescriptionInfo2: String = ""
+    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
 
     override fun subviewDidChangeSizing(view: UIView?) {
         val it = view ?: return
@@ -63,7 +66,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         val sizeLocal = size.local
         val measuredSize = Size()
 
-        val sizes = calcSizes(sizeLocal)
+        val sizes = calcSizes(sizeLocal, false)
         measuredSize.primary += padding
         for (size in sizes) {
             measuredSize.primary += size.primary + size.margin * 2
@@ -71,11 +74,11 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         }
         measuredSize.primary += padding
 
-        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()}" }
+        debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()} from ${sizes.joinToString { it.primary.toInt().toString() }}" }
         return measuredSize.objc
     }
 
-    fun calcSizes(size: Size): List<Size> {
+    fun calcSizes(size: Size, includeWeighted: Boolean): List<Size> {
 //        let size = padding.shrinkSize(size)
         val remaining = size.copy()
         remaining.primary -= padding * 2
@@ -127,7 +130,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
                 it.secondary?.let { required.secondary = it.value }
             }
             required.margin = m
-            required.primary = available
+            required.primary = if(includeWeighted) available else 0.0
             required.secondary = required.secondary.coerceAtLeast(0.0)
             out[index] = required
         }
@@ -138,10 +141,11 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     override fun layoutSubviews() {
         val mySize = bounds.useContents { size.local }
         var primary = padding
-        subviews.zip(calcSizes(frame.useContents { size.local })) { view, size ->
+        val sizes = calcSizes(frame.useContents { size.local }, true)
+        subviews.zip(sizes) { view, size ->
             view as UIView
             if(view.hidden) return@zip
-            val m = view.extensionMargin ?: 0.0
+            val m = size.margin
             val ps = primary + m
             val a = view.secondaryAlign ?: Align.Stretch
             val offset = when(a) {
@@ -167,6 +171,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             }
             primary += size.primary + 2 * m
         }
+        primary += padding
     }
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {

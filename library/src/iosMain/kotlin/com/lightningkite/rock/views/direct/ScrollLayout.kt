@@ -102,9 +102,7 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         val view = mainSubview ?: run {
             return
         }
-        var size = calcSizes(frame.useContents { size.local }, true)
-        if(size.primary == 10000.0)
-            size = calcSizes(frame.useContents { this.size.local }, false)
+        var size = calcSizes(frame.useContents { size.local }, false)
         val m = view.extensionMargin ?: 0.0
         val ps = primary + m
         val a = view.secondaryAlign ?: Align.Stretch

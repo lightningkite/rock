@@ -19,11 +19,13 @@ import platform.CoreGraphics.CGSize
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSCoder
 import platform.Foundation.NSIndexPath
+import platform.QuartzCore.CATextLayer
 import platform.UIKit.*
 import platform.darwin.NSInteger
 import platform.darwin.NSObject
 import platform.objc.object_getClass
 import kotlin.experimental.ExperimentalObjCName
+import kotlin.math.max
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = UICollectionView
@@ -124,6 +126,13 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
 
     }
 
+    var debugDescriptionInfo: String = ""
+    var debugDescriptionInfo2: String = ""
+    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
+
+//    var lockWidth = false
+//    var lockHeight = false
+
     val data = LateInitProperty<T>()
     var ready = false
     var suppressRemeasure = false
@@ -157,6 +166,7 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
     var lastHeight = -1.0
 
     override fun preferredLayoutAttributesFittingAttributes(layoutAttributes: UICollectionViewLayoutAttributes): UICollectionViewLayoutAttributes {
+        var before = layoutAttributes.size.useContents { "${width.toInt()} x ${height.toInt()}" }
         var widthMeasured = lastWidth
         var heightMeasured = lastHeight
         if(lastInputWidth != layoutAttributes.size.useContents { width } || lastInputHeight != layoutAttributes.size.useContents { height }) {
@@ -179,13 +189,15 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
                 heightMeasured,
             )
         }
+        if(debugMeasuring) debugDescriptionInfo = before + " -> " + layoutAttributes.size.useContents { "${width.toInt()} x ${height.toInt()} " } + data.let {
+            if(it.ready) it.value.toString()
+            else "loading..."
+        }
         return layoutAttributes
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
-        return frameLayoutSizeThatFits(size)
-    }
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
         return super.hitTest(point, withEvent).takeUnless { it == this }
@@ -210,8 +222,8 @@ actual fun <T> RecyclerView.children(
 
         init {
             native.calculationContext.reactiveScope(onLoad = {
-//                loading = true
-//                native.reloadData()
+                loading = true
+                native.reloadData()
             }) {
                 list = items.await()
                 loading = false
@@ -249,7 +261,9 @@ actual fun <T> RecyclerView.children(
             }
             if(!cell.ready) {
                 val vw = native.extensionViewWriter ?: throw IllegalStateException("No view writer attached")
+                cell.suppressRemeasure = true
                 render(vw.targeting(cell), cell.data)
+                cell.suppressRemeasure = false
                 cell.ready = true
             }
             return cell
@@ -267,14 +281,16 @@ actual fun RecyclerView.scrollToIndex(
     align: Align?,
     animate: Boolean
 ) {
-   native.scrollToItemAtIndexPath(
-       NSIndexPath.indexPathForRow(index.toLong(), 0L),
-       when(align) {
-           Align.Start -> UICollectionViewScrollPositionLeft or UICollectionViewScrollPositionTop
-           Align.Center -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
-           Align.End -> UICollectionViewScrollPositionRight or UICollectionViewScrollPositionBottom
-           else -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
-       },
-       animate
-   )
+    if(index in 0..<native.numberOfItemsInSection(0L)) {
+        native.scrollToItemAtIndexPath(
+            NSIndexPath.indexPathForRow(index.toLong(), 0L),
+            when (align) {
+                Align.Start -> UICollectionViewScrollPositionLeft or UICollectionViewScrollPositionTop
+                Align.Center -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
+                Align.End -> UICollectionViewScrollPositionRight or UICollectionViewScrollPositionBottom
+                else -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
+            },
+            animate
+        )
+    }
 }

@@ -72,7 +72,7 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
     val padding = extensionPadding ?: 0.0
 //        let size = padding.shrinkSize(size)
 //    val remaining = size.copy()
-    val remaining = size.copy(width = size.width - 2 * padding, height = size.height * 2 * padding)
+    val remaining = size.copy(width = size.width - 2 * padding, height = size.height - 2 * padding)
 
     return subviews.map {
         it as UIView

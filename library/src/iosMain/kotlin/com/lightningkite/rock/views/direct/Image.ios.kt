@@ -1,6 +1,5 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.backToMainThread
 import com.lightningkite.rock.fetch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.toNSData
@@ -11,6 +10,8 @@ import platform.UIKit.UIViewContentMode
 import platform.UIKit.accessibilityLabel
 import platform.UniformTypeIdentifiers.UTTypeImage
 import platform.UniformTypeIdentifiers.loadDataRepresentationForContentType
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NImage = UIImageView
@@ -55,12 +56,10 @@ actual inline var Image.source: ImageSource
                     value.file.suggestedType ?: UTTypeImage
                 ) { data, err ->
                     if (data != null) {
-                        //TODO There has to be a better way to handle this. This lambda is run on a background thread.
-                        launch {
-                            backToMainThread()
+                        dispatch_async(queue = dispatch_get_main_queue(), block = {
                             native.image = UIImage(data = data)
                             native.informParentOfSizeChange()
-                        }
+                        })
                     }
                 }
             }

@@ -112,11 +112,17 @@ class Constant<T>(val value: T) : Readable<T> {
     override suspend fun awaitRaw(): T = value
 }
 
-private class ReactiveScopeData(val rerun: () -> Unit) : CoroutineContext.Element {
+private class ReactiveScopeData(var rerun: () -> Unit) : CoroutineContext.Element {
     val removers: HashMap<ResourceUse, () -> Unit> = HashMap()
     val latestPass: ArrayList<ResourceUse> = ArrayList()
     override val key: CoroutineContext.Key<ReactiveScopeData> = Key
 
+    fun shutdown() {
+        removers.forEach { it.value() }
+        removers.clear()
+        latestPass.clear()
+        rerun = {}
+    }
     object Key : CoroutineContext.Key<ReactiveScopeData>
 }
 
@@ -124,6 +130,8 @@ fun CalculationContext.use(resourceUse: ResourceUse) {
     val x = resourceUse.start()
     onRemove { x() }
 }
+
+class Ref<T>(var value: T)
 
 fun CalculationContext.reactiveScope(action: suspend () -> Unit) = reactiveScope(null, action)
 fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> Unit) {
@@ -133,6 +141,7 @@ fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> 
     }
     val name = Random.nextInt(1000000)
     var previousContext: CoroutineContext? = null
+    var actionRef: Ref<suspend ()->Unit> = Ref(action)
     run = run@{
         val context: CoroutineContext = EmptyCoroutineContext.childCancellation() + data
         previousContext?.cancel()
@@ -142,7 +151,7 @@ fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> 
         var done = false
         var loadStarted = false
 
-        action.startCoroutine(object : Continuation<Unit> {
+        suspend { actionRef.value() }.startCoroutine(object : Continuation<Unit> {
             override val context: CoroutineContext = context
 
             // called when a coroutine ends. do nothing.
@@ -170,8 +179,9 @@ fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> 
     }
     run()
     this.onRemove {
-        data.removers.forEach { it.value() }
-        data.removers.clear()
+        data.shutdown()
+        run = {}
+        actionRef.value = {}
         previousContext?.cancel()
     }
 }

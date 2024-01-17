@@ -14,8 +14,8 @@ import platform.darwin.NSObject
 actual typealias NSelect = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = stack {
-    handleTheme(native, viewLoads = true)
+actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = element(FrameLayout()) {
+    handleTheme(this, viewDraws = false)
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         inputView = UIPickerView().apply {

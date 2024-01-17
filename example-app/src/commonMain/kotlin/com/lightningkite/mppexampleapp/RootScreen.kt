@@ -3,7 +3,7 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.*
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
-import com.lightningkite.rock.gc
+import com.lightningkite.rock.*
 import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
@@ -12,6 +12,7 @@ import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.icon
 import com.lightningkite.rock.views.minus
+import com.lightningkite.rock.views.reactiveScope
 
 @Routable("/")
 object RootScreen : RockScreen {
@@ -37,7 +38,10 @@ object RootScreen : RockScreen {
                 fun ViewWriter.linkScreen(screen: RockScreen) = link {
                     to = screen
                     row {
-                        text { ::content{ screen.title.await() } } in weight(1f)
+                        text {
+                            ::content{ screen.title.await() }
+//                            content  = screen.toString()
+                        } in weight(1f)
                         icon(Icon.chevronRight, "Open")
                     }
                 } in card

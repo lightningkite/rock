@@ -8,8 +8,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.websocket.*
 import kotlinx.cinterop.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import platform.Foundation.*
 import platform.UniformTypeIdentifiers.*
 import platform.darwin.dispatch_async
@@ -27,60 +27,52 @@ actual suspend fun fetch(
     headers: HttpHeaders,
     body: RequestBody?
 ): RequestResponse {
-    try {
-        val response = client.request(url) {
-            this.method = when (method) {
-                HttpMethod.GET -> io.ktor.http.HttpMethod.Get
-                HttpMethod.POST -> io.ktor.http.HttpMethod.Post
-                HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
-                HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
-                HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
-            }
-            this.headers {
-                for ((key, values) in headers.map) {
-                    for (value in values) append(key, value)
-                }
-            }
-            when (body) {
-                is RequestBodyBlob -> {
-                    contentType(ContentType.parse(body.content.type))
-                    setBody(body.content.data.toByteArray())
-                }
+    return withContext(Dispatchers.Main) {
+        try {
+            val response = withContext(Dispatchers.IO) {
+                client.request(url) {
+                    this.method = when (method) {
+                        HttpMethod.GET -> io.ktor.http.HttpMethod.Get
+                        HttpMethod.POST -> io.ktor.http.HttpMethod.Post
+                        HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
+                        HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
+                        HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
+                    }
+                    this.headers {
+                        for ((key, values) in headers.map) {
+                            for (value in values) append(key, value)
+                        }
+                    }
+                    when (body) {
+                        is RequestBodyBlob -> {
+                            contentType(ContentType.parse(body.content.type))
+                            setBody(body.content.data.toByteArray())
+                        }
 
-                is RequestBodyFile -> {
-                    val mime = body.content.suggestedType
-                        ?: (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
-                    contentType(ContentType.parse(mime.preferredMIMEType!!))
-                    body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
-                        if (error != null) throw Exception(error?.description)
-                        setBody(data!!.toByteArray())
+                        is RequestBodyFile -> {
+                            val mime = body.content.suggestedType
+                                ?: (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
+                            contentType(ContentType.parse(mime.preferredMIMEType!!))
+                            body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
+                                if (error != null) throw Exception(error?.description)
+                                setBody(data!!.toByteArray())
+                            }
+                        }
+
+                        is RequestBodyText -> {
+                            contentType(ContentType.parse(body.type))
+                            setBody(body.content)
+                        }
+
+                        null -> {}
                     }
                 }
-
-                is RequestBodyText -> {
-                    contentType(ContentType.parse(body.type))
-                    setBody(body.content)
-                }
-
-                null -> {}
             }
+            RequestResponse(response)
+        } catch (e: Exception) {
+            throw e
         }
-        backToMainThread()
-        return RequestResponse(response)
-    } catch (e: Exception) {
-        backToMainThread()
-        throw e
     }
-}
-
-suspend fun backToMainThread() {
-    suspendCoroutineCancellable<Unit> {
-        dispatch_async(queue = dispatch_get_main_queue(), block = {
-            it.resume(Unit)
-        })
-        return@suspendCoroutineCancellable {}
-    }
-    assertMainThread()
 }
 
 actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders =
@@ -111,23 +103,27 @@ actual class RequestResponse(val wraps: HttpResponse) {
     actual val ok: Boolean get() = wraps.status.isSuccess()
     actual suspend fun text(): String {
         try {
-            val result = wraps.bodyAsText()
-            backToMainThread()
+            val result = withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
+                    wraps.bodyAsText()
+                }
+            }
             return result
         } catch (e: Exception) {
-            backToMainThread()
             throw e
         }
     }
 
     actual suspend fun blob(): Blob {
         try {
-            val result = wraps.body<ByteArray>()
-                .let { Blob(it.toNSData(), wraps.contentType()?.toString() ?: "application/octet-stream") }
-            backToMainThread()
+            val result = withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
+                    wraps.body<ByteArray>()
+                        .let { Blob(it.toNSData(), wraps.contentType()?.toString() ?: "application/octet-stream") }
+                }
+            }
             return result
         } catch (e: Exception) {
-            backToMainThread()
             throw e
         }
     }
@@ -167,11 +163,11 @@ class WebSocketWrapper(val url: String) : WebSocket {
     }
 
     init {
-        launchGlobal {
+        GlobalScope.launch(Dispatchers.IO) {
             client.webSocket(url) {
-                dispatch_async(queue = dispatch_get_main_queue(), block = {
+                withContext(Dispatchers.Main) {
                     onOpen.forEach { it() }
-                })
+                }
                 launch {
                     while (stayOn) {
                         send(sending.receive())
@@ -180,9 +176,9 @@ class WebSocketWrapper(val url: String) : WebSocket {
                 launch {
                     this@WebSocketWrapper.closeReason.receive().let { reason ->
                         close(reason)
-                        dispatch_async(queue = dispatch_get_main_queue(), block = {
+                        withContext(Dispatchers.Main) {
                             onClose.forEach { it(reason.code) }
-                        })
+                        }
                     }
                 }
                 var reason: CloseReason? = null
@@ -190,16 +186,16 @@ class WebSocketWrapper(val url: String) : WebSocket {
                     when (val x = incoming.receive()) {
                         is Frame.Binary -> {
                             val data = Blob(x.data.toNSData())
-                            dispatch_async(queue = dispatch_get_main_queue(), block = {
+                            withContext(Dispatchers.Main) {
                                 onBinaryMessage.forEach { it(data) }
-                            })
+                            }
                         }
 
                         is Frame.Text -> {
                             val text = x.readText()
-                            dispatch_async(queue = dispatch_get_main_queue(), block = {
+                            withContext(Dispatchers.Main) {
                                 onMessage.forEach { it(text) }
-                            })
+                            }
                         }
 
                         is Frame.Close -> {
@@ -210,28 +206,24 @@ class WebSocketWrapper(val url: String) : WebSocket {
                         else -> {}
                     }
                 }
-                dispatch_async(queue = dispatch_get_main_queue(), block = {
+                withContext(Dispatchers.Main) {
                     onClose.forEach { it(reason?.code ?: 0) }
-                })
+                }
             }
         }
     }
 
     override fun close(code: Short, reason: String) {
         stayOn = false
-        launchGlobal {
-            closeReason.send(CloseReason(code, reason))
-            closeReason.close()
-            sending.close()
-        }
+        closeReason.trySend(CloseReason(code, reason))
     }
 
     override fun send(data: String) {
-        launchGlobal { sending.send(Frame.Text(data)) }
+        sending.trySend(Frame.Text(data))
     }
 
     override fun send(data: Blob) {
-        launchGlobal { sending.send(Frame.Binary(false, data.data.toByteArray())) }
+        sending.trySend(Frame.Binary(false, data.data.toByteArray()))
     }
 
     override fun onOpen(action: () -> Unit) {

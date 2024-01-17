@@ -124,13 +124,15 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             val w = it.extensionWeight!!.toDouble()
             val available = ((w / totalWeight) * remaining.primary).coerceAtLeast(0.0)
             val required = it.sizeThatFits2(Size(available, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
+//            val required = it.sizeThatFits2(Size(1000.0, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
                 it.secondaryMin?.let { required.secondary = required.secondary.coerceAtLeast(it.value) }
                 it.secondary?.let { required.secondary = it.value }
             }
             required.margin = m
-            required.primary = if(includeWeighted) available else 0.0
+//            required.primary = if(includeWeighted) available else 0.0
+            required.primary = if(includeWeighted) available else required.primary
             required.secondary = required.secondary.coerceAtLeast(0.0)
             out[index] = required
         }

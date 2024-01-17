@@ -105,14 +105,13 @@ interface Async<T>: Cancellable {
 suspend fun <T> async(action: suspend ()->T): Async<T> {
     val context: CoroutineContext = coroutineContext.childCancellation()
     var toReturn: Result<T>? = null
-    var otherResume: ((Result<T>) -> Unit)? = null
+    val awaiters = ArrayList<Continuation<T>>()
     action.startCoroutine(object : Continuation<T> {
         override val context: CoroutineContext = context
         // called when a coroutine ends. do nothing.
         override fun resumeWith(result: Result<T>) {
-            val otherResume = otherResume
-            if(otherResume != null) otherResume(result)
-            else toReturn = result
+            toReturn = result
+            awaiters.forEach { it.resumeWith(result) }
         }
     })
     return object: Async<T> {
@@ -122,7 +121,38 @@ suspend fun <T> async(action: suspend ()->T): Async<T> {
                 it.resumeWith(toReturn)
                 return@suspendCoroutineCancellable {}
             } else {
-                otherResume = it::resumeWith
+                awaiters.add(it)
+                return@suspendCoroutineCancellable {
+                    context.cancel()
+                }
+            }
+        }
+        override fun cancel() {
+            context.cancel()
+        }
+    }
+}
+
+fun <T> asyncGlobal(action: suspend ()->T): Async<T> {
+    val context: CoroutineContext = EmptyCoroutineContext.childCancellation()
+    var toReturn: Result<T>? = null
+    val awaiters = ArrayList<Continuation<T>>()
+    action.startCoroutine(object : Continuation<T> {
+        override val context: CoroutineContext = context
+        // called when a coroutine ends. do nothing.
+        override fun resumeWith(result: Result<T>) {
+            toReturn = result
+            awaiters.forEach { it.resumeWith(result) }
+        }
+    })
+    return object: Async<T> {
+        override suspend fun await(): T = suspendCoroutineCancellable<T> {
+            val toReturn = toReturn
+            if(toReturn != null) {
+                it.resumeWith(toReturn)
+                return@suspendCoroutineCancellable {}
+            } else {
+                awaiters.add(it)
                 return@suspendCoroutineCancellable {
                     context.cancel()
                 }

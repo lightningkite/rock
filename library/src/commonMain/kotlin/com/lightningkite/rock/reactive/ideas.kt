@@ -235,7 +235,11 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
             if (listeners.isEmpty()) {
                 // startup
 //                println("$this: Start listening")
-                ctx.reactiveScope {
+                ctx.reactiveScope(/*onLoad = {
+                    ready = false
+                    // Notify that we're loading
+                    listeners.toList().forEach { it() }
+                }*/) {
                     val listening = listening
 //                    if (listening) println("$this: Recalculating...")
 //                    else println("$this: Starting initial calculation...")

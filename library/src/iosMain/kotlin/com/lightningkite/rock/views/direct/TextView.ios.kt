@@ -11,8 +11,8 @@ actual typealias NTextView = UILabel
 actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(2.0.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 2.0.rem * 1.8,
-        minHeight = 2.0.rem * 1.8,
+        minWidth = 2.0.rem * 0.6,
+        minHeight = 2.0.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -27,8 +27,8 @@ actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.6.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 1.6.rem * 1.8,
-        minHeight = 1.6.rem * 1.8,
+        minWidth = 1.6.rem * 0.6,
+        minHeight = 1.6.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -43,8 +43,8 @@ actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.4.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 1.4.rem * 1.8,
-        minHeight = 1.4.rem * 1.8,
+        minWidth = 1.4.rem * 0.6,
+        minHeight = 1.4.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -59,8 +59,8 @@ actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.3.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 1.3.rem * 1.8,
-        minHeight = 1.3.rem * 1.8,
+        minWidth = 1.3.rem * 0.6,
+        minHeight = 1.3.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -75,8 +75,8 @@ actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.2.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 1.2.rem * 1.8,
-        minHeight = 1.2.rem * 1.8,
+        minWidth = 1.2.rem * 0.6,
+        minHeight = 1.2.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -91,8 +91,8 @@ actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.1.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 1.1.rem * 1.8,
-        minHeight = 1.1.rem * 1.8,
+        minWidth = 1.1.rem * 0.6,
+        minHeight = 1.1.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -107,8 +107,8 @@ actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = element(UILabel()) 
 actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.0.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 1.0.rem * 1.8,
-        minHeight = 1.0.rem * 1.8,
+        minWidth = 1.0.rem * 0.6,
+        minHeight = 1.0.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {
@@ -123,8 +123,8 @@ actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = element(UILabel()
 actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(0.8.rem.value)
     extensionSizeConstraints = SizeConstraints(
-        minWidth = 0.8.rem * 1.8,
-        minHeight = 0.8.rem * 1.8,
+        minWidth = 0.8.rem * 0.6,
+        minHeight = 0.8.rem * 1.5,
     )
     numberOfLines = 0
     handleTheme(this, viewLoads = true) {

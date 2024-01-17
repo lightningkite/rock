@@ -17,18 +17,18 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import timber.log.Timber
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 
-val client: HttpClient get() {
-    return AndroidAppContext.ktorClient
-}
+val client: HttpClient
+    get() {
+        return AndroidAppContext.ktorClient
+    }
 
 actual suspend fun fetch(
     url: String,
@@ -36,63 +36,59 @@ actual suspend fun fetch(
     headers: HttpHeaders,
     body: RequestBody?
 ): RequestResponse {
-    try {
-        val response = client.request(url) {
-            this.method = when (method) {
-                HttpMethod.GET -> io.ktor.http.HttpMethod.Get
-                HttpMethod.POST -> io.ktor.http.HttpMethod.Post
-                HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
-                HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
-                HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
-            }
-            this.headers {
-                for ((key, values) in headers.map) {
-                    for (value in values) append(key, value)
-                }
-            }
-            when (body) {
-                is RequestBodyBlob -> {
-                    contentType(ContentType.parse(body.content.type))
-                    setBody(body.content.data)
-                }
+    return withContext(Dispatchers.Main) {
+        try {
+            val response = withContext(Dispatchers.IO) {
+                client.request(url) {
+                    this.method = when (method) {
+                        HttpMethod.GET -> io.ktor.http.HttpMethod.Get
+                        HttpMethod.POST -> io.ktor.http.HttpMethod.Post
+                        HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
+                        HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
+                        HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
+                    }
+                    this.headers {
+                        for ((key, values) in headers.map) {
+                            for (value in values) append(key, value)
+                        }
+                    }
+                    when (body) {
+                        is RequestBodyBlob -> {
+                            contentType(ContentType.parse(body.content.type))
+                            setBody(body.content.data)
+                        }
 
-                is RequestBodyFile -> {
-                    val length =
-                        AndroidAppContext.applicationCtx.contentResolver.openAssetFileDescriptor(body.content.uri, "r")
-                            ?.use {
-                                it.length
-                            } ?: -1L
-                    val type = AndroidAppContext.applicationCtx.contentResolver.getType(body.content.uri)
-                        ?: "application/octet-stream"
-                    contentType(ContentType.parse(type))
-                    setBody(
-                        AndroidAppContext.applicationCtx.contentResolver.openInputStream(body.content.uri)!!
-                            .toByteReadChannel()
-                    )
-                }
+                        is RequestBodyFile -> {
+                            val length =
+                                AndroidAppContext.applicationCtx.contentResolver.openAssetFileDescriptor(
+                                    body.content.uri,
+                                    "r"
+                                )
+                                    ?.use {
+                                        it.length
+                                    } ?: -1L
+                            val type = AndroidAppContext.applicationCtx.contentResolver.getType(body.content.uri)
+                                ?: "application/octet-stream"
+                            contentType(ContentType.parse(type))
+                            setBody(
+                                AndroidAppContext.applicationCtx.contentResolver.openInputStream(body.content.uri)!!
+                                    .toByteReadChannel()
+                            )
+                        }
 
-                is RequestBodyText -> {
-                    contentType(ContentType.parse(body.type))
-                    setBody(body.content)
-                }
+                        is RequestBodyText -> {
+                            contentType(ContentType.parse(body.type))
+                            setBody(body.content)
+                        }
 
-                null -> {}
+                        null -> {}
+                    }
+                }
             }
+            RequestResponse(response)
+        } catch (e: Exception) {
+            throw e
         }
-        backToMainThread()
-        return RequestResponse(response)
-    } catch(e: Exception) {
-        backToMainThread()
-        throw e
-    }
-}
-
-suspend fun backToMainThread() {
-    suspendCoroutineCancellable<Unit> {
-        globalPost {
-            it.resume(Unit)
-        }
-        return@suspendCoroutineCancellable {}
     }
 }
 
@@ -124,23 +120,27 @@ actual class RequestResponse(val wraps: HttpResponse) {
     actual val ok: Boolean get() = wraps.status.isSuccess()
     actual suspend fun text(): String {
         try {
-            val result = wraps.bodyAsText()
-            backToMainThread()
+            val result = withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
+                    wraps.bodyAsText()
+                }
+            }
             return result
-        } catch(e: Exception) {
-            backToMainThread()
+        } catch (e: Exception) {
             throw e
         }
     }
 
     actual suspend fun blob(): Blob {
         try {
-            val result = wraps.body<ByteArray>()
-                .let { Blob(it, wraps.contentType()?.toString() ?: "application/octet-stream") }
-            backToMainThread()
+            val result = withContext(Dispatchers.Main) {
+                withContext(Dispatchers.IO) {
+                    wraps.body<ByteArray>()
+                        .let { Blob(it, wraps.contentType()?.toString() ?: "application/octet-stream") }
+                }
+            }
             return result
-        } catch(e: Exception) {
-            backToMainThread()
+        } catch (e: Exception) {
             throw e
         }
     }
@@ -156,55 +156,83 @@ class WebSocketWrapper(val url: String) : WebSocket {
     val sending = Channel<Frame>(10)
     var stayOn = true
     val onOpen = ArrayList<() -> Unit>()
+
+    init {
+        onOpen.add { assertMainThread() }
+    }
+
     val onClose = ArrayList<(Short) -> Unit>()
+
+    init {
+        onClose.add { assertMainThread() }
+    }
+
     val onMessage = ArrayList<(String) -> Unit>()
+
+    init {
+        onMessage.add { assertMainThread() }
+    }
+
     val onBinaryMessage = ArrayList<(Blob) -> Unit>()
 
     init {
-        launchGlobal {
+        onBinaryMessage.add { assertMainThread() }
+    }
+
+    init {
+        GlobalScope.launch(Dispatchers.IO) {
             client.webSocket(url) {
-                globalPost {
+                withContext(Dispatchers.Main) {
                     onOpen.forEach { it() }
                 }
                 launch {
-                    while (stayOn) {
-                        send(sending.receive())
+                    try {
+                        while (stayOn) {
+                            send(sending.receive())
+                        }
+                    } catch (e: ClosedReceiveChannelException) {
                     }
                 }
                 launch {
-                    this@WebSocketWrapper.closeReason.receive().let { reason ->
-                        close(reason)
-                        globalPost {
-                            onClose.forEach { it(reason.code) }
+                    try {
+                        this@WebSocketWrapper.closeReason.receive().let { reason ->
+                            close(reason)
+                            withContext(Dispatchers.Main) {
+                                onClose.forEach { it(reason.code) }
+                            }
                         }
+                    } catch (e: ClosedReceiveChannelException) {
                     }
                 }
                 var reason: CloseReason? = null
                 while (stayOn) {
-                    when (val x = incoming.receive()) {
-                        is Frame.Binary -> {
-                            val data = Blob(x.data, "application/octet-stream")
-                            globalPost {
-                                onBinaryMessage.forEach { it(data) }
+                    try {
+                        when (val x = incoming.receive()) {
+                            is Frame.Binary -> {
+                                val data = Blob(x.data, "application/octet-stream")
+                                withContext(Dispatchers.Main) {
+                                    onBinaryMessage.forEach { it(data) }
+                                }
                             }
-                        }
 
-                        is Frame.Text -> {
-                            val text = x.readText()
-                            globalPost {
-                                onMessage.forEach { it(text) }
+                            is Frame.Text -> {
+                                val text = x.readText()
+                                withContext(Dispatchers.Main) {
+                                    onMessage.forEach { it(text) }
+                                }
                             }
-                        }
 
-                        is Frame.Close -> {
-                            reason = x.readReason()
-                            break
-                        }
+                            is Frame.Close -> {
+                                reason = x.readReason()
+                                break
+                            }
 
-                        else -> {}
+                            else -> {}
+                        }
+                    } catch (e: ClosedReceiveChannelException) {
                     }
                 }
-                globalPost {
+                withContext(Dispatchers.Main) {
                     onClose.forEach { it(reason?.code ?: 0) }
                 }
             }
@@ -214,8 +242,6 @@ class WebSocketWrapper(val url: String) : WebSocket {
     override fun close(code: Short, reason: String) {
         stayOn = false
         closeReason.trySend(CloseReason(code, reason))
-        closeReason.close()
-        sending.close()
     }
 
     override fun send(data: String) {
@@ -245,6 +271,7 @@ class WebSocketWrapper(val url: String) : WebSocket {
 
 actual class FileReference(val uri: Uri)
 actual class Blob(val data: ByteArray, val type: String)
+
 val webSocketClient: HttpClient by lazy {
     HttpClient(CIO) {
         install(WebSockets) {

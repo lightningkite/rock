@@ -22,7 +22,12 @@ class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()), UIViewWithSizeO
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
+    var debugDescriptionInfo: String = ""
+    var debugDescriptionInfo2: String = ""
+    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size).also {
+        debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + it.useContents { "${width.toInt()} x ${height.toInt()}" }
+    }
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
 

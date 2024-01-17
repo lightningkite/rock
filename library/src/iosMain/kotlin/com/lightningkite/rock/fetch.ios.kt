@@ -10,6 +10,7 @@ import io.ktor.websocket.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import platform.Foundation.*
 import platform.UniformTypeIdentifiers.*
 import platform.darwin.dispatch_async
@@ -169,41 +170,50 @@ class WebSocketWrapper(val url: String) : WebSocket {
                     onOpen.forEach { it() }
                 }
                 launch {
-                    while (stayOn) {
-                        send(sending.receive())
+                    try {
+                        while (stayOn) {
+                            send(sending.receive())
+                        }
+                    } catch (e: ClosedReceiveChannelException) {
                     }
                 }
                 launch {
-                    this@WebSocketWrapper.closeReason.receive().let { reason ->
-                        close(reason)
-                        withContext(Dispatchers.Main) {
-                            onClose.forEach { it(reason.code) }
+                    try {
+                        this@WebSocketWrapper.closeReason.receive().let { reason ->
+                            close(reason)
+                            withContext(Dispatchers.Main) {
+                                onClose.forEach { it(reason.code) }
+                            }
                         }
+                    } catch (e: ClosedReceiveChannelException) {
                     }
                 }
                 var reason: CloseReason? = null
                 while (stayOn) {
-                    when (val x = incoming.receive()) {
-                        is Frame.Binary -> {
-                            val data = Blob(x.data.toNSData())
-                            withContext(Dispatchers.Main) {
-                                onBinaryMessage.forEach { it(data) }
+                    try {
+                        when (val x = incoming.receive()) {
+                            is Frame.Binary -> {
+                                val data = Blob(x.data.toNSData())
+                                withContext(Dispatchers.Main) {
+                                    onBinaryMessage.forEach { it(data) }
+                                }
                             }
-                        }
 
-                        is Frame.Text -> {
-                            val text = x.readText()
-                            withContext(Dispatchers.Main) {
-                                onMessage.forEach { it(text) }
+                            is Frame.Text -> {
+                                val text = x.readText()
+                                withContext(Dispatchers.Main) {
+                                    onMessage.forEach { it(text) }
+                                }
                             }
-                        }
 
-                        is Frame.Close -> {
-                            reason = x.readReason()
-                            break
-                        }
+                            is Frame.Close -> {
+                                reason = x.readReason()
+                                break
+                            }
 
-                        else -> {}
+                            else -> {}
+                        }
+                    } catch (e: ClosedReceiveChannelException) {
                     }
                 }
                 withContext(Dispatchers.Main) {

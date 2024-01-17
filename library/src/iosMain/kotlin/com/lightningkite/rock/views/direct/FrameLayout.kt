@@ -25,14 +25,11 @@ class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtoc
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
-//    val debugLayer = CATextLayer().apply {
-//        layer.addSublayer(this)
-//        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
-//        fontSize = 8.0
-//        foregroundColor = UIColor.redColor.CGColor
-//    }
+    var debugDescriptionInfo: String = ""
+    var debugDescriptionInfo2: String = ""
+    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size).also {
-//        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + it.useContents { "${width.toInt()} x ${height.toInt()}" }
+        debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + it.useContents { "${width.toInt()} x ${height.toInt()}" }
     }
     override fun layoutSubviews() = frameLayoutLayoutSubviews()
     override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)

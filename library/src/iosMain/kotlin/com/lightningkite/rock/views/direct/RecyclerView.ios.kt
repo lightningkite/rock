@@ -189,10 +189,7 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
                 heightMeasured,
             )
         }
-        if(debugMeasuring) debugDescriptionInfo = before + " -> " + layoutAttributes.size.useContents { "${width.toInt()} x ${height.toInt()} " } + data.let {
-            if(it.ready) it.value.toString()
-            else "loading..."
-        }
+        debugDescriptionInfo = before + " -> " + layoutAttributes.size.useContents { "${width.toInt()} x ${height.toInt()} " }
         return layoutAttributes
     }
 

@@ -1,5 +1,6 @@
 package com.lightningkite.rock.reactive
 
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.WindowStatistics
 import kotlinx.browser.document
 import kotlinx.browser.window
@@ -23,13 +24,22 @@ actual object AnimationFrame: Listenable {
         }
     }
 }
-actual object WindowInfo: Readable<WindowStatistics> by Property(
+actual object WindowInfo: Readable<WindowStatistics> by (Property(
     WindowStatistics(
-        width = window.innerWidth,
-        height = window.innerHeight,
+        width = Dimension(window.innerWidth.toString() + "px"),
+        height = Dimension(window.innerHeight.toString() + "px"),
         density = 1f
     )
-)
+).also {
+    window.addEventListener("resize", { ev ->
+        println("WINDOW RESIZE!")
+        it.value = WindowStatistics(
+            width = Dimension(window.innerWidth.toString() + "px"),
+            height = Dimension(window.innerHeight.toString() + "px"),
+            density = 1f
+        )
+    })
+})
 actual object InForeground: Readable<Boolean> {
     override suspend fun awaitRaw(): Boolean = (document.asDynamic().visibilityState as? String) != "hidden"
 

@@ -12,6 +12,7 @@ import android.view.ViewTreeObserver
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.WindowStatistics
 import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockNavigator
@@ -25,8 +26,8 @@ abstract class RockActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowInfo.value = WindowStatistics(
-            resources.displayMetrics.widthPixels,
-            resources.displayMetrics.heightPixels,
+            Dimension(resources.displayMetrics.widthPixels.toFloat()),
+            Dimension(resources.displayMetrics.heightPixels.toFloat()),
             resources.displayMetrics.density,
         )
         AndroidAppContext.applicationCtx = this.applicationContext

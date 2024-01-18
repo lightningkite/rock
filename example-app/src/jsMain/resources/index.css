@@ -329,7 +329,7 @@ button.loading:after {
 
 [hidden] {
     visibility: hidden !important;
-    display: none;
+    display: none !important;
 }
 
 iframe#webpack-dev-server-client-overlay {

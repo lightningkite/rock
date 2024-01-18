@@ -37,3 +37,5 @@ actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(
 
 actual sealed class ImageSource actual constructor()
 actual class ImageResource(val resource: Int) : ImageSource()
+
+actual fun Dimension.compareToImpl(other: Dimension): Int = value.compareTo(other.value)

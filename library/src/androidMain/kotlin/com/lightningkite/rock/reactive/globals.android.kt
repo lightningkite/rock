@@ -1,5 +1,6 @@
 package com.lightningkite.rock.reactive
 
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.WindowStatistics
 
 actual object AnimationFrame : Listenable {
@@ -16,7 +17,7 @@ actual object AnimationFrame : Listenable {
 
 actual object WindowInfo: Readable<WindowStatistics> {
     private val listeners = ArrayList<() -> Unit>()
-    var value: WindowStatistics = WindowStatistics(1920, 1080, 1f)
+    var value: WindowStatistics = WindowStatistics(Dimension(1920f), Dimension(1080f), 1f)
         set(value) {
             field = value
             listeners.toList().forEach { it() }

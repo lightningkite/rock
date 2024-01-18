@@ -46,6 +46,7 @@ object RootScreen : RockScreen {
                     }
                 } in card
 
+                linkScreen(TwoPaneTestScreen)
                 linkScreen(ThemesScreen)
                 linkScreen(ControlsScreen)
                 linkScreen(FormsScreen)

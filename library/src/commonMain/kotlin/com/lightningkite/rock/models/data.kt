@@ -115,12 +115,15 @@ enum class ImageScaleType { Fit, Crop, Stretch, NoScale }
 
 expect class DimensionRaw
 @JvmInline
-value class Dimension(val value: DimensionRaw)
+value class Dimension(val value: DimensionRaw): Comparable<Dimension> {
+    override fun compareTo(other: Dimension): Int = this.compareToImpl(other)
+}
 expect val Int.px: Dimension
 expect val Int.rem: Dimension
 expect val Int.dp: Dimension
 expect val Double.rem: Dimension
 expect val Double.dp: Dimension
+expect fun Dimension.compareToImpl(other: Dimension): Int
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 expect inline operator fun Dimension.minus(other: Dimension): Dimension
 expect inline operator fun Dimension.times(other: Float): Dimension

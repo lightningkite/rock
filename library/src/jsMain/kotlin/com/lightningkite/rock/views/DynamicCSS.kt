@@ -128,15 +128,6 @@ object DynamicCSS {
                 "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
             )
         } + mapOf(
-            "color" to theme.foreground.toCss(),
-            "--spacing" to theme.spacing.value,
-            "--foreground" to theme.foreground.toCss(),
-            "font-family" to font(theme.body.font),
-            "font-weight" to if (theme.body.bold) "bold" else "normal",
-            "font-style" to if (theme.body.italic) "italic" else "normal",
-            "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
-            "line-height" to theme.body.lineSpacingMultiplier.toString(),
-            "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
         )
         val border = mapOf(
             "outline-width" to theme.outlineWidth.value,
@@ -144,6 +135,15 @@ object DynamicCSS {
         )
         style(
             asSelector, mapOf(
+                "color" to theme.foreground.toCss(),
+                "--spacing" to theme.spacing.value,
+                "--foreground" to theme.foreground.toCss(),
+                "font-family" to font(theme.body.font),
+                "font-weight" to if (theme.body.bold) "bold" else "normal",
+                "font-style" to if (theme.body.italic) "italic" else "normal",
+                "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
+                "line-height" to theme.body.lineSpacingMultiplier.toString(),
+                "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
                 "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
                 "outline-color" to theme.outline.toCss(),
                 "outline-width" to 0.px.value,

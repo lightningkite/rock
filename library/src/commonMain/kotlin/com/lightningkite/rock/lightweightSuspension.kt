@@ -2,6 +2,7 @@ package com.lightningkite.rock
 
 import com.lightningkite.rock.reactive.CalculationContext
 import kotlin.coroutines.*
+import kotlin.time.Duration
 
 class CancelledException(): Exception()
 suspend fun <T> suspendCoroutineCancellable(start: (Continuation<T>)->()->Unit): T {
@@ -23,7 +24,8 @@ suspend fun <T> suspendCoroutineCancellable(start: (Continuation<T>)->()->Unit):
     return result
 }
 
-suspend fun delay(milliseconds: Long) = suspendCoroutineCancellable<Unit> {
+suspend fun delay(duration: Duration): Unit = delay(duration.inWholeMilliseconds)
+suspend fun delay(milliseconds: Long): Unit = suspendCoroutineCancellable<Unit> {
     val handle = afterTimeout(milliseconds) { ->
         it.resume(Unit)
     }

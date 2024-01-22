@@ -37,7 +37,9 @@ object DynamicCSS {
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
     }
 
-    fun rule(rule: String, index: Int = 0) = customStyleSheet.insertRule(rule, index)
+    fun rule(rule: String, index: Int = 0): Int {
+        return customStyleSheet.insertRule(rule, index)
+    }
 
     private val transitionHandled = HashSet<String>()
     fun transition(transition: ScreenTransition): String {
@@ -89,7 +91,7 @@ object DynamicCSS {
 
     fun style(selector: String, map: Map<String, String>) {
         rule(
-            """$selector { ${map.entries.joinToString("; ") { "${it.key}: ${it.value};" }} }""",
+            """$selector { ${map.entries.joinToString("; ") { "${it.key}: ${it.value}" }} }""",
             0
         )
     }
@@ -101,9 +103,9 @@ object DynamicCSS {
         theme(theme.hover(), ".theme-${theme.id}.clickable:hover", includeBackAlways = true)
         theme(theme.disabled(), ".theme-${theme.id}.clickable:disabled")
 
-        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable", includeBackAlways = true)
-        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover", includeBackAlways = true)
-        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled", includeBackAlways = true)
+        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable")
+        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover")
+        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled")
 
         theme(theme.selected(), ".theme-${theme.id}.clickable:checked", includeBackAlways = true)
         theme(theme.selected().hover(), ".theme-${theme.id}.clickable:checked:hover", includeBackAlways = true)

@@ -39,19 +39,5 @@ actual fun LocalDateTime.renderToString(
     }).format(this.toJavaLocalDateTime().atZone(ZoneId.systemDefault()))
 }
 
-actual fun Instant.renderToString(
-    size: RenderSize,
-    zone: TimeZone,
-    includeWeekday: Boolean,
-    includeYear: Boolean,
-    includeEra: Boolean
-): String {
-    return DateTimeFormatter.ofLocalizedDateTime(when(size) {
-        RenderSize.Numerical -> FormatStyle.MEDIUM
-        RenderSize.Abbreviation -> FormatStyle.MEDIUM
-        RenderSize.Full -> FormatStyle.MEDIUM
-    }).format(this.toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime().atZone(ZoneId.systemDefault()))
-}
-
 actual fun TimeZone.renderToString(size: RenderSize): String = this.toString()
 actual fun DayOfWeek.renderToString(size: RenderSize): String = this.toString()

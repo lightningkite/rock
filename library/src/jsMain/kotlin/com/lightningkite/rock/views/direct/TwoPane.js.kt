@@ -38,5 +38,6 @@ actual fun ViewWriter.twoPane(
         sizedBox(SizeConstraints(minWidth = rightPaneMinSize)) - expanding - stack {
             right(this)
         }
+        setup(TwoPane(native))
     }
 }

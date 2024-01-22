@@ -69,7 +69,7 @@ expect object Resources {
                     .sortedBy { it.key }
                     .joinToString("\n    ") {
                         when (val r = it.value) {
-                            is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal}\", bold = ${r.bold?.let { "\"/common/$it\"" }}, italic = ${r.italic?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.let { "\"/common/$it\"" }}))"
+                            is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal.relativeFile}\", bold = ${r.bold?.relativeFile?.let { "\"/common/$it\"" }}, italic = ${r.italic?.relativeFile?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.relativeFile?.let { "\"/common/$it\"" }}))"
                             is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.relativeFile}\")"
                             is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.relativeFile}\").blob()"
                             else -> ""

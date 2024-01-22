@@ -16,6 +16,14 @@ data class LinearGradient(
     override fun closestColor(): Color {
         return stops.maxByOrNull { it.ratio }?.color ?: Color.transparent
     }
+
+    fun toGrayscale()  = copy(stops = stops.map { it.copy(color = it.color.toGrayscale()) })
+    fun darken(ratio: Float) = copy(stops = stops.map { it.copy(color = it.color.darken(ratio)) })
+    fun lighten(ratio: Float) = copy(stops = stops.map { it.copy(color = it.color.lighten(ratio)) })
+    fun toWhite(ratio: Float) = copy(stops = stops.map { it.copy(color = it.color.toWhite(ratio)) })
+    fun toBlack(ratio: Float) = copy(stops = stops.map { it.copy(color = it.color.toBlack(ratio)) })
+    fun highlight(ratio: Float) = copy(stops = stops.map { it.copy(color = it.color.highlight(ratio)) })
+    fun invert() = copy(stops = stops.map { it.copy(color = it.color.invert()) })
 }
 
 data class RadialGradient(

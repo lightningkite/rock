@@ -17,13 +17,5 @@ actual fun LocalDateTime.renderToString(
     includeEra: Boolean
 ): String = this.toString()
 
-actual fun Instant.renderToString(
-    size: RenderSize,
-    zone: TimeZone,
-    includeWeekday: Boolean,
-    includeYear: Boolean,
-    includeEra: Boolean
-): String = this.toString()
-
 actual fun TimeZone.renderToString(size: RenderSize): String = this.toString()
 actual fun DayOfWeek.renderToString(size: RenderSize): String = this.toString()

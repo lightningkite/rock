@@ -56,6 +56,8 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
         style.flexGrow = "$amount"
         style.flexShrink = "$amount"
         style.flexBasis = "0"
+        style.minWidth = "0"
+        style.minHeight = "0"
     }
     return ViewWrapper
 }

@@ -9,21 +9,11 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
-
-data class NavItem(
-    val title: String,
-    val icon: Icon,
-    val destination: RockScreen,
-    val children: List<NavItem> = listOf()
-)
-
-
 data class UserInfo(
     val name: String,
     val profileImage: ImageVector? = null,
-    val defaultIcon: Icon
+    val defaultIcon: Icon,
 )
-
 
 interface AppNav {
     var appName: String
@@ -31,8 +21,8 @@ interface AppNav {
     var appLogo: ImageSource
     var navItems: List<NavItem>
     var currentUser: UserInfo?
-    var userLinks: List<NavItem>
-    var actions: List<Action>
+    var userLinks: List<NavElement>
+    var actions: List<NavElement>
     var exists: Boolean
 
     class ByProperty : AppNav {
@@ -46,10 +36,10 @@ interface AppNav {
         override var navItems: List<NavItem> by navItemsProperty
         val currentUserProperty = Property<UserInfo?>(null)
         override var currentUser: UserInfo? by currentUserProperty
-        val actionsProperty = Property<List<Action>>(listOf())
-        override var actions: List<Action> by actionsProperty
-        val userLinksProperty = Property(listOf<NavItem>())
-        override var userLinks: List<NavItem> by userLinksProperty
+        val actionsProperty = Property<List<NavElement>>(listOf())
+        override var actions: List<NavElement> by actionsProperty
+        val userLinksProperty = Property(listOf<NavElement>())
+        override var userLinks: List<NavElement> by userLinksProperty
         val existsProperty = Property(true)
         override var exists: Boolean by existsProperty
     }
@@ -114,14 +104,42 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 Align.Center
             ) in weight(1f)
             row {
-                forEachUpdating(appNav.actionsProperty) {
-                    button {
-                        image {
-                            val currentTheme = currentTheme
-                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.await().title }
+                forEach(appNav.actionsProperty) { element ->
+                    when (element) {
+                        is NavItem -> {
+                            link {
+                                ::to { element.destination() }
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                            }
                         }
-                        onClick { it.await().onSelect() }
+
+                        is Action -> {
+                            button {
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                                onClick(element.onSelect)
+                            }
+                        }
+
+                        is ExternalNav -> {
+                            externalLink {
+                                to = element.to
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                            }
+                        }
+
+                        is SubNav -> {} //TODO: What to do here?
                     }
                 }
             }
@@ -131,7 +149,7 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
             col {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
-                        ::to { it.await().destination }
+                        ::to { it.await().destination() }
                         text { ::content { it.await().title } }
                     } in bar
                 }.toString()
@@ -165,7 +183,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
             row {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
-                        ::to { it.await().destination }
+                        ::to { it.await().destination() }
                         text { ::content { it.await().title } }
                     } in bar
                 }
@@ -173,14 +191,42 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
             } in weight(1f)
             row {
                 row {
-                    forEachUpdating(appNav.actionsProperty) {
-                        button {
-                            image {
-                                val currentTheme = currentTheme
-                                ::source { it.await().icon.toImageSource(currentTheme().foreground) }
-                                ::description { it.await().title }
+                    forEach(appNav.actionsProperty) { element ->
+                        when (element) {
+                            is NavItem -> {
+                                link {
+                                    ::to { element.destination() }
+                                    image {
+                                        val currentTheme = currentTheme
+                                        ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                        ::description { element.title }
+                                    }
+                                }
                             }
-                            onClick { it.await().onSelect() }
+
+                            is Action -> {
+                                button {
+                                    image {
+                                        val currentTheme = currentTheme
+                                        ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                        ::description { element.title }
+                                    }
+                                    onClick(element.onSelect)
+                                }
+                            }
+
+                            is ExternalNav -> {
+                                externalLink {
+                                    to = element.to
+                                    image {
+                                        val currentTheme = currentTheme
+                                        ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                        ::description { element.title }
+                                    }
+                                }
+                            }
+
+                            is SubNav -> {} //TODO: What to do here?
                         }
                     }
 
@@ -212,14 +258,42 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 Align.Center
             ) in weight(1f)
             row {
-                forEachUpdating(appNav.actionsProperty) {
-                    button {
-                        image {
-                            val currentTheme = currentTheme
-                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.await().title }
+                forEach(appNav.actionsProperty) { element ->
+                    when (element) {
+                        is NavItem -> {
+                            link {
+                                ::to { element.destination() }
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                            }
                         }
-                        onClick { it.await().onSelect() }
+
+                        is Action -> {
+                            button {
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                                onClick(element.onSelect)
+                            }
+                        }
+
+                        is ExternalNav -> {
+                            externalLink {
+                                to = element.to
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                            }
+                        }
+
+                        is SubNav -> {} //TODO: What to do here?
                     }
                 }
             }
@@ -230,7 +304,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
         row {
             forEachUpdating(appNav.navItemsProperty) {
                 link {
-                    ::to { it.await().destination }
+                    ::to { it.await().destination() }
                     col {
                         image {
                             val currentTheme = currentTheme
@@ -271,14 +345,42 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             )
             space {} in weight(1f)
             row {
-                forEachUpdating(appNav.actionsProperty) {
-                    button {
-                        image {
-                            val currentTheme = currentTheme
-                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
-                            ::description { it.await().title }
+                forEach(appNav.actionsProperty) { element ->
+                    when (element) {
+                        is NavItem -> {
+                            link {
+                                ::to { element.destination() }
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                            }
                         }
-                        onClick { it.await().onSelect() }
+
+                        is Action -> {
+                            button {
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                                onClick(element.onSelect)
+                            }
+                        }
+
+                        is ExternalNav -> {
+                            externalLink {
+                                to = element.to
+                                image {
+                                    val currentTheme = currentTheme
+                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
+                                    ::description { element.title }
+                                }
+                            }
+                        }
+
+                        is SubNav -> {} //TODO: What to do here?
                     }
                 }
             }
@@ -300,10 +402,30 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 )
             } in withDefaultPadding in hasPopover {
                 col {
-                    forEachUpdating(appNav.userLinksProperty) {
-                        link {
-                            ::to { it.await().destination }
-                            text { ::content { it.await().title } }
+                    forEach(appNav.userLinksProperty) { element ->
+                        when (element) {
+                            is NavItem -> {
+                                link {
+                                    ::to { element.destination() }
+                                    text { ::content { element.title } }
+                                }
+                            }
+
+                            is Action -> {
+                                button {
+                                    text { ::content { element.title } }
+                                    onClick(element.onSelect)
+                                }
+                            }
+
+                            is ExternalNav -> {
+                                externalLink {
+                                    to = element.to
+                                    text { ::content { element.title } }
+                                }
+                            }
+
+                            is SubNav -> {} //TODO: What to do here?
                         }
                     }
                 } in card
@@ -315,7 +437,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             col {
                 forEachUpdating(appNav.navItemsProperty) {
                     link {
-                        ::to { it.await().destination }
+                        ::to { it.await().destination() }
                         text { ::content { it.await().title } }
                     }
                 }

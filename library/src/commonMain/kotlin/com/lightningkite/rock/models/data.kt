@@ -1,6 +1,7 @@
 package com.lightningkite.rock.models
 
 import com.lightningkite.rock.FileReference
+import com.lightningkite.rock.navigation.RockScreen
 import kotlin.jvm.JvmInline
 
 class AnimationId
@@ -105,11 +106,39 @@ data class KeyboardHints(
 enum class AutoComplete { Email, Password, NewPassword, Phone }
 enum class KeyboardCase { None, Letters, Words, Sentences }
 enum class KeyboardType { Text, Integer, Phone, Decimal, Email }
+
+sealed interface NavElement {
+    val title: String
+    val icon: Icon
+}
+
+data class SubNav(
+    override val title: String,
+    override val icon: Icon,
+    val children: List<NavElement> = listOf(),
+) : NavElement
+
+data class NavItem(
+    override val title: String,
+    override val icon: Icon,
+    val destination: suspend () -> RockScreen,
+) : NavElement {
+    constructor(title: String, icon: Icon, destination: RockScreen) : this(title, icon, { destination })
+}
+
+data class ExternalNav(
+    override val title: String,
+    override val icon: Icon,
+    val to: String,
+) : NavElement
+
 data class Action(
-    val title: String,
-    val icon: Icon,
-    val onSelect: suspend () -> Unit
-)
+    override val title: String,
+    override val icon: Icon,
+    val onSelect: suspend () -> Unit,
+) : NavElement
+
+
 
 enum class ImageScaleType { Fit, Crop, Stretch, NoScale }
 

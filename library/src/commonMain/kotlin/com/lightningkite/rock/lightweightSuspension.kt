@@ -174,7 +174,10 @@ fun launchGlobal(action: suspend () -> Unit): Cancellable {
         override val context: CoroutineContext = context
         // called when a coroutine ends. do nothing.
         override fun resumeWith(result: Result<Unit>) {
-            result.onFailure { ex : Throwable -> println("launchGlobal with ${ex.message}") }
+            result.onFailure { ex : Throwable ->
+                println("launchGlobal $action experienced an exception:")
+                ex.printStackTrace()
+            }
         }
     })
     return object: Cancellable {

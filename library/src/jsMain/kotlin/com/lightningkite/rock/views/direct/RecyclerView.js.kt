@@ -38,7 +38,7 @@ actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit =
 actual var RecyclerView.columns: Int
     get() = 1
     set(value) {
-        TODO()
+        native.style.setProperty("grid-template-rows", "repeat($value, auto)")
     }
 
 actual fun <T> RecyclerView.children(

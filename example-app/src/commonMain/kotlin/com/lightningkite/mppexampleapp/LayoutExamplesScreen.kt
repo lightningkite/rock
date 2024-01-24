@@ -5,60 +5,14 @@ import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.card
-import com.lightningkite.rock.views.centered
+import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.setTheme
 
 @Routable("layout-examples")
 object LayoutExamplesScreen : RockScreen {
     override fun ViewWriter.render() {
         col {
             h1 { content = "Sampling" }
-
-            col {
-                h2 { content = "Max Size / Image Interaction" }
-                image {
-                    source = ImageRemote("https://picsum.photos/seed/test/1920/1080")
-                } in sizedBox(
-                    SizeConstraints(
-                        maxHeight = 10.rem
-                    )
-                )
-                image {
-                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
-                } in sizedBox(
-                    SizeConstraints(
-                        maxHeight = 10.rem
-                    )
-                )
-                image {
-                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
-                } in sizedBox(
-                    SizeConstraints(
-                        height = 10.rem
-                    )
-                )
-                image {
-                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
-                    scaleType = ImageScaleType.Crop
-                } in sizedBox(
-                    SizeConstraints(
-                        width = 10.rem,
-                        height = 10.rem
-                    )
-                )  in centered
-                image {
-                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
-                    scaleType = ImageScaleType.Fit
-                } in sizedBox(
-                    SizeConstraints(
-                        width = 10.rem,
-                        height = 10.rem
-                    )
-                )  in centered
-            } in card
 
             col {
                 h2 { content = "Stack Layout" }
@@ -119,36 +73,78 @@ object LayoutExamplesScreen : RockScreen {
                     textField { content bind countString }
                 }
             } in card
+
+            col {
+                h2 { content = "Max Size" }
+                val text = Property(true)
+                important - button {
+                    text("Toggle text size")
+                    onClick {
+                        text.value = !text.value
+                    }
+                }
+                gravity(Align.Start, Align.Start) - sizeConstraints(maxWidth = 40.rem) - important - stack {
+                    text { ::content { if(text.await()) "maxWidth = 40.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "maxWidth = 20.rem" }}
+                }
+                gravity(Align.Start, Align.Start) - sizeConstraints(width = 40.rem) - important - stack {
+                    text { ::content { if(text.await()) "width = 40.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "width = 20.rem" }}
+                }
+                gravity(Align.Start, Align.Start) - sizeConstraints(minWidth = 40.rem) - important - stack {
+                    text { ::content { if(text.await()) "minWidth = 40.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "minWidth = 20.rem" }}
+                }
+            }
+
+            col {
+                h2("Scroll text")
+                sizeConstraints(height = 10.rem) - scrolls - col {
+                    col {
+                        sizeConstraints(height = 100.rem) - text("This item is really tall!")
+                    }
+                }
+            }
+
+            col {
+                h2 { content = "Max Size / Image Interaction" }
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/1920/1080")
+                } in sizedBox(
+                    SizeConstraints(
+                        maxHeight = 10.rem
+                    )
+                )
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                } in sizedBox(
+                    SizeConstraints(
+                        maxHeight = 10.rem
+                    )
+                )
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                } in sizedBox(
+                    SizeConstraints(
+                        height = 10.rem
+                    )
+                )
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                    scaleType = ImageScaleType.Crop
+                } in sizedBox(
+                    SizeConstraints(
+                        width = 10.rem,
+                        height = 10.rem
+                    )
+                )  in centered
+                image {
+                    source = ImageRemote("https://picsum.photos/seed/test/600/300")
+                    scaleType = ImageScaleType.Fit
+                } in sizedBox(
+                    SizeConstraints(
+                        width = 10.rem,
+                        height = 10.rem
+                    )
+                )  in centered
+            } in card
         } in scrolls
     }
-}
-
-fun ViewWriter.componentDemo() {
-    val currentTheme = Property<Theme>(MaterialLikeTheme())
-
-    col {
-
-
-        col {
-            h2 { content = "Sample Form" }
-            h3 { content = "Without cards" }
-            label { content = "First Name"; textField { hint = "Bill" } }
-            label { content = "Last Name"; textField { hint = "Murray" } }
-            label {
-                content = "Password"; textField {
-                this.keyboardHints = KeyboardHints.password
-            }
-            }
-            h3 { content = "With cards" }
-            label { content = "First Name"; textField { hint = "Bill" } in card }
-            label { content = "Last Name"; textField { hint = "Murray" } in card }
-            label {
-                content = "Password"; textField {
-                this.keyboardHints = KeyboardHints.password
-            } in card
-            }
-        } in card
-
-    } in scrolls in setTheme { currentTheme.await() } in marginless
-
 }

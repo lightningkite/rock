@@ -6,6 +6,7 @@ import kotlin.math.absoluteValue
 
 @JvmInline
 value class Angle(val turns: Float) {
+    constructor(turns: Double):this(turns.toFloat())
     companion object {
         const val RADIANS_PER_CIRCLE = (PI * 2).toFloat()
         const val DEGREES_PER_CIRCLE = 360f

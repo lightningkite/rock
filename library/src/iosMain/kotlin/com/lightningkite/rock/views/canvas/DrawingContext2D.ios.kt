@@ -8,6 +8,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.CoreGraphics.*
 import platform.Foundation.NSAttributedStringKey
+import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.UIKit.*
 import kotlin.math.*
@@ -146,9 +147,11 @@ class DrawingContext2DImpl(val wraps: CGContextRef, val width: Double, val heigh
 
     override fun beginPath() = CGContextBeginPath(wraps)
     override fun stroke() = CGContextStrokePath(wraps)
+    private var lastLineWidth = 0.0
     override var lineWidth: Double
-        get() = TODO()
+        get() = lastLineWidth
         set(value) {
+            lastLineWidth = value
             CGContextSetLineWidth(wraps, value)
         }
     override var miterLimit: Double
@@ -190,6 +193,7 @@ class DrawingContext2DImpl(val wraps: CGContextRef, val width: Double, val heigh
     var textAlign: TextAlign = TextAlign.start
     var font: UIFont = UIFont.systemFontOfSize(12.0)
     var fill: Paint = Color.black
+    var stroke: Paint = Color.black
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -214,24 +218,51 @@ actual fun DrawingContext2D.appendArc(
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double): Unit {
-//    (text as NSString).drawInRect(
-//        CGRectMake(x, y, maxWidth, 5000.0),
-//        withFont = (this as DrawingContext2DImpl).font,
-//        lineBreakMode = NSLineBreakByWordWrapping,
-//        alignment = when((this as DrawingContext2DImpl).textAlign) {
-//            TextAlign.start -> NSTextAlignmentLeft
-//            TextAlign.end -> NSTextAlignmentRight
-//            TextAlign.left -> NSTextAlignmentLeft
-//            TextAlign.right -> NSTextAlignmentRight
-//            TextAlign.center -> NSTextAlignmentCenter
-//        }
-//    )
     val attrs = mapOf<Any?, Any?>(
         NSFontAttributeName to (this as DrawingContext2DImpl).font,
         NSForegroundColorAttributeName to this.fill.closestColor().toUiColor(),
         NSParagraphStyleAttributeName to NSMutableParagraphStyle().apply {
             setAlignment(
                 when ((this@drawText as DrawingContext2DImpl).textAlign) {
+                    TextAlign.start -> NSTextAlignmentLeft
+                    TextAlign.end -> NSTextAlignmentRight
+                    TextAlign.left -> NSTextAlignmentLeft
+                    TextAlign.right -> NSTextAlignmentRight
+                    TextAlign.center -> NSTextAlignmentCenter
+                }
+            )
+        }
+    )
+    val ns = (text as NSString)
+    val sizeTaken = ns.sizeWithAttributes(attrs).useContents { width }
+    val height = font.lineHeight
+    var dx = x
+    var dy = y
+    when((this as DrawingContext2DImpl).textAlign) {
+        TextAlign.start, TextAlign.left -> {}
+        TextAlign.end, TextAlign.right -> {
+            dx -= sizeTaken
+        }
+        TextAlign.center -> {
+            dx -= sizeTaken / 2
+        }
+    }
+    dy -= height
+    (text as NSString).drawAtPoint(
+        CGPointMake(dx, dy),
+        withAttributes = attrs
+    )
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun DrawingContext2D.drawOutlinedText(text: String, x: Double, y: Double): Unit {
+    val attrs = mapOf<Any?, Any?>(
+        NSFontAttributeName to (this as DrawingContext2DImpl).font,
+        NSStrokeColorAttributeName to this.stroke.closestColor().toUiColor(),
+        NSStrokeWidthAttributeName to lineWidth as NSNumber,
+        NSParagraphStyleAttributeName to NSMutableParagraphStyle().apply {
+            setAlignment(
+                when ((this@drawOutlinedText as DrawingContext2DImpl).textAlign) {
                     TextAlign.start -> NSTextAlignmentLeft
                     TextAlign.end -> NSTextAlignmentRight
                     TextAlign.left -> NSTextAlignmentLeft
@@ -279,6 +310,7 @@ actual fun DrawingContext2D.fillEvenOdd(): Unit = CGContextEOFillPath((this as D
 actual var DrawingContext2D.strokePaint: Paint
     get() = TODO()
     set(value) {
+        (this as DrawingContext2DImpl).stroke = value
         val c = value.closestColor()
         CGContextSetRGBStrokeColor(
             (this as DrawingContext2DImpl).wraps,

@@ -9,6 +9,7 @@ actual typealias DrawingContext2D = CanvasRenderingContext2D
 //actual typealias TextAlign = CanvasTextAlign
 
 actual fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Angle, endAngle: Angle, anticlockwise: Boolean) = arc(x, y, radius, startAngle.radians.toDouble(), endAngle.radians.toDouble(), anticlockwise)
+actual fun DrawingContext2D.drawOutlinedText(text: String, x: Double, y: Double):Unit = strokeText(text, x, y)
 actual fun DrawingContext2D.drawText(text: String, x: Double, y: Double):Unit = fillText(text, x, y)
 actual fun DrawingContext2D.font(size: Double, value: FontAndStyle) {
     font = "${if(value.bold) "bold " else ""}${if(value.italic) "italic " else ""}${size}px ${value.font.cssFontFamilyName}"

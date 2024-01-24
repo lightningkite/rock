@@ -18,6 +18,8 @@ actual typealias NCanvas = HTMLCanvasElement
 @ViewDsl
 actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
     val c = Canvas(this)
+    style.width = "100%"
+    style.height = "100%"
     setup(c)
     tabIndex = 1
     onkeydown = { event: KeyboardEvent ->
@@ -73,7 +75,6 @@ actual var Canvas.delegate: CanvasDelegate?
         this.native.asDynamic().__ROCK_delegate__ = value
         value?.let { value ->
             value.invalidate = {
-                console.log("Rendering")
                 native.getContext("2d").apply {
                     this as DrawingContext2D
                     this.lineCap = CanvasLineCap.ROUND

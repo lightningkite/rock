@@ -157,6 +157,9 @@ input:focus textarea:focus {
     display: flex;
     flex-direction: row;
 }
+.rock-col > * {
+    max-width: unset;
+}
 
 .rock-row > .vStart {
     align-self: start;
@@ -177,6 +180,10 @@ input:focus textarea:focus {
 .rock-col {
     display: flex;
     flex-direction: column;
+}
+
+.rock-col > * {
+    max-height: unset;
 }
 
 .rock-col > .hStart {
@@ -206,7 +213,7 @@ input:focus textarea:focus {
         opacity: 1;
     }
 }
-
+@
 p.loading:not(.inclBack), h1.loading:not(.inclBack), h2.loading:not(.inclBack), h3.loading:not(.inclBack), h4.loading:not(.inclBack), h5.loading:not(.inclBack), h6.loading:not(.inclBack), img.loading:not(.inclBack), input.loading:not(.inclBack), select.loading:not(.inclBack), textarea.loading:not(.inclBack) {
     min-height: 1em;
     background: color-mix(in srgb, currentColor, transparent 70%) !important;
@@ -311,8 +318,15 @@ button.loading:after {
     scrollbar-width: thin;
     scrollbar-gutter: auto;
     flex-shrink: 0;
-    max-width: 100%;
-    max-height: 100%;
+    max-width: calc(100% - var(--margin, 0) * 2);
+    max-height: calc(100% - var(--margin, 0) * 2);
+    min-height: 0;
+    min-width: 0;
+}
+
+input {
+    min-height: 2rem;
+    min-width: 2rem;
 }
 
 ::placeholder {
@@ -340,10 +354,18 @@ iframe#webpack-dev-server-client-overlay {
     overflow-y: auto;
 }
 
+.recycler > * {
+    max-height: unset;
+}
+
 .recycler-horz {
     display: flex;
     flex-direction: row;
     overflow-x: auto;
+}
+
+.recycler-horz > * {
+    max-width: unset;
 }
 
 .recycler-grid {

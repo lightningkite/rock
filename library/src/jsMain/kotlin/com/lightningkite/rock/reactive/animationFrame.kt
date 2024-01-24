@@ -32,12 +32,15 @@ actual object WindowInfo: Readable<WindowStatistics> by (Property(
     )
 ).also {
     window.addEventListener("resize", { ev ->
-        println("WINDOW RESIZE!")
-        it.value = WindowStatistics(
-            width = Dimension(window.innerWidth.toString() + "px"),
-            height = Dimension(window.innerHeight.toString() + "px"),
-            density = 1f
-        )
+        val newwidth = Dimension(window.innerWidth.toString() + "px")
+        val newheight = Dimension(window.innerHeight.toString() + "px")
+        if(it.value.width != newwidth || it.value.height != newheight) {
+            it.value = WindowStatistics(
+                width = newwidth,
+                height = newheight,
+                density = 1f
+            )
+        }
     })
 })
 actual object InForeground: Readable<Boolean> {

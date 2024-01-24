@@ -70,8 +70,8 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
             ::exists { nav.currentScreen.await() != null }
             dismissBackground {
                 onClick { nav.dismiss() }
+                navigatorViewDialog() in tweakTheme { it.dialog() }
             } in marginless
-            navigatorViewDialog() in tweakTheme { it.dialog() }
         } in marginless
     } in marginless
 }
@@ -89,7 +89,6 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 description = "Open navigation menu"
             }
             }
-            h1 { ::content.invoke { appNav.appNameProperty.await() } }
             button {
                 image {
                     val currentTheme = currentTheme

@@ -16,7 +16,7 @@ actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Un
         name = "span",
         themeLogic = { _, _, virtualClasses ->
             virtualClasses.add("dismissBackground")
-            virtualClasses.add("inclBack")
+            virtualClasses.add("rock-stack")
         },
         setup = {
             setup(DismissBackground(this))

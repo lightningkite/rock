@@ -294,6 +294,19 @@ actual fun DrawingContext2D.drawText(
     )
 }
 
+actual fun DrawingContext2D.drawOutlinedText(
+    text: String,
+    x: Double,
+    y: Double
+) {
+    canvas.drawText(
+        text,
+        x.toFloat(),
+        y.toFloat(),
+        strokePaintObj
+    )
+}
+
 actual fun DrawingContext2D.font(
     size: Double,
     value: FontAndStyle

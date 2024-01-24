@@ -102,6 +102,7 @@ expect abstract class DrawingContext2D {
 }
 
 expect fun DrawingContext2D.appendArc(x: Double, y: Double, radius: Double, startAngle: Angle, endAngle: Angle, anticlockwise: Boolean)
+expect fun DrawingContext2D.drawOutlinedText(text: String, x: Double, y: Double)
 expect fun DrawingContext2D.drawText(text: String, x: Double, y: Double)
 expect fun DrawingContext2D.font(size: Double, value: FontAndStyle)
 expect fun DrawingContext2D.textAlign(alignment: TextAlign)

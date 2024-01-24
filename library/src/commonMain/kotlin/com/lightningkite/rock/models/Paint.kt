@@ -5,6 +5,7 @@ import kotlin.math.min
 
 sealed interface Paint {
     fun closestColor(): Color
+    fun applyAlpha(alpha: Float): Paint
 }
 
 data class GradientStop(val ratio: Float, val color: Color)
@@ -16,6 +17,8 @@ data class LinearGradient(
     override fun closestColor(): Color {
         return stops.maxByOrNull { it.ratio }?.color ?: Color.transparent
     }
+
+    override fun applyAlpha(alpha: Float) = copy(stops = stops.map { it.copy(color = it.color.applyAlpha(alpha)) })
 
     fun toGrayscale()  = copy(stops = stops.map { it.copy(color = it.color.toGrayscale()) })
     fun darken(ratio: Float) = copy(stops = stops.map { it.copy(color = it.color.darken(ratio)) })
@@ -33,6 +36,7 @@ data class RadialGradient(
     override fun closestColor(): Color {
         return stops.maxByOrNull { it.ratio }?.color ?: Color.transparent
     }
+    override fun applyAlpha(alpha: Float) = copy(stops = stops.map { it.copy(color = it.color.applyAlpha(alpha)) })
 }
 
 data class Color(
@@ -43,6 +47,7 @@ data class Color(
 ) : Paint {
 
     override fun closestColor(): Color = this
+    override fun applyAlpha(alpha: Float) = copy(alpha = alpha * this.alpha)
 
     fun toInt(): Int {
         return (alpha.byteize() shl 24) or (red.byteize() shl 16) or (green.byteize() shl 8) or (blue.byteize())

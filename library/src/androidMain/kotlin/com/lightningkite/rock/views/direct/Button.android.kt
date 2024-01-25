@@ -18,7 +18,7 @@ actual fun ViewWriter.button(setup: Button.() -> Unit) {
         native.minimumWidth = 2.rem.value.toInt()
         native.minimumHeight = 2.rem.value.toInt()
         val l = native.androidCalculationContext.loading
-        handleThemeControl(frame) {
+        handleThemeControl(frame, isTouchTarget = true) {
             setup(Button(frame))
 //            LinearProgressIndicator(context).apply {
 //                this.colo

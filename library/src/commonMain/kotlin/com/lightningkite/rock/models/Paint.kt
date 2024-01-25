@@ -77,6 +77,10 @@ data class Color(
         blue = blue + (1f - blue) * ratio
     )
 
+    fun withAlpha(alpha: Float): Color = copy(
+        alpha = alpha
+    )
+
     companion object {
 
         val transparent = Color()

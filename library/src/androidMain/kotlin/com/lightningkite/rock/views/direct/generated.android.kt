@@ -139,7 +139,6 @@ inline fun <T: NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
     viewLoads: Boolean = false,
-    isTouchTarget: Boolean = false,
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
@@ -183,7 +182,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
         // TODO: Animate background change?
         if(viewLoads && view.androidCalculationContext.loading.await()) {
 
-            val gradientDrawable = theme.backgroundDrawable(borders, isTouchTarget)
+            val gradientDrawable = theme.backgroundDrawable(borders, view.isClickable)
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
@@ -213,7 +212,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
             animator?.cancel()
             animator = null
             if (useBackground) {
-                val gradientDrawable = theme.backgroundDrawable(borders, isTouchTarget)
+                val gradientDrawable = theme.backgroundDrawable(borders, view.isClickable)
                 view.background = gradientDrawable
                 view.elevation = if (borders) theme.elevation.value else 0f
                 background(theme)
@@ -228,7 +227,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
 
 fun Theme.backgroundDrawable(
     borders: Boolean,
-    isTouchTarget: Boolean = false
+    clickable: Boolean = false
 ): LayerDrawable {
     val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -275,7 +274,7 @@ fun Theme.backgroundDrawable(
 
     // The layers for each Drawable below must correspond because code elsewhere unpacks formDrawable
     // by it's index
-    return if (isTouchTarget) {
+    return if (clickable) {
         // The Android framework uses 26% alpha for colored ripples
         val rippleColor = foreground.closestColor().withAlpha(0.26f).colorInt()
         RippleDrawable(ColorStateList.valueOf(rippleColor), null, null)
@@ -287,7 +286,6 @@ fun Theme.backgroundDrawable(
 inline fun <T: View> ViewWriter.handleThemeControl(
     view: T,
     viewLoads: Boolean = false,
-    isTouchTarget: Boolean = false,
     noinline checked: suspend () -> Boolean = { false },
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
@@ -318,7 +316,7 @@ inline fun <T: View> ViewWriter.handleThemeControl(
                 }
             }
         }
-        handleTheme(view, false, viewLoads, isTouchTarget, background, backgroundRemove, foreground)
+        handleTheme(view, false, viewLoads, background, backgroundRemove, foreground)
         setup()
     }
 }

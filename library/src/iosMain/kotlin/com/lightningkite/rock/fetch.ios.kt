@@ -256,6 +256,14 @@ class WebSocketWrapper(val url: String) : WebSocket {
 actual class Blob(val data: NSData, val type: String = "application/octet-stream")
 actual class FileReference(val provider: NSItemProvider, val suggestedType: UTType? = null)
 
+
+actual fun FileReference.mimeType(): String {
+    TODO()
+}
+actual fun FileReference.fileName(): String {
+    TODO()
+}
+
 fun String.nsdata(): NSData? =
     NSString.create(string = this).dataUsingEncoding(NSUTF8StringEncoding)
 

@@ -3,27 +3,25 @@
 package com.lightningkite.rock
 
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
+import android.provider.OpenableColumns
 import com.lightningkite.rock.views.AndroidAppContext
 import io.ktor.client.*
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
-import timber.log.Timber
-import java.io.File
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 val client: HttpClient
     get() {
@@ -34,7 +32,7 @@ actual suspend fun fetch(
     url: String,
     method: HttpMethod,
     headers: HttpHeaders,
-    body: RequestBody?
+    body: RequestBody?,
 ): RequestResponse {
     return withContext(Dispatchers.Main) {
         try {
@@ -46,6 +44,7 @@ actual suspend fun fetch(
                         HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
                         HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
                         HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
+                        HttpMethod.HEAD -> io.ktor.http.HttpMethod.Head
                     }
                     this.headers {
                         for ((key, values) in headers.map) {
@@ -144,6 +143,8 @@ actual class RequestResponse(val wraps: HttpResponse) {
             throw e
         }
     }
+
+    actual suspend fun headers(): Map<String, List<String>> = wraps.headers.toMap()
 }
 
 actual fun websocket(url: String): WebSocket {
@@ -270,6 +271,23 @@ class WebSocketWrapper(val url: String) : WebSocket {
 }
 
 actual class FileReference(val uri: Uri)
+
+
+actual fun FileReference.mimeType(): String {
+    return AndroidAppContext.applicationCtx.contentResolver.getType(uri) ?: "*/*"
+}
+
+actual fun FileReference.fileName(): String {
+    return AndroidAppContext.applicationCtx.contentResolver
+        .query(uri, null, null, null, null)
+        ?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            cursor.moveToFirst()
+            cursor.getString(nameIndex)
+        }
+        ?: return "Unknown File Name"
+}
+
 actual class Blob(val data: ByteArray, val type: String)
 
 val webSocketClient: HttpClient by lazy {

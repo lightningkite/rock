@@ -38,6 +38,9 @@ actual var Link.newTab: Boolean
 actual fun ViewWriter.link(setup: Link.() -> Unit) {
     return viewElement(factory = ::LinkFrameLayout, wrapper = ::Link) {
         native.navigator = navigator
+        // OnClickListener may not be set until after handleTheme() is called, so we must manually set isClickable for
+        // the RippleDrawable to be added to the background
+        native.isClickable = true
         handleTheme(native, viewDraws = false)
         setup(this)
     }

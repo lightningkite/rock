@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.lightningkite.rock.models.LinearGradient
+import com.lightningkite.rock.views.AndroidAppContext
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 
@@ -38,7 +39,19 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
         val l = native as LinearLayout
         l.orientation = LinearLayout.HORIZONTAL
         l.gravity = Gravity.CENTER_VERTICAL
-        handleTheme(l, viewDraws = false)
+
+        // The first rendered row will assume status bar leader responsibilities
+        // We are banking on this row being the toolbar so that the status bar color depends on the toolbar color
+        val isStatusBarLeader = !AndroidAppContext.statusBarLeaderAssigned
+        if (isStatusBarLeader) {
+            AndroidAppContext.statusBarLeaderAssigned = true
+            handleTheme(l, viewDraws = false, background = {
+                val window = AndroidAppContext.activityCtx?.window
+                window?.statusBarColor = it.background.closestColor().darken(0.3f).toInt()
+            })
+        } else {
+            handleTheme(l, viewDraws = false)
+        }
         setup(ContainingView(l))
     }
 }

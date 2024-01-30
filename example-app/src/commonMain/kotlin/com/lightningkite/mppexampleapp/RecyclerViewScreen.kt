@@ -35,9 +35,9 @@ object RecyclerViewScreen : RockScreen {
                     }
                 }
             }
-            sizedBox(SizeConstraints(height = 4.rem)) - horizontalRecyclerView {
+            sizedBox(SizeConstraints(height = 5.rem)) - horizontalRecyclerView {
                 children(items) {
-                    important - stack { text { ::content { it.await().toString() } } }
+                    important - stack { centered - text { ::content { it.await().toString() } } }
                 }
             }
             recyclerView {

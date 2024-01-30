@@ -41,14 +41,12 @@ fun ViewWriter.app() {
                 icon = Icon.search,
                 onSelect = {}
             ),
-            Action(
+            ExternalNav(
                 title = "Open on GitHub",
                 icon = Icon.star,
-                onSelect = {
+                to = {
                     val className = navigator.currentScreen.await()?.let { it::class.toString().removePrefix("class ") } ?: "App"
-                    ExternalServices.openTab(
-                        "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/$className.kt"
-                    )
+                    "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/$className.kt"
                 }
             )
         )

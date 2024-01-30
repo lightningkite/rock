@@ -131,7 +131,7 @@ data class NavItem(
 data class ExternalNav(
     override val title: String,
     override val icon: Icon,
-    val to: String,
+    val to: suspend () -> String,
 ) : NavElement
 
 data class Action(

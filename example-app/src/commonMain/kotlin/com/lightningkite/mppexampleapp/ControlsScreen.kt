@@ -47,7 +47,7 @@ object ControlsScreen : RockScreen {
                 } in scrollsHorizontally
             } in card
 
-            col {
+            card - col {
                 h2 { content = "Switches" }
                 col {
                     stack {

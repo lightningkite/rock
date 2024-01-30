@@ -84,7 +84,7 @@ private fun ViewWriter.navGroupColumn(readable: Readable<List<NavElement>>) {
             }
 
             is ExternalNav -> externalLink {
-                ::to { it.to }
+                ::to { it.to() }
                 text { ::content { it.title } }
             }
 
@@ -116,13 +116,15 @@ private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
     forEach(readable) {
         when (it) {
             is Action -> button {
-                text { ::content { it.title } }
+//                text { ::content { it.title } }
+                icon(it.icon, it.title)
                 onClick { it.onSelect() }
             }
 
             is ExternalNav -> externalLink {
-                ::to { it.to }
-                text { ::content { it.title } }
+                ::to { it.to() }
+//                text { ::content { it.title } }
+                icon(it.icon, it.title)
             }
 
             is NavGroup -> {
@@ -133,7 +135,8 @@ private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
 
             is NavItem -> link {
                 ::to { it.destination() }
-                text { ::content { it.title } }
+//                text { ::content { it.title } }
+                icon(it.icon, it.title)
             } in maybeThemeFromLast { existing ->
                 if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
                     existing.down()
@@ -161,7 +164,7 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
             }
 
             is ExternalNav -> externalLink {
-                ::to { it.to }
+                ::to { it.to() }
                 display(it)
             }
 
@@ -260,7 +263,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                             }
 
                             is ExternalNav -> externalLink {
-                                ::to { it.to }
+                                ::to { it.to() }
                                 text { ::content { it.title } }
                             } in bar
 

@@ -6,6 +6,7 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLLinkElement
 import org.w3c.dom.HTMLStyleElement
+import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.css.get
 import org.w3c.dom.events.Event
@@ -27,7 +28,7 @@ object DynamicCSS {
 
     init {
         // basis rules
-        style("*", mapOf("box-sizing" to "border-box", "line-height" to "unset"))
+        style("*", mapOf("box-sizing" to "border-box", "line-height" to "unset", "overflow" to "hidden"))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
         style("h3", mapOf("font-size" to "1.4rem"))
@@ -36,7 +37,10 @@ object DynamicCSS {
         style("h6", mapOf("font-size" to "1.1rem"))
         style(".subtext", mapOf("font-size" to "0.8rem"))
 //        style.visibility = if (value) "visible" else "hidden"
-        style(".visibleOnParentHover", mapOf("visibility" to "hidden", "width" to "max-content", "height" to "max-content"))
+        style(
+            ".visibleOnParentHover",
+            mapOf("visibility" to "hidden", "width" to "max-content", "height" to "max-content")
+        )
         style(":hover>.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(
@@ -220,11 +224,11 @@ object DynamicCSS {
                 "flex-direction" to "row",
             )
         )
-        style(
-            ".rock-row > *", mapOf(
-                "max-width" to "unset",
-            )
-        )
+//        style(
+//            ".rock-row > *", mapOf(
+//                "max-width" to "unset",
+//            )
+//        )
 
         style(
             ".rock-row > .vStart", mapOf(
@@ -257,11 +261,11 @@ object DynamicCSS {
             )
         )
 
-        style(
-            ".rock-col > *", mapOf(
-                "max-height" to "unset",
-            )
-        )
+//        style(
+//            ".rock-col > *", mapOf(
+//                "max-height" to "unset",
+//            )
+//        )
 
         style(
             ".rock-col > .hStart", mapOf(
@@ -392,7 +396,8 @@ object DynamicCSS {
 
         style(
             ".crowd > *", mapOf(
-                "margin" to "0 !important",
+                "margin" to "0px !important",
+                "--margin" to "0px !important",
             )
         )
 
@@ -423,11 +428,12 @@ object DynamicCSS {
                 "scrollbar-width" to "thin",
                 "scrollbar-gutter" to "auto",
                 "flex-shrink" to "0",
-//            "max-width" to "calc(100% - var(--margin, 0) * 2)",
-//            "max-height" to "calc(100% - var(--margin, 0) * 2)",
+                "max-width" to "calc(100% - var(--margin, 0) * 2)",
+                "max-height" to "calc(100% - var(--margin, 0) * 2)",
                 "min-height" to "0",
                 "min-width" to "0",
-                "margin" to "0",
+                "margin" to "0px",
+                "--margin" to "0px",
                 "padding" to "0",
             )
         )
@@ -607,7 +613,7 @@ object DynamicCSS {
 
         style(
             ":not(.unrock)", mapOf(
-                "transition-duration" to "0.25s",
+                "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
                 "transition-delay" to "0s",
                 "transition-property" to "color, background-image, background-color, outline-color, box-shadow, border-radius",
@@ -706,122 +712,6 @@ object DynamicCSS {
         }
     }
 
-    private val themeInteractiveHandled = HashSet<String>()
-    fun themeInteractive(theme: Theme): String {
-
-        theme(theme.down(), ".theme-${theme.id}.clickable:active", includeBackAlways = true)
-        theme(theme.hover(), ".theme-${theme.id}.clickable:hover", includeBackAlways = true)
-        theme(theme.disabled(), ".theme-${theme.id}.clickable:disabled")
-
-        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable")
-        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover")
-        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled")
-
-        theme(theme.selected(), ".theme-${theme.id}.clickable:checked", includeBackAlways = true)
-        theme(theme.selected().hover(), ".theme-${theme.id}.clickable:checked:hover", includeBackAlways = true)
-        theme(theme.selected(), ":checked+.theme-${theme.id}.clickable.checkResponsive", includeBackAlways = true)
-        theme(
-            theme.selected().hover(),
-            ":checked+.theme-${theme.id}.clickable:hover.checkResponsive",
-            includeBackAlways = true
-        )
-        theme(theme.selected().disabled(), ".theme-${theme.id}.clickable:checked:disabled", includeBackAlways = true)
-
-        return theme(theme)
-    }
-
-    private val themeHandled = HashSet<String>()
-    fun theme(theme: Theme, asSelector: String = ".theme-${theme.id}", includeBackAlways: Boolean = false): String {
-        if (!themeHandled.add(asSelector)) return "theme-${theme.id}"
-        val back = when (val it = theme.background) {
-            is Color -> mapOf("background-color" to it.toCss())
-            is LinearGradient -> mapOf(
-                "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
-                "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
-            )
-
-            is RadialGradient -> mapOf(
-                "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
-                "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
-            )
-        }
-        val border = mapOf(
-            "outline-width" to theme.outlineWidth.value,
-            "box-shadow" to theme.elevation.toBoxShadow(),
-        )
-        style(
-            asSelector, mapOf(
-                "color" to theme.foreground.toCss(),
-                "--spacing" to theme.spacing.value,
-                "--foreground" to theme.foreground.toCss(),
-                "font-family" to font(theme.body.font),
-                "font-weight" to if (theme.body.bold) "bold" else "normal",
-                "font-style" to if (theme.body.italic) "italic" else "normal",
-                "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
-                "line-height" to theme.body.lineSpacingMultiplier.toString(),
-                "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
-                "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
-                "outline-color" to theme.outline.toCss(),
-                "outline-width" to 0.px.value,
-                "border-top-left-radius" to theme.cornerRadii.topLeft.value,
-                "border-top-right-radius" to theme.cornerRadii.topRight.value,
-                "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
-                "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
-            ) + (if (includeBackAlways) back + border else mapOf())
-        )
-        style("$asSelector.inclMargin", mapOf("margin" to theme.spacing.value, "--margin" to theme.spacing.value))
-        style("$asSelector.addPadding", mapOf("padding" to theme.spacing.value))
-        style(
-            "$asSelector.title", mapOf(
-                "font-family" to font(theme.title.font),
-                "font-weight" to if (theme.title.bold) "bold" else "normal",
-                "font-style" to if (theme.title.italic) "italic" else "normal",
-                "text-transform" to if (theme.title.allCaps) "uppercase" else "none",
-                "line-height" to theme.title.lineSpacingMultiplier.toString(),
-                "letter-spacing" to theme.title.additionalLetterSpacing.toString(),
-            )
-        )
-
-
-        style("$asSelector.sameThemeText", mapOf("border-bottom-color" to theme.hover().background.toCss()))
-        style(
-            "$asSelector.sameThemeText:hover",
-            mapOf("border-bottom-color" to theme.hover().hover().background.toCss())
-        )
-        style(
-            "$asSelector.sameThemeText:hover:focus",
-            mapOf("border-bottom-color" to theme.selected().background.toCss())
-        )
-        style("$asSelector.sameThemeText:focus", mapOf("border-bottom-color" to theme.selected().background.toCss()))
-        if (includeBackAlways) {
-            style("$asSelector.inclBack", mapOf("padding" to theme.spacing.value))
-        } else {
-            style("$asSelector.inclBack", back)
-            style("$asSelector.inclBorder", border + mapOf("padding" to theme.spacing.value))
-        }
-        style(
-            "$asSelector.dismissBackground", mapOf(
-                "border-radius" to "0",
-                "margin" to "0",
-                "--margin" to "0",
-                "outline-width" to "0",
-                "z-index" to "999",
-            ) + when (val it = theme.background.applyAlpha(0.5f)) {
-                is Color -> mapOf("background-color" to it.toCss())
-                is LinearGradient -> mapOf(
-                    "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
-                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
-                )
-
-                is RadialGradient -> mapOf(
-                    "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
-                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
-                )
-            }
-        )
-        return "theme-${theme.id}"
-    }
-
     private fun Dimension.toBoxShadow(): String {
         if (value == "0px")
             return "none"
@@ -842,6 +732,120 @@ object DynamicCSS {
         return stops.joinToString {
             "${it.color.toWeb()} ${it.ratio * 100}%"
         }
+    }
+
+
+    fun themeInteractive(theme: Theme): String {
+        theme(theme.down(), ".clickable:active .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.down(), ".clickable:active.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.hover(), ".clickable:hover .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.hover(), ".clickable:hover.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.disabled(), ".clickable:disabled .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.disabled(), ".clickable:disabled.theme-${theme.id}", includeMaybeTransition = true)
+
+//        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable")
+//        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover")
+//        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled")
+
+        theme(theme.selected(), "input:checked .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected(), "input:checked.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().hover(), "input:checked:hover .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().hover(), "input:checked:hover.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().disabled(), "input:checked:disabled .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().disabled(), "input:checked:disabled.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected(), "input:checked+* .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected(), "input:checked+*.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().hover(), "input:checked+:hover .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().hover(), "input:checked+:hover.theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().disabled(), "input:checked+:disabled .theme-${theme.id}", includeMaybeTransition = true)
+        theme(theme.selected().disabled(), "input:checked+:disabled.theme-${theme.id}", includeMaybeTransition = true)
+
+        return theme(theme)
+    }
+
+    private val themeHandled = HashSet<String>()
+    fun theme(theme: Theme, asSelector: String = ".theme-${theme.id}", includeMaybeTransition: Boolean = false): String {
+        if(!themeHandled.add(asSelector)) return "theme-${theme.id}"
+        println("Generating theme ${theme.id}.  Known themes: ${themeHandled.size}")
+        style(
+            "$asSelector.mightTransition:not(.isRoot), $asSelector.forcePadding", mapOf(
+                "padding" to theme.spacing.value,
+            )
+        )
+        style(
+            "$asSelector.mightTransition:not(.marginless), $asSelector.viewDraws:not(.marginless), $asSelector.forcePadding", mapOf(
+                "margin" to theme.spacing.value,
+                "--margin" to theme.spacing.value,
+            )
+        )
+        style(
+            if(includeMaybeTransition) "$asSelector.mightTransition, $asSelector.clickable" else "$asSelector.transition", when (val it = theme.background) {
+                is Color -> mapOf("background-color" to it.toCss())
+                is LinearGradient -> mapOf(
+                    "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
+                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
+                )
+
+                is RadialGradient -> mapOf(
+                    "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
+                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
+                )
+            } + mapOf(
+                "outline-width" to theme.outlineWidth.value,
+                "box-shadow" to theme.elevation.toBoxShadow(),
+                "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
+                "outline-color" to theme.outline.toCss(),
+                "border-top-left-radius" to theme.cornerRadii.topLeft.value,
+                "border-top-right-radius" to theme.cornerRadii.topRight.value,
+                "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
+                "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
+            )
+        )
+        style(
+            "$asSelector.title", mapOf(
+                "font-family" to font(theme.title.font),
+                "font-weight" to if (theme.title.bold) "bold" else "normal",
+                "font-style" to if (theme.title.italic) "italic" else "normal",
+                "text-transform" to if (theme.title.allCaps) "uppercase" else "none",
+                "line-height" to theme.title.lineSpacingMultiplier.toString(),
+                "letter-spacing" to theme.title.additionalLetterSpacing.toString(),
+            )
+        )
+        style(
+            "$asSelector", mapOf(
+                "color" to theme.foreground.toCss(),
+                "--spacing" to theme.spacing.value,
+                "--foreground" to theme.foreground.toCss(),
+                "font-family" to font(theme.body.font),
+                "font-weight" to if (theme.body.bold) "bold" else "normal",
+                "font-style" to if (theme.body.italic) "italic" else "normal",
+                "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
+                "line-height" to theme.body.lineSpacingMultiplier.toString(),
+                "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
+            )
+        )
+        style(
+            "$asSelector.dismissBackground", mapOf(
+                "border-radius" to "0",
+                "margin" to "0px",
+                "--margin" to "0px",
+                "outline-width" to "0",
+                "z-index" to "999",
+            ) + when (val it = theme.background.applyAlpha(0.5f)) {
+                is Color -> mapOf("background-color" to it.toCss())
+                is LinearGradient -> mapOf(
+                    "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
+                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
+                )
+
+                is RadialGradient -> mapOf(
+                    "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
+                    "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
+                )
+            }
+        )
+
+        return "theme-${theme.id}"
     }
 }
 
@@ -882,7 +886,7 @@ fun HTMLElement.animateHidden(value: Boolean) {
                 classList.remove(classname)
                 classList.remove("animatingShowHide")
                 remover()
-            }, transitionTime.inWholeMilliseconds.toInt().also { println(it) })
+            }, transitionTime.inWholeMilliseconds.toInt() + 50)
             window.setTimeout({
                 hidden = value
             }, 5)
@@ -910,7 +914,7 @@ fun HTMLElement.animateHidden(value: Boolean) {
                 classList.remove(classname)
                 classList.remove("animatingShowHide")
                 remover()
-            }, transitionTime.inWholeMilliseconds.toInt().also { println(it) })
+            }, transitionTime.inWholeMilliseconds.toInt() + 50)
             window.setTimeout({
                 hidden = value
             }, 5)

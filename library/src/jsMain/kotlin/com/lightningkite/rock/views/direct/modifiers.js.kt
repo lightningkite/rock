@@ -127,7 +127,7 @@ actual val ViewWriter.marginless: ViewWrapper
 actual val ViewWriter.withDefaultPadding: ViewWrapper
     get() {
         beforeNextElementSetup {
-            classList.add("addPadding")
+            classList.add("forcePadding")
         }
         return ViewWrapper
     }

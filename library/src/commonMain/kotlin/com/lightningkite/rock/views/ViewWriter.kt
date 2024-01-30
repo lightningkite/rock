@@ -33,6 +33,7 @@ class ViewWriter(
         it.currentTheme = currentTheme
         it.isRoot = isRoot
         it.transitionNextView = transitionNextView
+        it.changedThemes = changedThemes
     }
 
     /**
@@ -44,6 +45,7 @@ class ViewWriter(
         it.currentTheme = currentTheme
         it.isRoot = isRoot
         it.transitionNextView = transitionNextView
+        it.changedThemes = changedThemes
     }
 
     /**
@@ -55,6 +57,7 @@ class ViewWriter(
         it.currentTheme = currentTheme
         it.isRoot = isRoot
         it.transitionNextView = transitionNextView
+        it.changedThemes = changedThemes
     }
 
     private val stack = if (parent == null) arrayListOf() else arrayListOf(parent)
@@ -72,6 +75,7 @@ class ViewWriter(
     var currentTheme: suspend () -> Theme = { MaterialLikeTheme() }
     inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend () -> Theme) -> Theme, action: () -> T): T {
         val old = currentTheme
+        changedThemes = true
         currentTheme = { calculate(old) }
         try {
             return action()
@@ -83,6 +87,7 @@ class ViewWriter(
     @ViewModifierDsl3
     inline fun ViewWriter.themeModifier(crossinline calculate: suspend (suspend () -> Theme) -> Theme): ViewWrapper {
         val old = currentTheme
+        changedThemes = true
         currentTheme = { calculate(old) }
         afterNextElementSetup {
             currentTheme = old
@@ -100,6 +105,7 @@ class ViewWriter(
     }
 
     var transitionNextView: TransitionNextView = TransitionNextView.No
+    var changedThemes: Boolean = false
     var isRoot: Boolean = true
 
     val calculationContext: CalculationContext get() = stack.last().calculationContext

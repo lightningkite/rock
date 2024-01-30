@@ -182,7 +182,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
         if(viewLoads && view.androidCalculationContext.loading.await()) {
 
             val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
-                customDrawable = { customDrawable(theme) })
+                customDrawable = customDrawable)
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
@@ -213,7 +213,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
             animator = null
             if (useBackground) {
                 val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
-                    customDrawable = { customDrawable(theme) })
+                    customDrawable = customDrawable)
                 view.background = backgroundDrawable
                 view.elevation = if (borders) theme.elevation.value else 0f
                 background(theme)
@@ -230,7 +230,7 @@ fun Theme.backgroundDrawable(
     borders: Boolean,
     clickable: Boolean = false,
     existingBackground: Drawable? = null,
-    customDrawable: LayerDrawable.() -> Unit = {},
+    customDrawable: LayerDrawable.(Theme) -> Unit = {},
 ): LayerDrawable {
     val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -306,7 +306,7 @@ fun Theme.backgroundDrawable(
             RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
     } else {
         LayerDrawable(arrayOfNulls(1))
-    }.apply { setDrawable(0, formDrawable); customDrawable() }
+    }.apply { setDrawable(0, formDrawable); customDrawable(this@backgroundDrawable) }
 }
 
 inline fun <T: View> ViewWriter.handleThemeControl(

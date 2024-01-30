@@ -2,7 +2,6 @@
 
 package com.lightningkite.rock.views.direct
 
-import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.graphics.Typeface
@@ -248,7 +247,26 @@ fun Theme.backgroundDrawable(
 
         when (this@backgroundDrawable.background) {
             is Color -> {
-                colors = intArrayOf(this@backgroundDrawable.background.colorInt(), this@backgroundDrawable.background.colorInt())
+                val oldColor: Int? = ((existingBackground as? LayerDrawable)?.getDrawable(0) as? GradientDrawable)?.colors?.get(0)
+                val newColor = this@backgroundDrawable.background.colorInt()
+
+                if (oldColor != null) {
+                    // Run the animation from old colors to new colors
+                    val animator: ValueAnimator = ValueAnimator.ofArgb(oldColor, newColor).apply {
+                        repeatMode = ValueAnimator.RESTART
+                        repeatCount = 0
+                        duration = 300
+                    }
+
+                    animator.addUpdateListener {
+                        val intermediateColor = it.animatedValue as Int
+                        colors = intArrayOf(intermediateColor, intermediateColor)
+                    }
+                    animator.start()
+                } else {
+                    // Set new colors immediately
+                    colors = intArrayOf(newColor, newColor)
+                }
             }
 
             is LinearGradient -> {

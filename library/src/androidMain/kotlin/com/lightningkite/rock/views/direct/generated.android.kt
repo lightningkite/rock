@@ -138,6 +138,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
     viewLoads: Boolean = false,
+    noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
@@ -178,10 +179,10 @@ inline fun <T: NView> ViewWriter.handleTheme(
             view.setPaddingAll(0)
         }
 
-        // TODO: Animate background change?
         if(viewLoads && view.androidCalculationContext.loading.await()) {
 
-            val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background)
+            val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
+                customDrawable = { customDrawable(theme) })
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
@@ -211,7 +212,8 @@ inline fun <T: NView> ViewWriter.handleTheme(
             animator?.cancel()
             animator = null
             if (useBackground) {
-                val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background)
+                val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
+                    customDrawable = { customDrawable(theme) })
                 view.background = backgroundDrawable
                 view.elevation = if (borders) theme.elevation.value else 0f
                 background(theme)
@@ -227,7 +229,8 @@ inline fun <T: NView> ViewWriter.handleTheme(
 fun Theme.backgroundDrawable(
     borders: Boolean,
     clickable: Boolean = false,
-    existingBackground: Drawable? = null
+    existingBackground: Drawable? = null,
+    customDrawable: LayerDrawable.() -> Unit = {},
 ): LayerDrawable {
     val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -303,13 +306,14 @@ fun Theme.backgroundDrawable(
             RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
     } else {
         LayerDrawable(arrayOfNulls(1))
-    }.apply { setDrawable(0, formDrawable) }
+    }.apply { setDrawable(0, formDrawable); customDrawable() }
 }
 
 inline fun <T: View> ViewWriter.handleThemeControl(
     view: T,
     viewLoads: Boolean = false,
     noinline checked: suspend () -> Boolean = { false },
+    noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
@@ -339,7 +343,7 @@ inline fun <T: View> ViewWriter.handleThemeControl(
                 }
             }
         }
-        handleTheme(view, false, viewLoads, background, backgroundRemove, foreground)
+        handleTheme(view, false, viewLoads, customDrawable, background, backgroundRemove, foreground)
         setup()
     }
 }

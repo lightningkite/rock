@@ -17,6 +17,7 @@ actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = eleme
     element<HTMLInputElement>("input") {
         this.type = "checkbox"
         this.hidden = true
+        this.style.display = "none"
     }
     themedElementClickable<HTMLSpanElement>("span") {
         classList.add("checkResponsive")

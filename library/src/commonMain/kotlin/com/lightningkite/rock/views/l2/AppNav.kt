@@ -3,7 +3,6 @@ package com.lightningkite.rock.views.l2
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.PlatformNavigator
-import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.navigation.Routes
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
@@ -19,7 +18,7 @@ interface AppNav {
     var appName: String
     var appIcon: Icon
     var appLogo: ImageSource
-    var navItems: List<NavItem>
+    var navItems: List<NavElement>
     var currentUser: UserInfo?
     var userLinks: List<NavElement>
     var actions: List<NavElement>
@@ -32,8 +31,8 @@ interface AppNav {
         override var appIcon: Icon by appIconProperty
         val appLogoProperty = Property<ImageSource>(Icon.home.toImageSource(Color.white))
         override var appLogo: ImageSource by appLogoProperty
-        val navItemsProperty = Property(listOf<NavItem>())
-        override var navItems: List<NavItem> by navItemsProperty
+        val navItemsProperty = Property(listOf<NavElement>())
+        override var navItems: List<NavElement> by navItemsProperty
         val currentUserProperty = Property<UserInfo?>(null)
         override var currentUser: UserInfo? by currentUserProperty
         val actionsProperty = Property<List<NavElement>>(listOf())
@@ -76,6 +75,117 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
     } in marginless
 }
 
+private fun ViewWriter.navGroupColumn(readable: Readable<List<NavElement>>) {
+    forEach(readable) {
+        when (it) {
+            is Action -> button {
+                text { ::content { it.title } }
+                onClick { it.onSelect() }
+            }
+
+            is ExternalNav -> externalLink {
+                ::to { it.to }
+                text { ::content { it.title } }
+            }
+
+            is NavGroup -> {
+                col {
+                    h3(it.title)
+                    row {
+                        space()
+                        col {
+                            navGroupColumn(shared { it.children() })
+                        }
+                    }
+                }
+            }
+
+            is NavItem -> link {
+                ::to { it.destination() }
+                text { ::content { it.title } }
+            } in maybeThemeFromLast { existing ->
+                if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
+                    existing.down()
+                else
+                    null
+            }
+        }
+    }
+}
+private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
+    forEach(readable) {
+        when (it) {
+            is Action -> button {
+                text { ::content { it.title } }
+                onClick { it.onSelect() }
+            }
+
+            is ExternalNav -> externalLink {
+                ::to { it.to }
+                text { ::content { it.title } }
+            }
+
+            is NavGroup -> {
+                row {
+                    navGroupActions(shared { it.children() })
+                }
+            }
+
+            is NavItem -> link {
+                ::to { it.destination() }
+                text { ::content { it.title } }
+            } in maybeThemeFromLast { existing ->
+                if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
+                    existing.down()
+                else
+                    null
+            }
+        }
+    }
+}
+fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
+    forEach(readable) {
+        fun display(navElement: NavElement) {
+            col {
+                image {
+                    val currentTheme = currentTheme
+                    ::source { it.icon.toImageSource(currentTheme().foreground) }
+                } in gravity(Align.Center, Align.Center)
+                subtext { ::content { it.title } } in gravity(Align.Center, Align.Center)
+            }
+        }
+        when (it) {
+            is Action -> button {
+                display(it)
+                onClick { it.onSelect() }
+            }
+
+            is ExternalNav -> externalLink {
+                ::to { it.to }
+                display(it)
+            }
+
+            is NavGroup -> button {
+                display(it)
+                onClick {  }  // TODO: select dialog
+            }
+
+            is NavItem -> {
+                link {
+                    ::to { it.destination() }
+                    display(it)
+                } in themeFromLast { existing ->
+                    if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
+                        (existing.bar() ?: existing).down()
+                    else
+                        existing.bar() ?: existing
+                }
+                Unit
+            }
+        } in weight(1f) in marginless
+    }
+}
+
 fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val showMenu = Property(false)
@@ -103,55 +213,13 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 Align.Center
             ) in weight(1f)
             row {
-                forEach(appNav.actionsProperty) { element ->
-                    when (element) {
-                        is NavItem -> {
-                            link {
-                                ::to { element.destination() }
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                            }
-                        }
-
-                        is Action -> {
-                            button {
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                                onClick(element.onSelect)
-                            }
-                        }
-
-                        is ExternalNav -> {
-                            externalLink {
-                                to = element.to
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                            }
-                        }
-
-                        is SubNav -> {} //TODO: What to do here?
-                    }
-                }
-            }
+                navGroupActions(appNav.actionsProperty)
+            } in withDefaultPadding
             ::exists { appNav.existsProperty.await() }
         } in bar in marginless
         row {
             col {
-                forEachUpdating(appNav.navItemsProperty) {
-                    link {
-                        ::to { it.await().destination() }
-                        text { ::content { it.await().title } }
-                    } in bar
-                }.toString()
+                navGroupColumn(appNav.navItemsProperty)
                 ::exists { showMenu.await() && appNav.existsProperty.await() }
             } in bar in marginless
             navigatorView(navigator) in weight(1f) in marginless
@@ -180,56 +248,42 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                 Align.Center
             )
             row {
-                forEachUpdating(appNav.navItemsProperty) {
-                    link {
-                        ::to { it.await().destination() }
-                        text { ::content { it.await().title } }
-                    } in bar
-                }
-
+                navGroupActions(appNav.actionsProperty)
             } in weight(1f)
             row {
-                row {
-                    forEach(appNav.actionsProperty) { element ->
-                        when (element) {
-                            is NavItem -> {
-                                link {
-                                    ::to { element.destination() }
-                                    image {
-                                        val currentTheme = currentTheme
-                                        ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                        ::description { element.title }
+                fun renderGroup(readable: Readable<List<NavElement>>) {
+                    forEach(readable) {
+                        when (it) {
+                            is Action -> button {
+                                text { ::content { it.title } }
+                                onClick { it.onSelect() }
+                            }
+
+                            is ExternalNav -> externalLink {
+                                ::to { it.to }
+                                text { ::content { it.title } }
+                            } in bar
+
+                            is NavGroup -> {
+                                col {
+                                    h3(it.title)
+                                    row {
+                                        space()
+                                        col {
+                                            renderGroup(shared { it.children() })
+                                        }
                                     }
                                 }
                             }
 
-                            is Action -> {
-                                button {
-                                    image {
-                                        val currentTheme = currentTheme
-                                        ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                        ::description { element.title }
-                                    }
-                                    onClick(element.onSelect)
-                                }
-                            }
-
-                            is ExternalNav -> {
-                                externalLink {
-                                    to = element.to
-                                    image {
-                                        val currentTheme = currentTheme
-                                        ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                        ::description { element.title }
-                                    }
-                                }
-                            }
-
-                            is SubNav -> {} //TODO: What to do here?
+                            is NavItem -> link {
+                                ::to { it.destination() }
+                                text { ::content { it.title } }
+                            } in bar
                         }
                     }
-
                 }
+                renderGroup(appNav.actionsProperty)
             }
             ::exists { appNav.existsProperty.await() }
         } in bar in marginless
@@ -257,69 +311,17 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 Align.Center
             ) in weight(1f)
             row {
-                forEach(appNav.actionsProperty) { element ->
-                    when (element) {
-                        is NavItem -> {
-                            link {
-                                ::to { element.destination() }
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                            }
-                        }
-
-                        is Action -> {
-                            button {
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                                onClick(element.onSelect)
-                            }
-                        }
-
-                        is ExternalNav -> {
-                            externalLink {
-                                to = element.to
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                            }
-                        }
-
-                        is SubNav -> {} //TODO: What to do here?
-                    }
-                }
+                navGroupActions(appNav.actionsProperty)
             }
             ::exists { appNav.existsProperty.await() }
         } in bar in marginless
         navigatorView(navigator) in weight(1f) in marginless
         //Nav 3 - top and bottom (bottom/tabs)
         row {
-            forEachUpdating(appNav.navItemsProperty) {
-                link {
-                    ::to { it.await().destination() }
-                    col {
-                        image {
-                            val currentTheme = currentTheme
-                            ::source { it.await().icon.toImageSource(currentTheme().foreground) }
-                        } in gravity(Align.Center, Align.Center)
-                        subtext { ::content { it.await().title } } in gravity(Align.Center, Align.Center)
-                    }
-                } in weight(1f) in themeFromLast { existing ->
-                    if (navigator.currentScreen.await() == it.await().destination)
-                        (existing.bar() ?: existing).down()
-                    else
-                        existing.bar() ?: existing
-                } in marginless
-            }
             ::exists { appNav.existsProperty.await() && !SoftInputOpen.await() }
+            navGroupTabs(appNav.navItemsProperty)
         } in marginless
+
     } in marginless
 }
 
@@ -344,44 +346,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             )
             space {} in weight(1f)
             row {
-                forEach(appNav.actionsProperty) { element ->
-                    when (element) {
-                        is NavItem -> {
-                            link {
-                                ::to { element.destination() }
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                            }
-                        }
-
-                        is Action -> {
-                            button {
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                                onClick(element.onSelect)
-                            }
-                        }
-
-                        is ExternalNav -> {
-                            externalLink {
-                                to = element.to
-                                image {
-                                    val currentTheme = currentTheme
-                                    ::source { element.icon.toImageSource(currentTheme().foreground) }
-                                    ::description { element.title }
-                                }
-                            }
-                        }
-
-                        is SubNav -> {} //TODO: What to do here?
-                    }
-                }
+                navGroupActions(appNav.actionsProperty)
             }
             row {
                 image {
@@ -401,32 +366,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 )
             } in withDefaultPadding in hasPopover {
                 col {
-                    forEach(appNav.userLinksProperty) { element ->
-                        when (element) {
-                            is NavItem -> {
-                                link {
-                                    ::to { element.destination() }
-                                    text { ::content { element.title } }
-                                }
-                            }
-
-                            is Action -> {
-                                button {
-                                    text { ::content { element.title } }
-                                    onClick(element.onSelect)
-                                }
-                            }
-
-                            is ExternalNav -> {
-                                externalLink {
-                                    to = element.to
-                                    text { ::content { element.title } }
-                                }
-                            }
-
-                            is SubNav -> {} //TODO: What to do here?
-                        }
-                    }
+                    navGroupColumn(appNav.userLinksProperty)
                 } in card
             }
 
@@ -434,15 +374,10 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
         } in bar in marginless
         row {
             col {
-                forEachUpdating(appNav.navItemsProperty) {
-                    link {
-                        ::to { it.await().destination() }
-                        text { ::content { it.await().title } }
-                    }
-                }
-
+                navGroupColumn(appNav.navItemsProperty)
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
-            } in marginless
+            } in withDefaultPadding
+            separator()
             navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless

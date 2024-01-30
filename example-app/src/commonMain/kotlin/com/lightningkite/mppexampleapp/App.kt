@@ -1,6 +1,6 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.UseFullScreen
+import com.lightningkite.mppexampleapp.UseFullScreen
 import com.lightningkite.rock.ExternalServices
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*

@@ -42,7 +42,9 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter
                 }
             }, 240)
         }
-    createNewView(vw)
+    native.withoutAnimation {
+        createNewView(vw)
+    }
     (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
         native.hidden = false
         newView.style.animation = "${keyframeName}-enter 0.25s forwards"

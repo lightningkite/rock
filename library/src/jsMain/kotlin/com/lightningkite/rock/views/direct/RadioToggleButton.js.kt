@@ -18,6 +18,7 @@ actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Un
         element<HTMLInputElement>("input") {
             this.type = "radio"
             this.hidden = true
+            this.style.display = "none"
         }
         themedElementClickable<HTMLSpanElement>("span") {
             classList.add("checkResponsive")

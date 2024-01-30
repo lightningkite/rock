@@ -1,4 +1,4 @@
-package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp
+package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.RootScreen
 import com.lightningkite.rock.QueryParameter

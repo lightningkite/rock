@@ -1,4 +1,4 @@
-package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp
+package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.*
 import com.lightningkite.rock.navigation.RockScreen

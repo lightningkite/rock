@@ -23,3 +23,4 @@ expect fun NView.addNView(child: NView)
 expect fun NView.removeNView(child: NView)
 expect fun NView.listNViews(): List<NView>
 
+expect inline fun NView.withoutAnimation(action: ()->Unit)

@@ -31,3 +31,20 @@ fun NView.scrollIntoView(horizontal: Align?, vertical: Align?, animate: Boolean)
     }
     this.scrollIntoView(d)
 }
+
+var animationsEnabled: Boolean = true
+actual inline fun NView.withoutAnimation(action: () -> Unit) {
+    if(!animationsEnabled) {
+        action()
+        return
+    }
+    try {
+        animationsEnabled = false
+        classList.add("notransition")
+        action()
+    } finally {
+        offsetHeight
+        classList.remove("notransition")
+        animationsEnabled = true
+    }
+}

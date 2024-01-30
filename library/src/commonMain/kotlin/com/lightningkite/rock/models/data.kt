@@ -112,11 +112,13 @@ sealed interface NavElement {
     val icon: Icon
 }
 
-data class SubNav(
+data class NavGroup(
     override val title: String,
     override val icon: Icon,
-    val children: List<NavElement> = listOf(),
-) : NavElement
+    val children: suspend () -> List<NavElement>,
+) : NavElement{
+    constructor(title: String, icon: Icon, children: List<NavElement> = listOf()) : this(title, icon, { children })
+}
 
 data class NavItem(
     override val title: String,

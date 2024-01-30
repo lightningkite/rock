@@ -57,7 +57,7 @@ class ViewWriter(
         it.transitionNextView = transitionNextView
     }
 
-    private val stack = if(parent == null) arrayListOf() else arrayListOf(parent)
+    private val stack = if (parent == null) arrayListOf() else arrayListOf(parent)
     val currentView: NView get() = stack.last()
     private inline fun <T : NView> stackUse(item: T, action: T.() -> Unit) =
         CalculationContextStack.useIn(item.calculationContext) {
@@ -70,7 +70,7 @@ class ViewWriter(
         }
 
     var currentTheme: suspend () -> Theme = { MaterialLikeTheme() }
-    inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend ()->Theme)->Theme, action: ()->T): T {
+    inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend () -> Theme) -> Theme, action: () -> T): T {
         val old = currentTheme
         currentTheme = { calculate(old) }
         try {
@@ -79,7 +79,9 @@ class ViewWriter(
             currentTheme = old
         }
     }
-    @ViewModifierDsl3 inline fun ViewWriter.themeModifier(crossinline calculate: suspend (suspend ()->Theme)->Theme): ViewWrapper {
+
+    @ViewModifierDsl3
+    inline fun ViewWriter.themeModifier(crossinline calculate: suspend (suspend () -> Theme) -> Theme): ViewWrapper {
         val old = currentTheme
         currentTheme = { calculate(old) }
         afterNextElementSetup {
@@ -92,10 +94,11 @@ class ViewWriter(
      * Adds a card / border / padding to the next view.
      */
     sealed interface TransitionNextView {
-        object No: TransitionNextView
-        object Yes: TransitionNextView
-        class Maybe(val logic: suspend () -> Boolean): TransitionNextView
+        object No : TransitionNextView
+        object Yes : TransitionNextView
+        class Maybe(val logic: suspend () -> Boolean) : TransitionNextView
     }
+
     var transitionNextView: TransitionNextView = TransitionNextView.No
     var isRoot: Boolean = true
 
@@ -167,54 +170,62 @@ class ViewWriter(
         }
     }
 
-    fun <T> forEachUpdating(items: Readable<List<T>>, placeholdersWhileLoading: Int = 5, render: ViewWriter.(Readable<T>) -> Unit) {
+    fun <T> forEachUpdating(
+        items: Readable<List<T>>,
+        placeholdersWhileLoading: Int = 5,
+        render: ViewWriter.(Readable<T>) -> Unit
+    ) {
         val split = split()
         val currentViews = ArrayList<LateInitProperty<T>>()
         val currentView = currentView
         calculationContext.reactiveScope(onLoad = {
-            if(placeholdersWhileLoading <= 0) return@reactiveScope
-            if(currentViews.size < placeholdersWhileLoading) {
-                repeat(placeholdersWhileLoading - currentViews.size) {
-                    val newProp = LateInitProperty<T>()
-                    split.render(newProp)
-                    currentViews.add(newProp)
-                }
-            }/* else if(currentViews.size > itemList.size) {
+            currentView.withoutAnimation {
+                if (placeholdersWhileLoading <= 0) return@reactiveScope
+                if (currentViews.size < placeholdersWhileLoading) {
+                    repeat(placeholdersWhileLoading - currentViews.size) {
+                        val newProp = LateInitProperty<T>()
+                        split.render(newProp)
+                        currentViews.add(newProp)
+                    }
+                }/* else if(currentViews.size > itemList.size) {
                 currentView.listNViews().takeLast(currentViews.size - itemList.size).forEach {
                     currentView.removeNView(it)
                     currentViews.removeLast()
                 }
             }*/
-            val children = currentView.listNViews()
-            for(index in 0 until placeholdersWhileLoading) {
-                children[index].exists = true
-                currentViews[index].unset()
-            }
-            for(index in placeholdersWhileLoading..<currentViews.size) {
-                children[index].exists = false
+                val children = currentView.listNViews()
+                for (index in 0 until placeholdersWhileLoading) {
+                    children[index].exists = true
+                    currentViews[index].unset()
+                }
+                for (index in placeholdersWhileLoading..<currentViews.size) {
+                    children[index].exists = false
+                }
             }
         }) {
-            val itemList = items.await()
-            if(currentViews.size < itemList.size) {
-                repeat(itemList.size - currentViews.size) {
-                    val newProp = LateInitProperty<T>()
-                    newProp.value = itemList[currentViews.size]
-                    split.render(newProp)
-                    currentViews.add(newProp)
-                }
-            }/* else if(currentViews.size > itemList.size) {
+            currentView.withoutAnimation {
+                val itemList = items.await()
+                if (currentViews.size < itemList.size) {
+                    repeat(itemList.size - currentViews.size) {
+                        val newProp = LateInitProperty<T>()
+                        newProp.value = itemList[currentViews.size]
+                        split.render(newProp)
+                        currentViews.add(newProp)
+                    }
+                }/* else if(currentViews.size > itemList.size) {
                 currentView.listNViews().takeLast(currentViews.size - itemList.size).forEach {
                     currentView.removeNView(it)
                     currentViews.removeLast()
                 }
             }*/
-            val children = currentView.listNViews()
-            for(index in itemList.indices) {
-                children[index].exists = true
-                currentViews[index].value = itemList[index]
-            }
-            for(index in itemList.size..<currentViews.size) {
-                children[index].exists = false
+                val children = currentView.listNViews()
+                for (index in itemList.indices) {
+                    children[index].exists = true
+                    currentViews[index].value = itemList[index]
+                }
+                for (index in itemList.size..<currentViews.size) {
+                    children[index].exists = false
+                }
             }
         }
     }

@@ -2,7 +2,6 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
@@ -24,7 +23,7 @@ inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
     val rootTheme = isRoot
     isRoot = false
     val theme2 = currentTheme
-    val themeChanged = transitionNextView
+    val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
 
     calculationContext.reactiveScope {
@@ -35,8 +34,8 @@ inline fun <T : HTMLElement> ViewWriter.themedElementPrivateMeta(
         virtualClasses.add(base)
         previousThemeClass = base
 
-        val changed = when(themeChanged) {
-            is ViewWriter.TransitionNextView.Maybe -> themeChanged.logic()
+        val changed = when(transition) {
+            is ViewWriter.TransitionNextView.Maybe -> transition.logic()
             ViewWriter.TransitionNextView.No -> false
             ViewWriter.TransitionNextView.Yes -> true
         }

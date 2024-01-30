@@ -11,3 +11,6 @@ actual fun NView.removeNView(child: NView) {
 actual fun NView.listNViews(): List<NView> {
     return subviews.map { it as UIView }
 }
+
+actual inline fun NView.withoutAnimation(action: () -> Unit) {
+}

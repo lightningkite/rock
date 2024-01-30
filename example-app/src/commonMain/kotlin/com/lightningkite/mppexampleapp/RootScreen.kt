@@ -1,6 +1,6 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.*
+import com.lightningkite.mppexampleapp.*
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.*
@@ -46,6 +46,7 @@ object RootScreen : RockScreen {
                     }
                 } in card
 
+                linkScreen(PlatformSpecificScreen)
                 linkScreen(TwoPaneTestScreen)
                 linkScreen(ThemesScreen)
                 linkScreen(ControlsScreen)

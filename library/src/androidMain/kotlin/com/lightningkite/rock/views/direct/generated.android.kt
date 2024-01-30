@@ -182,14 +182,14 @@ inline fun <T: NView> ViewWriter.handleTheme(
         // TODO: Animate background change?
         if(viewLoads && view.androidCalculationContext.loading.await()) {
 
-            val gradientDrawable = theme.backgroundDrawable(borders, view.isClickable)
+            val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background)
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
             animation.repeatMode = ValueAnimator.REVERSE
             animation.repeatCount = Animation.INFINITE
 
-            val formDrawable = gradientDrawable.getDrawable(0) as GradientDrawable
+            val formDrawable = backgroundDrawable.getDrawable(0) as GradientDrawable
 
             val originalColors = formDrawable.colors?.map { Color.fromInt(it) } ?: listOf()
             val currentColors = originalColors.map { it.toInt() }.toIntArray()
@@ -200,7 +200,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
 
             animation.start()
             animator = animation
-            view.background = gradientDrawable
+            view.background = backgroundDrawable
             view.elevation = if (useBackground && borders) theme.elevation.value else 0f
             if (useBackground) {
                 background(theme)
@@ -212,8 +212,8 @@ inline fun <T: NView> ViewWriter.handleTheme(
             animator?.cancel()
             animator = null
             if (useBackground) {
-                val gradientDrawable = theme.backgroundDrawable(borders, view.isClickable)
-                view.background = gradientDrawable
+                val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background)
+                view.background = backgroundDrawable
                 view.elevation = if (borders) theme.elevation.value else 0f
                 background(theme)
             } else {
@@ -227,7 +227,8 @@ inline fun <T: NView> ViewWriter.handleTheme(
 
 fun Theme.backgroundDrawable(
     borders: Boolean,
-    clickable: Boolean = false
+    clickable: Boolean = false,
+    existingBackground: Drawable? = null
 ): LayerDrawable {
     val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -272,15 +273,19 @@ fun Theme.backgroundDrawable(
         }
     }
 
-    // The layers for each Drawable below must correspond because code elsewhere unpacks formDrawable
-    // by it's index
     return if (clickable) {
         // The Android framework uses 26% alpha for colored ripples
-        val rippleColor = foreground.closestColor().withAlpha(0.26f).colorInt()
-        RippleDrawable(ColorStateList.valueOf(rippleColor), null, null)
+        val rippleColor = ColorStateList.valueOf(foreground.closestColor().withAlpha(0.26f).colorInt())
+
+        // If we can reuse the existing RippleDrawable, do it to preserve any pending ripples
+        // Problem: if the color is set mid-animation, then it is not applied until the next animation
+        (existingBackground as? RippleDrawable)?.apply {
+            setColor(rippleColor)
+        } ?:
+            RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
     } else {
-        LayerDrawable(arrayOf())
-    }.apply { addLayer(formDrawable) }
+        LayerDrawable(arrayOfNulls(1))
+    }.apply { setDrawable(0, formDrawable) }
 }
 
 inline fun <T: View> ViewWriter.handleThemeControl(

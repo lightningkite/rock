@@ -77,19 +77,57 @@ data class Theme(
         )
     },
 ) {
-    @JsName("dialogDirect") inline fun dialog() = dialog(this)
-    @JsName("hoverDirect") inline fun hover() = hover(this)
-    @JsName("downDirect") inline fun down() = down(this)
-    @JsName("selectedDirect") inline fun selected() = selected(this)
-    @JsName("unselectedDirect") inline fun unselected() = unselected(this)
-    @JsName("disabledDirect") inline fun disabled() = disabled(this)
-    @JsName("barDirect") inline fun bar() = bar(this)
-    @JsName("importantDirect") inline fun important() = important(this)
-    @JsName("criticalDirect") inline fun critical() = critical(this)
-    @JsName("warningDirect") inline fun warning() = warning(this)
-    @JsName("dangerDirect") inline fun danger() = danger(this)
-    @JsName("affirmativeDirect") inline fun affirmative() = affirmative(this)
+    @JsName("dialogDirect")
+    inline fun dialog() = dialog(this)
+    @JsName("hoverDirect")
+    inline fun hover() = hover(this)
+    @JsName("downDirect")
+    inline fun down() = down(this)
+    @JsName("selectedDirect")
+    inline fun selected() = selected(this)
+    @JsName("unselectedDirect")
+    inline fun unselected() = unselected(this)
+    @JsName("disabledDirect")
+    inline fun disabled() = disabled(this)
+    @JsName("barDirect")
+    inline fun bar() = bar(this)
+    @JsName("importantDirect")
+    inline fun important() = important(this)
+    @JsName("criticalDirect")
+    inline fun critical() = critical(this)
+    @JsName("warningDirect")
+    inline fun warning() = warning(this)
+    @JsName("dangerDirect")
+    inline fun danger() = danger(this)
+    @JsName("affirmativeDirect")
+    inline fun affirmative() = affirmative(this)
 
     val id: String get() = hashCode().toString()
+
+    override fun hashCode(): Int {
+        var out = 0
+        out = out * 31 + title.hashCode()
+        out = out * 31 + body.hashCode()
+        out = out * 31 + elevation.hashCode()
+        out = out * 31 + cornerRadii.hashCode()
+        out = out * 31 + spacing.hashCode()
+        out = out * 31 + foreground.hashCode()
+        out = out * 31 + outline.hashCode()
+        out = out * 31 + outlineWidth.hashCode()
+        out = out * 31 + background.hashCode()
+        return out
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Theme && this.title == other.title &&
+                this.body == other.body &&
+                this.elevation == other.elevation &&
+                this.cornerRadii == other.cornerRadii &&
+                this.spacing == other.spacing &&
+                this.foreground == other.foreground &&
+                this.outline == other.outline &&
+                this.outlineWidth == other.outlineWidth &&
+                this.background == other.background
+    }
 }
 

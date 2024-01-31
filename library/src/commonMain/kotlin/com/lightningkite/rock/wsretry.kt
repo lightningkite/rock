@@ -1,12 +1,11 @@
 package com.lightningkite.rock
 
 import com.lightningkite.rock.reactive.*
-import kotlinx.datetime.Clock
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 
 fun retryWebsocket(
-    url: String
+    url: String,
 ): RetryWebsocket {
     val baseDelay = 1000L
     var currentDelay = baseDelay
@@ -44,9 +43,12 @@ fun retryWebsocket(
             }
 
             val pings = launchGlobal {
-                while(true){
+                while (true) {
                     delay(30_000)
-                    if(lastPong < clockMillis() - 60_000) it.close((-1).toShort(), "Server did not respond to two consecutive pings.")
+                    if (lastPong < clockMillis() - 60_000) it.close(
+                        (-1).toShort(),
+                        "Server did not respond to two consecutive pings."
+                    )
                     it.send(" ")
                 }
             }
@@ -168,7 +170,7 @@ val <RECEIVE> TypedWebSocket<*, RECEIVE>.mostRecentMessage: Readable<RECEIVE?>
 fun <SEND, RECEIVE> RetryWebsocket.typed(
     json: Json,
     send: KSerializer<SEND>,
-    receive: KSerializer<RECEIVE>
+    receive: KSerializer<RECEIVE>,
 ): TypedWebSocket<SEND, RECEIVE> = object : TypedWebSocket<SEND, RECEIVE> {
     override val connected: Readable<Boolean>
         get() = this@typed.connected

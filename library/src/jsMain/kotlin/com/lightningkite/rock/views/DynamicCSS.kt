@@ -308,9 +308,9 @@ object DynamicCSS {
             )
         )
         style(
-            "button:after", mapOf(
+            "button.loading:after", mapOf(
+                "opacity" to "0.5 !important",
                 "content" to "\"\"",
-                "opacity" to "0",
 //                "display" to "none",
                 "pointer-events" to "none",
                 "position" to "absolute",
@@ -326,11 +326,6 @@ object DynamicCSS {
                 "border-radius" to "50% !important",
                 "transition" to "all .3s ease",
                 "animation" to "spin 2s infinite linear !important",
-            )
-        )
-        style(
-            "button.loading:after", mapOf(
-                "opacity" to "0.5 !important",
             )
         )
         style(

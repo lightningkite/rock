@@ -4,6 +4,7 @@ import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.MaterialLikeTheme
 import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
+import kotlin.math.min
 
 /**
  * An object that writes view trees, similar to the way a Writer in Java sequentially writes text data.
@@ -211,6 +212,7 @@ class ViewWriter(
         }) {
             currentView.withoutAnimation {
                 val itemList = items.await()
+                val oldCurrentViewsSize = currentViews.size
                 if (currentViews.size < itemList.size) {
                     repeat(itemList.size - currentViews.size) {
                         val newProp = LateInitProperty<T>()
@@ -225,7 +227,7 @@ class ViewWriter(
                 }
             }*/
                 val children = currentView.listNViews()
-                for (index in itemList.indices) {
+                for (index in 0 ..< min(oldCurrentViewsSize, itemList.size)) {
                     children[index].exists = true
                     currentViews[index].value = itemList[index]
                 }

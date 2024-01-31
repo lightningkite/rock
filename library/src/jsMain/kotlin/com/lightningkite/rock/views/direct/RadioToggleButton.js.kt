@@ -17,6 +17,7 @@ actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Un
         classList.add("toggle-button")
         element<HTMLInputElement>("input") {
             this.type = "radio"
+            classList.add("checkSensitive")
             this.hidden = true
             this.style.display = "none"
         }

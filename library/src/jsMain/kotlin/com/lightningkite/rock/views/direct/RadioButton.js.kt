@@ -33,11 +33,14 @@ fun <T : HTMLElement, V> T.vprop(
 }
 
 @ViewDsl
-actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit =
+actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit {
+    transitionNextView = ViewWriter.TransitionNextView.Yes
     themedElementClickable<HTMLInputElement>("input") {
+        classList.add("radio")
         this.type = "radio"
         setup(RadioButton(this))
     }
+}
 
 actual inline var RadioButton.enabled: Boolean
     get() = !native.disabled

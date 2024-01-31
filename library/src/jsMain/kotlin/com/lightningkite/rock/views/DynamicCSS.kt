@@ -135,6 +135,7 @@ object DynamicCSS {
 
         style(
             ".rock-swap", mapOf(
+                "display" to "block",
                 "position" to "relative",
             )
         )
@@ -302,26 +303,39 @@ object DynamicCSS {
         )
 
         style(
-            "button.loading", mapOf(
+            "button", mapOf(
                 "position" to "relative",
             )
         )
         style(
-            "button.loading:after", mapOf(
+            "button:after", mapOf(
                 "content" to "\"\"",
+                "opacity" to "0",
+//                "display" to "none",
+                "pointer-events" to "none",
                 "position" to "absolute",
                 "top" to "calc(50% - 20px)",
                 "left" to "calc(50% - 20px)",
                 "width" to "32px !important",
                 "height" to "32px !important",
-                "opacity" to "0.5 !important",
                 "background" to "none !important",
                 "box-shadow" to "none !important",
                 "border-style" to "solid !important",
                 "border-color" to "var(--foreground) var(--foreground) var(--foreground) transparent !important",
                 "border-width" to "6px !important",
                 "border-radius" to "50% !important",
+                "transition" to "all .3s ease",
                 "animation" to "spin 2s infinite linear !important",
+            )
+        )
+        style(
+            "button.loading:after", mapOf(
+                "opacity" to "0.5 !important",
+            )
+        )
+        style(
+            "button.loading > *", mapOf(
+                "opacity" to "0.15",
             )
         )
 
@@ -334,6 +348,7 @@ object DynamicCSS {
         style(
             ".switch", mapOf(
                 "position" to "relative",
+                "overflow" to "visible",
                 "height" to "1.5rem",
                 "width" to "3rem",
                 "cursor" to "pointer",
@@ -360,6 +375,8 @@ object DynamicCSS {
                 "display" to "block",
                 "height" to "1.6rem",
                 "width" to "1.6rem",
+                "max-width" to "unset",
+                "max-height" to "unset",
                 "cursor" to "pointer",
                 "border" to "1px solid rgba(100, 116, 139, 0.527)",
                 "border-radius" to "9999px !important",
@@ -385,6 +402,82 @@ object DynamicCSS {
             ".switch:checked:before", mapOf(
                 "left" to "calc(3rem - 1.6rem)",
                 "border-color" to "rgba(236, 72, 153, 1)",
+            )
+        )
+
+        style(
+            ".checkbox", mapOf(
+                "appearance" to "none",
+                "width" to "1.5rem",
+                "height" to "1.5rem",
+                "position" to "relative",
+                "padding" to "0px !important",
+//                "border-width" to "0.25rem",
+//                "border-style" to "solid",
+            )
+        )
+        style(
+            ".checkbox::after", mapOf(
+                "position" to "absolute",
+                "content" to "\"\"",
+                "display" to "block",
+                "width" to "0.8rem",
+                "height" to "0.3rem",
+                "top" to "0.4rem",
+                "left" to "0.25rem",
+                "border-left-color" to "currentColor",
+                "border-bottom-color" to "currentColor",
+                "border-left-style" to "solid",
+                "border-bottom-style" to "solid",
+                "border-left-width" to "0.2rem",
+                "border-bottom-width" to "0.2rem",
+                "opacity" to "0.4",
+                "transform" to "rotate(-45deg) scale(0,0)",
+                "transition-property" to "opacity, transform",
+                "transition-duration" to "0.15s",
+                "transition-timing-function" to "linear",
+            )
+        )
+        style(
+            ":checked.checkbox::after", mapOf(
+                "opacity" to "1",
+                "transform" to "rotate(-45deg)"
+            )
+        )
+        style(
+            ".radio", mapOf(
+                "appearance" to "none",
+                "width" to "1.5rem",
+                "height" to "1.5rem",
+                "position" to "relative",
+                "border-radius" to "999px !important",
+                "padding" to "0px !important",
+                "border-width" to "0.1rem",
+                "border-style" to "solid",
+            )
+        )
+        style(
+            ".radio::after", mapOf(
+                "position" to "absolute",
+                "border-radius" to "999px",
+                "content" to "\"\"",
+                "display" to "block",
+                "width" to "1rem",
+                "height" to "1rem",
+                "top" to "0.15rem",
+                "left" to "0.15rem",
+                "background-color" to "currentColor",
+                "opacity" to "0.4",
+                "transform" to "scale(0,0)",
+                "transition-property" to "opacity, transform",
+                "transition-duration" to "0.15s",
+                "transition-timing-function" to "linear",
+            )
+        )
+        style(
+            ":checked.radio::after", mapOf(
+                "opacity" to "1",
+                "transform" to "none"
             )
         )
 
@@ -460,11 +553,6 @@ object DynamicCSS {
                 "min-height" to "1px",
             )
         )
-
-//        style("[hidden]", mapOf(
-//            "visibility" to "hidden !important",
-//            "display" to "none !important",
-//        ))
 
         style(
             "iframe#webpack-dev-server-client-overlay", mapOf(
@@ -593,17 +681,17 @@ object DynamicCSS {
                 "transform" to "scaleY(0)",
             )
         )
-        style(
-            ".rock-stack > [hidden]", mapOf(
-                "width" to "0px !important",
-                "height" to "0px !important",
-                "margin-top" to "0px !important",
-                "margin-bottom" to "0px !important",
-                "margin-left" to "0px !important",
-                "margin-right" to "0px !important",
-                "transform" to "scale(0, 0)",
-            )
-        )
+//        style(
+//            ".rock-stack > [hidden]", mapOf(
+//                "width" to "0px !important",
+//                "height" to "0px !important",
+//                "margin-top" to "0px !important",
+//                "margin-bottom" to "0px !important",
+//                "margin-left" to "0px !important",
+//                "margin-right" to "0px !important",
+//                "transform" to "scale(0, 0)",
+//            )
+//        )
         style(
             "[hidden]", mapOf(
                 "pointer-events" to "none",
@@ -616,7 +704,7 @@ object DynamicCSS {
                 "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
                 "transition-delay" to "0s",
-                "transition-property" to "color, background-image, background-color, outline-color, box-shadow, border-radius",
+                "transition-property" to "color, background-image, background-color, outline-color, box-shadow, border-radius, opacity",
             )
         )
 
@@ -630,6 +718,13 @@ object DynamicCSS {
         style(
             ".notransition", mapOf(
                 "transition" to "none !important"
+            )
+        )
+
+        style(
+            ".dismissBackground > *", mapOf(
+                "width" to "100%",
+                "height" to "100%",
             )
         )
     }
@@ -736,50 +831,86 @@ object DynamicCSS {
 
 
     fun themeInteractive(theme: Theme): String {
-        theme(theme.down(), ".clickable:active .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.down(), ".clickable:active.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.hover(), ".clickable:hover .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.hover(), ".clickable:hover.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.disabled(), ".clickable:disabled .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.disabled(), ".clickable:disabled.theme-${theme.id}", includeMaybeTransition = true)
+        theme(
+            theme.down(),
+            listOf(".clickable:active .theme-${theme.id}", ".clickable:active.theme-${theme.id}"),
+            includeMaybeTransition = true
+        )
+        theme(
+            theme.hover(),
+            listOf(".clickable:hover .theme-${theme.id}", ".clickable:hover.theme-${theme.id}"),
+            includeMaybeTransition = true
+        )
+        theme(
+            theme.disabled(),
+            listOf(".clickable:disabled .theme-${theme.id}", ".clickable:disabled.theme-${theme.id}"),
+            includeMaybeTransition = true
+        )
 
 //        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable")
 //        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover")
 //        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled")
 
-        theme(theme.selected(), "input:checked .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected(), "input:checked.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().hover(), "input:checked:hover .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().hover(), "input:checked:hover.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().disabled(), "input:checked:disabled .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().disabled(), "input:checked:disabled.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected(), "input:checked+* .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected(), "input:checked+*.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().hover(), "input:checked+:hover .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().hover(), "input:checked+:hover.theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().disabled(), "input:checked+:disabled .theme-${theme.id}", includeMaybeTransition = true)
-        theme(theme.selected().disabled(), "input:checked+:disabled.theme-${theme.id}", includeMaybeTransition = true)
+        theme(
+            theme.selected(),
+            listOf(
+                "input:checked.checkSensitive .theme-${theme.id}",
+                "input:checked.checkSensitive.theme-${theme.id}",
+                "input:checked.checkSensitive+* .theme-${theme.id}",
+                "input:checked.checkSensitive+*.theme-${theme.id}",
+            ),
+            includeMaybeTransition = true
+        )
+        theme(
+            theme.selected().hover(),
+            listOf(
+                "input:checked.checkSensitive:hover .theme-${theme.id}",
+                "input:checked.checkSensitive:hover.theme-${theme.id}",
+                "input:checked.checkSensitive+:hover .theme-${theme.id}",
+                "input:checked.checkSensitive+:hover.theme-${theme.id}",
+            ),
+            includeMaybeTransition = true
+        )
+        theme(
+            theme.selected().disabled(),
+            listOf(
+                "input:checked.checkSensitive:disabled .theme-${theme.id}",
+                "input:checked.checkSensitive:disabled.theme-${theme.id}",
+                "input:checked.checkSensitive+:disabled .theme-${theme.id}",
+                "input:checked.checkSensitive+:disabled.theme-${theme.id}",
+            ),
+            includeMaybeTransition = true
+        )
 
         return theme(theme)
     }
 
     private val themeHandled = HashSet<String>()
-    fun theme(theme: Theme, asSelector: String = ".theme-${theme.id}", includeMaybeTransition: Boolean = false): String {
-        if(!themeHandled.add(asSelector)) return "theme-${theme.id}"
+    fun theme(
+        theme: Theme,
+        asSelectors: List<String> = listOf(".theme-${theme.id}"),
+        includeMaybeTransition: Boolean = false
+    ): String {
+        val includeSelectors = asSelectors.filter { themeHandled.add(it) }
+        if (includeSelectors.isEmpty()) return "theme-${theme.id}"
         println("Generating theme ${theme.id}.  Known themes: ${themeHandled.size}")
+        fun sel(vararg plus: String): String {
+            return includeSelectors.asSequence().flatMap { plus.asSequence().map { p -> "$it$p" } }.joinToString(", ")
+        }
         style(
-            "$asSelector.mightTransition:not(.isRoot), $asSelector.forcePadding", mapOf(
+            sel(".mightTransition:not(.isRoot)", ".forcePadding"), mapOf(
                 "padding" to theme.spacing.value,
             )
         )
         style(
-            "$asSelector.mightTransition:not(.marginless), $asSelector.viewDraws:not(.marginless), $asSelector.forcePadding", mapOf(
+            sel(".mightTransition:not(.marginless)", ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
                 "margin" to theme.spacing.value,
                 "--margin" to theme.spacing.value,
             )
         )
         style(
-            if(includeMaybeTransition) "$asSelector.mightTransition, $asSelector.clickable" else "$asSelector.transition", when (val it = theme.background) {
+            if (includeMaybeTransition) sel(".mightTransition", ".clickable") else sel(".transition"),
+            when (val it = theme.background) {
                 is Color -> mapOf("background-color" to it.toCss())
                 is LinearGradient -> mapOf(
                     "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
@@ -795,6 +926,10 @@ object DynamicCSS {
                 "box-shadow" to theme.elevation.toBoxShadow(),
                 "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
                 "outline-color" to theme.outline.toCss(),
+            )
+        )
+        style(
+            sel(".mightTransition", ".clickable"), mapOf(
                 "border-top-left-radius" to theme.cornerRadii.topLeft.value,
                 "border-top-right-radius" to theme.cornerRadii.topRight.value,
                 "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
@@ -802,7 +937,7 @@ object DynamicCSS {
             )
         )
         style(
-            "$asSelector.title", mapOf(
+            sel(".title"), mapOf(
                 "font-family" to font(theme.title.font),
                 "font-weight" to if (theme.title.bold) "bold" else "normal",
                 "font-style" to if (theme.title.italic) "italic" else "normal",
@@ -812,7 +947,7 @@ object DynamicCSS {
             )
         )
         style(
-            "$asSelector", mapOf(
+            sel(""), mapOf(
                 "color" to theme.foreground.toCss(),
                 "--spacing" to theme.spacing.value,
                 "--foreground" to theme.foreground.toCss(),
@@ -825,7 +960,7 @@ object DynamicCSS {
             )
         )
         style(
-            "$asSelector.dismissBackground", mapOf(
+            sel(".dismissBackground"), mapOf(
                 "border-radius" to "0",
                 "margin" to "0px",
                 "--margin" to "0px",

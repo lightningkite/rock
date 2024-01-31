@@ -32,7 +32,7 @@ object RootScreen : RockScreen {
                     content =
                         "Note the magnifying glass in the top right corner - clicking it will open the source of the current screen on GitHub!"
                 }
-            } in withDefaultPadding
+            }
             col {
 
                 fun ViewWriter.linkScreen(screen: RockScreen) = link {
@@ -72,7 +72,7 @@ object RootScreen : RockScreen {
                     onClick { gc() }
                 }
 
-            } in withDefaultPadding
+            }
         }
     }
 }

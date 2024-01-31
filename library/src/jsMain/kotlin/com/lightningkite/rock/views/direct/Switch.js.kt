@@ -12,6 +12,7 @@ actual typealias NSwitch = HTMLInputElement
 actual fun ViewWriter.switch(setup: Switch.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "checkbox"
     this.classList.add("switch")
+    this.classList.add("checkSensitive")
     setup(Switch(this))
 }
 

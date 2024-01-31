@@ -108,6 +108,37 @@ object ControlsScreen : RockScreen {
             } in card
 
             col {
+                h2 { content = "Radio Buttons" }
+                val selected = Property(1)
+                col {
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            radioButton { checked bind selected.equalTo(1) }
+                        }
+                    } in withDefaultPadding
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            radioButton { checked bind selected.equalTo(2) }
+                        }
+                    } in card
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            radioButton { checked bind selected.equalTo(3) }
+                        }
+                    } in important
+                    stack {
+                        row {
+                            h3 { content = "Example Setting" } in weight(1f)
+                            radioButton { checked bind selected.equalTo(4) }
+                        }
+                    } in critical
+                }
+            } in card
+
+            col {
                 h2 { content = "Activity Indicators" }
                 row {
                     space {} in weight(1f)

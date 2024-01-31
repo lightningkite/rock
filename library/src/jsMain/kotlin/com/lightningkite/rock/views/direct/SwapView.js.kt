@@ -6,6 +6,7 @@ import kotlinx.browser.window
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
+import kotlin.time.Duration
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NSwapView = HTMLDivElement
@@ -34,7 +35,9 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter
         .forEach { view ->
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
-            view.style.animation = "${keyframeName}-exit 0.25s forwards"
+            val myStyle = window.getComputedStyle(native)
+            val transitionTime = myStyle.transitionDuration.takeUnless { it.isBlank() } ?: "0.15"
+            view.style.animation = "${keyframeName}-exit $transitionTime forwards"
             val parent = view.parentElement
             window.setTimeout({
                 if (view.parentElement == parent) {
@@ -46,11 +49,13 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter
         createNewView(vw)
     }
     (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
-        native.hidden = false
-        newView.style.animation = "${keyframeName}-enter 0.25s forwards"
+        exists = true
+        val myStyle = window.getComputedStyle(native)
+        val transitionTime = myStyle.transitionDuration.takeUnless { it.isBlank() } ?: "0.15"
+        newView.style.animation = "${keyframeName}-enter $transitionTime forwards"
         newView.style.marginLeft = "auto"
         newView.style.marginRight = "auto"
     } ?: run {
-        native.hidden = true
+        exists = false
     }
 }

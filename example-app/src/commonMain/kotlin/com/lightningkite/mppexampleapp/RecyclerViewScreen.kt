@@ -43,7 +43,9 @@ object RecyclerViewScreen : RockScreen {
             recyclerView {
                 recyclerView = this
                 children(items) {
-                    col {
+                    themeFromLast { theme ->
+                        if(it.await() == 50) theme.important() else theme
+                    } - col {
                         row {
                             expanding - text { ::content { "Item ${it.await()}" } }
                             button {
@@ -54,8 +56,6 @@ object RecyclerViewScreen : RockScreen {
                                     expanded.value = it.await()
                                 }
                             }
-                        } in themeFromLast { theme ->
-                            if(it.await() == 50) theme.important() else theme
                         }
                         col {
                             ::exists { expanded.await() == it.await() }

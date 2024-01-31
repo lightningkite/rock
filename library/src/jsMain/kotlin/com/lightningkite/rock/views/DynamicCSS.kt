@@ -681,17 +681,13 @@ object DynamicCSS {
                 "transform" to "scaleY(0)",
             )
         )
-//        style(
-//            ".rock-stack > [hidden]", mapOf(
+        style(
+            ".rock-stack > [hidden]", mapOf(
 //                "width" to "0px !important",
 //                "height" to "0px !important",
-//                "margin-top" to "0px !important",
-//                "margin-bottom" to "0px !important",
-//                "margin-left" to "0px !important",
-//                "margin-right" to "0px !important",
-//                "transform" to "scale(0, 0)",
-//            )
-//        )
+                "transform" to "scale(0, 0)",
+            )
+        )
         style(
             "[hidden]", mapOf(
                 "pointer-events" to "none",

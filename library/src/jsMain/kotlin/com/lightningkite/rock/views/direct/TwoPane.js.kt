@@ -35,7 +35,7 @@ actual fun ViewWriter.twoPane(
             ::exists { tooSmall() }
             onClick { leftPane set !leftPane.await() }
         }
-        sizedBox(SizeConstraints(minWidth = rightPaneMinSize)) - expanding - stack {
+        expanding - stack {
             right(this)
         }
         setup(TwoPane(native))

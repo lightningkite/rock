@@ -26,7 +26,7 @@ expect suspend fun fetch(
     body: RequestBody? = null
 ): RequestResponse
 
-enum class HttpMethod { GET, POST, PUT, PATCH, DELETE }
+enum class HttpMethod { GET, POST, PUT, PATCH, DELETE, HEAD }
 
 fun httpHeaders(vararg entries: Pair<String, String>) = httpHeaders(entries.toList())
 expect inline fun httpHeaders(map: Map<String, String> = mapOf()): HttpHeaders
@@ -45,10 +45,14 @@ expect class RequestResponse {
     val ok: Boolean
     suspend fun text(): String
     suspend fun blob(): Blob
+    suspend fun headers(): Map<String, List<String>>
 }
 
 expect class Blob
 expect class FileReference
+
+expect fun FileReference.mimeType():String
+expect fun FileReference.fileName():String
 
 sealed interface RequestBody
 data class RequestBodyText(val content: String, val type: String): RequestBody

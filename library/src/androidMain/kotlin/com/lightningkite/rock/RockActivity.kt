@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -32,6 +33,7 @@ abstract class RockActivity : AppCompatActivity() {
         )
         AndroidAppContext.applicationCtx = this.applicationContext
         AndroidAppContext.activityCtx = this
+        window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         Timber.plant(Timber.DebugTree())
     }
 

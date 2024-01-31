@@ -2,13 +2,10 @@
 
 package com.lightningkite.rock.views.direct
 
-import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
+import android.content.res.ColorStateList
 import android.graphics.Typeface
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.StateListDrawable
+import android.graphics.drawable.*
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.Animation
@@ -141,6 +138,7 @@ inline fun <T: NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
     viewLoads: Boolean = false,
+    noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
@@ -181,26 +179,28 @@ inline fun <T: NView> ViewWriter.handleTheme(
             view.setPaddingAll(0)
         }
 
-        // TODO: Animate background change?
         if(viewLoads && view.androidCalculationContext.loading.await()) {
 
-            val gradientDrawable = theme.backgroundDrawable(borders)
+            val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
+                customDrawable = customDrawable)
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
             animation.repeatMode = ValueAnimator.REVERSE
             animation.repeatCount = Animation.INFINITE
 
-            val originalColors = gradientDrawable.colors?.map { Color.fromInt(it) } ?: listOf()
+            val formDrawable = backgroundDrawable.getDrawable(0) as GradientDrawable
+
+            val originalColors = formDrawable.colors?.map { Color.fromInt(it) } ?: listOf()
             val currentColors = originalColors.map { it.toInt() }.toIntArray()
             animation.addUpdateListener { it: ValueAnimator ->
                 for(index in originalColors.indices) currentColors[index] = originalColors[index].highlight(it.animatedFraction * 0.1f + 0.05f).toInt()
-                gradientDrawable.colors = currentColors
+                formDrawable.colors = currentColors
             }
 
             animation.start()
             animator = animation
-            view.background = gradientDrawable
+            view.background = backgroundDrawable
             view.elevation = if (useBackground && borders) theme.elevation.value else 0f
             if (useBackground) {
                 background(theme)
@@ -212,8 +212,9 @@ inline fun <T: NView> ViewWriter.handleTheme(
             animator?.cancel()
             animator = null
             if (useBackground) {
-                val gradientDrawable = theme.backgroundDrawable(borders)
-                view.background = gradientDrawable
+                val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
+                    customDrawable = customDrawable)
+                view.background = backgroundDrawable
                 view.elevation = if (borders) theme.elevation.value else 0f
                 background(theme)
             } else {
@@ -226,9 +227,12 @@ inline fun <T: NView> ViewWriter.handleTheme(
 }
 
 fun Theme.backgroundDrawable(
-    borders: Boolean
-): GradientDrawable {
-    return GradientDrawable().apply {
+    borders: Boolean,
+    clickable: Boolean = false,
+    existingBackground: Drawable? = null,
+    customDrawable: LayerDrawable.(Theme) -> Unit = {},
+): LayerDrawable {
+    val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
         if (borders) {
             cornerRadii = floatArrayOf(
@@ -246,7 +250,26 @@ fun Theme.backgroundDrawable(
 
         when (this@backgroundDrawable.background) {
             is Color -> {
-                colors = intArrayOf(this@backgroundDrawable.background.colorInt(), this@backgroundDrawable.background.colorInt())
+                val oldColor: Int? = ((existingBackground as? LayerDrawable)?.getDrawable(0) as? GradientDrawable)?.colors?.get(0)
+                val newColor = this@backgroundDrawable.background.colorInt()
+
+                if (oldColor != null) {
+                    // Run the animation from old colors to new colors
+                    val animator: ValueAnimator = ValueAnimator.ofArgb(oldColor, newColor).apply {
+                        repeatMode = ValueAnimator.RESTART
+                        repeatCount = 0
+                        duration = 300
+                    }
+
+                    animator.addUpdateListener {
+                        val intermediateColor = it.animatedValue as Int
+                        colors = intArrayOf(intermediateColor, intermediateColor)
+                    }
+                    animator.start()
+                } else {
+                    // Set new colors immediately
+                    colors = intArrayOf(newColor, newColor)
+                }
             }
 
             is LinearGradient -> {
@@ -270,12 +293,27 @@ fun Theme.backgroundDrawable(
             }
         }
     }
+
+    return if (clickable) {
+        // The Android framework uses 26% alpha for colored ripples
+        val rippleColor = ColorStateList.valueOf(foreground.closestColor().withAlpha(0.26f).colorInt())
+
+        // If we can reuse the existing RippleDrawable, do it to preserve any pending ripples
+        // Problem: if the color is set mid-animation, then it is not applied until the next animation
+        (existingBackground as? RippleDrawable)?.apply {
+            setColor(rippleColor)
+        } ?:
+            RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
+    } else {
+        LayerDrawable(arrayOfNulls(1))
+    }.apply { setDrawable(0, formDrawable); customDrawable(this@backgroundDrawable) }
 }
 
 inline fun <T: View> ViewWriter.handleThemeControl(
     view: T,
     viewLoads: Boolean = false,
     noinline checked: suspend () -> Boolean = { false },
+    noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
@@ -305,7 +343,7 @@ inline fun <T: View> ViewWriter.handleThemeControl(
                 }
             }
         }
-        handleTheme(view, false, viewLoads, background, backgroundRemove, foreground)
+        handleTheme(view, false, viewLoads, customDrawable, background, backgroundRemove, foreground)
         setup()
     }
 }

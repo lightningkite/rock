@@ -1,15 +1,20 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.widget.TextView
 import android.graphics.Typeface
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.BaseAdapter
 import android.widget.Spinner
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.core.content.res.ResourcesCompat
+import com.lightningkite.rock.R
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
@@ -94,7 +99,20 @@ actual fun <T> Select.bind(
 @ViewDsl
 actual fun ViewWriter.select(setup: Select.() -> Unit) {
     return viewElement(factory = ::NSelect, wrapper = ::Select, setup = {
-        handleThemeControl(native, viewLoads = true, background = {
+        handleThemeControl(native, viewLoads = true, customDrawable = {
+            // LayerDrawable has poor interfaces for dynamically adding layers, so we have to do this to be able to
+            // safely call setDrawable(1, ...) later
+            if (numberOfLayers < 2) {
+                addLayer(null)
+            }
+
+            val dropdown = ResourcesCompat.getDrawable(native.resources, R.drawable.baseline_arrow_drop_down_24, null)
+            dropdown?.colorFilter = PorterDuffColorFilter(it.foreground.closestColor().toInt(), PorterDuff.Mode.SRC_IN)
+
+            setDrawable(1, dropdown)
+            setLayerGravity(1, Gravity.END or Gravity.CENTER_VERTICAL)
+            setLayerInsetEnd(1, it.spacing.value.toInt())
+        },background = {
             native.setPopupBackgroundDrawable(it.backgroundDrawable(true))
         }) {
             native.viewWriter = newViews()

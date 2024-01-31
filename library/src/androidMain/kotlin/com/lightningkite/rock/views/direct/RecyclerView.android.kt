@@ -118,7 +118,9 @@ internal open class ObservableRVA<T>(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AndroidRecyclerView.ViewHolder {
         val event = LateInitProperty<T>()
-        viewWriter.makeView(viewType, event)
+        parent.withoutAnimation {
+            viewWriter.makeView(viewType, event)
+        }
         val subview = viewWriter.rootCreated!!
         subview.layoutParams = AndroidRecyclerView.LayoutParams(
             if ((recyclerView.native.layoutManager as? LinearLayoutManager)?.orientation == LinearLayoutManager.VERTICAL)
@@ -139,10 +141,12 @@ internal open class ObservableRVA<T>(
             println("Failed to find property to update")
             null
         })
-        if(loading)
-            prop?.unset()
-        else
-            prop?.value = (lastPublished[position])
+        holder.itemView.withoutAnimation {
+            if(loading)
+                prop?.unset()
+            else
+                prop?.value = (lastPublished[position])
+        }
     }
 }
 

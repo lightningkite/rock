@@ -8,6 +8,7 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.reactiveScope
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NCheckbox = AndroidCheckBox
@@ -27,12 +28,14 @@ actual val Checkbox.checked: Writable<Boolean>
 @ViewDsl
 actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
     return viewElement(factory = ::AndroidCheckBox, wrapper = ::Checkbox) {
-        handleTheme(native) { it, radio ->
+        val theme = currentTheme
+        reactiveScope {
+            val it = theme()
             CompoundButtonCompat.setButtonTintList(
-                radio, ColorStateList(
+                native, ColorStateList(
                     arrayOf<IntArray>(intArrayOf(-R.attr.state_checked), intArrayOf(R.attr.state_checked)), intArrayOf(
-                        it.foreground.closestColor().copy(alpha = 0.5f).colorInt(),
-                        it.foreground.colorInt()
+                        it.selected().background.closestColor().copy(alpha = 0.5f).colorInt(),
+                        it.selected().background.colorInt()
                     )
                 )
             )

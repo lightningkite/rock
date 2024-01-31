@@ -14,16 +14,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.models.WindowStatistics
 import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockNavigator
-import com.lightningkite.rock.reactive.AnimationFrame
-import com.lightningkite.rock.reactive.SoftInputOpen
-import com.lightningkite.rock.reactive.WindowInfo
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.AndroidAppContext
+import com.lightningkite.rock.views.direct.handleTheme
 import timber.log.Timber
 
 abstract class RockActivity : AppCompatActivity() {
+    open val theme: suspend () -> Theme get() = { Theme() }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowInfo.value = WindowStatistics(
@@ -104,6 +105,10 @@ abstract class RockActivity : AppCompatActivity() {
                 AnimationFrame.frame()
             }
             start()
+        }
+
+        CalculationContext.NeverEnds.reactiveScope {
+            window?.statusBarColor = theme().let { it.bar() ?: it }.background.closestColor().darken(0.3f).toInt()
         }
 
         this.findViewById<View>(android.R.id.content).viewTreeObserver.addOnGlobalLayoutListener(keyboardTreeObs)

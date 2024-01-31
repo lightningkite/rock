@@ -14,5 +14,17 @@ actual fun NView.removeNView(child: NView) {
 }
 
 actual fun NView.listNViews(): List<NView> = (this as? ViewGroup)?.children?.toList() ?: listOf()
+
+var animationsEnabled: Boolean = true
 actual inline fun NView.withoutAnimation(action: () -> Unit) {
+    if(!animationsEnabled) {
+        action()
+        return
+    }
+    try {
+        animationsEnabled = false
+        action()
+    } finally {
+        animationsEnabled = true
+    }
 }

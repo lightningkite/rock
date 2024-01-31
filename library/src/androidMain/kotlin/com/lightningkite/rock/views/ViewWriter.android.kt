@@ -38,9 +38,6 @@ object AndroidAppContext {
         get() = activityCtxRef?.get()
         set(value) { activityCtxRef = WeakReference(value) }
 
-    // The first rendered row will set this flag and assume the responsibility of setting the status bar color
-    var statusBarLeaderAssigned = false
-
     fun startActivityForResult(intent: Intent, options: Bundle? = null, onResult: (Int, Intent?)->Unit) = activityCtx?.startActivityForResult(intent = intent, options = options, onResult = onResult)
     fun requestPermissions(vararg permissions: String, onResult: (RockActivity.PermissionResult)->Unit) = activityCtx?.requestPermissions(permissions = permissions, onResult = onResult)
 }

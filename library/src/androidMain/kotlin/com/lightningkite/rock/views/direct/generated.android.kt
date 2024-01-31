@@ -4,6 +4,9 @@ package com.lightningkite.rock.views.direct
 
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.*
 import android.view.View
@@ -113,35 +116,39 @@ internal fun RockPaint.colorInt(): Int = closestColor().toInt()
 
 val applyTextColorFromThemeHeader: (Theme, AndroidTextView) -> Unit = { theme, textView ->
     textView.setTextColor(theme.foreground.colorInt())
-    textView.setTypeface(theme.title.font, when {
-        !theme.title.bold && !theme.title.italic -> Typeface.NORMAL
-        !theme.title.bold && theme.title.italic -> Typeface.ITALIC
-        theme.title.bold && !theme.title.italic -> Typeface.BOLD
-        theme.title.bold && theme.title.italic -> Typeface.BOLD_ITALIC
-        else -> Typeface.NORMAL
-    })
+    textView.setTypeface(
+        theme.title.font, when {
+            !theme.title.bold && !theme.title.italic -> Typeface.NORMAL
+            !theme.title.bold && theme.title.italic -> Typeface.ITALIC
+            theme.title.bold && !theme.title.italic -> Typeface.BOLD
+            theme.title.bold && theme.title.italic -> Typeface.BOLD_ITALIC
+            else -> Typeface.NORMAL
+        }
+    )
     textView.isAllCaps = theme.title.allCaps
 }
 val applyTextColorFromTheme: (Theme, AndroidTextView) -> Unit = { theme, textView ->
     textView.setTextColor(theme.foreground.colorInt())
-    textView.setTypeface(theme.body.font, when {
-        !theme.body.bold && !theme.body.italic -> Typeface.NORMAL
-        !theme.body.bold && theme.body.italic -> Typeface.ITALIC
-        theme.body.bold && !theme.body.italic -> Typeface.BOLD
-        theme.body.bold && theme.body.italic -> Typeface.BOLD_ITALIC
-        else -> Typeface.NORMAL
-    })
+    textView.setTypeface(
+        theme.body.font, when {
+            !theme.body.bold && !theme.body.italic -> Typeface.NORMAL
+            !theme.body.bold && theme.body.italic -> Typeface.ITALIC
+            theme.body.bold && !theme.body.italic -> Typeface.BOLD
+            theme.body.bold && theme.body.italic -> Typeface.BOLD_ITALIC
+            else -> Typeface.NORMAL
+        }
+    )
     textView.isAllCaps = theme.body.allCaps
 }
 
-inline fun <T: NView> ViewWriter.handleTheme(
+inline fun <T : NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
     viewLoads: Boolean = false,
     noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
-    crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
+    crossinline foreground: (Theme, T) -> Unit = { _, _ -> },
 ) {
     val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
@@ -179,10 +186,12 @@ inline fun <T: NView> ViewWriter.handleTheme(
             view.setPaddingAll(0)
         }
 
-        if(viewLoads && view.androidCalculationContext.loading.await()) {
+        if (viewLoads && view.androidCalculationContext.loading.await()) {
 
-            val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
-                customDrawable = customDrawable)
+            val backgroundDrawable = theme.backgroundDrawable(
+                borders, view.isClickable, view.background,
+                customDrawable = customDrawable
+            )
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
@@ -194,7 +203,8 @@ inline fun <T: NView> ViewWriter.handleTheme(
             val originalColors = formDrawable.colors?.map { Color.fromInt(it) } ?: listOf()
             val currentColors = originalColors.map { it.toInt() }.toIntArray()
             animation.addUpdateListener { it: ValueAnimator ->
-                for(index in originalColors.indices) currentColors[index] = originalColors[index].highlight(it.animatedFraction * 0.1f + 0.05f).toInt()
+                for (index in originalColors.indices) currentColors[index] =
+                    originalColors[index].highlight(it.animatedFraction * 0.1f + 0.05f).toInt()
                 formDrawable.colors = currentColors
             }
 
@@ -212,18 +222,52 @@ inline fun <T: NView> ViewWriter.handleTheme(
             animator?.cancel()
             animator = null
             if (useBackground) {
-                val backgroundDrawable = theme.backgroundDrawable(borders, view.isClickable, view.background,
-                    customDrawable = customDrawable)
+                val backgroundDrawable = theme.backgroundDrawable(
+                    borders, view.isClickable, view.background,
+                    customDrawable = customDrawable
+                )
                 view.background = backgroundDrawable
                 view.elevation = if (borders) theme.elevation.value else 0f
                 background(theme)
+            } else if (view.isClickable) {
+                view.elevation = 0f
+                view.background = theme.rippleDrawableOnly(borders, view.background)
+                backgroundRemove()
             } else {
+                view.elevation = 0f
                 view.background = null
                 backgroundRemove()
             }
         }
         foreground(theme, view)
     }
+}
+
+fun Theme.rippleDrawableOnly(
+    borders: Boolean,
+    existingBackground: Drawable? = null,
+): LayerDrawable {
+    val rippleColor = ColorStateList.valueOf(hover().background.colorInt())
+    val preparing = (existingBackground as? RippleDrawable)?.apply {
+        setColor(rippleColor)
+    } ?: RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
+    preparing.setDrawable(0, GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        if (borders) {
+            cornerRadii = floatArrayOf(
+                this@rippleDrawableOnly.cornerRadii.topLeft.value,
+                this@rippleDrawableOnly.cornerRadii.topLeft.value,
+                this@rippleDrawableOnly.cornerRadii.topRight.value,
+                this@rippleDrawableOnly.cornerRadii.topRight.value,
+                this@rippleDrawableOnly.cornerRadii.bottomLeft.value,
+                this@rippleDrawableOnly.cornerRadii.bottomLeft.value,
+                this@rippleDrawableOnly.cornerRadii.bottomRight.value,
+                this@rippleDrawableOnly.cornerRadii.bottomRight.value
+            )
+            colors = intArrayOf(background.applyAlpha(0.01f).colorInt(), background.applyAlpha(0.01f).colorInt())
+        }
+    })
+    return preparing
 }
 
 fun Theme.backgroundDrawable(
@@ -250,10 +294,11 @@ fun Theme.backgroundDrawable(
 
         when (this@backgroundDrawable.background) {
             is Color -> {
-                val oldColor: Int? = ((existingBackground as? LayerDrawable)?.getDrawable(0) as? GradientDrawable)?.colors?.get(0)
+                val oldColor: Int? =
+                    ((existingBackground as? LayerDrawable)?.getDrawable(0) as? GradientDrawable)?.colors?.get(0)
                 val newColor = this@backgroundDrawable.background.colorInt()
 
-                if (oldColor != null) {
+                if (oldColor != null && animationsEnabled) {
                     // Run the animation from old colors to new colors
                     val animator: ValueAnimator = ValueAnimator.ofArgb(oldColor, newColor).apply {
                         repeatMode = ValueAnimator.RESTART
@@ -295,28 +340,26 @@ fun Theme.backgroundDrawable(
     }
 
     return if (clickable) {
-        // The Android framework uses 26% alpha for colored ripples
-        val rippleColor = ColorStateList.valueOf(foreground.closestColor().withAlpha(0.26f).colorInt())
+        val rippleColor = ColorStateList.valueOf(hover().background.colorInt())
 
         // If we can reuse the existing RippleDrawable, do it to preserve any pending ripples
         // Problem: if the color is set mid-animation, then it is not applied until the next animation
         (existingBackground as? RippleDrawable)?.apply {
             setColor(rippleColor)
-        } ?:
-            RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
+        } ?: RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
     } else {
         LayerDrawable(arrayOfNulls(1))
     }.apply { setDrawable(0, formDrawable); customDrawable(this@backgroundDrawable) }
 }
 
-inline fun <T: View> ViewWriter.handleThemeControl(
+inline fun <T : View> ViewWriter.handleThemeControl(
     view: T,
     viewLoads: Boolean = false,
     noinline checked: suspend () -> Boolean = { false },
     noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
-    crossinline foreground: (Theme, T) -> Unit = { _, _  -> },
+    crossinline foreground: (Theme, T) -> Unit = { _, _ -> },
     setup: () -> Unit
 ) {
     val hovered = view.hovered

@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.widget.FrameLayout
 import com.lightningkite.mppexampleapp.*
 import com.lightningkite.rock.RockActivity
+import com.lightningkite.rock.models.Theme
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.*
 
 class MainActivity : RockActivity() {
@@ -14,4 +16,7 @@ class MainActivity : RockActivity() {
         setContentView(frame)
         ViewWriter(frame).app()
     }
+
+    override val theme: suspend () -> Theme
+        get() = { appTheme.await() }
 }

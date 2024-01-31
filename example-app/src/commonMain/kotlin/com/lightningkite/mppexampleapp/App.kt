@@ -8,7 +8,14 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.l2.*
 
-val appTheme = Property<Theme>(MaterialLikeTheme(primary = Color(1f, 0.2f, 0.2f, 0.2f), title = FontAndStyle(font = Resources.fontsMontserrat)))
+val appTheme = Property<Theme>(
+    MaterialLikeTheme(
+        primary = Color(1f, 0.2f, 0.2f, 0.2f),
+        title = FontAndStyle(font = Resources.fontsMontserrat),
+        body = FontAndStyle(font = Resources.fontsMontserrat),
+    )
+)
+
 fun ViewWriter.app() {
 
     appNav(AutoRoutes) {
@@ -45,7 +52,8 @@ fun ViewWriter.app() {
                 title = "Open on GitHub",
                 icon = Icon.star,
                 to = {
-                    val className = navigator.currentScreen.await()?.let { it::class.toString().removePrefix("class ") } ?: "App"
+                    val className =
+                        navigator.currentScreen.await()?.let { it::class.toString().removePrefix("class ") } ?: "App"
                     "https://github.com/lightningkite/rock/tree/main/example-app/src/commonMain/kotlin/com/lightningkite/mppexampleapp/$className.kt"
                 }
             )

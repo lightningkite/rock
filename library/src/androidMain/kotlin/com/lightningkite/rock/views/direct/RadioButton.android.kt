@@ -7,6 +7,7 @@ import androidx.core.widget.CompoundButtonCompat
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.reactiveScope
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRadioButton = AppCompatRadioButton
@@ -26,11 +27,13 @@ actual val RadioButton.checked: Writable<Boolean>
 @ViewDsl
 actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit) {
     return viewElement(factory = ::NRadioButton, wrapper = ::RadioButton) {
-        handleTheme(native) { it, radio ->
-            CompoundButtonCompat.setButtonTintList(radio, ColorStateList(
+        val theme = currentTheme
+        reactiveScope {
+            val it = theme()
+            CompoundButtonCompat.setButtonTintList(native, ColorStateList(
                 arrayOf<IntArray>(intArrayOf(-R.attr.state_checked), intArrayOf(R.attr.state_checked)), intArrayOf(
-                    it.unselected().foreground.colorInt(),
-                    it.selected().foreground.colorInt()
+                    it.selected().background.closestColor().copy(alpha = 0.5f).colorInt(),
+                    it.selected().background.colorInt()
                 )
             ))
         }

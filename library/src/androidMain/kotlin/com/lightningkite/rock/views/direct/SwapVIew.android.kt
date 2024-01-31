@@ -7,11 +7,7 @@ import android.widget.FrameLayout
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
 import com.lightningkite.rock.models.ScreenTransition
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.lparams
-import com.lightningkite.rock.views.shutdown
-import com.lightningkite.rock.views.visible
+import com.lightningkite.rock.views.*
 import java.util.WeakHashMap
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -42,7 +38,12 @@ actual fun SwapView.swap(
 ) {
     val oldView = this.native.getChildAt(0)
     native.viewWriter.rootCreated = null
-    native.viewWriter.createNewView()
+    animationsEnabled = false
+    try {
+        native.viewWriter.createNewView()
+    } finally {
+        animationsEnabled = true
+    }
     val newView = native.viewWriter.rootCreated
     newView?.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,  ViewGroup.LayoutParams.MATCH_PARENT)
     TransitionManager.beginDelayedTransition(native, TransitionSet().apply {

@@ -43,7 +43,7 @@ actual inline fun NView.withoutAnimation(action: () -> Unit) {
         classList.add("notransition")
         action()
     } finally {
-        offsetHeight
+        offsetHeight  // force layout calculation
         classList.remove("notransition")
         animationsEnabled = true
     }

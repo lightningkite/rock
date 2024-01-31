@@ -6,6 +6,7 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.util.*
 import io.ktor.websocket.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.*
@@ -38,6 +39,7 @@ actual suspend fun fetch(
                         HttpMethod.PUT -> io.ktor.http.HttpMethod.Put
                         HttpMethod.PATCH -> io.ktor.http.HttpMethod.Patch
                         HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
+                        HttpMethod.HEAD -> io.ktor.http.HttpMethod.Head
                     }
                     this.headers {
                         for ((key, values) in headers.map) {
@@ -128,6 +130,8 @@ actual class RequestResponse(val wraps: HttpResponse) {
             throw e
         }
     }
+
+    actual suspend fun headers(): Map<String, List<String>> = wraps.headers.toMap()
 }
 
 actual fun websocket(url: String): WebSocket {

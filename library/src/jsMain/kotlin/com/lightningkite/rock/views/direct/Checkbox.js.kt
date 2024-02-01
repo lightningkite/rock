@@ -14,7 +14,7 @@ actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit {
     themedElementClickable<HTMLInputElement>("input") {
         this.type = "checkbox"
         classList.add("checkbox")
-        classList.add("checkSensitive")
+        classList.add("checkResponsive")
         setup(Checkbox(this))
     }
 }

@@ -49,12 +49,11 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter
         createNewView(vw)
     }
     (native.lastElementChild as? HTMLElement).takeUnless { it == previousLast }?.let { newView ->
+        newView.classList.add("viewDraws")
         exists = true
         val myStyle = window.getComputedStyle(native)
         val transitionTime = myStyle.transitionDuration.takeUnless { it.isBlank() } ?: "0.15"
         newView.style.animation = "${keyframeName}-enter $transitionTime forwards"
-        newView.style.marginLeft = "auto"
-        newView.style.marginRight = "auto"
     } ?: run {
         exists = false
     }

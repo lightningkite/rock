@@ -47,7 +47,6 @@ object DynamicCSS {
                 "height" to "100vh",
                 "max-height" to "100vh",
                 "max-width" to "100vw",
-                "--foreground" to "gray",
             )
         )
 
@@ -125,7 +124,7 @@ object DynamicCSS {
                 "background" to "none !important",
                 "box-shadow" to "none !important",
                 "border-style" to "solid !important",
-                "border-color" to "var(--foreground) var(--foreground) var(--foreground) transparent !important",
+                "border-color" to "currentColor currentColor currentColor transparent !important",
                 "border-width" to "5px !important",
                 "border-radius" to "50% !important",
                 "animation" to "spin 2s infinite linear !important",
@@ -320,7 +319,7 @@ object DynamicCSS {
                 "background" to "none !important",
                 "box-shadow" to "none !important",
                 "border-style" to "solid !important",
-                "border-color" to "var(--foreground) var(--foreground) var(--foreground) transparent !important",
+                "border-color" to "currentColor currentColor currentColor transparent !important",
                 "border-width" to "6px !important",
                 "border-radius" to "50% !important",
                 "transition" to "all .3s ease",
@@ -534,14 +533,14 @@ object DynamicCSS {
 
         style(
             "::placeholder", mapOf(
-                "color" to "var(--foreground)",
+                "color" to "currentColor",
                 "opacity" to "0.3",
             )
         )
 
         style(
             ".rock-separator", mapOf(
-                "background-color" to "var(--foreground)",
+                "background-color" to "currentColor",
                 "opacity" to "0.25",
                 "min-width" to "1px",
                 "min-height" to "1px",
@@ -837,37 +836,33 @@ object DynamicCSS {
             includeMaybeTransition = true
         )
 
-//        theme(theme.unselected(), ".toggle-button > .theme-${theme.id}.clickable")
-//        theme(theme.unselected().hover(), ".toggle-button > .theme-${theme.id}.clickable:hover")
-//        theme(theme.unselected().disabled(), ".toggle-button > .theme-${theme.id}.clickable:disabled")
-
         theme(
             theme.selected(),
             listOf(
-                "input:checked.checkSensitive .theme-${theme.id}",
-                "input:checked.checkSensitive.theme-${theme.id}",
-                "input:checked+* .checkSensitive.theme-${theme.id}",
-                "input:checked+.checkSensitive.theme-${theme.id}",
+                "input:checked.checkResponsive .theme-${theme.id}",
+                "input:checked.checkResponsive.theme-${theme.id}",
+                "input:checked+.checkResponsive .theme-${theme.id}",
+                "input:checked+.checkResponsive.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
         theme(
             theme.selected().hover(),
             listOf(
-                "input:checked:hover.checkSensitive .theme-${theme.id}",
-                "input:checked:hover.checkSensitive.theme-${theme.id}",
-                "input:checked:hover+* .checkSensitive.theme-${theme.id}",
-                "input:checked:hover+.checkSensitive.theme-${theme.id}",
+                "input:checked.checkResponsive:hover .theme-${theme.id}",
+                "input:checked.checkResponsive:hover.theme-${theme.id}",
+                "input:checked+.checkResponsive:hover .theme-${theme.id}",
+                "input:checked+.checkResponsive:hover.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
         theme(
             theme.selected().disabled(),
             listOf(
-                "input:checked:disabled.checkSensitive .theme-${theme.id}",
-                "input:checked:disabled.checkSensitive.theme-${theme.id}",
-                "input:checked:disabled+* .checkSensitive.theme-${theme.id}",
-                "input:checked:disabled+.checkSensitive.theme-${theme.id}",
+                "input:checked.checkResponsive:disabled .theme-${theme.id}",
+                "input:checked.checkResponsive:disabled.theme-${theme.id}",
+                "input:checked+.checkResponsive:disabled .theme-${theme.id}",
+                "input:checked+.checkResponsive:disabled.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
@@ -887,18 +882,18 @@ object DynamicCSS {
             return includeSelectors.asSequence().flatMap { plus.asSequence().map { p -> "$it$p" } }.joinToString(", ")
         }
         style(
-            sel(".mightTransition:not(.isRoot)", ".clickable:not(.isRoot)", ".forcePadding"), mapOf(
+            sel(".mightTransition:not(.isRoot)", ".forcePadding"), mapOf(
                 "padding" to theme.spacing.value,
             )
         )
         style(
-            sel(".mightTransition:not(.marginless)", ".clickable:not(.marginless)", ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
+            sel(".mightTransition:not(.marginless)",  ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
                 "margin" to theme.spacing.value,
                 "--margin" to theme.spacing.value,
             )
         )
         style(
-            if (includeMaybeTransition) sel(".mightTransition", ".clickable") else sel(".transition"),
+            if (includeMaybeTransition) sel(".mightTransition") else sel(".transition"),
             when (val it = theme.background) {
                 is Color -> mapOf("background-color" to it.toCss())
                 is LinearGradient -> mapOf(
@@ -910,15 +905,22 @@ object DynamicCSS {
                     "background-image" to "radial-gradient(circle at center, ${joinGradientStops(it.stops)})",
                     "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
                 )
-            } + mapOf(
+            }
+        )
+        style(
+            if (includeMaybeTransition) sel(".mightTransition:not(.marginless)") else sel(".transition:not(.marginless)"),
+            mapOf(
                 "outline-width" to theme.outlineWidth.value,
                 "box-shadow" to theme.elevation.toBoxShadow(),
                 "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
                 "outline-color" to theme.outline.toCss(),
             )
         )
+        style(includeSelectors.joinToString { "$it > *" }, mapOf(
+            "--margin-2" to theme.spacing.value
+        ))
         style(
-            sel(".mightTransition", ".clickable"), mapOf(
+            sel(".mightTransition:not(.marginless)"), mapOf(
                 "border-top-left-radius" to theme.cornerRadii.topLeft.value,
                 "border-top-right-radius" to theme.cornerRadii.topRight.value,
                 "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
@@ -938,8 +940,6 @@ object DynamicCSS {
         style(
             sel(""), mapOf(
                 "color" to theme.foreground.toCss(),
-                "--spacing" to theme.spacing.value,
-                "--foreground" to theme.foreground.toCss(),
                 "font-family" to font(theme.body.font),
                 "font-weight" to if (theme.body.bold) "bold" else "normal",
                 "font-style" to if (theme.body.italic) "italic" else "normal",

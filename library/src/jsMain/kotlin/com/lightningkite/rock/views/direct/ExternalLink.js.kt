@@ -10,7 +10,6 @@ actual typealias NExternalLink = HTMLAnchorElement
 @ViewDsl
 actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) =
     themedElementClickable<NExternalLink>("a") {
-        style.display = "block"
         classList.add("rock-stack")
         setup(ExternalLink(this))
     }

@@ -61,7 +61,7 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             swapping(
                 current = { appNavFactory.await() },
-                views = { it(this, setup) }
+                views = { it(this, setup) in marginless }
             )
         } in marginless
         stack {
@@ -149,7 +149,7 @@ private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
 fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
     forEach(readable) {
         fun display(navElement: NavElement) {
-            col {
+            compact - col {
                 image {
                     val currentTheme = currentTheme
                     ::source { it.icon.toImageSource(currentTheme().foreground) }
@@ -300,7 +300,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
 // Nav 3 top and bottom (top)
         row {
             setup(appNav)
-            button {
+            compact - button {
                 image {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
@@ -313,7 +313,7 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
-            row {
+            compact - row {
                 navGroupActions(appNav.actionsProperty)
             }
             ::exists { appNav.existsProperty.await() }

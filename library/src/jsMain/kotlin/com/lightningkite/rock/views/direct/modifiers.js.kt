@@ -115,10 +115,7 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
 actual val ViewWriter.marginless: ViewWrapper
     get() {
         beforeNextElementSetup {
-            style.margin = 0.px.value
-            style.borderRadius = 0.px.value
-            style.borderWidth = 0.px.value
-            style.setProperty("--margin", 0.px.value)
+            classList.add("marginless")
         }
         return ViewWrapper
     }

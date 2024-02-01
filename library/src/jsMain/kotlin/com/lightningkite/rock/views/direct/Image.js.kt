@@ -22,12 +22,7 @@ actual inline var Image.source: ImageSource
             is ImageRaw -> native.src = URL.createObjectURL(Blob(arrayOf(value.data)))
             is ImageResource -> native.src = value.relativeUrl
             is ImageLocal -> native.src = URL.createObjectURL(value.file)
-            is ImageVector -> {
-                native.src = value.toWeb()
-                native.style.width = value.width.value
-                native.style.height = value.height.value
-            }
-
+            is ImageVector -> native.src = value.toWeb()
             else -> {}
         }
     }

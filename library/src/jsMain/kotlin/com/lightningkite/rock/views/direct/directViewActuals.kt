@@ -18,19 +18,19 @@ inline fun <T : HTMLElement> ViewWriter.themedElementEditable(name: String, cros
     setup(this)
 }
 
-inline fun <T : HTMLElement> ViewWriter.themedElementClickable(name: String, crossinline setup: T.() -> Unit) = themedElement<T>(name) {
+inline fun <T : HTMLElement> ViewWriter.themedElementClickable(name: String, crossinline setup: T.() -> Unit) = themedElement<T>(name, isControl = true) {
     classList.add("clickable")
     setup(this)
 }
 
-inline fun <T : HTMLElement> ViewWriter.themedElement(name: String, viewDraws: Boolean = true, crossinline setup: T.() -> Unit) {
+inline fun <T : HTMLElement> ViewWriter.themedElement(name: String, viewDraws: Boolean = true, isControl: Boolean = false, crossinline setup: T.() -> Unit) {
     element<T>(name) {
-        handleTheme(this, viewDraws = viewDraws)
+        handleTheme(this, viewDraws = viewDraws, isControl = isControl)
         setup(this)
     }
 }
 
-inline fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, crossinline setup: T.() -> Unit) = themedElement<T>(name, viewDraws = false, setup)
+inline fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, crossinline setup: T.() -> Unit) = themedElement<T>(name, viewDraws = false, setup = setup)
 
 @ViewDsl
 internal fun ViewWriter.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =

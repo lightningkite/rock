@@ -12,6 +12,7 @@ import org.w3c.dom.asList
 fun ViewWriter.handleTheme(
     view: NView,
     viewDraws: Boolean = true,
+    isControl: Boolean = false,
 ) {
     val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
@@ -28,7 +29,7 @@ fun ViewWriter.handleTheme(
 
         val theme = currentTheme()
 
-        val mightTransition = transition != ViewWriter.TransitionNextView.No
+        val mightTransition = isControl || transition != ViewWriter.TransitionNextView.No
         val shouldTransition = when (transition) {
             ViewWriter.TransitionNextView.No -> false
             ViewWriter.TransitionNextView.Yes -> true

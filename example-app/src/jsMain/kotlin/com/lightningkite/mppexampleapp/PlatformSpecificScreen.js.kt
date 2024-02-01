@@ -17,7 +17,7 @@ actual fun ViewWriter.platformSpecific() {
             text("Toggle")
 //            ::exists { native.assistAnimateHidden(); current.await() != 4 }
         }
-        button {
+        important - button {
             text("Animation Test Toggle")
             reactiveScope {
                 println("Animating? $animationsEnabled")
@@ -25,22 +25,22 @@ actual fun ViewWriter.platformSpecific() {
             }
 //            ::exists { native.assistAnimateHidden(); current.await() != 4 }
         }
-        button {
+        important - button {
             onClick { current set 1 }
             text("Animation Test 1")
             reactiveScope { exists = current.await() != 1 }
         }
-        button {
+        important - button {
             onClick { current set 2 }
             text("Animation Test 2")
             reactiveScope { exists = current.await() != 2 }
         }
-        button {
+        important - button {
             onClick { current set 3 }
             text("Animation Test 3")
             reactiveScope { exists = current.await() != 3 }
         }
-        button {
+        important - button {
             onClick { current set 4 }
             text("Animation Test 4")
             reactiveScope { exists = current.await() != 4 }

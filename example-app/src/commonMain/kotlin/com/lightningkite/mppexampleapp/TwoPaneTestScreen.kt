@@ -13,6 +13,13 @@ object TwoPaneTestScreen : RockScreen {
             setup = {},
             leftPaneSize = 25.rem,
             rightPaneMinSize = 25.rem,
+            left = {
+                hover - col {
+                    repeat(100) {
+                        text("Left Pane")
+                    }
+                }
+            },
             right = {
                 col {
                     repeat(100) {
@@ -20,12 +27,6 @@ object TwoPaneTestScreen : RockScreen {
                     }
                 }
             },
-        ) {
-            col {
-                repeat(100) {
-                    text("Left Pane")
-                }
-            }
-        }
+        )
     }
 }

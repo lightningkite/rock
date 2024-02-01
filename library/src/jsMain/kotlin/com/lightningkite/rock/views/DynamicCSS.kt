@@ -6,7 +6,6 @@ import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLLinkElement
 import org.w3c.dom.HTMLStyleElement
-import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.css.get
 import org.w3c.dom.events.Event
@@ -660,33 +659,32 @@ object DynamicCSS {
         """.trimIndent()
         )
 
-        style(
-            ".rock-row > [hidden]", mapOf(
-                "width" to "0px !important",
-                "margin-left" to "0px !important",
-                "margin-right" to "0px !important",
-                "transform" to "scaleX(0)",
-            )
-        )
-        style(
-            ".rock-col > [hidden]", mapOf(
-                "height" to "0px !important",
-                "margin-top" to "0px !important",
-                "margin-bottom" to "0px !important",
-                "transform" to "scaleY(0)",
-            )
-        )
-        style(
-            ".rock-stack > [hidden]", mapOf(
+//        style(
+//            ".rock-row > [hidden]", mapOf(
 //                "width" to "0px !important",
+//                "margin-left" to "0px !important",
+//                "margin-right" to "0px !important",
+//                "transform" to "scaleX(0)",
+//            )
+//        )
+//        style(
+//            ".rock-col > [hidden]", mapOf(
 //                "height" to "0px !important",
-                "transform" to "scale(0, 0)",
-            )
-        )
+//                "margin-top" to "0px !important",
+//                "margin-bottom" to "0px !important",
+//                "transform" to "scaleY(0)",
+//            )
+//        )
+//        style(
+//            ".rock-stack > [hidden]", mapOf(
+////                "width" to "0px !important",
+////                "height" to "0px !important",
+//                "transform" to "scale(0, 0)",
+//            )
+//        )
         style(
             "[hidden]", mapOf(
-                "pointer-events" to "none",
-                "opacity" to "0",
+                "display" to "none !important",
             )
         )
 
@@ -702,7 +700,8 @@ object DynamicCSS {
         style(
             ":not(.unrock).animatingShowHide", mapOf(
                 "overflow" to "hidden",
-                "transition-property" to "all",
+                "minWidth" to "0px",
+                "minHeight" to "0px",
             )
         )
 
@@ -847,28 +846,28 @@ object DynamicCSS {
             listOf(
                 "input:checked.checkSensitive .theme-${theme.id}",
                 "input:checked.checkSensitive.theme-${theme.id}",
-                "input:checked.checkSensitive+* .theme-${theme.id}",
-                "input:checked.checkSensitive+*.theme-${theme.id}",
+                "input:checked+* .checkSensitive.theme-${theme.id}",
+                "input:checked+.checkSensitive.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
         theme(
             theme.selected().hover(),
             listOf(
-                "input:checked.checkSensitive:hover .theme-${theme.id}",
-                "input:checked.checkSensitive:hover.theme-${theme.id}",
-                "input:checked.checkSensitive+:hover .theme-${theme.id}",
-                "input:checked.checkSensitive+:hover.theme-${theme.id}",
+                "input:checked:hover.checkSensitive .theme-${theme.id}",
+                "input:checked:hover.checkSensitive.theme-${theme.id}",
+                "input:checked:hover+* .checkSensitive.theme-${theme.id}",
+                "input:checked:hover+.checkSensitive.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
         theme(
             theme.selected().disabled(),
             listOf(
-                "input:checked.checkSensitive:disabled .theme-${theme.id}",
-                "input:checked.checkSensitive:disabled.theme-${theme.id}",
-                "input:checked.checkSensitive+:disabled .theme-${theme.id}",
-                "input:checked.checkSensitive+:disabled.theme-${theme.id}",
+                "input:checked:disabled.checkSensitive .theme-${theme.id}",
+                "input:checked:disabled.checkSensitive.theme-${theme.id}",
+                "input:checked:disabled+* .checkSensitive.theme-${theme.id}",
+                "input:checked:disabled+.checkSensitive.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
@@ -884,17 +883,16 @@ object DynamicCSS {
     ): String {
         val includeSelectors = asSelectors.filter { themeHandled.add(it) }
         if (includeSelectors.isEmpty()) return "theme-${theme.id}"
-        println("Generating theme ${theme.id}.  Known themes: ${themeHandled.size}")
         fun sel(vararg plus: String): String {
             return includeSelectors.asSequence().flatMap { plus.asSequence().map { p -> "$it$p" } }.joinToString(", ")
         }
         style(
-            sel(".mightTransition:not(.isRoot)", ".forcePadding"), mapOf(
+            sel(".mightTransition:not(.isRoot)", ".clickable:not(.isRoot)", ".forcePadding"), mapOf(
                 "padding" to theme.spacing.value,
             )
         )
         style(
-            sel(".mightTransition:not(.marginless)", ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
+            sel(".mightTransition:not(.marginless)", ".clickable:not(.marginless)", ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
                 "margin" to theme.spacing.value,
                 "--margin" to theme.spacing.value,
             )
@@ -984,69 +982,172 @@ fun js(vararg entries: Pair<String, Any?>): dynamic {
 
 private var tempId = 0
 fun HTMLElement.animateHidden(value: Boolean) {
-    val prev = hidden
+    val prev = this.asDynamic().__rock__goalHidden ?: hidden
     if (value == prev) return
+
+    classList.add("animatingShowHide")
+
+    val myStyle = window.getComputedStyle(this)
+    val transitionTime = myStyle.transitionDuration.let { Duration.parse(it) }
+    val totalTime = transitionTime.inWholeMilliseconds.toDouble()
+    var oldAnimTime = totalTime
+    (this.asDynamic().__rock__hiddenAnim as? Animation)?.let {
+//        it.commitStyles()
+        oldAnimTime = it.currentTime
+        it.cancel()
+    }
+    (this.asDynamic().__rock__hiddenAnim2 as? Animation)?.let {
+        it.cancel()
+    }
+    this.asDynamic().__rock__goalHidden = value
+    hidden = false
     val parent = generateSequence(this) { it.parentElement as? HTMLElement }.drop(1)
         .firstOrNull { !it.classList.contains("toggle-button") } ?: return
     val parentStyle = window.getComputedStyle(parent)
-    val myStyle = window.getComputedStyle(this)
-    val transitionTime = myStyle.transitionDuration.let { Duration.parse(it) }
     val x =
         parentStyle.display == "flex" && parentStyle.flexDirection.contains("row")// && myStyle.width.none { it.isDigit() }
     val y =
         parentStyle.display == "flex" && parentStyle.flexDirection.contains("column")// && myStyle.height.none { it.isDigit() }
 
-    if (value) {
-        // Hiding; we just need to artificially enforce current value
-        val classname = "animateHiddenTemp${tempId++}"
-        if (x || y) {
-            val remover = DynamicCSS.tempStyle(
-                ".$classname", listOfNotNull(
-                    if (x) "width" to "${myStyle.width} !important" else null,
-                    if (y) "height" to "${myStyle.height} !important" else null,
-                ).associate { it }
-            )
-            classList.add(classname)
-            classList.add("animatingShowHide")
-            window.setTimeout({
-                classList.remove(classname)
-                classList.remove("animatingShowHide")
-                remover()
-            }, transitionTime.inWholeMilliseconds.toInt() + 50)
-            window.setTimeout({
-                hidden = value
-            }, 5)
-        } else {
-            hidden = value
-        }
+    val before = js("{}")
+    val after = js("{}")
+    val full = if(value) before else after
+    val fullTransform = ArrayList<String>()
+    val gone = if(value) after else before
+    val goneTransform = ArrayList<String>()
+
+    var fullWidth = ""
+    var fullHeight = ""
+    var marginLeft = ""
+    var marginRight = ""
+    var marginTop = ""
+    var marginBottom = ""
+    var paddingLeft = ""
+    var paddingRight = ""
+    var paddingTop = ""
+    var paddingBottom = ""
+    if(hidden) {
+        hidden = false
+        fullWidth = myStyle.width
+        fullHeight = myStyle.height
+        marginLeft = myStyle.marginLeft
+        marginRight = myStyle.marginRight
+        marginTop = myStyle.marginTop
+        marginBottom = myStyle.marginBottom
+        paddingLeft = myStyle.paddingLeft
+        paddingRight = myStyle.paddingRight
+        paddingTop = myStyle.paddingTop
+        paddingBottom = myStyle.paddingBottom
+        hidden = true
     } else {
-        // Showing; we need to grab the desired values.  This is trickier
-        val classname = "animateHiddenTemp${tempId++}"
-        if (x || y) {
-            hidden = false
-            val afterWidth = myStyle.width
-            val afterHeight = myStyle.height
-            hidden = true
-            myStyle.width  // Force reflow
-            val remover = DynamicCSS.tempStyle(
-                ".$classname", listOfNotNull(
-                    if (x) "width" to "${afterWidth} !important" else null,
-                    if (y) "height" to "${afterHeight} !important" else null,
-                ).associate { it }
-            )
-            classList.add(classname)
-            classList.add("animatingShowHide")
-            window.setTimeout({
-                classList.remove(classname)
-                classList.remove("animatingShowHide")
-                remover()
-            }, transitionTime.inWholeMilliseconds.toInt() + 50)
-            window.setTimeout({
+        fullWidth = myStyle.width
+        fullHeight = myStyle.height
+        marginLeft = myStyle.marginLeft
+        marginRight = myStyle.marginRight
+        marginTop = myStyle.marginTop
+        marginBottom = myStyle.marginBottom
+        paddingLeft = myStyle.paddingLeft
+        paddingRight = myStyle.paddingRight
+        paddingTop = myStyle.paddingTop
+        paddingBottom = myStyle.paddingBottom
+    }
+
+    if(x) {
+        goneTransform.add("scaleX(0)")
+        fullTransform.add("scaleX(1)")
+        gone.marginLeft = "0px"
+        gone.paddingLeft = "0px"
+        gone.marginRight = "0px"
+        gone.paddingRight = "0px"
+        full.marginLeft = marginLeft
+        full.paddingLeft = paddingLeft
+        full.marginRight = marginRight
+        full.paddingRight = paddingRight
+        gone.width = "0px"
+        full.width = fullWidth
+    }
+    if(y) {
+        goneTransform.add("scaleY(0)")
+        fullTransform.add("scaleY(1)")
+        gone.marginTop = "0px"
+        gone.paddingTop = "0px"
+        gone.marginBottom = "0px"
+        gone.paddingBottom = "0px"
+        full.marginTop = marginTop
+        full.paddingTop = paddingTop
+        full.marginBottom = marginBottom
+        full.paddingBottom = paddingBottom
+        gone.height = "0px"
+        full.height = fullHeight
+    }
+    if(!x && !y) {
+        full.opacity = "1"
+        gone.opacity = "0"
+    }
+//    gone.transform = goneTransform.takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none"
+//    full.transform = fullTransform.takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none"
+
+//    this.animate(
+//        arrayOf(
+//            js("transform" to ((if(value) fullTransform else goneTransform).takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none")),
+//            js("transform" to ((if(value) goneTransform else fullTransform).takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none")),
+//        ),
+//        js(
+//            "duration" to totalTime,
+////            "easing" to "cubic-bezier(0.5, 1, 0.89, 1)"
+////            "easing" to "cubic-bezier(0, 0.55, 0.45, 1)"
+//            "easing" to "cubic-bezier(0.16, 1, 0.3, 1)"
+////            "easing" to "cubic-bezier(0.33, 1, 0.68, 1)"
+//        )
+//    ).let {
+//        it.currentTime = (totalTime - oldAnimTime).coerceAtLeast(0.0)
+//        it.onfinish = { ev ->
+//            if(this.asDynamic().__rock__hiddenAnim2 == it) {
+//                this.asDynamic().__rock__hiddenAnim2 = null
+//            }
+//        }
+//        it.oncancel = { ev ->
+//            if(this.asDynamic().__rock__hiddenAnim2 == it) {
+//                this.asDynamic().__rock__hiddenAnim2 = null
+//            }
+//        }
+//        it.onremove = { ev ->
+//            if(this.asDynamic().__rock__hiddenAnim2 == it) {
+//                this.asDynamic().__rock__hiddenAnim2 = null
+//            }
+//        }
+//        this.asDynamic().__rock__hiddenAnim2 = it
+//    }
+
+    this.animate(
+        arrayOf(before, after),
+        js(
+            "duration" to totalTime
+        )
+    ).let {
+        it.currentTime = (totalTime - oldAnimTime).coerceAtLeast(0.0)
+        it.onfinish = { ev ->
+            if(this.asDynamic().__rock__hiddenAnim == it) {
                 hidden = value
-            }, 5)
-        } else {
-            hidden = value
+                classList.remove("animatingShowHide")
+                this.asDynamic().__rock__hiddenAnim = null
+            }
         }
+        it.oncancel = { ev ->
+            if(this.asDynamic().__rock__hiddenAnim == it) {
+                hidden = value
+                classList.remove("animatingShowHide")
+                this.asDynamic().__rock__hiddenAnim = null
+            }
+        }
+        it.onremove = { ev ->
+            if(this.asDynamic().__rock__hiddenAnim == it) {
+                hidden = value
+                classList.remove("animatingShowHide")
+                this.asDynamic().__rock__hiddenAnim = null
+            }
+        }
+        this.asDynamic().__rock__hiddenAnim = it
     }
 }
 
@@ -1055,18 +1156,17 @@ inline fun HTMLElement.animate(keyframes: Array<dynamic>, options: dynamic): Ani
     this.asDynamic().animate(keyframes, options) as Animation
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-inline fun HTMLElement.animate(keyframes: Array<dynamic>, duration: Double): Animation =
-    this.asDynamic().animate(keyframes, duration) as Animation
-
-@Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
 inline fun HTMLElement.getAnimations(): Array<Animation> = this.asDynamic().getAnimations as Array<Animation>
 external interface Animation {
     var oncancel: ((Event) -> Unit)?
     var onfinish: ((Event) -> Unit)?
     var onremove: ((Event) -> Unit)?
     fun cancel()
+    fun commitStyles()
     fun finish()
     fun pause()
     fun play()
     fun reverse()
+    var currentTime: Double
+    var startTime: Double
 }

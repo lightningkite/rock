@@ -16,7 +16,7 @@ actual typealias NRecyclerView = HTMLDivElement
 
 @ViewDsl
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit {
-    themedElement<HTMLDivElement>("div") {
+    themedElement<HTMLDivElement>("div", viewDraws = false) {
         classList.add("recyclerView")
         var scrollingContainer: HTMLDivElement = this
         var sizingContainer: HTMLDivElement = this
@@ -30,7 +30,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit {
             scrollingContainer = this
             style.position = "absolute"
             style.left = "0"
-            style.right = "10px"
+            style.right = "0"
             style.top = "0"
             style.bottom = "0"
             style.overflowY = "scroll"
@@ -60,7 +60,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit {
             style.right = "0px"
             style.top = "0"
             style.bottom = "0"
-            style.width = "30px"
+            style.width = "20px"
             style.overflowY = "scroll"
             element<HTMLDivElement>("div") {
                 classList.add("barContent")
@@ -102,7 +102,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
             style.left = "0"
             style.right = "0"
             style.top = "0"
-            style.bottom = "10px"
+            style.bottom = "0"
             style.overflowX = "scroll"
             element<HTMLDivElement>("div") {
                 style.position = "relative"
@@ -131,7 +131,7 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
             style.bottom = "0px"
             style.left = "0"
             style.right = "0"
-            style.height = "30px"
+            style.height = "20px"
             style.overflowX = "scroll"
             element<HTMLDivElement>("div") {
                 classList.add("barContent")
@@ -268,6 +268,10 @@ class RecyclerController(
         root.calculationContext.onRemove {
             reserved.forEach { it.shutdown() }
         }
+
+        ResizeObserver { entries, obs ->
+            scrollHandler()
+        }.observe(contentCol.native)
         scrollingContainer.onscroll = { ev ->
             scrollHandler()
             Unit
@@ -367,12 +371,12 @@ class RecyclerController(
         val children = contentCol.native.children
 
         // Handle huge scroll
-        if (abs(scrollStart - lastDefaultPos) > (outerBounds.size + beyondEdge * 2) * 3 / 4) {
-            scrollStart = scrollStart.coerceIn(
-                lastDefaultPos - (outerBounds.size + beyondEdge * 2) * 3 / 4,
-                lastDefaultPos + (outerBounds.size + beyondEdge * 2) * 3 / 4,
-            )
-        }
+//        if (abs(scrollStart - lastDefaultPos) > (outerBounds.size + beyondEdge * 2) * 3 / 4) {
+//            scrollStart = scrollStart.coerceIn(
+//                lastDefaultPos - (outerBounds.size + beyondEdge * 2) * 3 / 4,
+//                lastDefaultPos + (outerBounds.size + beyondEdge * 2) * 3 / 4,
+//            )
+//        }
         val beforeScroll = scrollStart
 
         var scrollElements = 0
@@ -529,14 +533,14 @@ class RecyclerController(
 
         // Adjust offset
         if (scrollAmount != 0.0) {
-            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
+//            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
 //            scrollBy(ScrollToOptions(
 //                top = if(vertical) -scrollAmount else 0.0,
 //                left = if(!vertical) -scrollAmount else 0.0,
 //                behavior = ScrollBehavior.INSTANT
 //            ))
             scrollStart = beforeScroll - scrollAmount
-            window.setTimeout({ println("scrollStart: $scrollStart") }, 1)
+//            window.setTimeout({ println("scrollStart: $scrollStart") }, 1)
             updateFakeScroll()
         }
         suppress = false

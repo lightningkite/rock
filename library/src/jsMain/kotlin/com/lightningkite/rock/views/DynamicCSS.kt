@@ -301,16 +301,6 @@ object DynamicCSS {
         )
 
         style(
-            "div:not(.mightTransition):not(.mightTransition)", mapOf(
-                "pointer-events" to "none",
-            )
-        )
-        style(
-            "div:not(.mightTransition) > *", mapOf(
-                "pointer-events" to "all",
-            )
-        )
-        style(
             "button", mapOf(
                 "position" to "relative",
             )
@@ -730,6 +720,16 @@ object DynamicCSS {
                 "z-index" to "999",
             )
         )
+//        style(
+//            "div:not(.mightTransition):not(.mightTransition)", mapOf(
+//                "pointer-events" to "none",
+//            )
+//        )
+//        style(
+//            "div:not(.mightTransition) > *", mapOf(
+//                "pointer-events" to "all",
+//            )
+//        )
 //        recyclerView
 //        contentScroll
 //        content

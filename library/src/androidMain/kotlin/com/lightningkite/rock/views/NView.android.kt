@@ -28,3 +28,13 @@ actual inline fun NView.withoutAnimation(action: () -> Unit) {
         animationsEnabled = true
     }
 }
+
+actual fun NView.scrollIntoView(
+    horizontal: Align?,
+    vertical: Align?,
+    animate: Boolean
+) {
+}
+
+actual fun NView.consumeInputEvents() {
+}

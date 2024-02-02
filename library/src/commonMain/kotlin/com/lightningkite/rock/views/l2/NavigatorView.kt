@@ -4,6 +4,7 @@ import com.lightningkite.rock.contains
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.consumeInputEvents
 import com.lightningkite.rock.views.direct.marginless
 import com.lightningkite.rock.views.direct.swapView
 import com.lightningkite.rock.views.direct.swapViewDialog
@@ -26,6 +27,7 @@ fun ViewWriter.navigatorView(navigator: RockNavigator) {
 fun ViewWriter.navigatorViewDialog() {
     val n = navigator
     this.swapViewDialog {
+        native.consumeInputEvents()
         this@swapViewDialog.swapping(
             current = { n.dialog.currentScreen.await() },
             views = { screen ->

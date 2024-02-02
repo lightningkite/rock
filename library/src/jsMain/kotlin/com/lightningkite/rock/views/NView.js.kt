@@ -18,7 +18,7 @@ actual fun NView.listNViews(): List<NView> = children.let {
     (0..<it.length).mapNotNull { index -> it.get(index) as? HTMLElement }.toList()
 }
 
-fun NView.scrollIntoView(horizontal: Align?, vertical: Align?, animate: Boolean) {
+actual fun NView.scrollIntoView(horizontal: Align?, vertical: Align?, animate: Boolean) {
     val d: dynamic = js("{}")
     d.behavior = if(animate) "smooth" else "instant"
     d.inline = when(horizontal) {
@@ -126,3 +126,7 @@ actual val NView.calculationContext: CalculationContext
             return new
         }
     }
+
+actual fun NView.consumeInputEvents() {
+    onclick = { it.stopImmediatePropagation() }
+}

@@ -8,6 +8,7 @@ import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.lazyExpanding
 
 @Routable("recycler-view")
 object RecyclerViewScreen : RockScreen {
@@ -54,17 +55,38 @@ object RecyclerViewScreen : RockScreen {
                                 }
                                 onClick {
                                     expanded.value = if(it.await() == expanded.value) -1 else it.await()
+                                    native.scrollIntoView(null, Align.Start, true)
                                 }
                             }
                         }
                         text("le sigh")
-                        col {
-                            ::exists { expanded.await() == it.await() }
-                            text { ::content { "Content for ${it.await()} == ${expanded.await()}" } }
-                            text("More Content")
-                            text("More Content")
-                            text("More Content")
-                            text("More Content")
+                        lazyExpanding(shared { expanded.await() == it.await() }) {
+                            col {
+                                ::exists
+                                text { ::content { "Content for ${it.await()} == ${expanded.await()}" } }
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                                text("More Content")
+                            }
                         }
                     }
                 }

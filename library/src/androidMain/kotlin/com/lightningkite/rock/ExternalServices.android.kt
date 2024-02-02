@@ -18,80 +18,41 @@ actual object ExternalServices {
     actual fun requestFile(
         mimeTypes: List<String>,
         onResult: (FileReference?) -> Unit,
-    ) {
-        AndroidAppContext.requestPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE) {
-            if (!it.accepted) return@requestPermissions onResult(null)
-
-            val type = mimeTypes.joinToString(",")
-
-            val getIntent = Intent(Intent.ACTION_GET_CONTENT)
-            getIntent.type = type
-
-            val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickIntent.type = type
-
-            val chooserIntent = Intent.createChooser(getIntent, "Select items")
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
-
-            AndroidAppContext.startActivityForResult(chooserIntent) { code, data ->
-                if (code == Activity.RESULT_OK) {
-                    onResult(data?.data?.let(::FileReference))
-                } else {
-                    onResult(null)
-                }
-            }
-        }
-    }
+    ) = requestFiles(mimeTypes, { onResult(it.getOrNull(0)) }, false)
 
     actual fun requestFiles(
         mimeTypes: List<String>,
         onResult: (List<FileReference>) -> Unit,
+    ) = requestFiles(mimeTypes, onResult, true)
+
+    fun requestFiles(
+        mimeTypes: List<String>,
+        onResult: (List<FileReference>) -> Unit,
+        allowMultiple: Boolean = true
     ) {
 
-        val permsHandler: (RockActivity.PermissionResult) -> Unit = {
-            if (!it.accepted) onResult(listOf())
+        val type = mimeTypes.joinToString(",")
 
-            val type = mimeTypes.joinToString(",")
+        val getIntent = Intent(Intent.ACTION_GET_CONTENT)
+        getIntent.type = type
+        getIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple)
 
-            val getIntent = Intent(Intent.ACTION_GET_CONTENT)
-            getIntent.type = type
-            getIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        val chooserIntent = Intent.createChooser(getIntent, "Select items")
 
-            val pickIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            pickIntent.type = type
-
-            val chooserIntent = Intent.createChooser(getIntent, "Select items")
-            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(pickIntent))
-
-            AndroidAppContext.startActivityForResult(chooserIntent) { code, data ->
-                if (code == Activity.RESULT_OK) {
-                    onResult(
-                        data?.clipData?.let {
-                            (0 until it.itemCount).map { index ->
-                                it.getItemAt(index).uri.let(::FileReference)
-                            }
+        AndroidAppContext.startActivityForResult(chooserIntent) { code, data ->
+            if (code == Activity.RESULT_OK) {
+                onResult(
+                    data?.clipData?.let {
+                        (0 until it.itemCount).map { index ->
+                            it.getItemAt(index).uri.let(::FileReference)
                         }
-                            ?: data?.data?.let(::FileReference)?.let(::listOf)
-                            ?: listOf()
-                    )
-                } else {
-                    onResult(listOf())
-                }
+                    }
+                        ?: data?.data?.let(::FileReference)?.let(::listOf)
+                        ?: listOf()
+                )
+            } else {
+                onResult(listOf())
             }
-        }
-
-        if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
-            val permissions = buildList {
-                if (mimeTypes.any { it.startsWith("image") }) add(android.Manifest.permission.READ_MEDIA_IMAGES)
-                if (mimeTypes.any { it.startsWith("video") }) add(android.Manifest.permission.READ_MEDIA_VIDEO)
-                if (mimeTypes.any { it.startsWith("audio") }) add(android.Manifest.permission.READ_MEDIA_AUDIO)
-            }.toTypedArray()
-            AndroidAppContext.requestPermissions(*permissions, onResult = permsHandler)
-        } else {
-            AndroidAppContext.requestPermissions(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                onResult = permsHandler
-            )
         }
     }
 

@@ -13,11 +13,11 @@ object MaterialLikeTheme {
         secondaryForeground: Color = if (secondary.perceivedBrightness < 0.6f) Color.white else Color.black,
         title: FontAndStyle = FontAndStyle(systemDefaultFont),
         body: FontAndStyle = FontAndStyle(systemDefaultFont),
-        elevation: Dimension = 2.px,
-        cornerRadii: CornerRadii = CornerRadii(8.px),
+        elevation: Dimension = 2.dp,
+        cornerRadii: CornerRadii = CornerRadii(8.dp),
         spacing: Dimension = 0.5.rem,
         outline: Paint = background.closestColor().highlight(0.1f),
-        outlineWidth: Dimension = 0.px,
+        outlineWidth: Dimension = 0.dp,
     ) = Theme(
         title = title,
         body = body,
@@ -100,16 +100,16 @@ object MaterialLikeTheme {
 fun Theme.randomTitleFontSettings() = copy(title = title.copy(font = systemDefaultFont, bold = Random.nextBoolean(), allCaps = Random.nextBoolean()))
 fun Theme.randomElevationAndCorners() = when(Random.nextInt(0, 3)) {
     0 -> copy(
-            elevation = Random.nextInt(2, 4).px,
-            cornerRadii = CornerRadii(Random.nextInt(32).px)
+            elevation = Random.nextInt(2, 4).dp,
+            cornerRadii = CornerRadii(Random.nextInt(32).dp)
         )
     1 -> copy(
-            outlineWidth = Random.nextInt(1, 4).px,
-            cornerRadii = CornerRadii(Random.nextInt(32).px)
+            outlineWidth = Random.nextInt(1, 4).dp,
+            cornerRadii = CornerRadii(Random.nextInt(32).dp)
         )
     else -> copy(
-        outlineWidth = Random.nextInt(1, 4).px,
-        elevation = Random.nextInt(2, 4).px,
-        cornerRadii = CornerRadii(Random.nextInt(32).px)
+        outlineWidth = Random.nextInt(1, 4).dp,
+        elevation = Random.nextInt(2, 4).dp,
+        cornerRadii = CornerRadii(Random.nextInt(32).dp)
     )
 }

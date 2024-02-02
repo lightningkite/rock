@@ -380,7 +380,9 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 navGroupColumn(appNav.navItemsProperty)
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             } in withDefaultPadding
-            separator()
+            separator{
+                ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
+            }
             navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless

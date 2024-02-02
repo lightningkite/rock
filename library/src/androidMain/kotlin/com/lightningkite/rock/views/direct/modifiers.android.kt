@@ -141,3 +141,12 @@ actual fun ViewWriter.hasPopover(
 //    TODO("Not yet implemented")
     return ViewWrapper
 }
+
+@ViewModifierDsl3
+actual val ViewWriter.animateLayout: ViewWrapper
+    get() {
+        beforeNextElementSetup {
+            (this as? ViewGroup)?.layoutTransition = RockLayoutTransition()
+        }
+        return ViewWrapper
+    }

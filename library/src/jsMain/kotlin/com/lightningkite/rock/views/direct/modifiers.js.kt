@@ -129,3 +129,6 @@ actual val ViewWriter.withDefaultPadding: ViewWrapper
         return ViewWrapper
     }
 // End
+@ViewModifierDsl3
+actual val ViewWriter.animateLayout: ViewWrapper
+    get() = ViewWrapper

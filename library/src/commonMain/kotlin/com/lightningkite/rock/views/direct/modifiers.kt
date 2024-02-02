@@ -40,3 +40,5 @@ fun ViewWriter.sizeConstraints(
 expect val ViewWriter.marginless: ViewWrapper
 @ViewModifierDsl3
 expect val ViewWriter.withDefaultPadding: ViewWrapper
+@ViewModifierDsl3
+expect val ViewWriter.animateLayout: ViewWrapper

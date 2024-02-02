@@ -514,8 +514,8 @@ object DynamicCSS {
                 "scrollbar-width" to "thin",
                 "scrollbar-gutter" to "auto",
                 "flex-shrink" to "0",
-                "max-width" to "calc(100% - var(--margin, 0) * 2)",
-                "max-height" to "calc(100% - var(--margin, 0) * 2)",
+                "max-width" to "calc(100% - var(--margin, 0) * 2 + 1)",
+                "max-height" to "calc(100% - var(--margin, 0) * 2 + 1)",
                 "min-height" to "0",
                 "min-width" to "0",
                 "margin" to "0px",
@@ -705,7 +705,7 @@ object DynamicCSS {
         )
 
         style(
-            ".notransition", mapOf(
+            ".notransition *", mapOf(
                 "transition" to "none !important"
             )
         )
@@ -716,6 +716,21 @@ object DynamicCSS {
                 "height" to "100%",
             )
         )
+//        recyclerView
+//        contentScroll
+//        content
+//        barScroll
+//        barContent
+        style(".contentScroll::-webkit-scrollbar", mapOf(
+            "display" to "none"
+        ))
+        style(".contentScroll", mapOf(
+            "scrollbar-width" to "none",
+            "overflow-anchor" to "none",
+        ))
+        style(".contentScroll > *", mapOf(
+            "overflow-anchor" to "revert",
+        ))
     }
 
     fun rule(rule: String, index: Int = 0): Int {
@@ -916,9 +931,9 @@ object DynamicCSS {
                 "outline-color" to theme.outline.toCss(),
             )
         )
-        style(includeSelectors.joinToString { "$it > *" }, mapOf(
-            "--margin-2" to theme.spacing.value
-        ))
+//        style(includeSelectors.joinToString { "$it > *" }, mapOf(
+//            "--margin-2" to theme.spacing.value
+//        ))
         style(
             sel(".mightTransition:not(.marginless)"), mapOf(
                 "border-top-left-radius" to theme.cornerRadii.topLeft.value,

@@ -35,6 +35,7 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter
         .forEach { view ->
             if (view.asDynamic().__ROCK__removing) return@forEach
             view.asDynamic().__ROCK__removing = true
+            view.shutdown()
             val myStyle = window.getComputedStyle(native)
             val transitionTime = myStyle.transitionDuration.takeUnless { it.isBlank() } ?: "0.15"
             view.style.animation = "${keyframeName}-exit $transitionTime forwards"

@@ -1,6 +1,6 @@
 package com.lightningkite.rock
 
-var debug: Boolean = false
+var debug: Boolean = true
 actual fun debugger() {
     if(debug) js("debugger;")
 }

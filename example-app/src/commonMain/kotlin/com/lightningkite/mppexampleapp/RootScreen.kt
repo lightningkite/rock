@@ -72,6 +72,9 @@ object RootScreen : RockScreen {
                     onClick { gc() }
                 }
 
+                calculationContext.onRemove {
+                    println("Left root screen")
+                }
             }
         }
     }

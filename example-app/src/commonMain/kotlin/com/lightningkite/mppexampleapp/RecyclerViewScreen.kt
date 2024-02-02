@@ -44,22 +44,23 @@ object RecyclerViewScreen : RockScreen {
                 recyclerView = this
                 children(items) {
                     themeFromLast { theme ->
-                        if(it.await() == 50) theme.important() else theme
+                        if(it.await() == 50) theme.important() else if(it.await() % 7 == 0) theme.hover() else theme
                     } - col {
                         row {
-                            expanding - text { ::content { "Item ${it.await()}" } }
+                            expanding - centered - text { ::content { "Item ${it.await()}" } }
                             button {
                                 text {
                                     ::content { if (expanded.await() == it.await()) "Expanded" else "Expand" }
                                 }
                                 onClick {
-                                    expanded.value = it.await()
+                                    expanded.value = if(it.await() == expanded.value) -1 else it.await()
                                 }
                             }
                         }
+                        text("le sigh")
                         col {
                             ::exists { expanded.await() == it.await() }
-                            text("More Content")
+                            text { ::content { "Content for ${it.await()} == ${expanded.await()}" } }
                             text("More Content")
                             text("More Content")
                             text("More Content")

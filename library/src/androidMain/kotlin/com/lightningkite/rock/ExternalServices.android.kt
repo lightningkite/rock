@@ -12,7 +12,7 @@ import java.io.File
 
 actual object ExternalServices {
     actual fun openTab(url: String) {
-        AndroidAppContext.applicationCtx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        AndroidAppContext.activityCtx?.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 
     actual fun requestFile(

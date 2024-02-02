@@ -301,6 +301,16 @@ object DynamicCSS {
         )
 
         style(
+            "div:not(.mightTransition):not(.mightTransition)", mapOf(
+                "pointer-events" to "none",
+            )
+        )
+        style(
+            "div:not(.mightTransition) > *", mapOf(
+                "pointer-events" to "all",
+            )
+        )
+        style(
             "button", mapOf(
                 "position" to "relative",
             )
@@ -711,9 +721,13 @@ object DynamicCSS {
         )
 
         style(
-            ".dismissBackground > *", mapOf(
-                "width" to "100%",
-                "height" to "100%",
+            ".dismissBackground", mapOf(
+                "z-index" to "998",
+            )
+        )
+        style(
+            ".dismissBackground + *", mapOf(
+                "z-index" to "999",
             )
         )
     }
@@ -954,7 +968,6 @@ object DynamicCSS {
                 "margin" to "0px",
                 "--margin" to "0px",
                 "outline-width" to "0",
-                "z-index" to "999",
             ) + when (val it = theme.background.applyAlpha(0.5f)) {
                 is Color -> mapOf("background-color" to it.toCss())
                 is LinearGradient -> mapOf(

@@ -64,13 +64,11 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
                 views = { it(this, setup) in marginless }
             )
         } in marginless
-        stack {
+        dismissBackground {
             val nav = navigator.dialog
             ::exists { nav.currentScreen.await() != null }
-            dismissBackground {
-                onClick { nav.dismiss() }
-                navigatorViewDialog() in tweakTheme { it.dialog() }
-            } in marginless
+            onClick { nav.dismiss() }
+            navigatorViewDialog() in tweakTheme { it.dialog() }
         } in marginless
     } in marginless
 }

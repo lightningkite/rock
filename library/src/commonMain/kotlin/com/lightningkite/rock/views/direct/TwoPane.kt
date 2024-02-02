@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.rem
+import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.NView
 import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl

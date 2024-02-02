@@ -64,13 +64,11 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
                 views = { it(this, setup) in marginless }
             )
         } in marginless
-        stack {
+        dismissBackground {
             val nav = navigator.dialog
             ::exists { nav.currentScreen.await() != null }
-            dismissBackground {
-                onClick { nav.dismiss() }
-                navigatorViewDialog() in tweakTheme { it.dialog() }
-            } in marginless
+            onClick { nav.dismiss() }
+            navigatorViewDialog() in tweakTheme { it.dialog() }
         } in marginless
     } in marginless
 }
@@ -380,7 +378,9 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 navGroupColumn(appNav.navItemsProperty)
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             } in withDefaultPadding
-            separator()
+            separator{
+                ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
+            }
             navigatorView(navigator) in weight(1f) in marginless
         } in weight(1f)
     } in marginless

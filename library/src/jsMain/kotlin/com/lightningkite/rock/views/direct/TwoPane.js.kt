@@ -26,7 +26,7 @@ actual fun ViewWriter.twoPane(
     suspend fun tooSmall() = WindowInfo.await().width < leftPaneSize + rightPaneMinSize
     row {
         val leftPane = Property(false)
-        sizedBox(SizeConstraints(width = leftPaneSize)) - stack {
+        sizeConstraints(width = leftPaneSize) - stack {
             ::exists { !tooSmall() || leftPane.await() }
             left(this)
         }

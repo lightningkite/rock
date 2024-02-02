@@ -69,6 +69,9 @@ actual fun ViewWriter.hasPopover(
 }
 
 @ViewModifierDsl3
+actual fun ViewWriter.textPopover(message: String): ViewWrapper = TODO()
+
+@ViewModifierDsl3
 actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     val parent = this.currentView
     this.beforeNextElementSetup {

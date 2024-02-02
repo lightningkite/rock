@@ -138,7 +138,17 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit,
 ): ViewWrapper {
-//    TODO("Not yet implemented")
+    beforeNextElementSetup {
+        tooltipText = "I am a popover!"
+    }
+    return ViewWrapper
+}
+
+@ViewModifierDsl3
+actual fun ViewWriter.textPopover(message: String): ViewWrapper {
+    beforeNextElementSetup {
+        tooltipText = message
+    }
     return ViewWrapper
 }
 

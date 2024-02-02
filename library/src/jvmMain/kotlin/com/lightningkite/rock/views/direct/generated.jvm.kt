@@ -232,6 +232,7 @@ actual var RecyclerView.columns: Int
     set(value) { TODO() }
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit = TODO()
 @ViewModifierDsl3 actual fun ViewWriter.hasPopover(requireClick: Boolean, preferredDirection: PopoverPreferredDirection, setup: ViewWriter.()->Unit): ViewWrapper = TODO()
+@ViewModifierDsl3 actual fun ViewWriter.textPopover(message: String): ViewWrapper = TODO()
 @ViewModifierDsl3 actual fun ViewWriter.weight(amount: Float): ViewWrapper = TODO()
 @ViewModifierDsl3 actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper = TODO()
 @ViewModifierDsl3 actual val ViewWriter.scrolls: ViewWrapper get() = TODO()

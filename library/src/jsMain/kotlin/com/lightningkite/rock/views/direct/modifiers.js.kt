@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.ViewWrapper
+import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.views.*
 import org.w3c.dom.*
@@ -48,6 +49,13 @@ actual fun ViewWriter.hasPopover(
         }
     }
     return ViewWrapper
+}
+
+@ViewModifierDsl3
+actual fun ViewWriter.textPopover(message: String): ViewWrapper = hasPopover {
+    text {
+        content = message
+    } in card
 }
 
 @ViewModifierDsl3

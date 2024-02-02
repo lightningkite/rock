@@ -22,7 +22,7 @@ actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Un
             }
         ) in marginless
         setup(DismissBackground(native))
-    } in marginless
+    }
 }
 
 actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit {

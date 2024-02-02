@@ -1,8 +1,10 @@
 package com.lightningkite.rock.views.l2
 
+import com.lightningkite.rock.contains
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.direct.marginless
 import com.lightningkite.rock.views.direct.swapView
 import com.lightningkite.rock.views.direct.swapViewDialog
 import com.lightningkite.rock.views.direct.swapping
@@ -32,5 +34,5 @@ fun ViewWriter.navigatorViewDialog() {
                     with(screen) { render() }
             }
         )
-    }
+    } in marginless
 }

@@ -13,6 +13,7 @@ import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.views.direct.RockLayoutTransition
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
@@ -95,9 +96,15 @@ actual var NView.opacity: Double
         this.alpha = value.toFloat()
     }
 
+private fun NView.assertLayoutTransitionReady() {
+    val animateHost = (parent as? ViewGroup)
+    if (animateHost?.layoutTransition == null) animateHost?.layoutTransition = RockLayoutTransition()
+}
+
 actual var NView.exists: Boolean
     get() = visibility == View.VISIBLE
     set(value) {
+        assertLayoutTransitionReady()
         visibility = if (value) {
             View.VISIBLE
         } else {

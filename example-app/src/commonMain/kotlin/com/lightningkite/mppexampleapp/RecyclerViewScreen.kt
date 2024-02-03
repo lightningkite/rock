@@ -65,7 +65,7 @@ object RecyclerViewScreen : RockScreen {
                             text("More Content")
                             text("More Content")
                         }
-                    } in animateLayout
+                    }
                 }
             } in weight(1f)
 //            horizontalRecyclerView {

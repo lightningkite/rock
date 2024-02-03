@@ -240,5 +240,4 @@ actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWrite
 @ViewModifierDsl3 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper = TODO()
 @ViewModifierDsl3 actual val ViewWriter.marginless: ViewWrapper get() = TODO()
 @ViewModifierDsl3 actual val ViewWriter.withDefaultPadding: ViewWrapper get() = TODO()
-@ViewModifierDsl3 actual val ViewWriter.animateLayout: ViewWrapper get() = TODO()
 // End

@@ -501,15 +501,19 @@ class RecyclerController(
         // You can't just set scrollTop; it will have odd effects when pushing against the scroll edge
         lastDefaultPos = if (firstIndex == minIndex && lastIndex == maxIndex) {
             // cap both; go straight to native style
-            sizingContainer.style.size = "100%"
+            sizingContainer.style.size = "unset"
+            sizingContainer.style.position = "unset"
             contentCol.native.style.start = "-${0}px"
+            contentCol.native.style.position = "unset"
             val newDefaultPos = 0.0
             scrollAmount -= newDefaultPos - lastDefaultPos
             newDefaultPos
         } else if (firstIndex == minIndex) {
             // cap top
             sizingContainer.style.size = "${reservedScrollingSpace / 2}px"
+            sizingContainer.style.position = "relative"
             contentCol.native.style.start = "-${0}px"
+            contentCol.native.style.position = "absolute"
             val newDefaultPos = 0.0
 //            if(newDefaultPos != lastDefaultPos) scrollAmount += beyondEdge * 2
             scrollAmount -= newDefaultPos - lastDefaultPos
@@ -518,14 +522,18 @@ class RecyclerController(
             // cap bottom
             val h = contentCol.native.scrollSize
             sizingContainer.style.size = "${reservedScrollingSpace / 2 + h}px"
+            sizingContainer.style.position = "relative"
             contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
+            contentCol.native.style.position = "absolute"
             val newDefaultPos = reservedScrollingSpace / 2
             scrollAmount -= newDefaultPos - lastDefaultPos
             newDefaultPos
         } else {
             // uncap
             sizingContainer.style.size = "${reservedScrollingSpace}px"
+            sizingContainer.style.position = "relative"
             contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
+            contentCol.native.style.position = "absolute"
             val newDefaultPos = reservedScrollingSpace / 2
             scrollAmount -= newDefaultPos - lastDefaultPos
             newDefaultPos

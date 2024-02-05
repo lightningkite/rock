@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -93,7 +94,13 @@ actual var NView.opacity: Double
     }
 
     set(value) {
-        this.alpha = value.toFloat()
+        if (animationsEnabled) {
+            ValueAnimator.ofFloat(this.alpha, value.toFloat()).apply { addUpdateListener {
+                this@opacity.alpha = animatedValue as Float
+            } }.start()
+        } else {
+            this.alpha = value.toFloat()
+        }
     }
 
 private fun NView.assertLayoutTransitionReady() {

@@ -13,6 +13,11 @@ actual object PlatformNavigator: RockNavigator by LocalNavigator({ PlatformNavig
         get() = _routes
         set(value) {
             _routes = value
-            navigate(routes.parse(UrlLikePath(listOf(), mapOf())) ?: routes.fallback)
+            // The navigation stack could be recreated using savedInstanceState data in RockActivity.onCreate; only
+            // navigate to root if not
+            if (!ready()) navigate(routes.parse(UrlLikePath(listOf(), mapOf())) ?: routes.fallback)
         }
+
+    fun getRockScreenInstance(qualifiedName: String): RockScreen? =
+        Class.forName(qualifiedName).getDeclaredField("INSTANCE").get(null) as? RockScreen
 }

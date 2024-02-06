@@ -36,6 +36,19 @@ abstract class RockActivity : AppCompatActivity() {
         AndroidAppContext.activityCtx = this
         window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         Timber.plant(Timber.DebugTree())
+
+        CalculationContext.NeverEnds.reactiveScope {
+            window?.statusBarColor = theme().let { it.bar() ?: it }.background.closestColor().darken(0.3f).toInt()
+        }
+
+        savedInstanceState?.getStringArray("navStack")?.mapNotNull(PlatformNavigator::getRockScreenInstance)
+            ?.forEach(PlatformNavigator::navigate)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putStringArray("navStack", PlatformNavigator.saveStack())
     }
 
     private var currentNum = 0
@@ -105,10 +118,6 @@ abstract class RockActivity : AppCompatActivity() {
                 AnimationFrame.frame()
             }
             start()
-        }
-
-        CalculationContext.NeverEnds.reactiveScope {
-            window?.statusBarColor = theme().let { it.bar() ?: it }.background.closestColor().darken(0.3f).toInt()
         }
 
         this.findViewById<View>(android.R.id.content).viewTreeObserver.addOnGlobalLayoutListener(keyboardTreeObs)

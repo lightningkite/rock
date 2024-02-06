@@ -496,15 +496,32 @@ object DynamicCSS {
         )
 
         style(
-            ".rock-label > :nth-child(1).inclMargin", mapOf(
+            ".rock-label > :nth-child(1):nth-child(1):nth-child(1)", mapOf(
                 "font-size" to "0.8rem",
                 "margin-bottom" to "0px",
             )
         )
 
         style(
-            ".rock-label > :nth-child(2).inclMargin", mapOf(
+            ".rock-label > :nth-child(2):nth-child(2):nth-child(2)", mapOf(
                 "margin-top" to "0.25rem",
+            )
+        )
+
+        style(
+            "input:not(.mightTransition).editable.editable", mapOf(
+                "border-bottom-color" to "currentColor",
+                "border-bottom-width" to "1px",
+                "border-bottom-style" to "solid",
+            )
+        )
+
+        style(
+            "input:not(.mightTransition).editable.editable:focus", mapOf(
+                "border-bottom-color" to "currentColor",
+                "border-bottom-width" to "2px",
+                "border-bottom-style" to "solid",
+                "outline" to "none",
             )
         )
 
@@ -856,7 +873,7 @@ object DynamicCSS {
         )
         theme(
             theme.hover(),
-            listOf(".clickable:hover .theme-${theme.id}", ".clickable:hover.theme-${theme.id}"),
+            listOf(".clickable:hover .theme-${theme.id}", ".clickable:hover.theme-${theme.id}", ".clickable:focus .theme-${theme.id}", ".clickable:focus.theme-${theme.id}"),
             includeMaybeTransition = true
         )
         theme(
@@ -882,6 +899,10 @@ object DynamicCSS {
                 "input:checked.checkResponsive:hover.theme-${theme.id}",
                 "input:checked+.checkResponsive:hover .theme-${theme.id}",
                 "input:checked+.checkResponsive:hover.theme-${theme.id}",
+                "input:checked.checkResponsive:focus .theme-${theme.id}",
+                "input:checked.checkResponsive:focus.theme-${theme.id}",
+                "input:checked+.checkResponsive:focus .theme-${theme.id}",
+                "input:checked+.checkResponsive:focus.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )

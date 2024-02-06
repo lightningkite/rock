@@ -51,9 +51,9 @@ object ReactivityScreen : RockScreen {
 
             col {
                 h2 { content = "Using ::content {}" }
-                text { ::content{ local.await() } }
-                text { ::content{ persist.await() } }
-                text { ::content{ fetching.await() } }
+                text { ::content { local.await() } }
+                text { ::content { persist.await() } }
+                text { ::content { fetching.await() } }
             } in card
         }
     }

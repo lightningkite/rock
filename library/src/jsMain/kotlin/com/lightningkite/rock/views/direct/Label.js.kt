@@ -10,8 +10,8 @@ actual typealias NLabel = HTMLElement
 
 @ViewDsl
 actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
+    classList.add("rock-label")
     textElement("span") {
-        classList.add("rock-label")
     }
     setup(Label(this))
 }

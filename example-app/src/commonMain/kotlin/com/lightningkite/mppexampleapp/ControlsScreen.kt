@@ -21,19 +21,19 @@ object ControlsScreen : RockScreen {
                     content = "Pop over!"
                 } in card
             }
-            col {
+            card - col {
                 h2 { content = "Buttons" }
                 row {
-                    space {} in weight(1f)
+                    expanding - space {}
                     button { onClick { delay(1000L) }; text { content = "Sample" } }
-                    button { onClick { delay(1000L) }; text { content = "Card" } } in card
-                    button { onClick { delay(1000L) }; text { content = "Important" } } in important
-                    button { onClick { delay(1000L) }; text { content = "Critical" } } in critical
-                    button { onClick { delay(1000L) }; text { content = "Warning" } } in warning
-                    button { onClick { delay(1000L) }; text { content = "Danger" } } in danger
-                    space {} in weight(1f)
+                    card - button { onClick { delay(1000L) }; text { content = "Card" } }
+                    important - button { onClick { delay(1000L) }; text { content = "Important" } }
+                    critical - button { onClick { delay(1000L) }; text { content = "Critical" } }
+                    warning - button { onClick { delay(1000L) }; text { content = "Warning" } }
+                    danger - button { onClick { delay(1000L) }; text { content = "Danger" } }
+                    expanding - space {}
                 } in scrollsHorizontally
-            } in card
+            }
 
             col {
                 h2 { content = "Toggle Buttons" }

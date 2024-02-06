@@ -7,6 +7,7 @@ import com.lightningkite.rock.views.element
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLLabelElement
 import org.w3c.dom.HTMLSpanElement
+import org.w3c.dom.events.KeyboardEvent
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NToggleButton = HTMLSpanElement
@@ -14,7 +15,9 @@ actual typealias NToggleButton = HTMLSpanElement
 @ViewDsl
 actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
     classList.add("toggle-button")
+    lateinit var input: HTMLInputElement
     element<HTMLInputElement>("input") {
+        input = this
         this.type = "checkbox"
         classList.add("checkResponsive")
         this.hidden = true
@@ -22,7 +25,21 @@ actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = eleme
     }
     themedElementClickable<HTMLSpanElement>("span") {
         classList.add("checkResponsive")
+        tabIndex = 0
         setup(ToggleButton(this))
+        addEventListener("keydown", { ev ->
+            ev as KeyboardEvent
+            if (ev.key == KeyCodes.space || ev.key == KeyCodes.enter) {
+                ev.preventDefault()
+            }
+        })
+        addEventListener("keyup", { ev ->
+            ev as KeyboardEvent
+            if (ev.key == KeyCodes.space || ev.key == KeyCodes.enter) {
+                input.click()
+                ev.preventDefault()
+            }
+        })
     }
 }
 

@@ -1,0 +1,65 @@
+# Things that need documented
+
+- Set Up
+- Make a platform specific component
+- Data
+  - Routable / params 
+  - Query parameters 
+  - Property
+  - PersistentProperty
+  - shared
+  - reactiveScope
+  - launch
+- Components
+  - ActivityIndicator
+  - AutoCompleteTextField
+  - Button
+  - Canvas
+  - Checkbox
+  - ContainingView
+    - gravity
+    - centered
+    - expanding
+    - weight
+  - DismissBackground
+  - Image
+  - Label
+  - LocalDateTimeField
+  - RadioButton
+  - RadioToggleButton
+  - RecyclerView
+  - Select
+  - Separator
+  - Space
+  - SwapView
+  - Switch
+  - TextArea
+  - TextField
+  - TextView
+  - ToggleButton
+  - TwoPane
+  - WebView
+- Themes
+  - Theme Modifiers
+  - Virtual Margin/padding
+  - Marginless
+  - compact
+- Shortcuts
+  - icon
+  - lazyExpanding
+- External Services
+  - fetch
+  - websocket
+  - openTab
+  - requestFile
+  - requestFiles
+  - requestCaptureSelf
+  - requestCaptureEnvironment
+- Navigation
+  - ExternalLink
+  - Link
+  - PlatformNavigator.navigate
+  - PlatformNavigator.swap
+  - PlatformNavigator.pop
+  - PlatformNavigator.dialog
+  - AppNav

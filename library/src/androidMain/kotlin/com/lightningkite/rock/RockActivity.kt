@@ -17,10 +17,8 @@ import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.models.WindowStatistics
 import com.lightningkite.rock.navigation.PlatformNavigator
-import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.AndroidAppContext
-import com.lightningkite.rock.views.direct.handleTheme
 import timber.log.Timber
 
 abstract class RockActivity : AppCompatActivity() {
@@ -41,8 +39,7 @@ abstract class RockActivity : AppCompatActivity() {
             window?.statusBarColor = theme().let { it.bar() ?: it }.background.closestColor().darken(0.3f).toInt()
         }
 
-        savedInstanceState?.getStringArray("navStack")?.mapNotNull(PlatformNavigator::getRockScreenInstance)
-            ?.forEach(PlatformNavigator::navigate)
+        savedInstanceState?.getStringArray("navStack")?.let(PlatformNavigator::restoreStack)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

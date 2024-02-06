@@ -9,8 +9,6 @@ interface RockNavigator {
     val canGoBack: Readable<Boolean>
     fun navigate(screen: RockScreen)
     fun replace(screen: RockScreen)
-    fun saveStack(): Array<String>
-    fun ready(): Boolean
     fun reset(screen: RockScreen)
     fun goBack(): Boolean
     fun dismiss(): Boolean
@@ -51,9 +49,6 @@ class LocalNavigator(val routesGetter: ()->Routes, dialog: RockNavigator? = null
         direction = RockNavigator.Direction.Neutral
         stack.value = stack.value.dropLast(1).plus(screen)
     }
-    override fun saveStack(): Array<String> =
-        stack.value.mapNotNull { it::class.qualifiedName }.toTypedArray()
-    override fun ready(): Boolean = stack.value.isNotEmpty()
     override fun reset(screen: RockScreen) {
         direction = RockNavigator.Direction.Neutral
         stack.value = listOf(screen)

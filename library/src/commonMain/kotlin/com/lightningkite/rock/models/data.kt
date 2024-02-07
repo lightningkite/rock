@@ -9,6 +9,7 @@ class AnimationId
 expect class Font
 
 expect val systemDefaultFont: Font
+expect val systemDefaultFixedWidthFont: Font
 
 data class FontAndStyle(
     val font: Font = systemDefaultFont,

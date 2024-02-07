@@ -6,8 +6,8 @@ import com.lightningkite.rock.views.AndroidAppContext
 
 actual typealias Font = Typeface
 
-actual val systemDefaultFont: Font
-    get() = Typeface.DEFAULT
+actual val systemDefaultFont: Font  get() = Typeface.DEFAULT
+actual val systemDefaultFixedWidthFont: Font  get() = Typeface.MONOSPACE
 
 //actual sealed class ImageSource actual constructor()
 actual typealias DimensionRaw = Float

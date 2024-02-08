@@ -21,14 +21,15 @@ actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit =
 
 actual val LocalDateField.content: Writable<LocalDate?>
     get() = native.vprop(
-        "input",
-        {
-            (native.valueAsDate as? Date)?.toKotlinInstant()?.toLocalDateTime(
-                TimeZone.currentSystemDefault()
-            )?.date
+        eventName = "input",
+        get = {
+            (native.valueAsDate as? Date)
+                ?.toKotlinInstant()
+                ?.toLocalDateTime(TimeZone.UTC)
+                ?.date
         },
-        {
-            valueAsDate = it?.let { LocalDateTime(it, LocalTime(12, 0, 0)).toInstant(TimeZone.currentSystemDefault()) }
+        set = {
+            native.valueAsDate = it?.let { LocalDateTime(it, LocalTime(12, 0, 0)).toInstant(TimeZone.currentSystemDefault()) }
         }
     )
 actual var LocalDateField.action: Action?

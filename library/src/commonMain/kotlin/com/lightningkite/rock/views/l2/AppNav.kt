@@ -102,7 +102,9 @@ private fun ViewWriter.navGroupColumn(readable: Readable<List<NavElement>>) {
                 ::to { it.destination() }
                 text { ::content { it.title } }
             } in maybeThemeFromLast { existing ->
-                if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
+                if (navigator.currentScreen.await()
+                        ?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination())
+                )
                     existing.down()
                 else
                     null
@@ -110,6 +112,7 @@ private fun ViewWriter.navGroupColumn(readable: Readable<List<NavElement>>) {
         }
     }
 }
+
 private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
     forEach(readable) {
         when (it) {
@@ -136,7 +139,9 @@ private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
 //                text { ::content { it.title } }
                 icon(it.icon, it.title)
             } in maybeThemeFromLast { existing ->
-                if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
+                if (navigator.currentScreen.await()
+                        ?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination())
+                )
                     existing.down()
                 else
                     null
@@ -144,6 +149,7 @@ private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
         }
     }
 }
+
 fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
     forEach(readable) {
         fun display(navElement: NavElement) {
@@ -168,7 +174,7 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
 
             is NavGroup -> button {
                 display(it)
-                onClick {  }  // TODO: select dialog
+                onClick { }  // TODO: select dialog
             }
 
             is NavItem -> {
@@ -176,7 +182,9 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
                     ::to { it.destination() }
                     display(it)
                 } in themeFromLast { existing ->
-                    if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination()))
+                    if (navigator.currentScreen.await()?.let { navigator.routes.render(it) } == navigator.routes.render(
+                            it.destination()
+                        ))
                         (existing.bar() ?: existing).down()
                     else
                         existing.bar() ?: existing
@@ -378,7 +386,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                 navGroupColumn(appNav.navItemsProperty)
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             } in withDefaultPadding
-            separator{
+            separator {
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             }
             navigatorView(navigator) in weight(1f) in marginless

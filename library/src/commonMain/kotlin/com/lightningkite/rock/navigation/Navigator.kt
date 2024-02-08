@@ -12,6 +12,9 @@ interface RockNavigator {
     fun reset(screen: RockScreen)
     fun goBack(): Boolean
     fun dismiss(): Boolean
+    fun isStackEmpty(): Boolean
+    fun saveStack(): Array<String>
+    fun restoreStack(navStack: Array<String>)
     val direction: Direction?
     enum class Direction { Back, Neutral, Forward }
 }
@@ -52,6 +55,13 @@ class LocalNavigator(val routesGetter: ()->Routes, dialog: RockNavigator? = null
     override fun reset(screen: RockScreen) {
         direction = RockNavigator.Direction.Neutral
         stack.value = listOf(screen)
+    }
+    override fun isStackEmpty() = stack.value.isEmpty()
+    override fun saveStack(): Array<String> =
+        stack.value.mapNotNull { routes.render(it)?.urlLikePath?.render() }.toTypedArray()
+    override fun restoreStack(navStack: Array<String>) {
+        direction = RockNavigator.Direction.Forward
+        stack.value = navStack.map(UrlLikePath::fromUrlString).mapNotNull(routes::parse)
     }
 }
 

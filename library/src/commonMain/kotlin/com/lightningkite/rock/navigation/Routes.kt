@@ -1,5 +1,6 @@
 package com.lightningkite.rock.navigation
 
+import com.lightningkite.rock.decodeURIComponent
 import com.lightningkite.rock.reactive.Constant
 import com.lightningkite.rock.reactive.Listenable
 import com.lightningkite.rock.reactive.Readable
@@ -27,6 +28,16 @@ data class UrlLikePath(
 ) {
     companion object {
         val EMPTY = UrlLikePath(listOf(), mapOf())
+
+        fun fromParts(pathname: String, search: String) = UrlLikePath(
+            segments = pathname.split('/').filter { it.isNotBlank() },
+            parameters = search.trimStart('?').split('&').filter { it.isNotBlank() }.associate { it.substringBefore('=') to decodeURIComponent(it.substringAfter('=')) }
+        )
+
+        fun fromUrlString(url: String): UrlLikePath {
+            val parts = url.split("?")
+            return fromParts(parts.getOrNull(0) ?: "", parts.getOrNull(1) ?: "")
+        }
     }
 }
 

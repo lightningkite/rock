@@ -34,10 +34,7 @@ actual object PlatformNavigator : RockNavigator {
             }
         }
 
-    private fun Location.urlLike() = UrlLikePath(
-        segments = pathname.split('/').filter { it.isNotBlank() },
-        parameters = search.trimStart('?').split('&').filter { it.isNotBlank() }.associate { it.substringBefore('=') to decodeURIComponent(it.substringAfter('=')) }
-    )
+    private fun Location.urlLike() = UrlLikePath.fromParts(pathname, search)
 
     override val dialog: RockNavigator = LocalNavigator({ routes })
 
@@ -121,5 +118,17 @@ actual object PlatformNavigator : RockNavigator {
     override fun dismiss(): Boolean {
         window.history.go(-1)
         return true
+    }
+
+    override fun isStackEmpty(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveStack(): Array<String> {
+        TODO("Not yet implemented")
+    }
+
+    override fun restoreStack(navStack: Array<String>) {
+        TODO("Not yet implemented")
     }
 }

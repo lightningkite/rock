@@ -370,6 +370,8 @@ class RecyclerController(
         val outerBounds = root.getBoundingClientRect()
         val children = contentCol.native.children
 
+//        println("Processing $scrollStart")
+
         // Handle huge scroll
 //        if (abs(scrollStart - lastDefaultPos) > (outerBounds.size + beyondEdge * 2) * 3 / 4) {
 //            scrollStart = scrollStart.coerceIn(
@@ -464,6 +466,7 @@ class RecyclerController(
                     }
                 }
             }
+//            println("Appending view")
             contentCol.native.appendChild(newElement)
             neededOnBottom -= newElement.scrollSize
         }
@@ -499,9 +502,11 @@ class RecyclerController(
 
         // Handle scroll edges; we do this by altering the container size.
         // You can't just set scrollTop; it will have odd effects when pushing against the scroll edge
+//        println("Before edge processing: $scrollStart")
         lastDefaultPos = if (firstIndex == minIndex && lastIndex == maxIndex) {
             // cap both; go straight to native style
-            sizingContainer.style.size = "unset"
+//            println("cap both; go straight to native style")
+            sizingContainer.style.size = "max-content"
             sizingContainer.style.position = "unset"
             contentCol.native.style.start = "-${0}px"
             contentCol.native.style.position = "unset"
@@ -510,6 +515,7 @@ class RecyclerController(
             newDefaultPos
         } else if (firstIndex == minIndex) {
             // cap top
+//            println("cap top")
             sizingContainer.style.size = "${reservedScrollingSpace / 2}px"
             sizingContainer.style.position = "relative"
             contentCol.native.style.start = "-${0}px"
@@ -520,6 +526,7 @@ class RecyclerController(
             newDefaultPos
         } else if (lastIndex == maxIndex) {
             // cap bottom
+//            println("cap bottom")
             val h = contentCol.native.scrollSize
             sizingContainer.style.size = "${reservedScrollingSpace / 2 + h}px"
             sizingContainer.style.position = "relative"
@@ -530,6 +537,7 @@ class RecyclerController(
             newDefaultPos
         } else {
             // uncap
+//            println("uncap")
             sizingContainer.style.size = "${reservedScrollingSpace}px"
             sizingContainer.style.position = "relative"
             contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
@@ -538,17 +546,12 @@ class RecyclerController(
             scrollAmount -= newDefaultPos - lastDefaultPos
             newDefaultPos
         }
+//        println("After edge processing: $scrollStart")
 
         // Adjust offset
         if (scrollAmount != 0.0) {
 //            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
-//            scrollBy(ScrollToOptions(
-//                top = if(vertical) -scrollAmount else 0.0,
-//                left = if(!vertical) -scrollAmount else 0.0,
-//                behavior = ScrollBehavior.INSTANT
-//            ))
             scrollStart = beforeScroll - scrollAmount
-//            window.setTimeout({ println("scrollStart: $scrollStart") }, 1)
             updateFakeScroll()
         }
         suppress = false

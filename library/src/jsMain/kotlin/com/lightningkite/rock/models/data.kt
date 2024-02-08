@@ -34,6 +34,7 @@ actual data class Font(
 data class FontDirect(val normal: String, val bold: String? = null, val italic: String? = null, val boldItalic: String? = null)
 
 actual val systemDefaultFont: Font get() = Font("'Montserrat'", "https://fonts.googleapis.com/css2?family=Montserrat:wght@100;400;700&display=swap", "Helvetica")
+actual val systemDefaultFixedWidthFont: Font get() = Font("monospace")
 
 actual sealed class ImageSource actual constructor()
 actual class ImageResource(val relativeUrl: String) : ImageSource()

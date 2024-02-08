@@ -753,7 +753,7 @@ object DynamicCSS {
 //        barScroll
 //        barContent
         style(".contentScroll::-webkit-scrollbar", mapOf(
-            "display" to "none"
+//            "display" to "none"
         ))
         style(".contentScroll", mapOf(
             "scrollbar-width" to "none",

@@ -43,6 +43,7 @@ fun fontFromFamilyInfo(
     UIFont.fontWithName(fn, size) ?: systemDefaultFont.get(size, weight, getItalic)
 }
 actual val systemDefaultFont: Font get() = Font { size, weight, italic -> if(italic) UIFont.italicSystemFontOfSize(size) else UIFont.systemFontOfSize(size, weight) }
+actual val systemDefaultFixedWidthFont: Font get() = Font { size, weight, italic -> UIFont.systemFontOfSize(size, weight) }
 
 actual sealed class ImageSource actual constructor()
 actual class ImageResource(val name: String) : ImageSource()

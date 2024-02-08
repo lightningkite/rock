@@ -61,11 +61,11 @@ actual fun ViewWriter.platformSpecific() {
             var version = 2
             onClick {
                 val v = version++
-                if (v % 2 == 0) data.value = (0..30).map { "Item $it (v$v)" }.toList()
-                else data.value = (0..10).map { "Item $it (v$v)" }.toList()
+                if (v % 2 == 0) data.value = (0..10).map { "Item $it (v$v)" }.toList()
+                else data.value = (0..7).map { "Item $it (v$v)" }.toList()
             }
         }
-        expanding - recyclerView {
+        expanding - horizontalRecyclerView {
             children(data) { obs ->
                 card - stack {
                     text {

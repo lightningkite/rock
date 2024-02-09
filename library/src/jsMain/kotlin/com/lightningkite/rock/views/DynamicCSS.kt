@@ -884,13 +884,18 @@ object DynamicCSS {
         )
         theme(
             theme.hover(),
-            listOf(".clickable:hover .theme-${theme.id}", ".clickable:hover.theme-${theme.id}", ".clickable:focus .theme-${theme.id}", ".clickable:focus.theme-${theme.id}"),
+            listOf(".clickable:hover .theme-${theme.id}", ".clickable:hover.theme-${theme.id}"),
+            includeMaybeTransition = true
+        )
+        theme(
+            theme.focus(),
+            listOf(".clickable:focus-visible .theme-${theme.id}", ".clickable:focus-visible.theme-${theme.id}"),
             includeMaybeTransition = true
         )
         theme(
             theme.disabled(),
-            listOf(".clickable:disabled .theme-${theme.id}", ".clickable:disabled.theme-${theme.id}"),
-            includeMaybeTransition = true
+            listOf(".clickable:disabled:disabled .theme-${theme.id}", ".clickable:disabled:disabled.theme-${theme.id}"),
+            includeMaybeTransition = false
         )
 
         theme(
@@ -910,10 +915,16 @@ object DynamicCSS {
                 "input:checked.checkResponsive:hover.theme-${theme.id}",
                 "input:checked+.checkResponsive:hover .theme-${theme.id}",
                 "input:checked+.checkResponsive:hover.theme-${theme.id}",
-                "input:checked.checkResponsive:focus .theme-${theme.id}",
-                "input:checked.checkResponsive:focus.theme-${theme.id}",
-                "input:checked+.checkResponsive:focus .theme-${theme.id}",
-                "input:checked+.checkResponsive:focus.theme-${theme.id}",
+            ),
+            includeMaybeTransition = true
+        )
+        theme(
+            theme.selected().focus(),
+            listOf(
+                "input:checked.checkResponsive:focus-visible .theme-${theme.id}",
+                "input:checked.checkResponsive:focus-visible.theme-${theme.id}",
+                "input:checked+.checkResponsive:focus-visible .theme-${theme.id}",
+                "input:checked+.checkResponsive:focus-visible.theme-${theme.id}",
             ),
             includeMaybeTransition = true
         )
@@ -974,7 +985,6 @@ object DynamicCSS {
                 "outline-width" to theme.outlineWidth.value,
                 "box-shadow" to theme.elevation.toBoxShadow(),
                 "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
-                "outline-color" to theme.outline.toCss(),
             )
         )
 //        style(includeSelectors.joinToString { "$it > *" }, mapOf(
@@ -1007,6 +1017,7 @@ object DynamicCSS {
                 "text-transform" to if (theme.body.allCaps) "uppercase" else "none",
                 "line-height" to theme.body.lineSpacingMultiplier.toString(),
                 "letter-spacing" to theme.body.additionalLetterSpacing.toString(),
+                "outline-color" to theme.outline.toCss(),
             )
         )
         style(

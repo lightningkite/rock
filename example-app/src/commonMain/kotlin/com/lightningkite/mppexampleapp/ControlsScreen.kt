@@ -14,7 +14,7 @@ import kotlinx.datetime.*
 @Routable("controls")
 object ControlsScreen : RockScreen {
     override fun ViewWriter.render() {
-        val booleanContent = Property(false)
+        val booleanContent = Property(true)
         col {
 
             h1 { content = "Controls" } in withDefaultPadding in hasPopover {
@@ -26,12 +26,12 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Buttons" }
                 row {
                     expanding - space {}
-                    button { onClick { delay(1000L) }; text { content = "Sample" } }
-                    card - button { onClick { delay(1000L) }; text { content = "Card" } }
-                    important - button { onClick { delay(1000L) }; text { content = "Important" } }
-                    critical - button { onClick { delay(1000L) }; text { content = "Critical" } }
-                    warning - button { onClick { delay(1000L) }; text { content = "Warning" } }
-                    danger - button { onClick { delay(1000L) }; text { content = "Danger" } }
+                    button { onClick { delay(1000L) }; text { content = "Sample" }; ::enabled { booleanContent.await() } }
+                    card - button { onClick { delay(1000L) }; text { content = "Card" }; ::enabled { booleanContent.await() } }
+                    important - button { onClick { delay(1000L) }; text { content = "Important" }; ::enabled { booleanContent.await() } }
+                    critical - button { onClick { delay(1000L) }; text { content = "Critical" }; ::enabled { booleanContent.await() } }
+                    warning - button { onClick { delay(1000L) }; text { content = "Warning" }; ::enabled { booleanContent.await() } }
+                    danger - button { onClick { delay(1000L) }; text { content = "Danger" }; ::enabled { booleanContent.await() } }
                     expanding - space {}
                 } in scrollsHorizontally
             }

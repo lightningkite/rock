@@ -209,6 +209,7 @@ class RecyclerController(
     val newViews: ViewWriter,
     val vertical: Boolean = true
 ) {
+    var columns = 1
 //    var beyondEdge: Double = 0.0
     var beyondEdge: Double = 200.0
 

@@ -19,6 +19,11 @@ data class Theme(
             elevation = this.elevation * 2f,
         )
     },
+    val focus: (Theme.() -> Theme) = {
+        copy(
+            outlineWidth = outlineWidth + 2.dp
+        )
+    },
     val dialog: (Theme.() -> Theme) = {
         copy(
             background = this.background.closestColor().lighten(0.1f),
@@ -37,7 +42,9 @@ data class Theme(
     val selected: (Theme.() -> Theme) = { this.important(this) },
     val disabled: (Theme.() -> Theme) = {
         copy(
-            foreground = this.foreground.closestColor().copy(alpha = 0.5f)
+            foreground = this.foreground.applyAlpha(alpha = 0.25f),
+            background = this.background.applyAlpha(alpha = 0.5f),
+            outline = this.outline.applyAlpha(alpha = 0.25f),
         )
     },
     val bar: (Theme.() -> Theme?) = {
@@ -81,6 +88,8 @@ data class Theme(
     inline fun dialog() = dialog(this)
     @JsName("hoverDirect")
     inline fun hover() = hover(this)
+    @JsName("focusDirect")
+    inline fun focus() = focus(this)
     @JsName("downDirect")
     inline fun down() = down(this)
     @JsName("selectedDirect")

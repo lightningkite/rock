@@ -8,6 +8,7 @@ import com.lightningkite.rock.views.AndroidAppContext
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -33,6 +34,8 @@ actual suspend fun fetch(
     method: HttpMethod,
     headers: HttpHeaders,
     body: RequestBody?,
+    onUploadProgress: ((bytesComplete: Int, bytesExpectedOrNegativeOne: Int) -> Unit)?,
+    onDownloadProgress: ((bytesComplete: Int, bytesExpectedOrNegativeOne: Int) -> Unit)?,
 ): RequestResponse {
     return withContext(Dispatchers.Main) {
         try {
@@ -46,11 +49,7 @@ actual suspend fun fetch(
                         HttpMethod.DELETE -> io.ktor.http.HttpMethod.Delete
                         HttpMethod.HEAD -> io.ktor.http.HttpMethod.Head
                     }
-                    this.headers {
-                        for ((key, values) in headers.map) {
-                            for (value in values) append(key, value)
-                        }
-                    }
+                    headers { appendAll(headers) }
                     when (body) {
                         is RequestBodyBlob -> {
                             contentType(ContentType.parse(body.content.type))
@@ -82,6 +81,12 @@ actual suspend fun fetch(
 
                         null -> {}
                     }
+                    onUploadProgress?.let {
+                        onUpload { a, b -> it(a.toInt(), b.toInt()) }
+                    }
+                    onDownloadProgress?.let {
+                        onDownload { a, b -> it(a.toInt(), b.toInt()) }
+                    }
                 }
             }
             RequestResponse(response)
@@ -91,28 +96,14 @@ actual suspend fun fetch(
     }
 }
 
-actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders =
-    HttpHeaders(map.entries.associateTo(HashMap()) { it.key.lowercase() to listOf(it.value) })
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias HttpHeaders = Headers
 
-actual inline fun httpHeaders(headers: HttpHeaders): HttpHeaders = HttpHeaders(headers.map.toMutableMap())
-actual inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders =
-    HttpHeaders(list.groupBy { it.first.lowercase() }.mapValues { it.value.map { it.second } }.toMutableMap())
+actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders = Headers.build { map.forEach { append(it.key,  it.value) } }
+actual inline fun httpHeaders(headers: HttpHeaders): HttpHeaders = Headers.build { appendAll(headers) }
+actual inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders = Headers.build { list.forEach { append(it.first, it.second) } }
+actual inline fun httpHeaders(sequence: Sequence<Pair<String, String>>): HttpHeaders = Headers.build { sequence.forEach { append(it.first, it.second) } }
 
-actual class HttpHeaders(val map: MutableMap<String, List<String>>) {
-    actual fun append(name: String, value: String): Unit {
-        map[name.lowercase()] = (map[name.lowercase()] ?: listOf()) + value
-    }
-
-    actual fun delete(name: String): Unit {
-        map.remove(name.lowercase())
-    }
-
-    actual fun get(name: String): String? = map[name.lowercase()]?.joinToString(",")
-    actual fun has(name: String): Boolean = map.containsKey(name.lowercase())
-    actual fun set(name: String, value: String): Unit {
-        map[name.lowercase()] = listOf(value)
-    }
-}
 
 actual class RequestResponse(val wraps: HttpResponse) {
     actual val status: Short get() = wraps.status.value.toShort()
@@ -144,7 +135,7 @@ actual class RequestResponse(val wraps: HttpResponse) {
         }
     }
 
-    actual suspend fun headers(): Map<String, List<String>> = wraps.headers.toMap()
+    actual val headers: HttpHeaders get() = wraps.headers
 }
 
 actual fun websocket(url: String): WebSocket {

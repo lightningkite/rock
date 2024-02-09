@@ -22,7 +22,7 @@ object DataLoadingExampleScreen : RockScreen {
     override fun ViewWriter.render() {
         val data: Readable<List<Post>> = shared {
             delay(5000)
-            val response: RequestResponse = fetch("https://jsonplaceholder.typicode.com/posts")
+            val response: RequestResponse = fetch("https://jsonplaceholder.typicode.com/posts", onDownloadProgress = { complete, max -> println("$complete/$max") })
             Json.decodeFromString<List<Post>>(response.text())
         }
         col {

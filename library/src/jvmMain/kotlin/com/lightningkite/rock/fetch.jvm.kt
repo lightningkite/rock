@@ -8,11 +8,14 @@ actual suspend fun fetch(
     url: String,
     method: HttpMethod,
     headers: HttpHeaders,
-    body: RequestBody?
+    body: RequestBody?,
+    onUploadProgress: ((Int, Int) -> Unit)?,
+    onDownloadProgress: ((Int, Int) -> Unit)?,
 ): RequestResponse = TODO()
 actual inline fun httpHeaders(map: Map<String, String>): HttpHeaders = TODO()
 actual inline fun httpHeaders(headers: HttpHeaders): HttpHeaders =  TODO()
 actual inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders = TODO()
+actual inline fun httpHeaders(sequence: Sequence<Pair<String, String>>): HttpHeaders = TODO()
 actual class HttpHeaders {
     actual fun append(name: String, value: String): Unit = TODO()
     actual fun delete(name: String): Unit = TODO()
@@ -26,7 +29,7 @@ actual class RequestResponse {
     actual val ok: Boolean get() = TODO()
     actual suspend fun text(): String = TODO()
     actual suspend fun blob(): Blob = TODO()
-    actual suspend fun headers(): Map<String, List<String>> = TODO()
+    actual val headers: HttpHeaders = TODO()
 }
 
 actual class Blob(val file: File, val type: String) {

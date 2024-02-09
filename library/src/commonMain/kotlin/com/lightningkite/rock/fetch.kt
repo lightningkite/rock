@@ -23,7 +23,9 @@ expect suspend fun fetch(
     url: String,
     method: HttpMethod = HttpMethod.GET,
     headers: HttpHeaders = httpHeaders(),
-    body: RequestBody? = null
+    body: RequestBody? = null,
+    onUploadProgress: ((bytesComplete: Int, bytesExpectedOrNegativeOne: Int) -> Unit)? = null,
+    onDownloadProgress: ((bytesComplete: Int, bytesExpectedOrNegativeOne: Int) -> Unit)? = null,
 ): RequestResponse
 
 enum class HttpMethod { GET, POST, PUT, PATCH, DELETE, HEAD }
@@ -31,6 +33,7 @@ enum class HttpMethod { GET, POST, PUT, PATCH, DELETE, HEAD }
 fun httpHeaders(vararg entries: Pair<String, String>) = httpHeaders(entries.toList())
 expect inline fun httpHeaders(map: Map<String, String> = mapOf()): HttpHeaders
 expect inline fun httpHeaders(list: List<Pair<String, String>>): HttpHeaders
+expect inline fun httpHeaders(sequence: Sequence<Pair<String, String>>): HttpHeaders
 expect inline fun httpHeaders(headers: HttpHeaders): HttpHeaders
 expect class HttpHeaders {
     fun append(name: String, value: String)
@@ -43,9 +46,9 @@ expect class HttpHeaders {
 expect class RequestResponse {
     val status: Short
     val ok: Boolean
+    val headers: HttpHeaders
     suspend fun text(): String
     suspend fun blob(): Blob
-    suspend fun headers(): Map<String, List<String>>
 }
 
 expect class Blob

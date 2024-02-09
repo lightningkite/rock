@@ -18,3 +18,5 @@ value class RecyclerView(override val native: NRecyclerView) : RView<NRecyclerVi
 expect var RecyclerView.columns: Int
 expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit
 expect fun RecyclerView.scrollToIndex(index: Int, align: Align? = null, animate: Boolean = true)
+expect val RecyclerView.firstVisibleIndex: Readable<Int>
+expect val RecyclerView.lastVisibleIndex: Readable<Int>

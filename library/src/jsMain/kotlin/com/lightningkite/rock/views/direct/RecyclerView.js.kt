@@ -558,3 +558,9 @@ class RecyclerController(
 //                suppressNext = true
     }
 }
+
+actual val RecyclerView.firstVisibleIndex: Readable<Int>
+    get() = TODO("Not yet implemented")
+
+actual val RecyclerView.lastVisibleIndex: Readable<Int>
+    get() = TODO("Not yet implemented")

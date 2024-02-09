@@ -17,6 +17,23 @@ import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual class NRecyclerView(context: Context) : AndroidRecyclerView(context) {
     lateinit var viewWriter: ViewWriter
+
+    val firstVisibleIndex = Property(0)
+    val lastVisibleIndex = Property(0)
+    init {
+        addOnScrollListener(object: OnScrollListener() {
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                ((recyclerView.layoutManager as? LinearLayoutManager)?.findFirstCompletelyVisibleItemPosition()
+                    ?: (recyclerView.layoutManager as? GridLayoutManager)?.findFirstCompletelyVisibleItemPosition())?.let {
+                    if(firstVisibleIndex.value != it) firstVisibleIndex.value = it
+                }
+                ((recyclerView.layoutManager as? LinearLayoutManager)?.findLastCompletelyVisibleItemPosition()
+                    ?: (recyclerView.layoutManager as? GridLayoutManager)?.findLastCompletelyVisibleItemPosition())?.let {
+                    if(lastVisibleIndex.value != it) lastVisibleIndex.value = it
+                }
+            }
+        })
+    }
 }
 
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {
@@ -194,3 +211,6 @@ private class AlignSmoothScroller(context: Context, val align: Align?) : LinearS
         }
     }
 }
+
+actual val RecyclerView.firstVisibleIndex: Readable<Int> get() = native.firstVisibleIndex
+actual val RecyclerView.lastVisibleIndex: Readable<Int> get() = native.lastVisibleIndex

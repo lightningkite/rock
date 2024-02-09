@@ -9,11 +9,7 @@ import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.useContents
-import platform.CoreGraphics.CGPoint
-import platform.CoreGraphics.CGRect
-import platform.CoreGraphics.CGRectMake
-import platform.CoreGraphics.CGSize
-import platform.CoreGraphics.CGSizeMake
+import platform.CoreGraphics.*
 import platform.Foundation.NSCoder
 import platform.Foundation.NSIndexPath
 import platform.QuartzCore.CATextLayer
@@ -303,3 +299,69 @@ actual fun RecyclerView.scrollToIndex(
         )
     }
 }
+
+actual val RecyclerView.firstVisibleIndex: Readable<Int>
+    get() = object: Readable<Int> {
+        override suspend fun awaitRaw(): Int {
+            return if(listeners.isEmpty()) get() else last
+        }
+        fun get() = (native.indexPathsForVisibleItems as List<NSIndexPath>).minOfOrNull { it.row }?.toInt() ?: 0
+        var last = get()
+        private val listeners = ArrayList<() -> Unit>()
+        private var parentListener: (()->Unit)? = null
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            if(listeners.isEmpty()) {
+                parentListener = (native.delegate as? GeneralCollectionDelegate<*>)?.onScroll?.addListener {
+                    val current = get()
+                    if(last != current) {
+                        last = current
+                        listeners.toList().forEach { it() }
+                    }
+                } ?: {}
+            }
+            listeners.add(listener)
+            return  {
+                val pos = listeners.indexOfFirst { it === listener }
+                if(pos != -1) {
+                    listeners.removeAt(pos)
+                }
+                if(listeners.isEmpty()) {
+                    parentListener?.invoke()
+                    parentListener = null
+                }
+            }
+        }
+    }
+
+actual val RecyclerView.lastVisibleIndex: Readable<Int>
+    get() = object: Readable<Int> {
+        override suspend fun awaitRaw(): Int {
+            return if(listeners.isEmpty()) get() else last
+        }
+        fun get() = (native.indexPathsForVisibleItems as List<NSIndexPath>).maxOfOrNull { it.row }?.toInt() ?: 0
+        var last = get()
+        private val listeners = ArrayList<() -> Unit>()
+        private var parentListener: (()->Unit)? = null
+        override fun addListener(listener: () -> Unit): () -> Unit {
+            if(listeners.isEmpty()) {
+                parentListener = (native.delegate as? GeneralCollectionDelegate<*>)?.onScroll?.addListener {
+                    val current = get()
+                    if(last != current) {
+                        last = current
+                        listeners.toList().forEach { it() }
+                    }
+                } ?: {}
+            }
+            listeners.add(listener)
+            return  {
+                val pos = listeners.indexOfFirst { it === listener }
+                if(pos != -1) {
+                    listeners.removeAt(pos)
+                }
+                if(listeners.isEmpty()) {
+                    parentListener?.invoke()
+                    parentListener = null
+                }
+            }
+        }
+    }

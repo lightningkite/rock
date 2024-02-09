@@ -14,7 +14,7 @@ object LayoutExamplesScreen : RockScreen {
         col {
             h1 { content = "Sampling" }
 
-            col {
+            card - col {
                 h2 { content = "Stack Layout" }
                 stack {
                     val aligns = listOf(Align.Start, Align.Center, Align.End)
@@ -24,9 +24,9 @@ object LayoutExamplesScreen : RockScreen {
                         }
                     }
                 } in sizedBox(SizeConstraints(minHeight = 200.px))
-            } in card
+            }
 
-            col {
+            card - col {
                 h2 { content = "Column Gravity" }
                 col {
                     val aligns = listOf(Align.Start, Align.Center, Align.End)
@@ -34,9 +34,9 @@ object LayoutExamplesScreen : RockScreen {
                         text { content = "$h" } in gravity(h, Align.Stretch)
                     }
                 }
-            } in card
+            }
 
-            col {
+            card - col {
                 h2 { content = "Row Gravity / Weight" }
                 row {
                     val aligns = listOf(Align.Start, Align.Center, Align.End)
@@ -50,12 +50,12 @@ object LayoutExamplesScreen : RockScreen {
                         gravity(Align.Stretch, v) - text { content = "$v" }
                     }
                 } in sizedBox(SizeConstraints(minHeight = 200.px))
-            } in card
+            }
 
-            col {
+            card - col {
                 h2 { content = "Dynamic List" }
                 val countString = Property("5")
-                row {
+                scrollsHorizontally - row {
                     forEachUpdating(
                         shared {
                             (1..(countString.await().toIntOrNull()
@@ -64,14 +64,14 @@ object LayoutExamplesScreen : RockScreen {
                     ) {
                         text { ::content.invoke { it.await() } }
                     }
-                } in scrollsHorizontally
+                }
                 label {
                     content = "Element count:"
                     textField { content bind countString }
                 }
-            } in card
+            }
 
-            col {
+            card - col {
                 h2 { content = "Max Size" }
                 val text = Property(true)
                 important - button {
@@ -91,7 +91,7 @@ object LayoutExamplesScreen : RockScreen {
                 }
             }
 
-            col {
+            card - col {
                 h2("Scroll text")
                 sizeConstraints(height = 10.rem) - scrolls - col {
                     col {
@@ -100,7 +100,19 @@ object LayoutExamplesScreen : RockScreen {
                 }
             }
 
-            col {
+            card - col {
+                h2("Compact test")
+                card - compact - col {
+                    text("This one is compact")
+                    text("This one is compact")
+                }
+                card - col {
+                    text("This one is NOT compact")
+                    text("This one is NOT compact")
+                }
+            }
+
+            card - col {
                 h2 { content = "Max Size / Image Interaction" }
                 image {
                     source = ImageRemote("https://picsum.photos/seed/test/1920/1080")

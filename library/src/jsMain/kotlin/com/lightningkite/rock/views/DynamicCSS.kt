@@ -960,8 +960,8 @@ object DynamicCSS {
         )
         style(
             sel(".mightTransition:not(.marginless)",  ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
-                "margin" to theme.spacing.value,
-                "--margin" to theme.spacing.value,
+                "margin" to "var(--nextMargin, ${theme.spacing.value})",
+                "--margin" to "var(--nextMargin, ${theme.spacing.value})",
             )
         )
         style(
@@ -987,9 +987,9 @@ object DynamicCSS {
                 "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
             )
         )
-//        style(includeSelectors.joinToString { "$it > *" }, mapOf(
-//            "--margin-2" to theme.spacing.value
-//        ))
+        style(sel("> *"), mapOf(
+            "--nextMargin" to theme.spacing.value,
+        ))
         style(
             sel(".mightTransition:not(.marginless)"), mapOf(
                 "border-top-left-radius" to theme.cornerRadii.topLeft.value,

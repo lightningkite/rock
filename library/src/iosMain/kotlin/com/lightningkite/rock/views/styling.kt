@@ -36,7 +36,7 @@ fun ViewWriter.handleTheme(
             firstTime = false
             action()
         } else {
-            UIView.animateWithDuration(0.25) { action() }
+            animateIfAllowed(action)
         }
     }
 

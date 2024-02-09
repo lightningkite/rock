@@ -230,7 +230,6 @@ class GeneralCollectionDelegate<T>(
     var list: List<T> = listOf()
     var loading: Boolean = false
     val registered = HashSet<String>()
-    val onScroll = BasicListenable()
 
     @Suppress("CONFLICTING_OVERLOADS", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun collectionView(collectionView: UICollectionView, cellForItemAtIndexPath: NSIndexPath): UICollectionViewCell {
@@ -246,34 +245,70 @@ class GeneralCollectionDelegate<T>(
 //                }
 //                vw.rootCreated as? ObsUICollectionViewCell<T> ?: throw IllegalStateException("No view created")
 //            }
-        if(loading) {
-            cell.suppressRemeasure = true
-            cell.data.unset()
-            cell.setNeedsNewMeasure()
-            cell.suppressRemeasure = false
-        } else {
-            list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
+        collectionView.withoutAnimation {
+            if(loading) {
                 cell.suppressRemeasure = true
-                cell.data.value = it
+                cell.data.unset()
                 cell.setNeedsNewMeasure()
                 cell.suppressRemeasure = false
+            } else {
+                list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
+                    cell.suppressRemeasure = true
+                    cell.data.value = it
+                    cell.setNeedsNewMeasure()
+                    cell.suppressRemeasure = false
+                }
             }
-        }
-        if(!cell.ready) {
-            val vw = viewWriter
-            cell.suppressRemeasure = true
-            render(vw.targeting(cell), cell.data)
-            cell.suppressRemeasure = false
-            cell.ready = true
+            if(!cell.ready) {
+                val vw = viewWriter
+                cell.suppressRemeasure = true
+                render(vw.targeting(cell), cell.data)
+                cell.suppressRemeasure = false
+                cell.ready = true
+            }
         }
         return cell
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     override fun scrollViewDidScroll(scrollView: UIScrollView) {
-        onScroll.invokeAll()
+        val native = scrollView as UICollectionView
+        native.bounds.useContents {
+            val outerBounds = this
+            (native.indexPathsForVisibleItems as List<NSIndexPath>).filter {
+                native.cellForItemAtIndexPath(it)?.frame?.useContents {
+                    this.origin.x >= outerBounds.origin.x &&
+                    this.origin.y >= outerBounds.origin.y &&
+                    this.origin.x + this.size.width <= outerBounds.origin.x + outerBounds.size.width &&
+                    this.origin.y + this.size.height <= outerBounds.origin.y + outerBounds.size.height
+                } == true
+            }.rangeOfOrNull { it.row.toInt() }?.let {
+                it.start.let { if(firstVisibleIndex.value != it) firstVisibleIndex.value = it }
+                it.endInclusive.let { if(lastVisibleIndex.value != it) lastVisibleIndex.value = it }
+            }
+        }
+        native.indexPathForItemAtPoint(native.frame.useContents { CGPointMake(size.width / 2, size.height / 2) })?.row?.toInt()?.let {
+            if(centerIndex.value != it) centerIndex.value = it
+        }
     }
 
     override fun collectionView(collectionView: UICollectionView, numberOfItemsInSection: NSInteger): NSInteger = if(loading) placeholders.toLong() else list.size.toLong()
+
+    val firstVisibleIndex = Property(0)
+    val centerIndex = Property(0)
+    val lastVisibleIndex = Property(0)
+}
+
+inline fun <S, T: Comparable<T>> Iterable<S>.rangeOfOrNull(calculate: (S)->T): ClosedRange<T>? {
+    var min: T? = null
+    var max: T? = null
+    for(item in this) {
+        val value = calculate(item)
+        if(min == null || value < min) min = value
+        if(max == null || value > max) max = value
+    }
+    if(min == null || max == null) return null
+    else return min..max
 }
 
 actual fun <T> RecyclerView.children(
@@ -301,67 +336,10 @@ actual fun RecyclerView.scrollToIndex(
 }
 
 actual val RecyclerView.firstVisibleIndex: Readable<Int>
-    get() = object: Readable<Int> {
-        override suspend fun awaitRaw(): Int {
-            return if(listeners.isEmpty()) get() else last
-        }
-        fun get() = (native.indexPathsForVisibleItems as List<NSIndexPath>).minOfOrNull { it.row }?.toInt() ?: 0
-        var last = get()
-        private val listeners = ArrayList<() -> Unit>()
-        private var parentListener: (()->Unit)? = null
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            if(listeners.isEmpty()) {
-                parentListener = (native.delegate as? GeneralCollectionDelegate<*>)?.onScroll?.addListener {
-                    val current = get()
-                    if(last != current) {
-                        last = current
-                        listeners.toList().forEach { it() }
-                    }
-                } ?: {}
-            }
-            listeners.add(listener)
-            return  {
-                val pos = listeners.indexOfFirst { it === listener }
-                if(pos != -1) {
-                    listeners.removeAt(pos)
-                }
-                if(listeners.isEmpty()) {
-                    parentListener?.invoke()
-                    parentListener = null
-                }
-            }
-        }
-    }
+    get() = (native.delegate as? GeneralCollectionDelegate<*>)?.firstVisibleIndex ?: Constant(0)
 
 actual val RecyclerView.lastVisibleIndex: Readable<Int>
-    get() = object: Readable<Int> {
-        override suspend fun awaitRaw(): Int {
-            return if(listeners.isEmpty()) get() else last
-        }
-        fun get() = (native.indexPathsForVisibleItems as List<NSIndexPath>).maxOfOrNull { it.row }?.toInt() ?: 0
-        var last = get()
-        private val listeners = ArrayList<() -> Unit>()
-        private var parentListener: (()->Unit)? = null
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            if(listeners.isEmpty()) {
-                parentListener = (native.delegate as? GeneralCollectionDelegate<*>)?.onScroll?.addListener {
-                    val current = get()
-                    if(last != current) {
-                        last = current
-                        listeners.toList().forEach { it() }
-                    }
-                } ?: {}
-            }
-            listeners.add(listener)
-            return  {
-                val pos = listeners.indexOfFirst { it === listener }
-                if(pos != -1) {
-                    listeners.removeAt(pos)
-                }
-                if(listeners.isEmpty()) {
-                    parentListener?.invoke()
-                    parentListener = null
-                }
-            }
-        }
-    }
+    get() = (native.delegate as? GeneralCollectionDelegate<*>)?.lastVisibleIndex ?: Constant(0)
+
+val RecyclerView.centerIndex: Readable<Int>
+    get() = (native.delegate as? GeneralCollectionDelegate<*>)?.centerIndex ?: Constant(0)

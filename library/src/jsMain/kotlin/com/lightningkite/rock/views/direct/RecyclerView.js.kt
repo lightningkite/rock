@@ -182,6 +182,11 @@ actual fun RecyclerView.scrollToIndex(
     (native.asDynamic().__ROCK__controller as RecyclerController).jump(index, align ?: Align.Center)
 }
 
+actual val RecyclerView.firstVisibleIndex: Readable<Int>
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController).firstVisible
+
+actual val RecyclerView.lastVisibleIndex: Readable<Int>
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController).lastVisible
 
 
 
@@ -233,6 +238,8 @@ class RecyclerController(
 
 
     var dataCopy = Property<List<*>>(listOf<Any?>())
+    val firstVisible = Property(0)
+    val lastVisible = Property(0)
     var firstIndex = 0
     var lastIndex = -1
     var minIndex = -40
@@ -364,7 +371,7 @@ class RecyclerController(
 //            return
 //        }
         if (suppress) {
-            return
+            return Unit
         }
         suppress = true
         val outerBounds = root.getBoundingClientRect()
@@ -548,6 +555,7 @@ class RecyclerController(
         }
 //        println("After edge processing: $scrollStart")
 
+
         // Adjust offset
         if (scrollAmount != 0.0) {
 //            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
@@ -556,11 +564,20 @@ class RecyclerController(
         }
         suppress = false
 //                suppressNext = true
+
+        (0..<children.length).firstOrNull { index ->
+            val child = children.get(index) as? org.w3c.dom.HTMLElement ?: return@firstOrNull false
+            val bounds = child.getBoundingClientRect()
+            bounds.start >= outerBounds.start
+        }?.plus(firstIndex)?.let {
+            if(it != firstVisible.value) firstVisible.value = it
+        }
+        (children.length-1 downTo 0).firstOrNull { index ->
+            val child = children.get(index) as? org.w3c.dom.HTMLElement ?: return@firstOrNull false
+            val bounds = child.getBoundingClientRect()
+            bounds.end <= outerBounds.end
+        }?.plus(firstIndex)?.let {
+            if(it != lastVisible.value) lastVisible.value = it
+        }
     }
 }
-
-actual val RecyclerView.firstVisibleIndex: Readable<Int>
-    get() = TODO("Not yet implemented")
-
-actual val RecyclerView.lastVisibleIndex: Readable<Int>
-    get() = TODO("Not yet implemented")

@@ -2,10 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.objc.UICollectionViewFlowLayout2Protocol
-import com.lightningkite.rock.reactive.BasicListenable
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.Writable
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CValue
@@ -52,10 +49,8 @@ actual fun ViewWriter.viewPager(setup: ViewPager.() -> Unit) = element(
 
 @OptIn(ExperimentalForeignApi::class)
 actual val ViewPager.index: Writable<Int>
-    get() = object: Writable<Int> {
-        var last = native.indexPathForItemAtPoint(native.frame.useContents { CGPointMake(size.width / 2, size.height / 2) })?.row?.toInt() ?:  0
-
-        override suspend fun set(value: Int) {
+    get() = ((native.delegate as? GeneralCollectionDelegate<*>)?.centerIndex ?: Constant(0))
+        .withWrite { value ->
             if(value in 0..<native.numberOfItemsInSection(0L)) {
                 native.scrollToItemAtIndexPath(
                     NSIndexPath.indexPathForRow(value.toLong(), 0L),
@@ -64,38 +59,6 @@ actual val ViewPager.index: Writable<Int>
                 )
             }
         }
-
-        override suspend fun awaitRaw(): Int {
-            val current = native.indexPathForItemAtPoint(native.frame.useContents { CGPointMake(size.width / 2, size.height / 2) })?.row?.toInt() ?:  0
-            last = current
-            return current
-        }
-
-        private val listeners = ArrayList<() -> Unit>()
-        private var parentListener: (()->Unit)? = null
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            if(listeners.isEmpty()) {
-                parentListener = (native.delegate as? GeneralCollectionDelegate<*>)?.onScroll?.addListener {
-                    val current = native.indexPathForItemAtPoint(native.frame.useContents { CGPointMake(size.width / 2, size.height / 2) })?.row?.toInt() ?:  0
-                    if(last != current) {
-                        last = current
-                        listeners.toList().forEach { it() }
-                    }
-                } ?: {}
-            }
-            listeners.add(listener)
-            return  {
-                val pos = listeners.indexOfFirst { it === listener }
-                if(pos != -1) {
-                    listeners.removeAt(pos)
-                }
-                if(listeners.isEmpty()) {
-                    parentListener?.invoke()
-                    parentListener = null
-                }
-            }
-        }
-    }
 
 @OptIn(ExperimentalForeignApi::class)
 class ViewPagerLayout(): UICollectionViewFlowLayout(), UICollectionViewFlowLayout2Protocol {

@@ -91,6 +91,13 @@ object RecyclerViewScreen : RockScreen {
                     }
                 }
             } in weight(1f)
+            row {
+                text {
+                    ::content {
+                        "Min: ${recyclerView!!.firstVisibleIndex.await()}, Max: ${recyclerView!!.lastVisibleIndex.await()}"
+                    }
+                }
+            }
 //            horizontalRecyclerView {
 //                children(items) {
 //                    text { ::content { "Item ${it.await()}" } }

@@ -20,15 +20,11 @@ fun <T : HTMLElement, V> T.vprop(
         override suspend fun set(value: V) {
             set(this@vprop, value)
         }
-
-        private var block = false
-
         override fun addListener(listener: () -> Unit): () -> Unit {
             val callback: (Event) -> Unit = { listener() }
             this@vprop.addEventListener(eventName, callback)
             return { this@vprop.removeEventListener(eventName, callback) }
         }
-
     }
 }
 

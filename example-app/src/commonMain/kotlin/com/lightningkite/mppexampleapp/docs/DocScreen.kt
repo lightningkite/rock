@@ -5,7 +5,8 @@ import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.FontAndStyle
 import com.lightningkite.rock.models.systemDefaultFixedWidthFont
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
+import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
@@ -15,6 +16,17 @@ interface DocScreen: RockScreen {
 
 val ViewWriter.code: ViewWrapper get() = tweakTheme {
     it.copy(body = FontAndStyle(font = systemDefaultFixedWidthFont))
+}
+
+fun ViewWriter.example(
+    codeText: String,
+    action: ViewWriter.()->Unit
+) {
+    card - row {
+        expanding - scrollsHorizontally - code - text(codeText)
+        separator()
+        expanding - action()
+    }
 }
 
 @Routable("docs/screen")
@@ -43,37 +55,30 @@ object DataScreen: DocScreen {
             counter.value = 0
 
             text("Anyone who listens to the property will be notified when the value changes.  Now, how do we observe it?  We can use what's called a reactive scope:")
-            card - row {
-                expanding - code - text("""
-                    text {
-                        reactiveScope { content = "The current counter value is ${'$'}{counter.await()}" }
-                    }
-                """.trimIndent())
-                separator()
-                expanding - stack {
-                    text {
-                        reactiveScope { content = "The current counter value is ${counter.await()}" }
-                    }
+            example("""
+                text {
+                    reactiveScope { content = "The current counter value is ${'$'}{counter.await()}" }
+                }
+                """.trimIndent()) {
+                text {
+                    reactiveScope { content = "The current counter value is ${counter.await()}" }
                 }
             }
 
             text("Now, a button to increment it:")
-            card - row {
-                expanding - code - text("""
+            example("""
                 important - button {
                     text("Increment the counter")
                     onClick { counter.value++ }
                 }
-                """.trimIndent())
-                separator()
-                expanding - stack {
-                    important - button {
-                        text("Increment the counter")
-                        onClick { counter.value++ }
-                    }
+                """.trimIndent()) {
+                important - button {
+                    text("Increment the counter")
+                    onClick { counter.value++ }
                 }
             }
         }
     }
 
 }
+

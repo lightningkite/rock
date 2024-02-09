@@ -12,7 +12,18 @@ actual fun NView.listNViews(): List<NView> {
     return subviews.map { it as UIView }
 }
 
+var animationsEnabled: Boolean = true
 actual inline fun NView.withoutAnimation(action: () -> Unit) {
+    if(!animationsEnabled) {
+        action()
+        return
+    }
+    try {
+        animationsEnabled = false
+        action()
+    } finally {
+        animationsEnabled = true
+    }
 }
 
 actual fun NView.scrollIntoView(

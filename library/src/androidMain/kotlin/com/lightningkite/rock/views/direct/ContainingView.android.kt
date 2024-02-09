@@ -1,13 +1,13 @@
 package com.lightningkite.rock.views.direct
 
 import android.animation.LayoutTransition
+import android.content.Context
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
+import androidx.appcompat.widget.LinearLayoutCompat
 import com.lightningkite.rock.models.LinearGradient
-import com.lightningkite.rock.views.AndroidAppContext
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 
@@ -25,9 +25,9 @@ actual fun ViewWriter.stack(setup: ContainingView.() -> Unit) = viewElement(
 
 @ViewDsl
 actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
-    viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
-        val l = native as LinearLayout
-        l.orientation = LinearLayout.VERTICAL
+    viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
+        val l = native as LinearLayoutCompat
+        l.orientation = LinearLayoutCompat.VERTICAL
         l.gravity = Gravity.CENTER_HORIZONTAL
         l.setLayoutTransition(LayoutTransition())
         handleTheme(l, viewDraws = false)
@@ -37,9 +37,9 @@ actual fun ViewWriter.col(setup: ContainingView.() -> Unit) {
 
 @ViewDsl
 actual fun ViewWriter.row(setup: ContainingView.() -> Unit) {
-    viewElement(factory = ::LinearLayout, wrapper = ::ContainingView) {
-        val l = native as LinearLayout
-        l.orientation = LinearLayout.HORIZONTAL
+    viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
+        val l = native as LinearLayoutCompat
+        l.orientation = LinearLayoutCompat.HORIZONTAL
         l.gravity = Gravity.CENTER_VERTICAL
         l.setLayoutTransition(LayoutTransition())
         handleTheme(l, viewDraws = false)
@@ -54,5 +54,16 @@ private fun LinearGradient.orientation(): GradientDrawable.Orientation {
         in 181..270 -> GradientDrawable.Orientation.RIGHT_LEFT
         in 271..360 -> GradientDrawable.Orientation.BOTTOM_TOP
         else -> GradientDrawable.Orientation.LEFT_RIGHT
+    }
+}
+
+class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context) {
+    override fun generateDefaultLayoutParams(): LayoutParams? {
+        if (orientation == HORIZONTAL) {
+            return LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
+        } else if (orientation == VERTICAL) {
+            return LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        }
+        return null
     }
 }

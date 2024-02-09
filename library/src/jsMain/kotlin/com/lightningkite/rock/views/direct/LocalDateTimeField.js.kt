@@ -29,7 +29,7 @@ actual val LocalDateField.content: Writable<LocalDate?>
                 ?.date
         },
         set = {
-            native.valueAsDate = it?.let { LocalDateTime(it, LocalTime(12, 0, 0)).toInstant(TimeZone.currentSystemDefault()) }
+            native.valueAsDate = it?.let { LocalDateTime(it, LocalTime(12, 0, 0)).toInstant(TimeZone.UTC).toJSDate() }
         }
     )
 actual var LocalDateField.action: Action?
@@ -69,12 +69,12 @@ actual val LocalTimeField.content: Writable<LocalTime?>
         "input",
         {
             (native.valueAsDate as? Date)?.toKotlinInstant()?.toLocalDateTime(
-                TimeZone.currentSystemDefault()
+                TimeZone.UTC
             )?.time
         },
         {
             valueAsDate =
-                it?.let { LocalDateTime(LocalDate(1970, 1, 1), it).toInstant(TimeZone.currentSystemDefault()) }
+                it?.let { LocalDateTime(LocalDate(1970, 1, 1), it).toInstant(TimeZone.UTC).toJSDate() }
         }
     )
 actual var LocalTimeField.action: Action?
@@ -114,11 +114,11 @@ actual val LocalDateTimeField.content: Writable<LocalDateTime?>
         "input",
         {
             (native.valueAsDate as? Date)?.toKotlinInstant()?.toLocalDateTime(
-                TimeZone.currentSystemDefault()
+                TimeZone.UTC
             )
         },
         {
-            valueAsDate = it?.let { it.toInstant(TimeZone.currentSystemDefault()) }
+            valueAsDate = it?.let { it.toInstant(TimeZone.UTC).toJSDate() }
         }
     )
 actual var LocalDateTimeField.action: Action?

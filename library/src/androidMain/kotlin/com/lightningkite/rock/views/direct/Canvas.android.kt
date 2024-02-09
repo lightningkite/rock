@@ -33,9 +33,7 @@ actual class NCanvas @JvmOverloads constructor(
         }
 
     init {
-        println("NCanvas init")
         setWillNotDraw(false)
-
     }
 
 //    var accessibilityView: View? = null

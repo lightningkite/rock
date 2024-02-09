@@ -762,6 +762,17 @@ object DynamicCSS {
         style(".contentScroll > *", mapOf(
             "overflow-anchor" to "revert",
         ))
+        style(".viewPager", mapOf(
+            "overflow-x" to "scroll",
+            "scroll-snap-type" to "x mandatory",
+            "display" to "flex",
+            "flex-direction" to "row",
+        ))
+        style(".viewPager > *", mapOf(
+            "width" to "100%",
+            "height" to "100%",
+            "scroll-snap-align" to "center",
+        ))
     }
 
     fun rule(rule: String, index: Int = 0): Int {

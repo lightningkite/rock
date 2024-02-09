@@ -41,16 +41,13 @@ object LayoutExamplesScreen : RockScreen {
                 row {
                     val aligns = listOf(Align.Start, Align.Center, Align.End)
                     for (v in aligns) {
-                        text { content = "$v" } in gravity(Align.Stretch, v)
+                        gravity(Align.Stretch, v) - text { content = "$v" }
                     }
-                    stack {
-                        text { content = "Weight 1" } in gravity(
-                            Align.Center,
-                            Align.Center
-                        )
-                    } in weight(1f)
+                    expanding - card - stack {
+                        centered - text { content = "Expanding" }
+                    }
                     for (v in aligns) {
-                        text { content = "$v" } in gravity(Align.Stretch, v)
+                        gravity(Align.Stretch, v) - text { content = "$v" }
                     }
                 } in sizedBox(SizeConstraints(minHeight = 200.px))
             } in card

@@ -19,9 +19,19 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews()
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
+    private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, sizeCache)
+    override fun didAddSubview(subview: UIView) {
+        super.didAddSubview(subview)
+        sizeCache.clear()
+    }
+    override fun willRemoveSubview(subview: UIView) {
+        // Fixes a really cursed crash where "this" is null
+        this?.sizeCache?.clear()
+        super.willRemoveSubview(subview)
+    }
 
     val toolbar = UIToolbar().apply {
         barStyle = UIBarStyleDefault

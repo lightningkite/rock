@@ -3,6 +3,7 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.delay
+import com.lightningkite.rock.locale.renderToString
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
@@ -167,6 +168,11 @@ object ControlsScreen : RockScreen {
             col {
                 val date = Property<LocalDate?>(null)
                 h2 { content = "Date Fields" }
+                text { ::content { date.await()?.renderToString() ?: "Not Selected" }}
+                button {
+                    text("Set to now")
+                    onClick { date set Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date }
+                }
                 localDateField { content bind date }
                 localDateField { content bind date } in card
                 localDateField { content bind date } in important
@@ -176,6 +182,11 @@ object ControlsScreen : RockScreen {
             col {
                 val date = Property<LocalTime?>(null)
                 h2 { content = "Time Fields" }
+                text { ::content { date.await()?.renderToString() ?: "Not Selected" }}
+                button {
+                    text("Set to now")
+                    onClick { date set Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).time }
+                }
                 localTimeField { content bind date }
                 localTimeField { content bind date } in card
                 localTimeField { content bind date } in important
@@ -185,6 +196,11 @@ object ControlsScreen : RockScreen {
             col {
                 val date = Property<LocalDateTime?>(null)
                 h2 { content = "Date Time Fields" }
+                text { ::content { date.await()?.renderToString() ?: "Not Selected" }}
+                button {
+                    text("Set to now")
+                    onClick { date set Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()) }
+                }
                 localDateTimeField { content bind date }
                 localDateTimeField { content bind date } in card
                 localDateTimeField { content bind date } in important

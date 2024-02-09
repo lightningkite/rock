@@ -19,20 +19,23 @@ import kotlin.math.max
 
 @OptIn(ExperimentalForeignApi::class)
 class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
-
-
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
-    var debugDescriptionInfo: String = ""
-    var debugDescriptionInfo2: String = ""
-    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size).also {
-        debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + it.useContents { "${width.toInt()} x ${height.toInt()}" }
+    private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, sizeCache)
+    override fun didAddSubview(subview: UIView) {
+        super.didAddSubview(subview)
+        sizeCache.clear()
     }
-    override fun layoutSubviews() = frameLayoutLayoutSubviews()
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view)
+    override fun willRemoveSubview(subview: UIView) {
+        // Fixes a really cursed crash where "this" is null
+        this?.sizeCache?.clear()
+        super.willRemoveSubview(subview)
+    }
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
         return super.hitTest(point, withEvent).takeUnless { it == this }

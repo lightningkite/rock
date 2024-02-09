@@ -6,6 +6,7 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.navigation.RockScreen
+import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
@@ -21,25 +22,23 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class NativeLink: UIButton(CGRectZero.readValue()) {
+class NativeLink: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
-//    val debugLayer = CATextLayer().apply {
-//        layer.addSublayer(this)
-//        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
-//        fontSize = 8.0
-//        foregroundColor = UIColor.redColor.CGColor
-//    }
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
-        return frameLayoutSizeThatFits(size).also {
-//        if(debugMeasuring) debugLayer.string = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + it.useContents { "${width.toInt()} x ${height.toInt()}" }
+    private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, sizeCache)
+    override fun didAddSubview(subview: UIView) {
+        super.didAddSubview(subview)
+        sizeCache.clear()
     }
-    }
-
-    override fun layoutSubviews() {
-        frameLayoutLayoutSubviews()
+    override fun willRemoveSubview(subview: UIView) {
+        // Fixes a really cursed crash where "this" is null
+        this?.sizeCache?.clear()
+        super.willRemoveSubview(subview)
     }
 
     var toScreen: RockScreen? = null

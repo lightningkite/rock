@@ -7,11 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.reactive.LateInitProperty
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.reactiveScope
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 
@@ -22,7 +20,13 @@ actual class NRecyclerView(context: Context) : AndroidRecyclerView(context) {
 }
 
 actual fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>) -> Unit): Unit {
-    native.adapter = object : ObservableRVA<T>(this, 5, { 0 }, { _, obs -> render(obs) }) {
+    native.adapter = object : ObservableRVA<T>(
+        viewWriter = native.viewWriter,
+        calculationContext = native.calculationContext,
+        layoutManager = native.layoutManager,
+        placeholderCount = 5,
+        determineType = { 0 },
+        makeView = { _, obs -> render(obs) }) {
         init {
             native.calculationContext.reactiveScope(onLoad = {
                 loading = true
@@ -102,13 +106,17 @@ actual var RecyclerView.columns: Int
 
 
 internal open class ObservableRVA<T>(
-    val recyclerView: RecyclerView,
+    val viewWriter: ViewWriter,
+    val calculationContext: CalculationContext,
+    val layoutManager: LayoutManager?,
     val placeholderCount: Int = 5,
     val determineType: (T) -> Int,
     val makeView: ViewWriter.(Int, Readable<T>) -> Unit
 ) : AndroidRecyclerView.Adapter<AndroidRecyclerView.ViewHolder>() {
+    interface ParentView {
+    }
+
     var lastPublished: List<T> = listOf()
-    val viewWriter = recyclerView.native.viewWriter
     var loading: Boolean = false
 
     override fun getItemViewType(position: Int): Int {
@@ -123,13 +131,13 @@ internal open class ObservableRVA<T>(
         }
         val subview = viewWriter.rootCreated!!
         subview.layoutParams = AndroidRecyclerView.LayoutParams(
-            if ((recyclerView.native.layoutManager as? LinearLayoutManager)?.orientation == LinearLayoutManager.VERTICAL)
+            if ((layoutManager as? LinearLayoutManager)?.orientation != LinearLayoutManager.HORIZONTAL)
                 AndroidRecyclerView.LayoutParams.MATCH_PARENT else AndroidRecyclerView.LayoutParams.WRAP_CONTENT,
-            if ((recyclerView.native.layoutManager as? LinearLayoutManager)?.orientation == LinearLayoutManager.HORIZONTAL)
+            if ((layoutManager as? LinearLayoutManager)?.orientation != LinearLayoutManager.VERTICAL)
                 AndroidRecyclerView.LayoutParams.MATCH_PARENT else AndroidRecyclerView.LayoutParams.WRAP_CONTENT,
         )
         subview.tag = event
-        recyclerView.native.calculationContext.onRemove { subview.shutdown() }
+        calculationContext.onRemove { subview.shutdown() }
         return object : AndroidRecyclerView.ViewHolder(subview) {}
     }
 

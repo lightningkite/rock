@@ -68,8 +68,8 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
                     if (horizontal) remainingPrimary else remaining.secondary,
                     if (horizontal) remaining.secondary else remainingPrimary
                 ),
-                null
-//                it.extensionSizeConstraints
+//                null,
+                it.extensionSizeConstraints,
             ).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
@@ -102,7 +102,10 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         val view = mainSubview ?: run {
             return
         }
-        var size = calcSizes(frame.useContents { size.local }, false)
+        var size = calcSizes(frame.useContents { this.size.local }, true)
+        if(size.primary >= 9999.0) {
+            size = calcSizes(frame.useContents { this.size.local }, false)
+        }
         val m = view.extensionMargin ?: 0.0
         val ps = primary + m
         val a = view.secondaryAlign ?: Align.Stretch

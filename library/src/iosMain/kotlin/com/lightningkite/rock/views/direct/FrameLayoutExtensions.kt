@@ -13,10 +13,10 @@ import kotlin.math.max
 
 
 @OptIn(ExperimentalForeignApi::class)
-fun UIView.frameLayoutLayoutSubviews() {
+fun UIView.frameLayoutLayoutSubviews(sizeCache: MutableMap<Size, List<Size>>) {
     val mySize = bounds.useContents { size.local }
     var padding = extensionPadding ?: 0.0
-    subviews.zip(frameLayoutCalcSizes(frame.useContents { size.local })) { view, size ->
+    subviews.zip(frameLayoutCalcSizes(frame.useContents { size.local }, sizeCache)) { view, size ->
         view as UIView
         if (view.hidden) return@zip
         val m = view.extensionMargin ?: 0.0
@@ -53,11 +53,11 @@ fun UIView.frameLayoutLayoutSubviews() {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
+fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>, sizeCache: MutableMap<Size, List<Size>>): CValue<CGSize> {
     val size = size.local
     val measuredSize = Size()
 
-    val sizes = frameLayoutCalcSizes(size)
+    val sizes = frameLayoutCalcSizes(size, sizeCache)
     val padding = extensionPadding ?: 0.0
     for (size in sizes) {
         measuredSize.width = max(measuredSize.width, size.width + padding * 2 + size.margin * 2)
@@ -68,7 +68,7 @@ fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
+private fun UIView.frameLayoutCalcSizes(size: Size, sizeCache: MutableMap<Size, List<Size>>): List<Size> = sizeCache.getOrPut(size) {
     val padding = extensionPadding ?: 0.0
 //        let size = padding.shrinkSize(size)
 //    val remaining = size.copy()
@@ -99,8 +99,9 @@ private fun UIView.frameLayoutCalcSizes(size: Size): List<Size> {
     }
 }
 
-fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?) {
+fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?, sizeCache: MutableMap<Size, List<Size>>) {
     val it = child ?: return
+    sizeCache.clear()
 //    if(it.hidden) return
 //    if(
 //        it.extensionHorizontalAlign.let { it == null || it == Align.Stretch} &&

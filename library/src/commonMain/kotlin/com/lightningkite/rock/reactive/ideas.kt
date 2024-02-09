@@ -104,6 +104,22 @@ class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
 }
 
+class BasicListenable: Listenable {
+    private val listeners = ArrayList<() -> Unit>()
+    override fun addListener(listener: () -> Unit): () -> Unit {
+        listeners.add(listener)
+        return {
+            val pos = listeners.indexOfFirst { it === listener }
+            if(pos != -1) {
+                listeners.removeAt(pos)
+            }
+        }
+    }
+    fun invokeAll() {
+        listeners.toList().forEach { it() }
+    }
+}
+
 class Constant<T>(val value: T) : Readable<T> {
     companion object {
         private val NOOP = {}

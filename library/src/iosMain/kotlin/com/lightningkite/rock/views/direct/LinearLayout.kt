@@ -19,6 +19,7 @@ import kotlin.math.max
 
 @OptIn(ExperimentalForeignApi::class)
 class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
+    private val sizeCache = HashMap<Pair<Size, Boolean>, List<Size>>()
     var horizontal: Boolean = true
     var padding: Double
         get() = extensionPadding ?: 0.0
@@ -46,6 +47,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 //        if(it.extensionWeight != null && it.extensionWeight!! > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
 //            return
 //        }
+        sizeCache.clear()
         informParentOfSizeChange()
     }
 
@@ -78,7 +80,18 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         return measuredSize.objc
     }
 
-    fun calcSizes(size: Size, includeWeighted: Boolean): List<Size> {
+    override fun didAddSubview(subview: UIView) {
+        super.didAddSubview(subview)
+        sizeCache.clear()
+    }
+
+    override fun willRemoveSubview(subview: UIView) {
+        // Fixes a really cursed crash where "this" is null
+        this?.sizeCache?.clear()
+        super.willRemoveSubview(subview)
+    }
+
+    fun calcSizes(size: Size, includeWeighted: Boolean): List<Size> = sizeCache.getOrPut(size to includeWeighted) {
 //        let size = padding.shrinkSize(size)
         val remaining = size.copy()
         remaining.primary -= padding * 2

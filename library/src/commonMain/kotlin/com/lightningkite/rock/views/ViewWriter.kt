@@ -29,11 +29,13 @@ class ViewWriter(
      * Creates a copy of the [ViewWriter] with the current view as its root.
      * Used for view containers that need their contents removed and replaced later.
      */
-    fun split(): ViewWriter = ViewWriter(stack.last(), startDepth = depth).also {
+    fun split(): ViewWriter = ViewWriter(stack.last(), context = context, startDepth = depth).also {
         it.addons.putAll(this.addons)
         it.currentTheme = currentTheme
+        it.lastTheme = lastTheme
         it.isRoot = isRoot
         it.transitionNextView = transitionNextView
+        it.includePaddingAtStackEmpty = includePaddingAtStackEmpty
         it.changedThemes = changedThemes
     }
 
@@ -41,11 +43,13 @@ class ViewWriter(
      * Creates a copy of the [ViewWriter] with no root view.
      * Used for view containers that need their contents removed and replaced later.
      */
-    fun newViews(): ViewWriter = ViewWriter(null, context = currentView.nContext, startDepth = depth).also {
+    fun newViews(): ViewWriter = ViewWriter(null, context = context, startDepth = depth).also {
         it.addons.putAll(this.addons)
         it.currentTheme = currentTheme
+        it.lastTheme = lastTheme
         it.isRoot = isRoot
         it.transitionNextView = transitionNextView
+        it.includePaddingAtStackEmpty = includePaddingAtStackEmpty
         it.changedThemes = changedThemes
     }
 
@@ -53,15 +57,17 @@ class ViewWriter(
      * Creates a copy of the [ViewWriter] with no root view.
      * Used for view containers that need their contents removed and replaced later.
      */
-    fun targeting(view: NView): ViewWriter = ViewWriter(view, startDepth = depth).also {
+    fun targeting(view: NView): ViewWriter = ViewWriter(view, context = context, startDepth = depth).also {
         it.addons.putAll(this.addons)
         it.currentTheme = currentTheme
+        it.lastTheme = lastTheme
         it.isRoot = isRoot
         it.transitionNextView = transitionNextView
+        it.includePaddingAtStackEmpty = includePaddingAtStackEmpty
         it.changedThemes = changedThemes
     }
 
-    private val stack = if (parent == null) arrayListOf() else arrayListOf(parent)
+    val stack = if (parent == null) arrayListOf() else arrayListOf(parent)
     val currentView: NView get() = stack.last()
     private inline fun <T : NView> stackUse(item: T, action: T.() -> Unit) =
         CalculationContextStack.useIn(item.calculationContext) {
@@ -73,15 +79,19 @@ class ViewWriter(
             }
         }
 
+    var lastTheme: suspend () -> Theme = { MaterialLikeTheme() }
     var currentTheme: suspend () -> Theme = { MaterialLikeTheme() }
     inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend () -> Theme) -> Theme, action: () -> T): T {
         val old = currentTheme
         changedThemes = true
+        val oldold = lastTheme
+        lastTheme = old
         currentTheme = { calculate(old) }
         try {
             return action()
         } finally {
             currentTheme = old
+            lastTheme = oldold
         }
     }
 
@@ -89,9 +99,12 @@ class ViewWriter(
     inline fun ViewWriter.themeModifier(crossinline calculate: suspend (suspend () -> Theme) -> Theme): ViewWrapper {
         val old = currentTheme
         changedThemes = true
+        val oldold = lastTheme
+        lastTheme = old
         currentTheme = { calculate(old) }
         afterNextElementSetup {
             currentTheme = old
+            lastTheme = oldold
         }
         return ViewWrapper
     }
@@ -108,6 +121,8 @@ class ViewWriter(
     var transitionNextView: TransitionNextView = TransitionNextView.No
     var changedThemes: Boolean = false
     var isRoot: Boolean = true
+    var includePaddingAtStackEmpty = false
+    val stackEmpty: Boolean get() = stack.isEmpty()
 
     val calculationContext: CalculationContext get() = stack.last().calculationContext
 

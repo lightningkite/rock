@@ -9,14 +9,18 @@ actual typealias NSwapView = FrameLayout
 
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) = element(FrameLayout()) {
-    extensionViewWriter = this@swapView.split()
+    extensionViewWriter = this@swapView.newViews().also {
+        it.includePaddingAtStackEmpty = true
+    }
     handleTheme(this, viewDraws = false)
     setup(SwapView(this))
 }
 
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element(FrameLayout()) {
-    extensionViewWriter = this@swapViewDialog.split()
+    extensionViewWriter = this@swapViewDialog.newViews().also {
+        it.includePaddingAtStackEmpty = true
+    }
     handleTheme(this, viewDraws = false)
     hidden = true
     setup(SwapView(this))
@@ -24,8 +28,11 @@ actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
     native.withoutAnimation {
-        native.clearNViews()
         createNewView(native.extensionViewWriter!!)
-        native.hidden = native.subviews.all { (it as UIView).hidden }
     }
+    native.clearNViews()
+    native.extensionViewWriter!!.rootCreated?.let {
+        native.addNView(it)
+    }
+    native.hidden = native.subviews.all { (it as UIView).hidden }
 }

@@ -18,7 +18,7 @@ actual class NSwapView(context: Context): FrameLayout(context) {
 @ViewDsl
 actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
     return viewElement(factory = ::NSwapView, wrapper = ::SwapView, setup = {
-        native.viewWriter = newViews()
+        native.viewWriter = newViews().also { it.includePaddingAtStackEmpty = true }
         setup(this)
     })
 }
@@ -26,7 +26,7 @@ actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit) {
     return viewElement(factory = ::NSwapView, wrapper = ::SwapView, setup = {
-        native.viewWriter = newViews()
+        native.viewWriter = newViews().also { it.includePaddingAtStackEmpty = true }
         native.visibility = View.GONE
         setup(this)
     })
@@ -45,7 +45,10 @@ actual fun SwapView.swap(
         animationsEnabled = true
     }
     val newView = native.viewWriter.rootCreated
-    newView?.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,  ViewGroup.LayoutParams.MATCH_PARENT)
+    newView?.layoutParams = newView?.layoutParams?.also {
+        it.width = ViewGroup.LayoutParams.MATCH_PARENT
+        it.height = ViewGroup.LayoutParams.MATCH_PARENT
+    } ?: FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     TransitionManager.beginDelayedTransition(native, TransitionSet().apply {
         oldView?.let { transition.exit?.addTarget(it) }
         newView?.let { transition.enter?.addTarget(it) }

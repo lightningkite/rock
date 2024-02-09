@@ -4,9 +4,6 @@ package com.lightningkite.rock.views.direct
 
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
-import android.graphics.Canvas
-import android.graphics.ColorFilter
-import android.graphics.PixelFormat
 import android.graphics.Typeface
 import android.graphics.drawable.*
 import android.view.View
@@ -20,7 +17,6 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
-import kotlin.collections.set
 import kotlin.math.roundToInt
 import android.widget.TextView as AndroidTextView
 import com.lightningkite.rock.models.Paint as RockPaint
@@ -153,9 +149,13 @@ inline fun <T : NView> ViewWriter.handleTheme(
     val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
     val currentTheme = currentTheme
+    val parentTheme = lastTheme
     val isRoot = isRoot
     this.isRoot = false
+    val changedThemes = changedThemes
+    this.changedThemes = false
     var animator: ValueAnimator? = null
+    val parentIsSwap = includePaddingAtStackEmpty && stack.size == 1
 
     view.calculationContext.reactiveScope {
         val theme = currentTheme()
@@ -171,12 +171,17 @@ inline fun <T : NView> ViewWriter.handleTheme(
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
         val usePadding = mightTransition && !isRoot || viewForcePadding
-        val useMargins = (viewDraws || mightTransition) && !viewMarginless
+        val useMargins = (viewDraws || parentIsSwap || mightTransition) && !viewMarginless
 
         val borders = !viewMarginless
 
+        if(parentIsSwap) println("parentIsSwap! ${useMargins}")
         if (useMargins) {
-            view.setMarginAll(theme.spacing.value.toInt())
+            if(changedThemes) {
+                view.setMarginAll(parentTheme().spacing.value.toInt())
+            } else {
+                view.setMarginAll(theme.spacing.value.toInt())
+            }
         } else {
             view.setMarginAll(0)
         }

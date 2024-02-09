@@ -19,7 +19,7 @@ import platform.objc.*
 @OptIn(BetaInteropApi::class, ExperimentalForeignApi::class)
 fun UIViewController.setup(app: ViewWriter.()->Unit) {
     ExternalServices.currentPresenter = { presentViewController(it, animated = true, completion = null) }
-    val writer = ViewWriter(this.view)
+    val writer = ViewWriter(this.view, context = this)
     writer.app()
     val subview = view.subviews.first() as UIView
     subview.translatesAutoresizingMaskIntoConstraints = false

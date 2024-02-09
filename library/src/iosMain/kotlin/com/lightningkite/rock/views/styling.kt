@@ -27,8 +27,12 @@ fun ViewWriter.handleTheme(
     val transition = transitionNextView
     transitionNextView = ViewWriter.TransitionNextView.No
     val currentTheme = currentTheme
+    val parentTheme = lastTheme
     val isRoot = isRoot
     this.isRoot = false
+    val changedThemes = changedThemes
+    this.changedThemes = false
+    val parentIsSwap = includePaddingAtStackEmpty && stack.size == 1
 
     var firstTime = true
     inline fun animateAfterFirst(crossinline action: () -> Unit) {
@@ -56,12 +60,16 @@ fun ViewWriter.handleTheme(
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
         val usePadding = mightTransition && !isRoot || viewForcePadding
-        val useMargins = (viewDraws || mightTransition) && !viewMarginless
+        val useMargins = (viewDraws || mightTransition || parentIsSwap) && !viewMarginless
 
         val borders = !viewMarginless
 
         if (useMargins) {
-            view.extensionMargin = theme.spacing.value
+            if (changedThemes) {
+                view.extensionMargin = parentTheme().spacing.value
+            } else {
+                view.extensionMargin = theme.spacing.value
+            }
         } else {
             view.extensionMargin = 0.0
         }

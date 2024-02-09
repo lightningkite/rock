@@ -99,6 +99,7 @@ actual val ViewWriter.scrolls: ViewWrapper
     get() {
         wrapNext(NestedScrollView(this.context)) {
             isFillViewport = true
+            handleTheme(this, viewDraws = false)
         }
         return ViewWrapper
     }
@@ -108,6 +109,7 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         wrapNext(HorizontalScrollView(this.context)) {
             isFillViewport = true
+            handleTheme(this, viewDraws = false)
         }
         return ViewWrapper
     }

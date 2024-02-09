@@ -34,6 +34,12 @@ class ImageRaw(val data: ByteArray) : ImageSource()
 class ImageLocal(val file: FileReference) : ImageSource()
 expect class ImageResource : ImageSource
 
+expect sealed class VideoSource()
+data class VideoRemote(val url: String) : VideoSource()
+class VideoRaw(val data: ByteArray) : VideoSource()
+class VideoLocal(val file: FileReference) : VideoSource()
+expect class VideoResource : VideoSource
+
 data class SizeConstraints(
     val minWidth: Dimension? = null,
     val maxWidth: Dimension? = null,

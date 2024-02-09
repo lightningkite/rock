@@ -12,7 +12,7 @@ actual typealias NImage = HTMLImageElement
 
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit): Unit =
-    themedElement<NImage>("img") { classList.add("tooltip"); setup(Image(this)) }
+    themedElement<NImage>("img") { setup(Image(this)) }
 
 actual inline var Image.source: ImageSource
     get() = TODO()

@@ -39,6 +39,9 @@ actual val systemDefaultFixedWidthFont: Font get() = Font("monospace")
 actual sealed class ImageSource actual constructor()
 actual class ImageResource(val relativeUrl: String) : ImageSource()
 
+actual sealed class VideoSource actual constructor()
+actual class VideoResource(val relativeUrl: String) : VideoSource()
+
 fun Dimension.toBoxShadow(): String {
     if (value == "0px")
         return "none"

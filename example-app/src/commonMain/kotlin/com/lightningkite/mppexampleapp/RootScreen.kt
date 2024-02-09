@@ -1,6 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.*
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.docs.VideoScreen
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.docs.ViewPagerScreen
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
@@ -48,6 +49,7 @@ object RootScreen : RockScreen {
                 } in card
 
                 linkScreen(PlatformSpecificScreen)
+                linkScreen(VideoScreen)
                 linkScreen(ViewPagerScreen)
                 linkScreen(TwoPaneTestScreen)
                 linkScreen(ThemesScreen)

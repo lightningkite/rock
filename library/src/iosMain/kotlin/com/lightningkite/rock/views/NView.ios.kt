@@ -158,3 +158,12 @@ actual fun NView.addNView(child: NView) {
 //    child.setTranslatesAutoresizingMaskIntoConstraints(false)
     this.addSubview(child)
 }
+
+actual typealias NContext = UIViewController
+actual val NView.nContext: NContext get() {
+    return nextResponder?.let {
+        if(it is UIViewController) it
+        else if(it is UIView) it.nContext
+        else throw IllegalStateException()
+    } ?: throw IllegalStateException()
+}

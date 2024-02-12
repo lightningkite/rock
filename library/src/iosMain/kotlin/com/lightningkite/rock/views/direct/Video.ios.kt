@@ -100,10 +100,14 @@ actual fun ViewWriter.video(setup: Video.() -> Unit): Unit = element(NVideo()) {
     setup(Video(this))
 }
 
-actual inline var Video.source: VideoSource
+actual inline var Video.source: VideoSource?
     get() = TODO()
     set(value) {
         when (value) {
+            null -> {
+                native.player = null
+                native.informParentOfSizeChange()
+            }
             is VideoRaw -> {
                 TODO()
             }

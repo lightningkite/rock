@@ -27,7 +27,7 @@ object DynamicCSS {
 
     init {
         // basis rules
-        style("*", mapOf("box-sizing" to "border-box", "line-height" to "unset", "overflow" to "hidden"))
+        style("*", mapOf("box-sizing" to "border-box", "line-height" to "unset", /*"overflow" to "hidden"*/))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
         style("h3", mapOf("font-size" to "1.4rem"))

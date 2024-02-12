@@ -15,6 +15,6 @@ value class Image(override val native: NImage) : RView<NImage>
 
 @ViewDsl
 expect fun ViewWriter.image(setup: Image.() -> Unit = {}): Unit
-expect var Image.source: ImageSource
+expect var Image.source: ImageSource?
 expect var Image.scaleType: ImageScaleType
 expect var Image.description: String?

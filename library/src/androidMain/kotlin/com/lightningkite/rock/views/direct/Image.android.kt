@@ -19,11 +19,14 @@ import timber.log.Timber
 
 actual typealias NImage = ImageView
 
-actual var Image.source: ImageSource
+actual var Image.source: ImageSource?
     get() = TODO()
     set(value) {
         native.tag = value
         when (value) {
+            null -> {
+                native.setImageDrawable(null)
+            }
             is ImageRaw -> {
                 val imageData = value.data
                 try {

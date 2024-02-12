@@ -19,10 +19,11 @@ actual fun ViewWriter.video(setup: Video.() -> Unit): Unit =
         setup(Video(this))
         controls = true
     }
-actual inline var Video.source: VideoSource
+actual inline var Video.source: VideoSource?
     get() = TODO()
     set(value) {
         when(value) {
+            null -> native.src = ""
             is VideoRemote -> native.src = value.url
             is VideoRaw -> native.src = URL.createObjectURL(Blob(arrayOf(value.data)))
             is VideoResource -> native.src = value.relativeUrl

@@ -38,7 +38,7 @@ actual inline var ExternalLink.newTab: Boolean
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NImage = HTMLElement
 @ViewDsl actual fun ViewWriter.image(setup: Image.() -> Unit): Unit = todo("image")
-actual inline var Image.source: ImageSource
+actual inline var Image.source: ImageSource?
     get() = TODO()
     set(value) { }
 actual inline var Image.scaleType: ImageScaleType

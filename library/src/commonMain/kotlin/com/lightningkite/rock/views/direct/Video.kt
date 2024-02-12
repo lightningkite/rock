@@ -15,6 +15,6 @@ value class Video(override val native: NVideo) : RView<NVideo>
 
 @ViewDsl
 expect fun ViewWriter.video(setup: Video.() -> Unit = {}): Unit
-expect var Video.source: VideoSource
+expect var Video.source: VideoSource?
 expect val Video.time: Writable<Double>
 expect val Video.playing: Writable<Boolean>

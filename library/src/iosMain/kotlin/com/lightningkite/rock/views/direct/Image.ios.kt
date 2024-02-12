@@ -23,10 +23,14 @@ actual fun ViewWriter.image(setup: Image.() -> Unit): Unit = element(NImage()) {
     setup(Image(this))
 }
 
-actual inline var Image.source: ImageSource
+actual inline var Image.source: ImageSource?
     get() = TODO()
     set(value) {
         when (value) {
+            null -> {
+                native.image = null
+                native.informParentOfSizeChange()
+            }
             is ImageRaw -> {
                 native.image = UIImage(data = value.data.toNSData())
                 native.informParentOfSizeChange()

@@ -17,6 +17,9 @@ actual fun ViewWriter.hasPopover(
             // TODO
         }
         style.position = "relative"
+        style.width = "fit-content"
+        style.height = "fit-content"
+        style.lineHeight = "0"
         element<HTMLDivElement>("div") {
             if (!requireClick) classList.add("visibleOnParentHover")
             style.position = "absolute"

@@ -14,10 +14,11 @@ actual typealias NImage = HTMLImageElement
 actual fun ViewWriter.image(setup: Image.() -> Unit): Unit =
     themedElement<NImage>("img") { setup(Image(this)) }
 
-actual inline var Image.source: ImageSource
+actual inline var Image.source: ImageSource?
     get() = TODO()
     set(value) {
         when (value) {
+            null -> native.src = ""
             is ImageRemote -> native.src = value.url
             is ImageRaw -> native.src = URL.createObjectURL(Blob(arrayOf(value.data)))
             is ImageResource -> native.src = value.relativeUrl

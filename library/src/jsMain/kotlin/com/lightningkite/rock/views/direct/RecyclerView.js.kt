@@ -7,6 +7,7 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.window
 import org.w3c.dom.*
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -415,12 +416,13 @@ class RecyclerController(
 //        println("Processing $scrollStart")
 
         // Handle huge scroll
-//        if (abs(scrollStart - lastDefaultPos) > (outerBounds.size + beyondEdge * 2) * 3 / 4) {
-//            scrollStart = scrollStart.coerceIn(
-//                lastDefaultPos - (outerBounds.size + beyondEdge * 2) * 3 / 4,
-//                lastDefaultPos + (outerBounds.size + beyondEdge * 2) * 3 / 4,
-//            )
-//        }
+        if (abs(scrollStart - lastDefaultPos) > (outerBounds.size + beyondEdge * 2) * 3 / 4) {
+            scrollStart = scrollStart.coerceIn(
+                lastDefaultPos - (outerBounds.size + beyondEdge * 2) * 3 / 4,
+                lastDefaultPos + (outerBounds.size + beyondEdge * 2) * 3 / 4,
+            )
+            println("Capping scroll")
+        }
         val beforeScroll = scrollStart
 
         var scrollAmount = 0.0
@@ -439,7 +441,7 @@ class RecyclerController(
                     scrollAmount += style.marginStart.removeSuffix("px").toInt()
                     scrollAmount += style.marginEnd.removeSuffix("px").toInt()
                     canRecycle.add(child)
-//                    println("Removing view from top because ${bounds.end} + ${margin} < ${outerBounds.start}")
+                    println("Removing view from top because ${bounds.end} + ${margin} < ${outerBounds.start}")
 //                    println("Scrolling ${scrollAmount}")
                     firstIndex += columns
                 } else {
@@ -457,32 +459,13 @@ class RecyclerController(
             if (bounds.start - margin > (outerBounds.end + beyondEdge) ) {
                 // We're scrolling up and this fell out the bottom
                 canRecycle.add(child)
-//                println("Removing view from bottom because ${bounds.start} - ${margin} > ${outerBounds.end}")
+                println("Removing view from bottom because ${bounds.start} - ${margin} > ${outerBounds.end}")
                 lastIndex -= columns
             } else {
                 break
             }
         }
-        // Handle top needs content
-        var neededOnTop = (children.get(0) as? org.w3c.dom.HTMLElement)?.let { child ->
-            val bounds = child.getBoundingClientRect()
-            val style = window.getComputedStyle(child)
-            val margin = style.marginStart.removeSuffix("px").toDouble()
-//            println("bounds.start - margin - outerBounds.start: ${bounds.start} - $margin - ${outerBounds.start}")
-            (bounds.start - margin - (outerBounds.start - beyondEdge)).coerceAtLeast(0.0)
-        } ?: 0.0
-        // Handle bottom needs content
-        var neededOnBottom = (contentCol.native.lastElementChild as? org.w3c.dom.HTMLElement)?.let { child ->
-            val bounds = child.getBoundingClientRect()
-            val style = window.getComputedStyle(child)
-            val margin = style.marginEnd.removeSuffix("px").toDouble()
-//            println("outerBounds.end - bounds.end - margin: ${outerBounds.end} - ${bounds.end} - $margin")
-            ((outerBounds.end + beyondEdge) - bounds.end - margin).coerceAtLeast(0.0)
-        } ?: (outerBounds.size + beyondEdge * 2)
 
-        // Add new elements
-        for (r in canRecycle) contentCol.native.removeChild(r)
-        reserved.addAll(canRecycle)
 
         fun makeElement(index: Int): HTMLElement {
             return if (reserved.isNotEmpty()) {
@@ -560,37 +543,53 @@ class RecyclerController(
             }
         }
 
+
+        // Handle top needs content
+        val neededOnTop = (children.get(0) as? org.w3c.dom.HTMLElement)?.let { child ->
+            val bounds = child.getBoundingClientRect()
+            val style = window.getComputedStyle(child)
+            val margin = style.marginStart.removeSuffix("px").toDouble()
+//            println("bounds.start - margin - outerBounds.start: ${bounds.start} - $margin - ${outerBounds.start}")
+            (bounds.start - margin - (outerBounds.start - beyondEdge)).coerceAtLeast(0.0)
+        } ?: 0.0
+        // Handle bottom needs content
+        val neededOnBottom = (contentCol.native.lastElementChild as? org.w3c.dom.HTMLElement)?.let { child ->
+            val bounds = child.getBoundingClientRect()
+            val style = window.getComputedStyle(child)
+            val margin = style.marginEnd.removeSuffix("px").toDouble()
+//            println("outerBounds.end - bounds.end - margin: ${outerBounds.end} - ${bounds.end} - $margin")
+            ((outerBounds.end + beyondEdge) - bounds.end - margin).coerceAtLeast(0.0)
+        } ?: (outerBounds.size + beyondEdge * 2)
+
+        // Add new elements
+        for (r in canRecycle) contentCol.native.removeChild(r)
+        reserved.addAll(canRecycle)
+
         // Append views at the bottom until the needed space is filled
-        println("lastIndex: $lastIndex < maxIndex: $maxIndex")
-        while (neededOnBottom > 1.0 && lastIndex < maxIndex) {
+        val startHeight1 = contentCol.native.getBoundingClientRect().height
+        while (neededOnBottom > contentCol.native.getBoundingClientRect().height - startHeight1 && lastIndex < maxIndex) {
             println("Appending view on bottom $neededOnBottom")
             lastIndex += columns
             val newElement = makeElement(lastIndex)
-//            println("Appending view")
             contentCol.native.appendChild(newElement)
-            neededOnBottom -= newElement.scrollSize
         }
 
         // Insert views on top until the needed space is filled
-        println("firstIndex: $firstIndex > minIndex: $minIndex")
-        while (neededOnTop > 1.0 && firstIndex > minIndex) {
+        val startHeight2 = contentCol.native.getBoundingClientRect().height
+        while (neededOnTop > contentCol.native.getBoundingClientRect().height - startHeight2 && firstIndex > minIndex) {
             println("Inserting view on top $neededOnTop")
             firstIndex -= columns
             val newElement = makeElement(firstIndex)
             contentCol.native.insertBefore(newElement, contentCol.native.firstChild)
-            val style = window.getComputedStyle(newElement)
-            scrollAmount -= newElement.scrollSize
-            scrollAmount -= style.marginStart.removeSuffix("px").toInt()
-            scrollAmount -= style.marginEnd.removeSuffix("px").toInt()
-            neededOnTop -= newElement.scrollSize
         }
+        scrollAmount -= contentCol.native.getBoundingClientRect().height - startHeight2
 
         // Handle scroll edges; we do this by altering the container size.
         // You can't just set scrollTop; it will have odd effects when pushing against the scroll edge
 //        println("Before edge processing: $scrollStart")
         lastDefaultPos = if (firstIndex <= minIndex && lastIndex >= maxIndex) {
             // cap both; go straight to native style
-            println("cap both; go straight to native style")
+//            println("cap both; go straight to native style")
             sizingContainer.style.size = "max-content"
             sizingContainer.style.position = "unset"
             contentCol.native.style.start = "-${0}px"
@@ -600,7 +599,7 @@ class RecyclerController(
             newDefaultPos
         } else if (firstIndex <= minIndex) {
             // cap top
-            println("cap top")
+//            println("cap top")
             sizingContainer.style.size = "${reservedScrollingSpace / 2}px"
             sizingContainer.style.position = "relative"
             contentCol.native.style.start = "-${0}px"
@@ -611,7 +610,7 @@ class RecyclerController(
             newDefaultPos
         } else if (lastIndex >= maxIndex) {
             // cap bottom
-            println("cap bottom")
+//            println("cap bottom")
             val h = contentCol.native.scrollSize
             sizingContainer.style.size = "${reservedScrollingSpace / 2 + h}px"
             sizingContainer.style.position = "relative"
@@ -622,7 +621,7 @@ class RecyclerController(
             newDefaultPos
         } else {
             // uncap
-            println("uncap")
+//            println("uncap")
             sizingContainer.style.size = "${reservedScrollingSpace}px"
             sizingContainer.style.position = "relative"
             contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
@@ -636,7 +635,7 @@ class RecyclerController(
 
         // Adjust offset
         if (scrollAmount != 0.0) {
-//            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
+            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
             scrollStart = beforeScroll - scrollAmount
             updateFakeScroll()
         }

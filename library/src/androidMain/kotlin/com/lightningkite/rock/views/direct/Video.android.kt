@@ -20,10 +20,14 @@ actual fun ViewWriter.video(setup: Video.() -> Unit): Unit = viewElement(factory
     native.player = ExoPlayer.Builder(context).build()
     setup(this)
 }
-actual inline var Video.source: VideoSource
+actual inline var Video.source: VideoSource?
     get() = TODO()
     set(value) {
         when(value) {
+            null -> {
+                native.player!!.stop()
+                native.player!!.clearMediaItems()
+            }
             is VideoRemote -> {
                 native.player!!.setMediaItem(MediaItem.fromUri(value.url))
                 native.player!!.prepare()

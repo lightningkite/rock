@@ -373,7 +373,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
                     Align.Center,
                     Align.Center
                 )
-            } in withDefaultPadding in hasPopover {
+            } in withDefaultPadding in hasPopover(preferredDirection = PopoverPreferredDirection.belowLeft) {
                 col {
                     navGroupColumn(appNav.userLinksProperty)
                 } in card

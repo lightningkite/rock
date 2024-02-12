@@ -1,6 +1,5 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.debugger
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
@@ -8,7 +7,8 @@ import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.window
 import org.w3c.dom.*
-import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -155,13 +155,11 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
         setup(RecyclerView(this))
     }
 }
-@ViewDsl
-actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = TODO()
 
 actual var RecyclerView.columns: Int
-    get() = 1
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController).columns
     set(value) {
-        native.style.setProperty("grid-template-rows", "repeat($value, auto)")
+        (native.asDynamic().__ROCK__controller as RecyclerController).columns = value
     }
 
 actual fun <T> RecyclerView.children(
@@ -210,6 +208,22 @@ class RecyclerController(
     val vertical: Boolean = true
 ) {
     var columns = 1
+        set(value) {
+            println("Changing to $value columns")
+            suppress = true
+            field = value
+            println("Clearing native views")
+            contentCol.native.clearNViews()
+            println("Cleared native views")
+            scrollingContainer.scrollStart = lastDefaultPos
+            firstIndex = 0
+            lastIndex = -value
+            reserved.clear()
+            suppress = false
+            println("Existing views should be empty, but is ${contentCol.native.listNViews().size}")
+            println("Rerunning scrolling")
+            correctScrollBoundaries()
+        }
 //    var beyondEdge: Double = 0.0
     var beyondEdge: Double = 200.0
 
@@ -243,8 +257,10 @@ class RecyclerController(
     val lastVisible = Property(0)
     var firstIndex = 0
     var lastIndex = -1
-    var minIndex = -40
-    var maxIndex = 40
+    val minIndexProperty = Property(-40)
+    var minIndex by minIndexProperty
+    val maxIndexProperty = Property(40)
+    var maxIndex by maxIndexProperty
     var suppress = false
     var lastDefaultPos = reservedScrollingSpace / 2
     val forSingleRenderer = CalculationContext.Standard()
@@ -256,18 +272,22 @@ class RecyclerController(
             contentCol.native.clearNViews()
             lastDefaultPos = reservedScrollingSpace / 2
             firstIndex = 0
-            lastIndex = -1
+            lastIndex = -columns
             minIndex = 0
             maxIndex = 0
             dataCopy.value = emptyList<Unit>()
+            reserved.clear()
             forSingleRenderer.cancel()
             suppress = false
             forSingleRenderer.reactiveScope {
+                suppress = true
                 scrollingContainer.scrollStart = lastDefaultPos
                 val list = value.data.await()
                 minIndex = 0
                 maxIndex = list.size - 1
                 dataCopy.value = list
+                reserved.clear()
+                suppress = false
                 correctScrollBoundaries()
             }
         }
@@ -311,24 +331,31 @@ class RecyclerController(
                 index - firstIndex
             }
             Align.End -> {
-                val visibleViews = (lastIndex - firstIndex + 1).coerceAtLeast(1)
-                scrollingContainer.scrollStart = lastDefaultPos + (root.getBoundingClientRect().size) / visibleViews + beyondEdge * 2
+                val visibleRows = (lastIndex - firstIndex + 1).div(columns).coerceAtLeast(1)
+                scrollingContainer.scrollStart = lastDefaultPos + (root.getBoundingClientRect().size) / visibleRows + beyondEdge * 2
                 index - lastIndex
             }
             else -> {
-                val visibleViews = (lastIndex - firstIndex + 1).coerceAtLeast(1)
-                scrollingContainer.scrollStart = lastDefaultPos + (root.getBoundingClientRect().size) / visibleViews / 2 + beyondEdge
+                val visibleRows = (lastIndex - firstIndex + 1).div(columns).coerceAtLeast(1)
+                scrollingContainer.scrollStart = lastDefaultPos + (root.getBoundingClientRect().size) / visibleRows / 2 + beyondEdge
                 index - (firstIndex + lastIndex) / 2
             }
-        }.coerceIn(minIndex - firstIndex, maxIndex - lastIndex)
+        }
 
         if(shift != 0) {
             root.withoutAnimation {
                 for (view in contentCol.native.listNViews()) {
-                    val p = view.asDynamic().__ROCK__property as? Property<Int> ?: continue
-                    val newValue = p.value + shift
-                    if(newValue < minIndex || newValue > maxIndex) contentCol.native.removeChild(view)
-                    else p.value = newValue
+                    if(columns == 1) {
+                        val p = view.asDynamic().__ROCK__property as? Property<Int> ?: continue
+                        val newValue = p.value + shift
+                        if (newValue < minIndex || newValue > maxIndex) contentCol.native.removeChild(view)
+                        else p.value = newValue
+                    } else {
+                        val ps = view.asDynamic().__ROCK__properties as? Array<Property<Int>> ?: continue
+                        for(p in ps) {
+                            p.value = p.value + shift
+                        }
+                    }
                 }
             }
             firstIndex = (firstIndex + shift).coerceAtLeast(minIndex)
@@ -342,35 +369,42 @@ class RecyclerController(
         // If this runs twice at the beginning then the scroll offset gets messed up
         // Correct for being out-of-bounds
         val shift = if(lastIndex > maxIndex) {
-            maxIndex - lastIndex
+            (maxIndex - lastIndex).div(columns).times(columns)
         } else if(firstIndex < minIndex) {
-            minIndex - firstIndex
+            (minIndex - firstIndex).div(columns).times(columns)
         } else {
             0
         }
         if(shift != 0) {
             root.withoutAnimation {
                 for (view in contentCol.native.listNViews()) {
-                    val p = view.asDynamic().__ROCK__property as? Property<Int> ?: continue
-                    val newValue = p.value + shift
-                    if(newValue < minIndex || newValue > maxIndex) contentCol.native.removeChild(view)
-                    else p.value = newValue
+                    if(columns == 1) {
+                        val p = view.asDynamic().__ROCK__property as? Property<Int> ?: continue
+                        val newValue = p.value + shift
+                        if(newValue < minIndex || newValue > maxIndex) contentCol.native.removeChild(view)
+                        else p.value = newValue
+                    } else {
+                        val ps = view.asDynamic().__ROCK__properties as? Array<Property<Int>> ?: continue
+                        var min = 100000000
+                        var max = -100000000
+                        for(p in ps) {
+                            p.value = p.value + shift
+                            min = min(min, p.value)
+                            max = max(max, p.value)
+                        }
+                        if(max < minIndex || min > maxIndex) contentCol.native.removeChild(view)
+                    }
                 }
             }
-            firstIndex = (firstIndex + shift).coerceAtLeast(minIndex)
-            lastIndex = (lastIndex + shift).coerceAtMost(maxIndex)
+            firstIndex = (firstIndex + shift).coerceAtLeast(minIndex.minus(1).div(columns).times(columns))
+            lastIndex = (lastIndex + shift).coerceAtMost(maxIndex.plus(1).div(columns).times(columns))
             updateFakeScroll()
         }
         scrollHandler()
     }
 
-    var block = false
     val reserved = ArrayList<HTMLElement>()
     fun scrollHandler() = with(scrollingContainer) {
-//        if(block) {
-//            println("Blocked for $scrollStart")
-//            return
-//        }
         if (suppress) {
             return Unit
         }
@@ -389,7 +423,6 @@ class RecyclerController(
 //        }
         val beforeScroll = scrollStart
 
-        var scrollElements = 0
         var scrollAmount = 0.0
         val canRecycle = ArrayList<NView>()
 
@@ -402,15 +435,13 @@ class RecyclerController(
                 val margin = style.marginStart.removeSuffix("px").toDouble()
                 if (bounds.end + margin < (outerBounds.start - beyondEdge)) {
                     // We're scrolling down and this fell out the top
-                    scrollElements += 1
                     scrollAmount += bounds.size
                     scrollAmount += style.marginStart.removeSuffix("px").toInt()
                     scrollAmount += style.marginEnd.removeSuffix("px").toInt()
                     canRecycle.add(child)
 //                    println("Removing view from top because ${bounds.end} + ${margin} < ${outerBounds.start}")
 //                    println("Scrolling ${scrollAmount}")
-                    firstIndex += 1
-                    block = firstIndex == 2
+                    firstIndex += columns
                 } else {
                     break
                 }
@@ -427,7 +458,7 @@ class RecyclerController(
                 // We're scrolling up and this fell out the bottom
                 canRecycle.add(child)
 //                println("Removing view from bottom because ${bounds.start} - ${margin} > ${outerBounds.end}")
-                lastIndex -= 1
+                lastIndex -= columns
             } else {
                 break
             }
@@ -453,53 +484,99 @@ class RecyclerController(
         for (r in canRecycle) contentCol.native.removeChild(r)
         reserved.addAll(canRecycle)
 
-        // Append views at the bottom until the needed space is filled
-        while (neededOnBottom > 1.0 && lastIndex < maxIndex) {
-//            println("Appending view on bottom $neededOnBottom")
-            lastIndex += 1
-            val newElement = if (reserved.isNotEmpty()) {
+        fun makeElement(index: Int): HTMLElement {
+            return if (reserved.isNotEmpty()) {
                 reserved.removeAt(reserved.lastIndex).also {
-                    root.withoutAnimation {
-                        (it.asDynamic().__ROCK__property as Property<Int>).value = lastIndex
+                    if(columns == 1) {
+                        root.withoutAnimation {
+                            (it.asDynamic().__ROCK__property as Property<Int>).value = index
+                        }
+                    } else {
+                        root.withoutAnimation {
+                            (it.asDynamic().__ROCK__properties as Array<Property<Int>>).forEachIndexed { offset, p ->
+                                p.value = index + offset
+                            }
+                        }
                     }
                 }
             } else {
-                with(newViews) {
-                    val p = Property(lastIndex)
-                    root.withoutAnimation {
-                        dataAndRenderer.renderAny(newViews, shared { dataCopy.await()[p.await()] })
+                if(columns == 1) {
+                    with(newViews) {
+                        val p = Property(index)
+                        root.withoutAnimation {
+                            dataAndRenderer.renderAny(newViews, shared { dataCopy.await()[p.await()] })
+                        }
+                        rootCreated!!.also {
+                            it.asDynamic().__ROCK__property = p
+                        }
                     }
-                    rootCreated!!.also {
-                        it.asDynamic().__ROCK__property = p
+                } else {
+                    with(newViews) {
+                        val properties = Array(columns) { offset -> Property(index + offset) }
+                        root.withoutAnimation {
+                            if(vertical) {
+                                row {
+                                    repeat(columns) { offset ->
+                                        val p = properties[offset]
+                                        beforeNextElementSetup {
+                                            style.flexGrow = "1"
+                                            style.flexShrink = "1"
+                                            style.flexBasis = "0"
+                                            this.calculationContext.reactiveScope {
+                                                style.visibility =
+                                                    if (p.await() in minIndexProperty.await()..maxIndexProperty.await()) "visible" else "hidden"
+                                            }
+                                        }
+                                        dataAndRenderer.renderAny(
+                                            newViews,
+                                            shared { dataCopy.await()[p.await().coerceIn(minIndex, maxIndex)] })
+                                    }
+                                }
+                            } else {
+                                col {
+                                    repeat(columns) { offset ->
+                                        val p = properties[offset]
+                                        beforeNextElementSetup {
+                                            style.flexGrow = "1"
+                                            style.flexShrink = "1"
+                                            style.flexBasis = "0"
+                                            this.calculationContext.reactiveScope {
+                                                style.visibility =
+                                                    if (p.await() in minIndexProperty.await()..maxIndexProperty.await()) "visible" else "hidden"
+                                            }
+                                        }
+                                        dataAndRenderer.renderAny(
+                                            newViews,
+                                            shared { dataCopy.await()[p.await().coerceIn(minIndex, maxIndex)] })
+                                    }
+                                }
+                            }
+                        }
+                        rootCreated!!.also {
+                            it.asDynamic().__ROCK__properties = properties
+                        }
                     }
                 }
             }
+        }
+
+        // Append views at the bottom until the needed space is filled
+        println("lastIndex: $lastIndex < maxIndex: $maxIndex")
+        while (neededOnBottom > 1.0 && lastIndex < maxIndex) {
+            println("Appending view on bottom $neededOnBottom")
+            lastIndex += columns
+            val newElement = makeElement(lastIndex)
 //            println("Appending view")
             contentCol.native.appendChild(newElement)
             neededOnBottom -= newElement.scrollSize
         }
 
         // Insert views on top until the needed space is filled
+        println("firstIndex: $firstIndex > minIndex: $minIndex")
         while (neededOnTop > 1.0 && firstIndex > minIndex) {
-//            println("Inserting view on top $neededOnTop")
-            firstIndex -= 1
-            val newElement = if (reserved.isNotEmpty()) {
-                reserved.removeAt(reserved.lastIndex).also {
-                    root.withoutAnimation {
-                        (it.asDynamic().__ROCK__property as Property<Int>).value = firstIndex
-                    }
-                }
-            } else {
-                with(newViews) {
-                    val p = Property(firstIndex)
-                    root.withoutAnimation {
-                        dataAndRenderer.renderAny(newViews, shared { dataCopy.await()[p.await()] })
-                    }
-                    rootCreated!!.also {
-                        it.asDynamic().__ROCK__property = p
-                    }
-                }
-            }
+            println("Inserting view on top $neededOnTop")
+            firstIndex -= columns
+            val newElement = makeElement(firstIndex)
             contentCol.native.insertBefore(newElement, contentCol.native.firstChild)
             val style = window.getComputedStyle(newElement)
             scrollAmount -= newElement.scrollSize
@@ -511,9 +588,9 @@ class RecyclerController(
         // Handle scroll edges; we do this by altering the container size.
         // You can't just set scrollTop; it will have odd effects when pushing against the scroll edge
 //        println("Before edge processing: $scrollStart")
-        lastDefaultPos = if (firstIndex == minIndex && lastIndex == maxIndex) {
+        lastDefaultPos = if (firstIndex <= minIndex && lastIndex >= maxIndex) {
             // cap both; go straight to native style
-//            println("cap both; go straight to native style")
+            println("cap both; go straight to native style")
             sizingContainer.style.size = "max-content"
             sizingContainer.style.position = "unset"
             contentCol.native.style.start = "-${0}px"
@@ -521,9 +598,9 @@ class RecyclerController(
             val newDefaultPos = 0.0
             scrollAmount -= newDefaultPos - lastDefaultPos
             newDefaultPos
-        } else if (firstIndex == minIndex) {
+        } else if (firstIndex <= minIndex) {
             // cap top
-//            println("cap top")
+            println("cap top")
             sizingContainer.style.size = "${reservedScrollingSpace / 2}px"
             sizingContainer.style.position = "relative"
             contentCol.native.style.start = "-${0}px"
@@ -532,9 +609,9 @@ class RecyclerController(
 //            if(newDefaultPos != lastDefaultPos) scrollAmount += beyondEdge * 2
             scrollAmount -= newDefaultPos - lastDefaultPos
             newDefaultPos
-        } else if (lastIndex == maxIndex) {
+        } else if (lastIndex >= maxIndex) {
             // cap bottom
-//            println("cap bottom")
+            println("cap bottom")
             val h = contentCol.native.scrollSize
             sizingContainer.style.size = "${reservedScrollingSpace / 2 + h}px"
             sizingContainer.style.position = "relative"
@@ -545,7 +622,7 @@ class RecyclerController(
             newDefaultPos
         } else {
             // uncap
-//            println("uncap")
+            println("uncap")
             sizingContainer.style.size = "${reservedScrollingSpace}px"
             sizingContainer.style.position = "relative"
             contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
@@ -570,14 +647,14 @@ class RecyclerController(
             val child = children.get(index) as? org.w3c.dom.HTMLElement ?: return@firstOrNull false
             val bounds = child.getBoundingClientRect()
             bounds.start >= outerBounds.start
-        }?.plus(firstIndex)?.let {
+        }?.times(columns)?.plus(firstIndex)?.let {
             if(it != firstVisible.value) firstVisible.value = it
         }
         (children.length-1 downTo 0).firstOrNull { index ->
             val child = children.get(index) as? org.w3c.dom.HTMLElement ?: return@firstOrNull false
             val bounds = child.getBoundingClientRect()
             bounds.end <= outerBounds.end
-        }?.plus(firstIndex)?.let {
+        }?.times(columns)?.plus(columns-1)?.plus(firstIndex)?.let {
             if(it != lastVisible.value) lastVisible.value = it
         }
     }

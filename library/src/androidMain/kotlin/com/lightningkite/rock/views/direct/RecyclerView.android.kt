@@ -77,7 +77,7 @@ class SpacingItemDecoration(var spacing: Int) : AndroidRecyclerView.ItemDecorati
 actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
-        native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        native.layoutManager = GridLayoutManager(context, 1, LinearLayoutManager.VERTICAL, false)
 //        val spacing = SpacingItemDecoration(0)
 //        native.addItemDecoration(spacing)
 //        handleTheme(native, viewDraws = false) { theme, view ->
@@ -91,21 +91,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit) {
 actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
-        native.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-//        val spacing = SpacingItemDecoration(0)
-//        native.addItemDecoration(spacing)
-//        handleTheme(native, viewDraws = false) { theme, view ->
-//            spacing.spacing = theme.spacing.value.toInt()
-//        }
-        setup()
-    }
-}
-
-@ViewDsl
-actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit) {
-    viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
-        native.viewWriter = newViews()
-        native.layoutManager = GridLayoutManager(context, 3)
+        native.layoutManager = GridLayoutManager(context, 1, LinearLayoutManager.HORIZONTAL, false)
 //        val spacing = SpacingItemDecoration(0)
 //        native.addItemDecoration(spacing)
 //        handleTheme(native, viewDraws = false) { theme, view ->

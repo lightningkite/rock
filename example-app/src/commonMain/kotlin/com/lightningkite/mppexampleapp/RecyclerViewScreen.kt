@@ -36,6 +36,15 @@ object RecyclerViewScreen : RockScreen {
                     }
                 }
             }
+            row {
+                repeat(4) {
+                    val cols = it + 1
+                    expanding - button {
+                        subtext("${cols} columns")
+                        onClick { recyclerView?.columns = cols }
+                    }
+                }
+            }
             sizedBox(SizeConstraints(height = 5.rem)) - horizontalRecyclerView {
                 children(items) {
                     important - stack { centered - text { ::content { it.await().toString() } } }
@@ -43,13 +52,14 @@ object RecyclerViewScreen : RockScreen {
             }
             recyclerView {
                 recyclerView = this
+                columns = 2
                 children(items) {
                     themeFromLast { theme ->
                         if(it.await() == 50) theme.important() else if(it.await() % 7 == 0) theme.hover() else theme
                     } - col {
                         row {
                             expanding - centered - text { ::content { "Item ${it.await()}" } }
-                            button {
+                            centered - button {
                                 text {
                                     ::content { if (expanded.await() == it.await()) "Expanded" else "Expand" }
                                 }
@@ -59,7 +69,6 @@ object RecyclerViewScreen : RockScreen {
                                 }
                             }
                         }
-                        text("le sigh")
                         lazyExpanding(shared { expanded.await() == it.await() }) {
                             col {
                                 ::exists

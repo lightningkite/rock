@@ -61,11 +61,14 @@ actual fun ViewWriter.platformSpecific() {
             var version = 2
             onClick {
                 val v = version++
-                if (v % 2 == 0) data.value = (0..10).map { "Item $it (v$v)" }.toList()
-                else data.value = (0..7).map { "Item $it (v$v)" }.toList()
+                if (v % 2 == 0) data.value = (0..100).map { "Item $it (v$v)" }.toList()
+                else data.value = (0..50).map { "Item $it (v$v)" }.toList()
             }
         }
-        expanding - horizontalRecyclerView {
+        var rv: RecyclerView? = null
+        expanding - recyclerView {
+            rv = this
+            columns = 5
             children(data) { obs ->
                 card - stack {
                     text {
@@ -78,19 +81,19 @@ actual fun ViewWriter.platformSpecific() {
             button {
                 text("Jump S")
                 onClick {
-                    controller!!.jump(10, Align.Start)
+                    rv!!.scrollToIndex(100, Align.Start)
                 }
             }
             button {
                 text("Jump C")
                 onClick {
-                    controller!!.jump(10, Align.Center)
+                    rv!!.scrollToIndex(100, Align.Center)
                 }
             }
             button {
                 text("Jump E")
                 onClick {
-                    controller!!.jump(10, Align.End)
+                    rv!!.scrollToIndex(100, Align.End)
                 }
             }
         }

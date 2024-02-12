@@ -14,7 +14,6 @@ expect class NRecyclerView : NView
 value class RecyclerView(override val native: NRecyclerView) : RView<NRecyclerView>
 @ViewDsl expect fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 @ViewDsl expect fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
-@ViewDsl expect fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit = {}): Unit
 expect var RecyclerView.columns: Int
 expect fun <T> RecyclerView.children(items: Readable<List<T>>, render: ViewWriter.(value: Readable<T>)->Unit): Unit
 expect fun RecyclerView.scrollToIndex(index: Int, align: Align? = null, animate: Boolean = true)

@@ -97,11 +97,47 @@ actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Un
     setup(RecyclerView(this))
 }
 
-@ViewDsl
-actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = recyclerView(setup)
 actual var RecyclerView.columns: Int
-    get() = 1
+    get() = 1  // TODO
     set(value) {
+        val existingConfig = (native.collectionViewLayout as? UICollectionViewCompositionalLayout)?.configuration
+        if(existingConfig?.scrollDirection == UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal) {
+            val size = NSCollectionLayoutSize.sizeWithWidthDimension(
+                width = NSCollectionLayoutDimension.estimatedDimension(500.0),
+                heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension(1.0),
+            )
+            native.collectionViewLayout = UICollectionViewCompositionalLayout(
+                NSCollectionLayoutSection.sectionWithGroup(
+                    NSCollectionLayoutGroup.verticalGroupWithLayoutSize(
+                        layoutSize = size,
+                        subitem = NSCollectionLayoutItem.itemWithLayoutSize(
+                            layoutSize = size
+                        ),
+                        count = value.toLong(),
+                    )
+                )
+            ).apply {
+                existingConfig?.let { configuration = it }
+            }
+        } else {
+            val size = NSCollectionLayoutSize.sizeWithWidthDimension(
+                width = NSCollectionLayoutDimension.fractionalWidthDimension(1.0),
+                heightDimension = NSCollectionLayoutDimension.estimatedDimension(1000.0),
+            )
+            native.collectionViewLayout = UICollectionViewCompositionalLayout(
+                NSCollectionLayoutSection.sectionWithGroup(
+                    NSCollectionLayoutGroup.horizontalGroupWithLayoutSize(
+                        layoutSize = size,
+                        subitem = NSCollectionLayoutItem.itemWithLayoutSize(
+                            layoutSize = size
+                        ),
+                        count = value.toLong(),
+                    )
+                )
+            ).apply {
+                existingConfig?.let { configuration = it }
+            }
+        }
     }
 
 @OptIn(ExperimentalObjCName::class, BetaInteropApi::class, ExperimentalForeignApi::class)

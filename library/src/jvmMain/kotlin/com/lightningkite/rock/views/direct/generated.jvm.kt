@@ -226,7 +226,6 @@ actual inline var WebView.content: String
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRecyclerView = HTMLElement
 @ViewDsl actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
 @ViewDsl actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")
-@ViewDsl actual fun ViewWriter.gridRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("gridRecyclerView")
 actual var RecyclerView.columns: Int
     get() = 1
     set(value) { TODO() }

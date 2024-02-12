@@ -1,5 +1,11 @@
 # Feedback
 
+- Spacing seems to apply at the whole containerview layer.  A default spacing is sane; but individual containers have their own spacing rules.
+- Labels should have feedback spaces
+- A feedback theme makes sense
+
+----
+
 ## Layouts and Themes
 
 - Nesting layout sizing?  Need to find a specific instant where "nested weights are required"

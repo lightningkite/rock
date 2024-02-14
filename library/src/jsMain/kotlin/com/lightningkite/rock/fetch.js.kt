@@ -43,15 +43,15 @@ actual suspend fun fetch(
         when (body) {
             null -> request.send()
             is RequestBodyBlob -> {
-                headers.append("Content-Type", body.content.type)
+                request.setRequestHeader("Content-Type", body.content.type)
                 request.send(body.content)
             }
             is RequestBodyFile -> {
-                headers.append("Content-Type", body.content.type)
+                request.setRequestHeader("Content-Type", body.content.type)
                 request.send(body.content)
             }
             is RequestBodyText -> {
-                headers.append("Content-Type", body.type)
+                request.setRequestHeader("Content-Type", body.type)
                 request.send(body.content)
             }
             else -> throw NotImplementedError()

@@ -6,6 +6,7 @@ import android.animation.ValueAnimator
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.*
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.Animation
@@ -344,7 +345,7 @@ fun Theme.backgroundDrawable(
         }
     }
 
-    return if (clickable) {
+    return if (clickable || Build.VERSION.SDK_INT < 26) {
         val rippleColor = ColorStateList.valueOf(hover().background.colorInt())
 
         // If we can reuse the existing RippleDrawable, do it to preserve any pending ripples

@@ -18,6 +18,9 @@ import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 import java.util.WeakHashMap
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 /**
  * A native view in the underlying view system.
@@ -37,6 +40,10 @@ object AndroidAppContext {
     var activityCtx: RockActivity?
         get() = activityCtxRef?.get()
         set(value) { activityCtxRef = WeakReference(value) }
+    val executor by lazy {
+        ThreadPoolExecutor(1, 1, 10, TimeUnit.SECONDS, ArrayBlockingQueue(10))
+    }
+
 
     fun startActivityForResult(intent: Intent, options: Bundle? = null, onResult: (Int, Intent?)->Unit) = activityCtx?.startActivityForResult(intent = intent, options = options, onResult = onResult)
     fun requestPermissions(vararg permissions: String, onResult: (RockActivity.PermissionResult)->Unit) = activityCtx?.requestPermissions(permissions = permissions, onResult = onResult)

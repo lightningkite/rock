@@ -60,6 +60,16 @@ kotlin {
                 srcDir(file("build/generated/ksp/common/commonMain/kotlin"))
             }
         }
+
+        val androidMain by getting {
+            dependencies {
+                val CAMERAX_VERSION = "1.3.1"
+                implementation("androidx.camera:camera-camera2:$CAMERAX_VERSION")
+                implementation("androidx.camera:camera-view:$CAMERAX_VERSION")
+
+                implementation("com.google.mlkit:barcode-scanning:17.2.0")
+            }
+        }
 //        val commonJvmMain by creating {
 //            dependsOn(commonMain)
 //        }

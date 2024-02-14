@@ -48,6 +48,7 @@ object RootScreen : RockScreen {
                     }
                 } in card
 
+                linkScreen(CameraScreen)
                 linkScreen(PlatformSpecificScreen)
                 linkScreen(VideoScreen)
                 linkScreen(ViewPagerScreen)

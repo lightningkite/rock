@@ -16,6 +16,8 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.lightningkite.rock.RockActivity
+import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
@@ -33,10 +35,8 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         native.controller = cameraController
     }
 
-    private var permissionRejectionHandler: () -> Unit = {}
-    fun setPermissionRejectionHandler(action: () -> Unit) {
-        permissionRejectionHandler = action
-    }
+    // TODO: Implement one-way binding, expose this in an externally immutable way
+    val cameraPermission = Property(false)
 
     private var barcodeResultHandler: (List<String>) -> Unit = {}
     fun setBarcodeResultHandler(action: (List<String>) -> Unit) {
@@ -49,8 +49,10 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
             == PackageManager.PERMISSION_DENIED) {
             AndroidAppContext.requestPermissions(Manifest.permission.CAMERA, onResult = {
                     result: RockActivity.PermissionResult ->
-                if (!result.accepted) permissionRejectionHandler()
+                cameraPermission.value = result.accepted
             })
+        } else {
+            cameraPermission.value = true
         }
     }
 
@@ -95,7 +97,8 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
     }
 }
 
-actual fun CameraPreview.onPermissionRejected(action: () -> Unit) =
-    setPermissionRejectionHandler(action)
 actual fun CameraPreview.barcodeHandler(action: (List<String>) -> Unit) =
     setBarcodeResultHandler(action)
+
+actual val CameraPreview.hasPermissions: Writable<Boolean>
+    get() = cameraPermission

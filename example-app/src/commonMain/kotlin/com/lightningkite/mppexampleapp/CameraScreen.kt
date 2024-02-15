@@ -2,7 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.barcodeHandler
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.cameraPreview
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.onPermissionRejected
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.hasPermissions
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Align
@@ -16,12 +16,12 @@ import com.lightningkite.rock.views.direct.*
 object CameraScreen : RockScreen, UseFullScreen {
     override fun ViewWriter.render() {
         val barcodeContent = Property("")
-        val errorMessage = Property("")
+        val cameraPermissions = Property(false)
         stack {
             cameraPreview {
-                onPermissionRejected {
-                    errorMessage.value = "Please accept camera permissions to use the camera."
-                }
+                // One-way binding with a Readable on one side would be great here (feature request)
+                cameraPermissions bind hasPermissions
+                ::opacity { if (hasPermissions.await()) 1.0 else 0.0 }
                 barcodeHandler {
                     it.firstOrNull()?.let { barcodeContent.value = it }
                 }
@@ -32,8 +32,8 @@ object CameraScreen : RockScreen, UseFullScreen {
                     ::exists { barcodeContent.await().isNotEmpty() }
                 }
                 text {
-                    ::content { errorMessage.await() }
-                    ::exists { errorMessage.await().isNotEmpty() }
+                    content = "Please allow camera access in device settings to use the camera."
+                    ::exists { !cameraPermissions.await() }
                 }
             } in card in sizeConstraints(height = 200.dp) in gravity(Align.Stretch, Align.End)
         } in marginless

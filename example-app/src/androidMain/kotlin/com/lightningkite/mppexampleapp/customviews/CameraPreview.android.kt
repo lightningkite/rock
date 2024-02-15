@@ -1,5 +1,7 @@
 package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.view.ViewGroup
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
@@ -7,11 +9,13 @@ import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
@@ -26,6 +30,18 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
             height = ViewGroup.LayoutParams.MATCH_PARENT
         }
 
+        // Handle camera permission
+        if (ContextCompat.checkSelfPermission(native.context, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_DENIED) {
+            AndroidAppContext.requestPermissions(Manifest.permission.CAMERA, onResult = {
+                    result: RockActivity.PermissionResult ->
+                if (!result.accepted) {
+                    // TODO: Do something if the user explicitly rejects the permission
+                }
+            })
+        }
+
+        // Continue setup regardless of permission status; LifecycleCameraController fails safely without permissions
         val cameraController = LifecycleCameraController(native.context)
         AndroidAppContext.activityCtx!!.let(cameraController::bindToLifecycle)
         cameraController.cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA

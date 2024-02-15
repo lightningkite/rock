@@ -22,33 +22,40 @@ import com.lightningkite.rock.views.direct.*
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NCameraPreview = PreviewView
 
-@OptIn(ExperimentalGetImage::class) @ViewDsl
-actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
-    viewElement(factory = ::PreviewView, wrapper = ::CameraPreview) {
-        native.updateLayoutParams {
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            height = ViewGroup.LayoutParams.MATCH_PARENT
-        }
+actual class CameraPreview actual constructor(actual override val native: NCameraPreview) :
+    RView<NCameraPreview> {
 
-        // Handle camera permission
+    private val cameraController = LifecycleCameraController(native.context)
+    init {
+        AndroidAppContext.activityCtx!!.let(cameraController::bindToLifecycle)
+        cameraController.cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+        cameraController.isPinchToZoomEnabled = false
+        native.controller = cameraController
+    }
+
+    private var permissionRejectionHandler: () -> Unit = {}
+    fun setPermissionRejectionHandler(action: () -> Unit) {
+        permissionRejectionHandler = action
+    }
+
+    private var barcodeResultHandler: (List<String>) -> Unit = {}
+    fun setBarcodeResultHandler(action: (List<String>) -> Unit) {
+        barcodeResultHandler = action
+        setupImageAnalyzer()
+    }
+
+    fun ensurePermissions() {
         if (ContextCompat.checkSelfPermission(native.context, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_DENIED) {
             AndroidAppContext.requestPermissions(Manifest.permission.CAMERA, onResult = {
                     result: RockActivity.PermissionResult ->
-                if (!result.accepted) {
-                    // TODO: Do something if the user explicitly rejects the permission
-                }
+                if (!result.accepted) permissionRejectionHandler()
             })
         }
+    }
 
-        // Continue setup regardless of permission status; LifecycleCameraController fails safely without permissions
-        val cameraController = LifecycleCameraController(native.context)
-        AndroidAppContext.activityCtx!!.let(cameraController::bindToLifecycle)
-        cameraController.cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        cameraController.isPinchToZoomEnabled = false
-
-        native.controller = cameraController
-
+    @OptIn(ExperimentalGetImage::class)
+    fun setupImageAnalyzer() {
         val options = BarcodeScannerOptions.Builder()
             .setBarcodeFormats(
                 Barcode.FORMAT_CODE_128,
@@ -64,14 +71,31 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
                 scanner.process(image)
                     .addOnSuccessListener { barcodes ->
                         imageProxy.close()
-                        for (barcode in barcodes) {
-                            barcode.rawValue?.let { this.barcode.value = it }
-                        }
+                        barcodeResultHandler(barcodes.mapNotNull(Barcode::getRawValue))
                     }
             }
         }
 
         cameraController.setImageAnalysisAnalyzer(AndroidAppContext.executor, analyzer)
-        setup(this)
     }
 }
+
+@OptIn(ExperimentalGetImage::class) @ViewDsl
+actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
+    viewElement(factory = ::PreviewView, wrapper = ::CameraPreview) {
+        native.updateLayoutParams {
+            width = ViewGroup.LayoutParams.MATCH_PARENT
+            height = ViewGroup.LayoutParams.MATCH_PARENT
+        }
+        setup(this)
+
+        // We check and request permissions but don't do much here if permissions
+        // are denied as CameraX fails safely without permissions
+        ensurePermissions()
+    }
+}
+
+actual fun CameraPreview.onPermissionRejected(action: () -> Unit) =
+    setPermissionRejectionHandler(action)
+actual fun CameraPreview.barcodeHandler(action: (List<String>) -> Unit) =
+    setBarcodeResultHandler(action)

@@ -22,6 +22,7 @@ import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
+import java.io.File
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NCameraPreview = PreviewView
@@ -90,8 +91,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
 
         val captureOptions =
             ImageCapture.OutputFileOptions.Builder(
-                native.context.contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
+                File(AndroidAppContext.applicationCtx.filesDir, "image.jpg")
             ).build()
 
         val internalCallback = object: ImageCapture.OnImageSavedCallback {

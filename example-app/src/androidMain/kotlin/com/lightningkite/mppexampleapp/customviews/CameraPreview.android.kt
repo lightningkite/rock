@@ -1,12 +1,12 @@
 package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.provider.MediaStore
 import android.view.ViewGroup
 import androidx.annotation.OptIn
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ExperimentalGetImage
-import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.*
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -15,7 +15,9 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.lightningkite.rock.FileReference
 import com.lightningkite.rock.RockActivity
+import com.lightningkite.rock.models.ImageLocal
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
@@ -79,6 +81,33 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         }
 
         cameraController.setImageAnalysisAnalyzer(AndroidAppContext.executor, analyzer)
+    }
+
+    actual fun capture(error: () -> Unit, success: (ImageLocal) -> Unit) {
+        val contentValues = ContentValues()
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "capture")
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+
+        val captureOptions =
+            ImageCapture.OutputFileOptions.Builder(
+                native.context.contentResolver,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
+            ).build()
+
+        val internalCallback = object: ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                outputFileResults.savedUri?.let {
+                    val image = ImageLocal(FileReference(it))
+                    success(image)
+                }
+            }
+
+            override fun onError(exception: ImageCaptureException) {
+                error()
+            }
+        }
+
+        cameraController.takePicture(captureOptions, AndroidAppContext.executor, internalCallback)
     }
 }
 

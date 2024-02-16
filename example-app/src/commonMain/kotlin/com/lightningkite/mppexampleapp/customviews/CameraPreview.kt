@@ -1,5 +1,6 @@
 package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews
 
+import com.lightningkite.rock.models.ImageLocal
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.NView
 import com.lightningkite.rock.views.RView
@@ -22,9 +23,10 @@ expect class NCameraPreview : NView
 */
 expect class CameraPreview(native: NCameraPreview) : RView<NCameraPreview> {
     override val native: NCameraPreview
+    fun capture(error: () -> Unit = {}, success: (ImageLocal) -> Unit)
 }
 
 @ViewDsl
-expect fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit = {}): Unit
+expect fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit = {})
 expect fun CameraPreview.barcodeHandler(action: (List<String>) -> Unit)
 expect val CameraPreview.hasPermissions: Writable<Boolean>

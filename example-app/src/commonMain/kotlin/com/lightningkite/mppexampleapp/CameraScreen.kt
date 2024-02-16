@@ -1,5 +1,6 @@
 package com.lightningkite.mppexampleapp
 
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.CameraPreview
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.barcodeHandler
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.cameraPreview
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.hasPermissions
@@ -18,7 +19,9 @@ object CameraScreen : RockScreen, UseFullScreen {
         val barcodeContent = Property("")
         val cameraPermissions = Property(false)
         stack {
+            var cp: CameraPreview? = null
             cameraPreview {
+                cp = this
                 // One-way binding with a Readable on one side would be great here (feature request)
                 cameraPermissions bind hasPermissions
                 ::opacity { if (hasPermissions.await()) 1.0 else 0.0 }
@@ -34,6 +37,14 @@ object CameraScreen : RockScreen, UseFullScreen {
                 text {
                     content = "Please allow camera access in device settings to use the camera."
                     ::exists { !cameraPermissions.await() }
+                }
+                button {
+                    text { content = "Capture" }
+                    onClick {
+                        cp!!.capture {
+                            println("Image stored successfully")
+                        }
+                    }
                 }
             } in card in sizeConstraints(height = 200.dp) in gravity(Align.Stretch, Align.End)
         } in marginless

@@ -22,7 +22,10 @@ import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
+import timber.log.Timber
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NCameraPreview = PreviewView
@@ -84,6 +87,11 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         cameraController.setImageAnalysisAnalyzer(AndroidAppContext.executor, analyzer)
     }
 
+    private fun timestamp(): String {
+        val df = SimpleDateFormat("MMddyyHHmmss", Locale.getDefault())
+        return df.format(Date())
+    }
+
     actual fun capture(error: () -> Unit, success: (ImageLocal) -> Unit) {
         val contentValues = ContentValues()
         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "capture")
@@ -91,13 +99,14 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
 
         val captureOptions =
             ImageCapture.OutputFileOptions.Builder(
-                File(AndroidAppContext.applicationCtx.filesDir, "image.jpg")
+                File(AndroidAppContext.applicationCtx.filesDir, "${timestamp()}.jpg")
             ).build()
 
         val internalCallback = object: ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                 outputFileResults.savedUri?.let {
                     val image = ImageLocal(FileReference(it))
+                    Timber.d("Capture saved to $it")
                     success(image)
                 }
             }

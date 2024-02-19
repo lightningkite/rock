@@ -54,3 +54,27 @@ fun ViewWriter.confirmDanger(
         }
     })
 }
+fun ViewWriter.alert(
+    title: String,
+    body: String,
+) {
+    navigator.dialog.navigate(object : RockScreen {
+        override val title: Readable<String> = Constant(title)
+        override fun ViewWriter.render() {
+            stack {
+                centered - card - col {
+                    h2(title)
+                    text(body)
+                    row {
+                        button {
+                            h6("OK")
+                            onClick {
+                                navigator.dismiss()
+                            }
+                        } in danger
+                    }
+                }
+            }
+        }
+    })
+}

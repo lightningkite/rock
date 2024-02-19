@@ -33,7 +33,10 @@ actual fun ViewWriter.hasPopover(
                 when (preferredDirection.align) {
                     Align.Start -> style.bottom = "0"
                     Align.End -> style.top = "0"
-                    else -> style.top = "calc(50% - 0)"
+                    else -> {
+                        style.top = "50%"
+                        style.transform = "translateY(-50%)"
+                    }
                 }
             } else {
                 if (preferredDirection.after) {
@@ -44,7 +47,10 @@ actual fun ViewWriter.hasPopover(
                 when (preferredDirection.align) {
                     Align.Start -> style.right = "0"
                     Align.End -> style.left = "0"
-                    else -> style.left = "calc(50% - 0)"
+                    else -> {
+                        style.left = "50%"
+                        style.transform = "translateX(-50%)"
+                    }
                 }
             }
             setup()

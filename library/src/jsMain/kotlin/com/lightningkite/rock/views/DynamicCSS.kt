@@ -488,7 +488,7 @@ object DynamicCSS {
         )
 
         style(
-            ".rock-label", mapOf(
+            ".rock-label.rock-label", mapOf(
                 "display" to "flex",
                 "flex-direction" to "column",
                 "align-items" to "stretch",
@@ -496,20 +496,20 @@ object DynamicCSS {
         )
 
         style(
-            ".rock-label > :nth-child(1):nth-child(1):nth-child(1)", mapOf(
+            ".rock-label.rock-label > :nth-child(1):nth-child(1):nth-child(1)", mapOf(
                 "font-size" to "0.8rem",
                 "margin-bottom" to "0px",
             )
         )
 
         style(
-            ".rock-label > :nth-child(2):nth-child(2):nth-child(2)", mapOf(
+            ".rock-label.rock-label > :nth-child(2):nth-child(2):nth-child(2)", mapOf(
                 "margin-top" to "0.25rem",
             )
         )
 
         style(
-            "input:not(.mightTransition).editable.editable", mapOf(
+            "input:not(.mightTransition).editable.editable, textarea:not(.mightTransition).editable.editable, select:not(.mightTransition).editable.editable", mapOf(
                 "border-bottom-color" to "currentColor",
                 "border-bottom-width" to "1px",
                 "border-bottom-style" to "solid",
@@ -517,7 +517,7 @@ object DynamicCSS {
         )
 
         style(
-            "input:not(.mightTransition).editable.editable:focus", mapOf(
+            "input:not(.mightTransition).editable.editable:focus, textarea:not(.mightTransition).editable.editable:focus, select:not(.mightTransition).editable.editable:focus", mapOf(
                 "border-bottom-color" to "currentColor",
                 "border-bottom-width" to "2px",
                 "border-bottom-style" to "solid",

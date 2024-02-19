@@ -150,6 +150,35 @@ private fun ViewWriter.navGroupActions(readable: Readable<List<NavElement>>) {
     }
 }
 
+private fun ViewWriter.navGroupTop(readable: Readable<List<NavElement>>) {
+    forEach(readable) {
+        when (it) {
+            is Action -> button {
+                text { ::content { it.title } }
+                onClick { it.onSelect() }
+            }
+
+            is ExternalNav -> externalLink {
+                ::to { it.to() }
+                text { ::content { it.title } }
+            }
+
+            is NavGroup -> button {
+                text { ::content { it.title } }
+            } in hasPopover {
+                card - col {
+                    navGroupColumn(shared { it.children() })
+                }
+            }
+
+            is NavItem -> link {
+                ::to { it.destination() }
+                text { ::content { it.title } }
+            }
+        }
+    }
+}
+
 fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
     forEach(readable) {
         fun display(navElement: NavElement) {
@@ -256,43 +285,34 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             )
-            row {
-                navGroupActions(appNav.actionsProperty)
+            space()
+            centered - row {
+                navGroupTop(appNav.navItemsProperty)
             } in weight(1f)
+            space()
+            centered - row {
+                navGroupActions(appNav.actionsProperty)
+            }
             row {
-                fun renderGroup(readable: Readable<List<NavElement>>) {
-                    forEach(readable) {
-                        when (it) {
-                            is Action -> button {
-                                text { ::content { it.title } }
-                                onClick { it.onSelect() }
-                            }
-
-                            is ExternalNav -> externalLink {
-                                ::to { it.to() }
-                                text { ::content { it.title } }
-                            } in bar
-
-                            is NavGroup -> {
-                                col {
-                                    h3(it.title)
-                                    row {
-                                        space()
-                                        col {
-                                            renderGroup(shared { it.children() })
-                                        }
-                                    }
-                                }
-                            }
-
-                            is NavItem -> link {
-                                ::to { it.destination() }
-                                text { ::content { it.title } }
-                            } in bar
-                        }
+                image {
+                    val currentTheme = currentTheme
+                    ::source {
+                        appNav.currentUserProperty.await()?.profileImage ?: Icon.person.toImageSource(
+                            currentTheme().foreground
+                        )
                     }
+                    description = "User icon"
                 }
-                renderGroup(appNav.actionsProperty)
+                text {
+                    ::content { appNav.currentUserProperty.await()?.name ?: "No user" }
+                } in gravity(
+                    Align.Center,
+                    Align.Center
+                )
+            } in withDefaultPadding in hasPopover(preferredDirection = PopoverPreferredDirection.belowLeft) {
+                col {
+                    navGroupColumn(appNav.userLinksProperty)
+                } in card
             }
             ::exists { appNav.existsProperty.await() }
         } in bar in marginless

@@ -91,6 +91,7 @@ data class PopoverPreferredDirection(
     companion object {
         val belowRight: PopoverPreferredDirection = PopoverPreferredDirection(false, after = true, align = Align.End)
         val belowLeft: PopoverPreferredDirection = PopoverPreferredDirection(false, after = true, align = Align.Start)
+        val belowCenter: PopoverPreferredDirection = PopoverPreferredDirection(false, after = true, align = Align.Center)
     }
 }
 

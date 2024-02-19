@@ -9,6 +9,9 @@ import kotlin.reflect.KMutableProperty0
 
 interface CalculationContext {
     fun notifyStart() {}
+    fun notifyLongComplete(result: Result<Unit>) {
+        notifyComplete(result)
+    }
     fun notifyComplete(result: Result<Unit>) {
         result.onFailure { if(it !is CancelledException) it.printStackTrace() }
     }
@@ -51,9 +54,9 @@ interface CalculationContext {
             loadCount++
         }
 
-        override fun notifyComplete(result: Result<Unit>) {
+        override fun notifyLongComplete(result: Result<Unit>) {
             loadCount--
-            super.notifyComplete(result)
+            super.notifyLongComplete(result)
         }
     }
 }

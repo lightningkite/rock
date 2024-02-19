@@ -15,7 +15,8 @@ actual typealias NSelect = HTMLSelectElement
 
 @ViewDsl
 actual fun ViewWriter.select(setup: Select.() -> Unit): Unit =
-    themedElementClickable<NSelect>("select") { setup(Select(this)) }
+    themedElementEditable<NSelect>("select") { setup(Select(this)) }
+//    themedElementClickable<NSelect>("select") { setup(Select(this)) }
 
 actual fun <T> Select.bind(
     edits: Writable<T>,

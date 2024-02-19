@@ -31,7 +31,7 @@ data class UrlLikePath(
 }
 
 interface RockScreen {
-    val title: Readable<String> get() = Constant(this::class.simpleName.toString().camelToHuman())
+    val title: Readable<String> get() = Constant(this::class.simpleName.toString().camelToHuman().removeSuffix(" Screen"))
     fun ViewWriter.render()
     object Empty: RockScreen {
         override fun ViewWriter.render() {
@@ -43,6 +43,7 @@ interface RockScreen {
         override val title: Readable<String> = Constant(title)
     }
 }
+fun RockScreen.render(viewWriter: ViewWriter) = with(viewWriter) { render() }
 
 private val camelRegex = Regex("([a-z])([A-Z]+)")
 private fun String.camelToHuman(): String = this.replace(camelRegex) { it.groupValues[1] + " " + it.groupValues[2] }

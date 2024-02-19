@@ -21,24 +21,26 @@ class RockPlugin : Plugin<Project> {
         val ext = extensions.create("rock", RockPluginExtension::class.java)
         tasks.create("commonResources", Task::class.java).apply {
             group = "build"
-            val out = project.file("src/commonMain/kotlin/ResourcesExpect.kt")
-            outputs.file(out)
             val resourceFolder = project.file("src/commonMain/resources")
             inputs.files(resourceFolder)
-            doLast {
-                val lines = resourceFolder.resources()
-                    .entries
-                    .sortedBy { it.key }
-                    .joinToString("\n    ") {
-                        when (val r = it.value) {
-                            is Resource.Font -> "val ${r.name}: Font"
-                            is Resource.Image -> "val ${r.name}: ImageResource"
-                            is Resource.Binary -> "suspend fun ${r.name}(): Blob"
-                            else -> ""
+            afterEvaluate {
+
+                val out = project.file("src/commonMain/kotlin/${ext.packageName.replace(".", "/")}/ResourcesExpect.kt")
+                outputs.file(out)
+                doLast {
+                    val lines = resourceFolder.resources()
+                        .entries
+                        .sortedBy { it.key }
+                        .joinToString("\n    ") {
+                            when (val r = it.value) {
+                                is Resource.Font -> "val ${r.name}: Font"
+                                is Resource.Image -> "val ${r.name}: ImageResource"
+                                is Resource.Binary -> "suspend fun ${r.name}(): Blob"
+                                else -> ""
+                            }
                         }
-                    }
-                out.writeText(
-                    """
+                    out.writeText(
+                        """
 package ${ext.packageName}
 
 import com.lightningkite.rock.models.*
@@ -47,7 +49,8 @@ expect object Resources {
     $lines
 }
         """.trimIndent()
-                )
+                    )
+                }
             }
         }
 
@@ -56,27 +59,29 @@ expect object Resources {
             group = "build"
             from("src/commonMain/resources")
             into("src/jsMain/resources/common")
-            val out = project.file("src/jsMain/kotlin/ResourcesActual.kt")
-            val gitIgnore = project.file("src/jsMain/resources/common/.gitignore")
-            outputs.file(out)
-            outputs.file(gitIgnore)
-            val resourceFolder = project.file("src/commonMain/resources")
-            inputs.files(resourceFolder)
-            doLast {
-                gitIgnore.writeText("*\n")
-                val lines = resourceFolder.resources()
-                    .entries
-                    .sortedBy { it.key }
-                    .joinToString("\n    ") {
-                        when (val r = it.value) {
-                            is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal.relativeFile}\", bold = ${r.bold?.relativeFile?.let { "\"/common/$it\"" }}, italic = ${r.italic?.relativeFile?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.relativeFile?.let { "\"/common/$it\"" }}))"
-                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.relativeFile}\")"
-                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.relativeFile}\").blob()"
-                            else -> ""
+            afterEvaluate {
+
+                val out = project.file("src/jsMain/kotlin/${ext.packageName.replace(".", "/")}/ResourcesActual.kt")
+                val gitIgnore = project.file("src/jsMain/resources/common/.gitignore")
+                outputs.file(out)
+                outputs.file(gitIgnore)
+                val resourceFolder = project.file("src/commonMain/resources")
+                inputs.files(resourceFolder)
+                doLast {
+                    gitIgnore.writeText("*\n")
+                    val lines = resourceFolder.resources()
+                        .entries
+                        .sortedBy { it.key }
+                        .joinToString("\n    ") {
+                            when (val r = it.value) {
+                                is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"/common/${r.normal.relativeFile}\", bold = ${r.bold?.relativeFile?.let { "\"/common/$it\"" }}, italic = ${r.italic?.relativeFile?.let { "\"/common/$it\"" }}, boldItalic = ${r.boldItalic?.relativeFile?.let { "\"/common/$it\"" }}))"
+                                is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"/common/${r.relativeFile}\")"
+                                is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"/common/${r.relativeFile}\").blob()"
+                                else -> ""
+                            }
                         }
-                    }
-                out.writeText(
-                    """
+                    out.writeText(
+                        """
 package ${ext.packageName}
 
 import com.lightningkite.rock.models.*
@@ -85,17 +90,18 @@ actual object Resources {
     $lines
 }
         """.trimIndent()
-                )
+                    )
+                }
             }
         }
 
         tasks.create("iosResources").apply {
             dependsOn("commonResources")
             group = "build"
-            val outKt = project.file("src/iosMain/kotlin/ResourcesActual.kt")
-            outputs.file(outKt)
 
             afterEvaluate {
+                val outKt = project.file("src/iosMain/kotlin/${ext.packageName.replace(".", "/")}/ResourcesActual.kt")
+                outputs.file(outKt)
 
                 val outProject = ext.iosProjectRoot
                 val outAssets = outProject.resolve("Assets.xcassets")
@@ -207,86 +213,94 @@ actual object Resources {
         tasks.create("androidResources").apply {
             dependsOn("commonResources")
             group = "build"
-            val outKt = project.file("src/androidMain/kotlin/ResourcesActual.kt")
-            outputs.file(outKt)
             val resourceFolder = project.file("src/commonMain/resources")
             inputs.files(resourceFolder)
             val androidResFolder = project.file("src/androidMain/res")
 
-            doLast {
-                val resources = resourceFolder.resources()
-                    .entries
-                    .sortedBy { it.key }
-                val androidDrawableFolder = androidResFolder.resolve("drawable-xhdpi").also { it.mkdirs() }
-                resources.forEach { (key, value) ->
-                    if(value !is Resource.Image) return@forEach
-                    val destFile = androidDrawableFolder.resolve(key.snakeCase() + "." + value.source.extension)
-                    value.source.copyTo(destFile, overwrite = true)
-                }
-                val androidFontFolder = androidResFolder.resolve("font").also { it.mkdirs() }
-                resources.forEach { (key, value) ->
-                    if(value !is Resource.Font) return@forEach
-                    val xmlFile = androidFontFolder.resolve(key.snakeCase() + ".xml")
-                    val variants = listOfNotNull(
-                        value.normal.let {
-                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_normal." + it.source.extension)
-                            it.source.copyTo(destFile, overwrite = true)
-                            """
+            afterEvaluate {
+                val outKt =
+                    project.file("src/androidMain/kotlin/${ext.packageName.replace(".", "/")}/ResourcesActual.kt")
+                outputs.file(outKt)
+                doLast {
+                    val resources = resourceFolder.resources()
+                        .entries
+                        .sortedBy { it.key }
+                    val androidDrawableFolder = androidResFolder.resolve("drawable-xhdpi").also { it.mkdirs() }
+                    resources.forEach { (key, value) ->
+                        if (value !is Resource.Image) return@forEach
+                        val destFile = androidDrawableFolder.resolve(key.snakeCase() + "." + value.source.extension)
+                        value.source.copyTo(destFile, overwrite = true)
+                    }
+                    val androidFontFolder = androidResFolder.resolve("font").also { it.mkdirs() }
+                    resources.forEach { (key, value) ->
+                        if (value !is Resource.Font) return@forEach
+                        val xmlFile = androidFontFolder.resolve(key.snakeCase() + ".xml")
+                        val variants = listOfNotNull(
+                            value.normal.let {
+                                val destFile =
+                                    androidFontFolder.resolve(key.snakeCase() + "_normal." + it.source.extension)
+                                it.source.copyTo(destFile, overwrite = true)
+                                """
                             <font
                                 android:fontStyle="normal"
                                 android:fontWeight="400"
                                 android:font="@font/${destFile.nameWithoutExtension}" />
                             """.trimIndent()
-                        },
-                        value.bold?.let {
-                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_bold." + it.source.extension)
-                            it.source.copyTo(destFile, overwrite = true)
-                            """
+                            },
+                            value.bold?.let {
+                                val destFile =
+                                    androidFontFolder.resolve(key.snakeCase() + "_bold." + it.source.extension)
+                                it.source.copyTo(destFile, overwrite = true)
+                                """
                             <font
                                 android:fontStyle="normal"
                                 android:fontWeight="700"
                                 android:font="@font/${destFile.nameWithoutExtension}" />
                             """.trimIndent()
-                        },
-                        value.italic?.let {
-                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_italic." + it.source.extension)
-                            it.source.copyTo(destFile, overwrite = true)
-                            """
+                            },
+                            value.italic?.let {
+                                val destFile =
+                                    androidFontFolder.resolve(key.snakeCase() + "_italic." + it.source.extension)
+                                it.source.copyTo(destFile, overwrite = true)
+                                """
                             <font
                                 android:fontStyle="italic"
                                 android:fontWeight="400"
                                 android:font="@font/${destFile.nameWithoutExtension}" />
                             """.trimIndent()
-                        },
-                        value.boldItalic?.let {
-                            val destFile = androidFontFolder.resolve(key.snakeCase() + "_bold_italic." + it.source.extension)
-                            it.source.copyTo(destFile, overwrite = true)
-                            """
+                            },
+                            value.boldItalic?.let {
+                                val destFile =
+                                    androidFontFolder.resolve(key.snakeCase() + "_bold_italic." + it.source.extension)
+                                it.source.copyTo(destFile, overwrite = true)
+                                """
                             <font
                                 android:fontStyle="italic"
                                 android:fontWeight="700"
                                 android:font="@font/${destFile.nameWithoutExtension}" />
                             """.trimIndent()
-                        }
-                    )
-                    xmlFile.writeText("""
+                            }
+                        )
+                        xmlFile.writeText(
+                            """
 <?xml version="1.0" encoding="utf-8"?>
 <font-family xmlns:android="http://schemas.android.com/apk/res/android">
 ${variants.joinToString("\n")}
 </font-family>
-                    """.trim())
-                }
-                val lines = resources
-                    .joinToString("\n    ") {
-                        when (val r = it.value) {
-                            is Resource.Font -> "actual val ${r.name}: Font = AndroidAppContext.applicationCtx.resources.getFont(R.font.${it.key.snakeCase()})"
-                            is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(R.drawable.${it.key.snakeCase()})"
-                            is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = TODO()"
-                            else -> ""
-                        }
+                    """.trim()
+                        )
                     }
-                outKt.writeText(
-                    """
+                    val lines = resources
+                        .joinToString("\n    ") {
+                            when (val r = it.value) {
+                                is Resource.Font -> "actual val ${r.name}: Font = AndroidAppContext.applicationCtx.resources.getFont(R.font.${it.key.snakeCase()})"
+                                is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(R.drawable.${it.key.snakeCase()})"
+                                is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = TODO()"
+                                else -> ""
+                            }
+                        }
+                    outKt.writeText(
+                        """
 package ${ext.packageName}
 
 import com.lightningkite.rock.models.*
@@ -295,7 +309,9 @@ import com.lightningkite.rock.views.AndroidAppContext
 actual object Resources {
     $lines
 }
-        """.trimIndent())
+        """.trimIndent()
+                    )
+                }
             }
         }
 

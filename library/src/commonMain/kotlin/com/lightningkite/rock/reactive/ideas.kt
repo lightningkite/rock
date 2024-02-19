@@ -31,12 +31,12 @@ suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
     set(action(await()))
 }
 
-class LateInitProperty<T>(): Writable<T>, ReadWriteProperty<Any?, T> {
+class LateInitProperty<T>() : Writable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = ArrayList<() -> Unit>()
     private var queued = ArrayList<Continuation<T>>()
     private var _value: T? = null
     var value: T
-        get() = if(ready) _value as T else throw IllegalStateException()
+        get() = if (ready) _value as T else throw IllegalStateException()
         set(value) {
             _value = value
             ready = true
@@ -59,24 +59,32 @@ class LateInitProperty<T>(): Writable<T>, ReadWriteProperty<Any?, T> {
 
     override suspend fun awaitRaw(): T {
         if (ready) return _value as T
-        else return suspendCoroutineCancellable<T> { queued.add(it); return@suspendCoroutineCancellable { queued.remove(it) } }
+        else return suspendCoroutineCancellable<T> {
+            queued.add(it); return@suspendCoroutineCancellable {
+            queued.remove(
+                it
+            )
+        }
+        }
     }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
         listeners.add(listener)
         return {
             val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
+            if (pos != -1) {
                 listeners.removeAt(pos)
             }
         }
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = value
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        this.value = value
+    }
 }
 
-class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
+class Property<T>(startValue: T) : Writable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = ArrayList<() -> Unit>()
     var value: T = startValue
         set(value) {
@@ -94,27 +102,30 @@ class Property<T>(startValue: T): Writable<T>, ReadWriteProperty<Any?, T> {
         listeners.add(listener)
         return {
             val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
+            if (pos != -1) {
                 listeners.removeAt(pos)
             }
         }
     }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = value
-    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { this.value = value }
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        this.value = value
+    }
 }
 
-class BasicListenable: Listenable {
+class BasicListenable : Listenable {
     private val listeners = ArrayList<() -> Unit>()
     override fun addListener(listener: () -> Unit): () -> Unit {
         listeners.add(listener)
         return {
             val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
+            if (pos != -1) {
                 listeners.removeAt(pos)
             }
         }
     }
+
     fun invokeAll() {
         listeners.toList().forEach { it() }
     }
@@ -124,6 +135,7 @@ class Constant<T>(val value: T) : Readable<T> {
     companion object {
         private val NOOP = {}
     }
+
     override fun addListener(listener: () -> Unit): () -> Unit = NOOP
     override suspend fun awaitRaw(): T = value
 }
@@ -139,6 +151,7 @@ private class ReactiveScopeData(var rerun: () -> Unit) : CoroutineContext.Elemen
         latestPass.clear()
         rerun = {}
     }
+
     object Key : CoroutineContext.Key<ReactiveScopeData>
 }
 
@@ -150,14 +163,14 @@ fun CalculationContext.use(resourceUse: ResourceUse) {
 class Ref<T>(var value: T)
 
 fun CalculationContext.reactiveScope(action: suspend () -> Unit) = reactiveScope(null, action)
-fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> Unit) {
+fun CalculationContext.reactiveScope(onLoad: (() -> Unit)?, action: suspend () -> Unit) {
     var run: () -> Unit = {}
     val data = ReactiveScopeData {
         run()
     }
     val name = Random.nextInt(1000000)
     var previousContext: CoroutineContext? = null
-    var actionRef: Ref<suspend ()->Unit> = Ref(action)
+    var actionRef: Ref<suspend () -> Unit> = Ref(action)
     run = run@{
         val context: CoroutineContext = EmptyCoroutineContext.childCancellation() + data
         previousContext?.cancel()
@@ -173,10 +186,12 @@ fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> 
             // called when a coroutine ends. do nothing.
             override fun resumeWith(result: Result<Unit>) {
                 done = true
-                if(loadStarted) {
+                if (loadStarted) {
+                    notifyLongComplete(result)
+                } else {
                     notifyComplete(result)
                 }
-                if(previousContext !== context) return
+                if (previousContext !== context) return
                 for (entry in data.removers.entries.toList()) {
                     if (entry.key !in data.latestPass) {
                         entry.value()
@@ -186,7 +201,7 @@ fun CalculationContext.reactiveScope(onLoad: (()->Unit)?, action: suspend () -> 
             }
         })
 
-        if(!done) {
+        if (!done) {
             // start load
             loadStarted = true
             notifyStart()
@@ -223,22 +238,22 @@ suspend fun <T> Readable<T>.await(): T {
  * - Inside a reactive scope, [Readable.await] starts the whole system listening and sharing the calculation.
  */
 fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
-    val removers = ArrayList<()->Unit>()
-    val ctx = object: CalculationContext {
+    val removers = ArrayList<() -> Unit>()
+    val ctx = object : CalculationContext {
         override fun onRemove(action: () -> Unit) {
             removers.add(action)
         }
     }
-    return object: Readable<T> {
+    return object : Readable<T> {
         var value: T? = null
         var ready: Boolean = false
         var exception: Exception? = null
         var listening = false
         var queued = ArrayList<Continuation<T>>()
-        override suspend fun awaitRaw(): T = if(ready) {
+        override suspend fun awaitRaw(): T = if (ready) {
 //            println("$this: Ready answer")
             exception?.let { throw it } ?: value as T
-        } else if(listening) {
+        } else if (listening) {
 //            println("$this: Already listening; queue")
             suspendCoroutineCancellable<T> { queued.add(it); { queued.remove(it) } }
         } else {
@@ -255,7 +270,8 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                     ready = false
                     // Notify that we're loading
                     listeners.toList().forEach { it() }
-                }*/) {
+                }*/
+                ) {
                     val listening = listening
 //                    if (listening) println("$this: Recalculating...")
 //                    else println("$this: Starting initial calculation...")
@@ -291,9 +307,10 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                 removeListener(listener)
             }
         }
+
         private fun removeListener(listener: () -> Unit) {
             val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
+            if (pos != -1) {
                 listeners.removeAt(pos)
             }
             if (listeners.isEmpty()) {
@@ -308,10 +325,10 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
     }
 }
 
-private class WaitForNotNull<T: Any>(val wraps: Readable<T?>): Readable<T> {
+private class WaitForNotNull<T : Any>(val wraps: Readable<T?>) : Readable<T> {
     override suspend fun awaitRaw(): T {
         val basis = wraps.awaitRaw()
-        if(basis == null) return suspendCoroutineCancellable<T> { {  } }
+        if (basis == null) return suspendCoroutineCancellable<T> { { } }
         else return basis
     }
 
@@ -324,9 +341,9 @@ private class WaitForNotNull<T: Any>(val wraps: Readable<T?>): Readable<T> {
     override fun equals(other: Any?): Boolean = other is WaitForNotNull<*> && this.wraps == other.wraps
 }
 
-val <T: Any> Readable<T?>.waitForNotNull: Readable<T> get() = WaitForNotNull(this)
-suspend fun <T: Any> Readable<T?>.awaitNotNull(): T {
+val <T : Any> Readable<T?>.waitForNotNull: Readable<T> get() = WaitForNotNull(this)
+suspend fun <T : Any> Readable<T?>.awaitNotNull(): T {
     val basis = await()
-    if(basis == null) return suspendCoroutineCancellable<T> { {} }
+    if (basis == null) return suspendCoroutineCancellable<T> { {} }
     else return basis
 }

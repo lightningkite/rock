@@ -4,6 +4,7 @@ import com.lightningkite.rock.Blob
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import kotlinx.dom.addClass
 import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.url.URL
 
@@ -12,7 +13,10 @@ actual typealias NImage = HTMLImageElement
 
 @ViewDsl
 actual fun ViewWriter.image(setup: Image.() -> Unit): Unit =
-    themedElement<NImage>("img") { setup(Image(this)) }
+    themedElement<NImage>("img") {
+        addClass(".viewDraws")
+        setup(Image(this))
+    }
 
 actual inline var Image.source: ImageSource?
     get() = TODO()

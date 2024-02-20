@@ -3,13 +3,19 @@ package com.lightningkite.rock.views.direct
 import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.drawable.GradientDrawable
+import android.util.AttributeSet
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.view.children
+import androidx.core.view.setMargins
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.LinearGradient
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.lparams
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NContainingView = ViewGroup
@@ -58,6 +64,7 @@ private fun LinearGradient.orientation(): GradientDrawable.Orientation {
 }
 
 class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context) {
+    var overrideSpacing: Dimension? = null
     override fun generateDefaultLayoutParams(): LayoutParams? {
         if (orientation == HORIZONTAL) {
             return LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
@@ -67,3 +74,9 @@ class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context
         return null
     }
 }
+
+actual var ContainingView.spacing: Dimension
+    get() = TODO()
+    set(value) {
+        (native as SlightlyModifiedLinearLayout).overrideSpacing = value
+    }

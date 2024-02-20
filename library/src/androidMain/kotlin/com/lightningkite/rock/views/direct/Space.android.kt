@@ -12,8 +12,8 @@ actual typealias NSpace = View
 actual fun ViewWriter.space(setup: Space.() -> Unit) {
     return viewElement(factory = ::NSpace, wrapper = ::Space) {
         handleTheme(native)  { it, native ->
-            native.lparams.width = it.spacing.value.toInt()
-            native.lparams.height = it.spacing.value.toInt()
+            native.lparams.width = it.defaultSpacing.value.toInt()
+            native.lparams.height = it.defaultSpacing.value.toInt()
         }
         setup(this)
     }
@@ -25,8 +25,8 @@ actual fun ViewWriter.space(
 ) {
     return viewElement(factory = ::View, wrapper = ::Space) {
         handleTheme(native)  { it, native ->
-            native.lparams.width = it.spacing.value.times(multiplier).toInt()
-            native.lparams.height = it.spacing.value.times(multiplier).toInt()
+            native.lparams.width = it.defaultSpacing.value.times(multiplier).toInt()
+            native.lparams.height = it.defaultSpacing.value.times(multiplier).toInt()
         }
         setup(this)
     }

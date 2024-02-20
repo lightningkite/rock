@@ -111,7 +111,7 @@ actual fun ViewWriter.select(setup: Select.() -> Unit) {
 
             setDrawable(1, dropdown)
             setLayerGravity(1, Gravity.END or Gravity.CENTER_VERTICAL)
-            setLayerInsetEnd(1, it.spacing.value.toInt())
+            setLayerInsetEnd(1, it.defaultSpacing.value.toInt())
         },background = {
             native.setPopupBackgroundDrawable(it.backgroundDrawable(true))
         }) {

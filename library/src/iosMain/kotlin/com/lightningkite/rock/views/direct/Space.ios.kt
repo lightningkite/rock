@@ -23,8 +23,8 @@ actual class NSpace(): UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
 actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = element(NSpace()) {
     handleTheme(this) {
         extensionSizeConstraints = SizeConstraints(
-            minHeight = it.spacing,
-            minWidth = it.spacing
+            minHeight = it.defaultSpacing,
+            minWidth = it.defaultSpacing
         )
     }
     setup(Space(this))
@@ -33,8 +33,8 @@ actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = element(NSpace()) {
 actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit = element(NSpace()) {
     handleTheme(this) {
         extensionSizeConstraints = SizeConstraints(
-            minHeight = it.spacing * multiplier,
-            minWidth = it.spacing * multiplier
+            minHeight = it.defaultSpacing * multiplier,
+            minWidth = it.defaultSpacing * multiplier
         )
     }
     setup(Space(this))

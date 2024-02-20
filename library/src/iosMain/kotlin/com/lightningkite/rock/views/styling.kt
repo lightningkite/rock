@@ -66,15 +66,15 @@ fun ViewWriter.handleTheme(
 
         if (useMargins) {
             if (changedThemes) {
-                view.extensionMargin = parentTheme().spacing.value
+                view.extensionMargin = parentTheme().defaultSpacing.value
             } else {
-                view.extensionMargin = theme.spacing.value
+                view.extensionMargin = theme.defaultSpacing.value
             }
         } else {
             view.extensionMargin = 0.0
         }
         if (usePadding) {
-            view.extensionPadding = theme.spacing.value
+            view.extensionPadding = theme.defaultSpacing.value
         } else {
             view.extensionPadding = 0.0
         }

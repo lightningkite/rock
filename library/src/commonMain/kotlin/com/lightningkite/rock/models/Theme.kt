@@ -6,8 +6,9 @@ data class Theme(
     val title: FontAndStyle = FontAndStyle(systemDefaultFont),
     val body: FontAndStyle = FontAndStyle(systemDefaultFont),
     val elevation: Dimension = 2.px,
-    val cornerRadii: CornerRadii = CornerRadii(8.px),
-    val spacing: Dimension = 0.5.rem,
+    val cornerRadiusRatio: Float = 1f,
+    val capsuleButtons: Boolean = false,
+    val defaultSpacing: Dimension = 0.5.rem,
     val foreground: Paint = Color.black,
     val outline: Paint = Color.black,
     val outlineWidth: Dimension = 0.px,
@@ -118,8 +119,9 @@ data class Theme(
         out = out * 31 + title.hashCode()
         out = out * 31 + body.hashCode()
         out = out * 31 + elevation.hashCode()
-        out = out * 31 + cornerRadii.hashCode()
-        out = out * 31 + spacing.hashCode()
+        out = out * 31 + cornerRadiusRatio.hashCode()
+        out = out * 31 + capsuleButtons.hashCode()
+        out = out * 31 + defaultSpacing.hashCode()
         out = out * 31 + foreground.hashCode()
         out = out * 31 + outline.hashCode()
         out = out * 31 + outlineWidth.hashCode()
@@ -131,8 +133,9 @@ data class Theme(
         return other is Theme && this.title == other.title &&
                 this.body == other.body &&
                 this.elevation == other.elevation &&
-                this.cornerRadii == other.cornerRadii &&
-                this.spacing == other.spacing &&
+                this.cornerRadiusRatio == other.cornerRadiusRatio &&
+                this.capsuleButtons == other.capsuleButtons &&
+                this.defaultSpacing == other.defaultSpacing &&
                 this.foreground == other.foreground &&
                 this.outline == other.outline &&
                 this.outlineWidth == other.outlineWidth &&

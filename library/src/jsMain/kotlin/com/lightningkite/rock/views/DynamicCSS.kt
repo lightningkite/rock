@@ -955,13 +955,13 @@ object DynamicCSS {
         }
         style(
             sel(".mightTransition:not(.isRoot)", ".forcePadding"), mapOf(
-                "padding" to theme.spacing.value,
+                "padding" to theme.defaultSpacing.value,
             )
         )
         style(
             sel(".mightTransition:not(.marginless)",  ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
-                "margin" to "var(--nextMargin, ${theme.spacing.value})",
-                "--margin" to "var(--nextMargin, ${theme.spacing.value})",
+                "margin" to "var(--nextMargin, ${theme.defaultSpacing.value})",
+                "--margin" to "var(--nextMargin, ${theme.defaultSpacing.value})",
             )
         )
         style(
@@ -988,7 +988,7 @@ object DynamicCSS {
             )
         )
         style(sel("> *"), mapOf(
-            "--nextMargin" to theme.spacing.value,
+            "--nextMargin" to theme.defaultSpacing.value,
         ))
         style(
             sel(".mightTransition:not(.marginless)"), mapOf(

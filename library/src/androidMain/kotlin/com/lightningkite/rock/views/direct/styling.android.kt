@@ -178,15 +178,15 @@ inline fun <T : NView> ViewWriter.handleTheme(
         if(parentIsSwap) println("parentIsSwap! ${useMargins}")
         if (useMargins) {
             if(changedThemes) {
-                view.setMarginAll(parentTheme().spacing.value.toInt())
+                view.setMarginAll(parentTheme().defaultSpacing.value.toInt())
             } else {
-                view.setMarginAll(theme.spacing.value.toInt())
+                view.setMarginAll(theme.defaultSpacing.value.toInt())
             }
         } else {
             view.setMarginAll(0)
         }
         if (usePadding) {
-            view.setPaddingAll(theme.spacing.value.toInt())
+            view.setPaddingAll(theme.defaultSpacing.value.toInt())
         } else {
             view.setPaddingAll(0)
         }

@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.handleTheme
@@ -27,3 +28,7 @@ actual fun ViewWriter.row(setup: ContainingView.() -> Unit): Unit = element(Line
     handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
+
+actual var ContainingView.spacing: Dimension
+    get() = TODO("Not yet implemented")
+    set(value) {}

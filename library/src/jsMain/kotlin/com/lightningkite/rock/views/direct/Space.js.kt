@@ -15,8 +15,8 @@ actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = element<NSpace>("sp
     val getter = currentTheme
     val s = Space(this)
     s.reactiveScope {
-        style.width = (getter().spacing * 4).value
-        style.height = (getter().spacing * 4).value
+        style.width = (getter().defaultSpacing * 4).value
+        style.height = (getter().defaultSpacing * 4).value
     }
     setup(s)
 }
@@ -25,8 +25,8 @@ actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit =
     val getter = currentTheme
     val s = Space(this)
     s.reactiveScope {
-        style.width = (getter().spacing * multiplier).value
-        style.height = (getter().spacing * multiplier).value
+        style.width = (getter().defaultSpacing * multiplier).value
+        style.height = (getter().defaultSpacing * multiplier).value
     }
     setup(s)
 }

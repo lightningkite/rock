@@ -23,10 +23,6 @@ fun ViewWriter.handleTheme(
     this.changedThemes = false
 
     view.calculationContext.reactiveScope {
-        val virtualClasses = view.classList.asList().toMutableSet()
-        if (viewDraws) virtualClasses.add("viewDraws")
-        if (isRoot) virtualClasses.add("isRoot")
-
         val theme = currentTheme()
 
         val mightTransition = isControl || transition != ViewWriter.TransitionNextView.No
@@ -35,6 +31,11 @@ fun ViewWriter.handleTheme(
             ViewWriter.TransitionNextView.Yes -> true
             is ViewWriter.TransitionNextView.Maybe -> transition.logic()
         }
+
+        val virtualClasses = view.classList.asList().toMutableSet()
+        if (viewDraws) virtualClasses.add("viewDraws")
+        if (isRoot) virtualClasses.add("isRoot")
+
         if (shouldTransition) virtualClasses.add("transition")
         else virtualClasses.remove("transition")
         if (mightTransition) virtualClasses.add("mightTransition")

@@ -39,7 +39,7 @@ actual suspend fun fetch(
         request.responseType = XMLHttpRequestResponseType.BLOB
         request.open(method.name, url)
         headers.forEach { key, value -> request.setRequestHeader(key, value) }
-        request.onloadstart = { ev -> cont.resume(RequestResponse(request)) }
+        request.onloadend = { ev -> cont.resume(RequestResponse(request)) }
         when (body) {
             null -> request.send()
             is RequestBodyBlob -> {

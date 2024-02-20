@@ -198,7 +198,9 @@ fun CalculationContext.launch(action: suspend () -> Unit) {
         // called when a coroutine ends. do nothing.
         override fun resumeWith(result: Result<Unit>) {
             done = true
-            if(loadStarted) {
+            if (loadStarted) {
+                notifyLongComplete(result)
+            } else {
                 notifyComplete(result)
             }
         }
@@ -220,7 +222,9 @@ fun CalculationContext.launchManualCancel(action: suspend () -> Unit): Cancellab
         // called when a coroutine ends. do nothing.
         override fun resumeWith(result: Result<Unit>) {
             done = true
-            if(loadStarted) {
+            if (loadStarted) {
+                notifyLongComplete(result)
+            } else {
                 notifyComplete(result)
             }
         }

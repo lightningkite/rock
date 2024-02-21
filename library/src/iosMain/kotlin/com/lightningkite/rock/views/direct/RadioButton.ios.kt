@@ -14,7 +14,7 @@ import com.lightningkite.rock.views.visible
 actual typealias NRadioButton = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit {
+actual fun ViewWriter.radioButtonActual(setup: RadioButton.() -> Unit): Unit {
     transitionNextView = ViewWriter.TransitionNextView.Yes
     radioToggleButton {
         icon(Icon.done, "") {

@@ -29,7 +29,7 @@ actual fun <T> ViewPager.children(
 
 @OptIn(ExperimentalForeignApi::class)
 @ViewDsl
-actual fun ViewWriter.viewPager(setup: ViewPager.() -> Unit) = element(
+actual fun ViewWriter.viewPagerActual(setup: ViewPager.() -> Unit) = element(
     UICollectionView(
         CGRectMake(
             0.0,

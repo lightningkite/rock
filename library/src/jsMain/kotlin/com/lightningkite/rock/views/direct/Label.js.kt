@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLElement
 actual typealias NLabel = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
+actual fun ViewWriter.labelActual(setup: Label.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-label")
     textElement("span") {
     }

@@ -6,6 +6,7 @@ import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NCanvas : NView
 
@@ -13,7 +14,8 @@ expect class NCanvas : NView
 value class Canvas(override val native: NCanvas) : RView<NCanvas>
 
 @ViewDsl
-expect fun ViewWriter.canvas(setup: Canvas.() -> Unit = {}): Unit
+expect fun ViewWriter.canvasActual(setup: Canvas.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.canvas(noinline setup: Canvas.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; canvasActual(setup) }
 
 expect var Canvas.delegate: CanvasDelegate?
 

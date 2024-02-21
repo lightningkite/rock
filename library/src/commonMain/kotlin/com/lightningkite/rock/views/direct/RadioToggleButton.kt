@@ -6,6 +6,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NRadioToggleButton : NView
 
@@ -13,6 +14,7 @@ expect class NRadioToggleButton : NView
 value class RadioToggleButton(override val native: NRadioToggleButton) : RView<NRadioToggleButton>
 
 @ViewDsl
-expect fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit = {}): Unit
+expect fun ViewWriter.radioToggleButtonActual(setup: RadioToggleButton.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.radioToggleButton(noinline setup: RadioToggleButton.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; radioToggleButtonActual(setup) }
 expect var RadioToggleButton.enabled: Boolean
 expect val RadioToggleButton.checked: Writable<Boolean>

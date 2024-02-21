@@ -13,7 +13,7 @@ import org.w3c.dom.events.KeyboardEvent
 actual typealias NRadioToggleButton = HTMLSpanElement
 
 @ViewDsl
-actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit =
+actual fun ViewWriter.radioToggleButtonActual(setup: RadioToggleButton.() -> Unit): Unit =
     element<HTMLLabelElement>("label") {
         classList.add("toggle-button")
         lateinit var input: HTMLInputElement

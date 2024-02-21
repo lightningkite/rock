@@ -14,7 +14,7 @@ import com.lightningkite.rock.views.visible
 actual typealias NCheckbox = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit {
+actual fun ViewWriter.checkboxActual(setup: Checkbox.() -> Unit): Unit {
     transitionNextView = ViewWriter.TransitionNextView.Yes
     toggleButton {
         icon(Icon.done, "") {

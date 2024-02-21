@@ -6,6 +6,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NToggleButton : NView
 
@@ -13,6 +14,7 @@ expect class NToggleButton : NView
 value class ToggleButton(override val native: NToggleButton) : RView<NToggleButton>
 
 @ViewDsl
-expect fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit = {}): Unit
+expect fun ViewWriter.toggleButtonActual(setup: ToggleButton.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.toggleButton(noinline setup: ToggleButton.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; toggleButtonActual(setup) }
 expect var ToggleButton.enabled: Boolean
 expect val ToggleButton.checked: Writable<Boolean>

@@ -6,6 +6,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NSwitch : NView
 
@@ -13,6 +14,7 @@ expect class NSwitch : NView
 value class Switch(override val native: NSwitch) : RView<NSwitch>
 
 @ViewDsl
-expect fun ViewWriter.switch(setup: Switch.() -> Unit = {}): Unit
+expect fun ViewWriter.switchActual(setup: Switch.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.switch(noinline setup: Switch.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; switchActual(setup) }
 expect var Switch.enabled: Boolean
 expect val Switch.checked: Writable<Boolean>

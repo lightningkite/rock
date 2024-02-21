@@ -33,7 +33,7 @@ actual class NViewPager(context: Context) : FrameLayout(context) {
 }
 
 @ViewDsl
-actual fun ViewWriter.viewPager(setup: ViewPager.() -> Unit) {
+actual fun ViewWriter.viewPagerActual(setup: ViewPager.() -> Unit) {
     element(NViewPager(context))  {
         viewWriter = newViews()
         handleTheme(this, viewDraws = false)

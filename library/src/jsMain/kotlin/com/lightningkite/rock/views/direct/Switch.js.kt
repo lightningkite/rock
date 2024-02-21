@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLInputElement
 actual typealias NSwitch = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.switch(setup: Switch.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
+actual fun ViewWriter.switchActual(setup: Switch.() -> Unit): Unit = themedElementClickable<HTMLInputElement>("input") {
     this.type = "checkbox"
     this.classList.add("switch")
     this.classList.add("checkResponsive")

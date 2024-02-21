@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
 actual typealias NViewPager = HTMLDivElement
 
 @ViewDsl
-actual fun ViewWriter.viewPager(setup: ViewPager.() -> Unit) {
+actual fun ViewWriter.viewPagerActual(setup: ViewPager.() -> Unit) {
     themedElement<HTMLDivElement>("div") {
         this.asDynamic().__ROCK__viewWriter = split()
         classList.add("viewPager")

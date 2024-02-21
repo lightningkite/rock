@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
 actual typealias NRecyclerView = HTMLDivElement
 
 @ViewDsl
-actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit {
+actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit): Unit {
     themedElement<HTMLDivElement>("div", viewDraws = false) {
         classList.add("recyclerView")
         var scrollingContainer: HTMLDivElement = this
@@ -86,7 +86,7 @@ actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit {
 }
 
 @ViewDsl
-actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit {
+actual fun ViewWriter.horizontalRecyclerViewActual(setup: RecyclerView.() -> Unit): Unit {
     themedElement<HTMLDivElement>("div") {
         classList.add("recyclerView")
         var scrollingContainer: HTMLDivElement = this

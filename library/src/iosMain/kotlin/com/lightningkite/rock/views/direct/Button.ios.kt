@@ -11,7 +11,7 @@ import platform.UIKit.UIControlEventTouchUpInside
 actual typealias NButton = FrameLayoutButton
 
 @ViewDsl
-actual fun ViewWriter.button(setup: Button.() -> Unit): Unit = element(FrameLayoutButton()) {
+actual fun ViewWriter.buttonActual(setup: Button.() -> Unit): Unit = element(FrameLayoutButton()) {
     val l = iosCalculationContext.loading
     handleThemeControl(this) {
         setup(Button(this))

@@ -8,6 +8,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NTwoPane : NView
 

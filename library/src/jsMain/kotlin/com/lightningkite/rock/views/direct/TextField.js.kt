@@ -14,7 +14,7 @@ import org.w3c.dom.HTMLInputElement
 actual typealias NTextField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit =
+actual fun ViewWriter.textFieldActual(setup: TextField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         setup(TextField(this))
     }

@@ -122,7 +122,7 @@ actual var Image.description: String?
     }
 
 @ViewDsl
-actual fun ViewWriter.image(setup: Image.() -> Unit) {
+actual fun ViewWriter.imageActual(setup: Image.() -> Unit) {
     return viewElement(factory = ::ImageView, wrapper = ::Image) {
         handleTheme(native, viewDraws = true, viewLoads = true)
         setup(this)
@@ -131,7 +131,7 @@ actual fun ViewWriter.image(setup: Image.() -> Unit) {
 
 
 @ViewDsl
-actual fun ViewWriter.zoomableImage(setup: Image.() -> Unit) {
+actual fun ViewWriter.zoomableImageActual(setup: Image.() -> Unit) {
     return viewElement(::ZoomClass, wrapper = ::Image){
         handleTheme(native, viewDraws = true)
         setup(this)

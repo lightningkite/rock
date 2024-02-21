@@ -9,7 +9,7 @@ import com.lightningkite.rock.views.lparams
 actual typealias NSpace = View
 
 @ViewDsl
-actual fun ViewWriter.space(setup: Space.() -> Unit) {
+actual fun ViewWriter.spaceActual(setup: Space.() -> Unit) {
     return viewElement(factory = ::NSpace, wrapper = ::Space) {
         handleTheme(native)  { it, native ->
             native.lparams.width = it.spacing.value.toInt()

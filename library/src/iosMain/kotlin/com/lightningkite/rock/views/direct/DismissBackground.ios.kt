@@ -12,7 +12,7 @@ import platform.objc.sel_registerName
 actual typealias NDismissBackground = FrameLayout
 
 @ViewDsl
-actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit = element(FrameLayout()) {
+actual fun ViewWriter.dismissBackgroundActual(setup: DismissBackground.() -> Unit): Unit = element(FrameLayout()) {
     handleTheme(this) {
         backgroundColor = it.background.closestColor().copy(alpha = 0.5f).toUiColor()
     }

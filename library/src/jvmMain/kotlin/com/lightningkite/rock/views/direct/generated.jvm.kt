@@ -11,15 +11,15 @@ import kotlinx.datetime.*
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSeparator = HTMLElement
-@ViewDsl actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit = todo("separator")
+@ViewDsl actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit = todo("separator")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NContainingView = HTMLElement
-@ViewDsl actual fun ViewWriter.stack(setup: ContainingView.() -> Unit): Unit = todo("stack")
-@ViewDsl actual fun ViewWriter.col(setup: ContainingView.() -> Unit): Unit = todo("col")
-@ViewDsl actual fun ViewWriter.row(setup: ContainingView.() -> Unit): Unit = todo("row")
+@ViewDsl actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit): Unit = todo("stack")
+@ViewDsl actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit): Unit = todo("col")
+@ViewDsl actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = todo("row")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLink = HTMLElement
-@ViewDsl actual fun ViewWriter.link(setup: Link.() -> Unit): Unit = todo("link")
+@ViewDsl actual fun ViewWriter.linkActual(setup: Link.() -> Unit): Unit = todo("link")
 actual inline var Link.to: RockScreen
     get() = TODO()
     set(value) { }
@@ -28,7 +28,7 @@ actual inline var Link.newTab: Boolean
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NExternalLink = HTMLElement
-@ViewDsl actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit): Unit = todo("externalLink")
+@ViewDsl actual fun ViewWriter.externalLinkActual(setup: ExternalLink.() -> Unit): Unit = todo("externalLink")
 actual inline var ExternalLink.to: String
     get() = TODO()
     set(value) { }
@@ -37,7 +37,7 @@ actual inline var ExternalLink.newTab: Boolean
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NImage = HTMLElement
-@ViewDsl actual fun ViewWriter.image(setup: Image.() -> Unit): Unit = todo("image")
+@ViewDsl actual fun ViewWriter.imageActual(setup: Image.() -> Unit): Unit = todo("image")
 actual inline var Image.source: ImageSource?
     get() = TODO()
     set(value) { }
@@ -49,14 +49,14 @@ actual inline var Image.description: String?
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NTextView = HTMLElement
-@ViewDsl actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = todo("h1")
-@ViewDsl actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = todo("h2")
-@ViewDsl actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = todo("h3")
-@ViewDsl actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = todo("h4")
-@ViewDsl actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = todo("h5")
-@ViewDsl actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = todo("h6")
-@ViewDsl actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = todo("text")
-@ViewDsl actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = todo("subtext")
+@ViewDsl actual fun ViewWriter.h1Actual(setup: TextView.() -> Unit): Unit = todo("h1")
+@ViewDsl actual fun ViewWriter.h2Actual(setup: TextView.() -> Unit): Unit = todo("h2")
+@ViewDsl actual fun ViewWriter.h3Actual(setup: TextView.() -> Unit): Unit = todo("h3")
+@ViewDsl actual fun ViewWriter.h4Actual(setup: TextView.() -> Unit): Unit = todo("h4")
+@ViewDsl actual fun ViewWriter.h5Actual(setup: TextView.() -> Unit): Unit = todo("h5")
+@ViewDsl actual fun ViewWriter.h6Actual(setup: TextView.() -> Unit): Unit = todo("h6")
+@ViewDsl actual fun ViewWriter.textActual(setup: TextView.() -> Unit): Unit = todo("text")
+@ViewDsl actual fun ViewWriter.subtextActual(setup: TextView.() -> Unit): Unit = todo("subtext")
 actual inline var TextView.content: String
     get() = TODO()
     set(value) { }
@@ -68,66 +68,66 @@ actual inline var TextView.textSize: Dimension
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLabel = HTMLElement
-@ViewDsl actual fun ViewWriter.label(setup: Label.() -> Unit): Unit = todo("label")
+@ViewDsl actual fun ViewWriter.labelActual(setup: Label.() -> Unit): Unit = todo("label")
 actual inline var Label.content: String
     get() = TODO()
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NActivityIndicator = HTMLElement
-@ViewDsl actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit = todo("activityIndicator")
+@ViewDsl actual fun ViewWriter.activityIndicatorActual(setup: ActivityIndicator.() -> Unit): Unit = todo("activityIndicator")
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSpace = HTMLElement
-@ViewDsl actual fun ViewWriter.space(setup: Space.() -> Unit): Unit = todo("space")
+@ViewDsl actual fun ViewWriter.spaceActual(setup: Space.() -> Unit): Unit = todo("space")
 actual fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit): Unit = TODO()
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NDismissBackground = HTMLElement
-@ViewDsl actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit = todo("dismissBackground")
+@ViewDsl actual fun ViewWriter.dismissBackgroundActual(setup: DismissBackground.() -> Unit): Unit = todo("dismissBackground")
 actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit = TODO()
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NButton = HTMLElement
-@ViewDsl actual fun ViewWriter.button(setup: Button.() -> Unit): Unit = todo("button")
+@ViewDsl actual fun ViewWriter.buttonActual(setup: Button.() -> Unit): Unit = todo("button")
 actual fun Button.onClick(action: suspend () -> Unit): Unit = TODO()
 actual inline var Button.enabled: Boolean
     get() = TODO()
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NCheckbox = HTMLElement
-@ViewDsl actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit = todo("checkbox")
+@ViewDsl actual fun ViewWriter.checkboxActual(setup: Checkbox.() -> Unit): Unit = todo("checkbox")
 actual inline var Checkbox.enabled: Boolean
     get() = TODO()
     set(value) { }
 actual val Checkbox.checked: Writable<Boolean> get() = Property(false)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRadioButton = HTMLElement
-@ViewDsl actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit = todo("radioButton")
+@ViewDsl actual fun ViewWriter.radioButtonActual(setup: RadioButton.() -> Unit): Unit = todo("radioButton")
 actual inline var RadioButton.enabled: Boolean
     get() = TODO()
     set(value) { }
 actual val RadioButton.checked: Writable<Boolean> get() = Property(false)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSwitch = HTMLElement
-@ViewDsl actual fun ViewWriter.switch(setup: Switch.() -> Unit): Unit = todo("switch")
+@ViewDsl actual fun ViewWriter.switchActual(setup: Switch.() -> Unit): Unit = todo("switch")
 actual inline var Switch.enabled: Boolean
     get() = TODO()
     set(value) { }
 actual val Switch.checked: Writable<Boolean> get() = Property(false)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NToggleButton = HTMLElement
-@ViewDsl actual fun ViewWriter.toggleButton(setup: ToggleButton.() -> Unit): Unit = todo("toggleButton")
+@ViewDsl actual fun ViewWriter.toggleButtonActual(setup: ToggleButton.() -> Unit): Unit = todo("toggleButton")
 actual inline var ToggleButton.enabled: Boolean
     get() = TODO()
     set(value) { }
 actual val ToggleButton.checked: Writable<Boolean> get() = Property(false)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRadioToggleButton = HTMLElement
-@ViewDsl actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit): Unit = todo("radioToggleButton")
+@ViewDsl actual fun ViewWriter.radioToggleButtonActual(setup: RadioToggleButton.() -> Unit): Unit = todo("radioToggleButton")
 actual inline var RadioToggleButton.enabled: Boolean
     get() = TODO()
     set(value) { }
 actual val RadioToggleButton.checked: Writable<Boolean> get() = Property(false)
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLocalDateField = HTMLElement
-@ViewDsl actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit): Unit = todo("localDateField")
+@ViewDsl actual fun ViewWriter.localDateFieldActual(setup: LocalDateField.() -> Unit): Unit = todo("localDateField")
 actual var LocalDateField.action: Action?
     get() = TODO()
     set(value) {}
@@ -137,7 +137,7 @@ actual inline var LocalDateField.range: ClosedRange<LocalDate>?
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLocalTimeField = HTMLElement
-@ViewDsl actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = todo("localTimeField")
+@ViewDsl actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit): Unit = todo("localTimeField")
 actual var LocalTimeField.action: Action?
     get() = TODO()
     set(value) {}
@@ -147,7 +147,7 @@ actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NLocalDateTimeField = HTMLElement
-@ViewDsl actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit): Unit = todo("localDateTimeField")
+@ViewDsl actual fun ViewWriter.localDateTimeFieldActual(setup: LocalDateTimeField.() -> Unit): Unit = todo("localDateTimeField")
 actual var LocalDateTimeField.action: Action?
     get() = TODO()
     set(value) {}
@@ -157,7 +157,7 @@ actual inline var LocalDateTimeField.range: ClosedRange<LocalDateTime>?
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NTextField = HTMLElement
-@ViewDsl actual fun ViewWriter.textField(setup: TextField.() -> Unit): Unit = todo("textField")
+@ViewDsl actual fun ViewWriter.textFieldActual(setup: TextField.() -> Unit): Unit = todo("textField")
 actual val TextField.content: Writable<String> get() = Property("")
 actual inline var TextField.keyboardHints: KeyboardHints
     get() = TODO()
@@ -173,7 +173,7 @@ actual inline var TextField.range: ClosedRange<Double>?
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NTextArea = HTMLElement
-@ViewDsl actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit = todo("textArea")
+@ViewDsl actual fun ViewWriter.textAreaActual(setup: TextArea.() -> Unit): Unit = todo("textArea")
 actual val TextArea.content: Writable<String> get() = Property("")
 actual inline var TextArea.keyboardHints: KeyboardHints
     get() = TODO()
@@ -183,7 +183,7 @@ actual inline var TextArea.hint: String
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSelect = HTMLElement
-@ViewDsl actual fun ViewWriter.select(setup: Select.() -> Unit): Unit = todo("select")
+@ViewDsl actual fun ViewWriter.selectActual(setup: Select.() -> Unit): Unit = todo("select")
 actual fun <T> Select.bind(
     edits: Writable<T>,
     data: Readable<List<T>>,
@@ -192,7 +192,7 @@ actual fun <T> Select.bind(
 }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NAutoCompleteTextField = HTMLElement
-@ViewDsl actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit = todo("autoCompleteTextField")
+@ViewDsl actual fun ViewWriter.autoCompleteTextFieldActual(setup: AutoCompleteTextField.() -> Unit): Unit = todo("autoCompleteTextField")
 actual val AutoCompleteTextField.content: Writable<String> get() = Property("")
 actual inline var AutoCompleteTextField.keyboardHints: KeyboardHints
     get() = TODO()
@@ -205,12 +205,12 @@ actual inline var AutoCompleteTextField.suggestions: List<String>
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NSwapView = HTMLElement
-@ViewDsl actual fun ViewWriter.swapView(setup: SwapView.() -> Unit): Unit = todo("swapView")
-@ViewDsl actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = todo("swapViewDialog")
+@ViewDsl actual fun ViewWriter.swapViewActual(setup: SwapView.() -> Unit): Unit = todo("swapView")
+@ViewDsl actual fun ViewWriter.swapViewDialogActual(setup: SwapView.() -> Unit): Unit = todo("swapViewDialog")
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.()->Unit): Unit = TODO()
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NWebView = HTMLElement
-@ViewDsl actual fun ViewWriter.webView(setup: WebView.() -> Unit): Unit = todo("webView")
+@ViewDsl actual fun ViewWriter.webViewActual(setup: WebView.() -> Unit): Unit = todo("webView")
 actual inline var WebView.url: String
     get() = TODO()
     set(value) { }
@@ -222,10 +222,10 @@ actual inline var WebView.content: String
     set(value) { }
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NCanvas = HTMLElement
-@ViewDsl actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = todo("canvas")
+@ViewDsl actual fun ViewWriter.canvasActual(setup: Canvas.() -> Unit): Unit = todo("canvas")
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NRecyclerView = HTMLElement
-@ViewDsl actual fun ViewWriter.recyclerView(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
-@ViewDsl actual fun ViewWriter.horizontalRecyclerView(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")
+@ViewDsl actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit): Unit = todo("recyclerView")
+@ViewDsl actual fun ViewWriter.horizontalRecyclerViewActual(setup: RecyclerView.() -> Unit): Unit = todo("horizontalRecyclerView")
 actual var RecyclerView.columns: Int
     get() = 1
     set(value) { TODO() }

@@ -5,6 +5,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NExternalLink : NView
 
@@ -12,6 +13,7 @@ expect class NExternalLink : NView
 value class ExternalLink(override val native: NExternalLink) : RView<NExternalLink>
 
 @ViewDsl
-expect fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit = {}): Unit
+expect fun ViewWriter.externalLinkActual(setup: ExternalLink.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.externalLink(noinline setup: ExternalLink.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; externalLinkActual(setup) }
 expect var ExternalLink.to: String
 expect var ExternalLink.newTab: Boolean

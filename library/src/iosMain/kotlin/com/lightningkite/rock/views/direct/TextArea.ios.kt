@@ -12,7 +12,7 @@ import platform.darwin.NSObject
 actual typealias NTextArea = UITextView
 
 @ViewDsl
-actual fun ViewWriter.textArea(setup: TextArea.() -> Unit): Unit = stack {
+actual fun ViewWriter.textAreaActual(setup: TextArea.() -> Unit): Unit = stack {
     element(UITextView()) {
         smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo

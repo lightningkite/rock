@@ -3,6 +3,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.models.ScreenTransition
 import com.lightningkite.rock.views.*
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NSwapView : NView
 
@@ -10,9 +11,11 @@ expect class NSwapView : NView
 value class SwapView(override val native: NSwapView) : RView<NSwapView>
 
 @ViewDsl
-expect fun ViewWriter.swapView(setup: SwapView.() -> Unit = {}): Unit
+expect fun ViewWriter.swapViewActual(setup: SwapView.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.swapView(noinline setup: SwapView.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; swapViewActual(setup) }
 @ViewDsl
-expect fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit = {}): Unit
+expect fun ViewWriter.swapViewDialogActual(setup: SwapView.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.swapViewDialog(noinline setup: SwapView.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; swapViewDialogActual(setup) }
 expect fun SwapView.swap(transition: ScreenTransition = ScreenTransition.Fade, createNewView: ViewWriter.()->Unit): Unit
 
 inline fun <T> SwapView.swapping(

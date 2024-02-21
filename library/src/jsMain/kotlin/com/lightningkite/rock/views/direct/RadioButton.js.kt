@@ -29,7 +29,7 @@ fun <T : HTMLElement, V> T.vprop(
 }
 
 @ViewDsl
-actual fun ViewWriter.radioButton(setup: RadioButton.() -> Unit): Unit {
+actual fun ViewWriter.radioButtonActual(setup: RadioButton.() -> Unit): Unit {
     transitionNextView = ViewWriter.TransitionNextView.Yes
     themedElementClickable<HTMLInputElement>("input") {
         classList.add("radio")

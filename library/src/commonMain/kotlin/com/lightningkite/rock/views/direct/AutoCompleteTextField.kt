@@ -8,6 +8,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NAutoCompleteTextField : NView
 
@@ -15,7 +16,8 @@ expect class NAutoCompleteTextField : NView
 value class AutoCompleteTextField(override val native: NAutoCompleteTextField) : RView<NAutoCompleteTextField>
 
 @ViewDsl
-expect fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit = {}): Unit
+expect fun ViewWriter.autoCompleteTextFieldActual(setup: AutoCompleteTextField.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.autoCompleteTextField(noinline setup: AutoCompleteTextField.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; autoCompleteTextFieldActual(setup) }
 expect val AutoCompleteTextField.content: Writable<String>
 expect var AutoCompleteTextField.keyboardHints: KeyboardHints
 expect var AutoCompleteTextField.action: Action?

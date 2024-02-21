@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLElement
 actual typealias NSeparator = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.separator(setup: Separator.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
+actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit = themedElement<HTMLDivElement>("div") {
     classList.add("rock-separator")
     setup(Separator(this))
 }

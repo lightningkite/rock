@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLInputElement
 actual typealias NCheckbox = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit): Unit {
+actual fun ViewWriter.checkboxActual(setup: Checkbox.() -> Unit): Unit {
     transitionNextView = ViewWriter.TransitionNextView.Yes
     themedElementClickable<HTMLInputElement>("input") {
         this.type = "checkbox"

@@ -126,7 +126,7 @@ actual var LocalDateTimeField.action: Action?
     }
 
 @ViewDsl
-actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit) = button {
+actual fun ViewWriter.localDateFieldActual(setup: LocalDateField.() -> Unit) = button {
     val me = LocalDateField(this.native)
     val d = LocalDateFieldData()
     LocalDateFieldMoreData[me] = d
@@ -142,7 +142,7 @@ actual fun ViewWriter.localDateField(setup: LocalDateField.() -> Unit) = button 
 }
 
 @ViewDsl
-actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit) = button {
+actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit) = button {
     val me = LocalTimeField(this.native)
     val d = LocalTimeFieldData()
     LocalTimeFieldMoreData[me] = d
@@ -158,7 +158,7 @@ actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit) = button 
 }
 
 @ViewDsl
-actual fun ViewWriter.localDateTimeField(setup: LocalDateTimeField.() -> Unit) = button {
+actual fun ViewWriter.localDateTimeFieldActual(setup: LocalDateTimeField.() -> Unit) = button {
     val me = LocalDateTimeField(this.native)
     val d = LocalDateTimeFieldData()
     LocalDateTimeFieldMoreData[me] = d

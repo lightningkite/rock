@@ -8,7 +8,7 @@ import org.w3c.dom.HTMLIFrameElement
 actual typealias NWebView = HTMLIFrameElement
 
 @ViewDsl
-actual fun ViewWriter.webView(setup: WebView.() -> Unit): Unit =
+actual fun ViewWriter.webViewActual(setup: WebView.() -> Unit): Unit =
     themedElement<NWebView>("iframe") { setup(WebView(this)) }
 
 actual inline var WebView.url: String

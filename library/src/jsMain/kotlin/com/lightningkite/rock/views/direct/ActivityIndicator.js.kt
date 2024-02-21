@@ -9,7 +9,7 @@ import org.w3c.dom.HTMLSpanElement
 actual typealias NActivityIndicator = HTMLSpanElement
 
 @ViewDsl
-actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
+actual fun ViewWriter.activityIndicatorActual(setup: ActivityIndicator.() -> Unit): Unit =
     themedElement<HTMLSpanElement>("span") {
         addClass("spinner")
     }

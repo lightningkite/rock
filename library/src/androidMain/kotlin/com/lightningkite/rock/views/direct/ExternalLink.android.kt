@@ -39,6 +39,6 @@ actual var ExternalLink.newTab: Boolean
     }
 
 @ViewDsl
-actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) {
+actual fun ViewWriter.externalLinkActual(setup: ExternalLink.() -> Unit) {
     viewElement(factory = ::FrameLayout, wrapper = ::ExternalLink, setup = setup)
 }

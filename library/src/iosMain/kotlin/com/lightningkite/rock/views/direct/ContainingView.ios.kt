@@ -9,20 +9,20 @@ import platform.UIKit.UIView
 actual typealias NContainingView = UIView
 
 @ViewDsl
-actual fun ViewWriter.stack(setup: ContainingView.() -> Unit): Unit = element(FrameLayout()) {
+actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit): Unit = element(FrameLayout()) {
     handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
 
 @ViewDsl
-actual fun ViewWriter.col(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
+actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = false
     handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
 
 @ViewDsl
-actual fun ViewWriter.row(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
+actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = true
     handleTheme(this, viewDraws = false)
     setup(ContainingView(this))

@@ -31,7 +31,7 @@ actual val RadioToggleButton.checked: Writable<Boolean>
     get() = native.checked
 
 @ViewDsl
-actual fun ViewWriter.radioToggleButton(setup: RadioToggleButton.() -> Unit) {
+actual fun ViewWriter.radioToggleButtonActual(setup: RadioToggleButton.() -> Unit) {
     return viewElement(factory = ::NRadioToggleButton, wrapper = ::RadioToggleButton) {
         handleThemeControl(native, checked = { checked.await() }){
             setup(this)

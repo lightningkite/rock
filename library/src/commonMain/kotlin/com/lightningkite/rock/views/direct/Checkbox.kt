@@ -6,6 +6,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NCheckbox : NView
 
@@ -13,6 +14,7 @@ expect class NCheckbox : NView
 value class Checkbox(override val native: NCheckbox) : RView<NCheckbox>
 
 @ViewDsl
-expect fun ViewWriter.checkbox(setup: Checkbox.() -> Unit = {}): Unit
+expect fun ViewWriter.checkboxActual(setup: Checkbox.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.checkbox(noinline setup: Checkbox.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; checkboxActual(setup) }
 expect var Checkbox.enabled: Boolean
 expect val Checkbox.checked: Writable<Boolean>

@@ -11,28 +11,28 @@ import org.w3c.dom.HTMLElement
 actual typealias NTextView = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.h1(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
+actual fun ViewWriter.h1Actual(setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
 
 @ViewDsl
-actual fun ViewWriter.h2(setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
+actual fun ViewWriter.h2Actual(setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
 
 @ViewDsl
-actual fun ViewWriter.h3(setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
+actual fun ViewWriter.h3Actual(setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
 
 @ViewDsl
-actual fun ViewWriter.h4(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
+actual fun ViewWriter.h4Actual(setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
 
 @ViewDsl
-actual fun ViewWriter.h5(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
+actual fun ViewWriter.h5Actual(setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
 
 @ViewDsl
-actual fun ViewWriter.h6(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
+actual fun ViewWriter.h6Actual(setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
 
 @ViewDsl
-actual fun ViewWriter.text(setup: TextView.() -> Unit): Unit = textElement("p", setup)
+actual fun ViewWriter.textActual(setup: TextView.() -> Unit): Unit = textElement("p", setup)
 
 @ViewDsl
-actual fun ViewWriter.subtext(setup: TextView.() -> Unit): Unit = textElement("span") {
+actual fun ViewWriter.subtextActual(setup: TextView.() -> Unit): Unit = textElement("span") {
     native.classList.add("subtext")
     setup()
 }

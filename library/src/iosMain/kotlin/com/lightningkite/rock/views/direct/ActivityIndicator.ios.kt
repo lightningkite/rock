@@ -9,7 +9,7 @@ import platform.UIKit.UIActivityIndicatorView
 actual typealias NActivityIndicator = UIActivityIndicatorView
 
 @ViewDsl
-actual fun ViewWriter.activityIndicator(setup: ActivityIndicator.() -> Unit): Unit =
+actual fun ViewWriter.activityIndicatorActual(setup: ActivityIndicator.() -> Unit): Unit =
     element(UIActivityIndicatorView()) {
         hidden = false
         startAnimating()

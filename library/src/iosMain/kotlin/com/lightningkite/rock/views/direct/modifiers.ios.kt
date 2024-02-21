@@ -12,7 +12,7 @@ import kotlinx.cinterop.*
 //actual typealias NLocalTimeField = UIDatePicker
 //
 //@ViewDsl
-//actual fun ViewWriter.localTimeField(setup: LocalTimeField.() -> Unit): Unit = stack {
+//actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit): Unit = stack {
 //    element(UIDatePicker()){
 //        setPreferredDatePickerStyle(UIDatePickerStyle.UIDatePickerStyleCompact)
 ////        handleTheme(this) { this. = it.foreground.closestColor().toUiColor() }
@@ -44,7 +44,7 @@ import kotlinx.cinterop.*
 //actual typealias NAutoCompleteTextField = UIView
 //
 //@ViewDsl
-//actual fun ViewWriter.autoCompleteTextField(setup: AutoCompleteTextField.() -> Unit): Unit =
+//actual fun ViewWriter.autoCompleteTextFieldActual(setup: AutoCompleteTextField.() -> Unit): Unit =
 //    todo("autoCompleteTextField")
 //
 //actual val AutoCompleteTextField.content: Writable<String> get() = Property("")

@@ -13,7 +13,7 @@ import org.w3c.dom.get
 actual typealias NDismissBackground = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.dismissBackground(setup: DismissBackground.() -> Unit): Unit {
+actual fun ViewWriter.dismissBackgroundActual(setup: DismissBackground.() -> Unit): Unit {
     stack {
         themedElement<HTMLSpanElement>(
             name = "span",

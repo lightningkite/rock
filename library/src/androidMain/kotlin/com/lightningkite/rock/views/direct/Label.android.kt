@@ -19,7 +19,7 @@ actual var Label.content: String
     }
 
 @ViewDsl
-actual fun ViewWriter.label(setup: Label.() -> Unit) {
+actual fun ViewWriter.labelActual(setup: Label.() -> Unit) {
     col {
         subtext {  }
         setup(Label(this.native))

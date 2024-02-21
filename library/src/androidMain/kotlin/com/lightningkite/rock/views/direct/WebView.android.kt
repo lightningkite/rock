@@ -31,6 +31,6 @@ actual var WebView.content: String
     }
 
 @ViewDsl
-actual fun ViewWriter.webView(setup: WebView.() -> Unit) {
+actual fun ViewWriter.webViewActual(setup: WebView.() -> Unit) {
     return viewElement(factory = ::AndroidWebView, wrapper = ::WebView, setup = setup)
 }

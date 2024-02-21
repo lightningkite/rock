@@ -16,7 +16,7 @@ import org.w3c.dom.pointerevents.PointerEvent
 actual typealias NCanvas = HTMLCanvasElement
 
 @ViewDsl
-actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
+actual fun ViewWriter.canvasActual(setup: Canvas.() -> Unit): Unit = element<HTMLCanvasElement>("canvas") {
     val c = Canvas(this)
     setup(c)
     tabIndex = 1

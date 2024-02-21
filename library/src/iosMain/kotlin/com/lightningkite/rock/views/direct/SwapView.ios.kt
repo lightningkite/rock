@@ -8,7 +8,7 @@ import platform.UIKit.UIView
 actual typealias NSwapView = FrameLayout
 
 @ViewDsl
-actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) = element(FrameLayout()) {
+actual fun ViewWriter.swapViewActual(setup: SwapView.() -> Unit) = element(FrameLayout()) {
     extensionViewWriter = this@swapView.newViews().also {
         it.includePaddingAtStackEmpty = true
     }
@@ -17,7 +17,7 @@ actual fun ViewWriter.swapView(setup: SwapView.() -> Unit) = element(FrameLayout
 }
 
 @ViewDsl
-actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = element(FrameLayout()) {
+actual fun ViewWriter.swapViewDialogActual(setup: SwapView.() -> Unit): Unit = element(FrameLayout()) {
     extensionViewWriter = this@swapViewDialog.newViews().also {
         it.includePaddingAtStackEmpty = true
     }

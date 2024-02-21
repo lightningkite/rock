@@ -13,7 +13,7 @@ import org.w3c.dom.url.URL
 actual typealias NImage = HTMLImageElement
 
 @ViewDsl
-actual fun ViewWriter.image(setup: Image.() -> Unit): Unit =
+actual fun ViewWriter.imageActual(setup: Image.() -> Unit): Unit =
     themedElement<NImage>("img") {
         addClass(".viewDraws")
         setup(Image(this))
@@ -49,7 +49,7 @@ actual inline var Image.description: String?
     }
 
 @ViewDsl
-actual fun ViewWriter.zoomableImage(setup: Image.() -> Unit) {
+actual fun ViewWriter.zoomableImageActual(setup: Image.() -> Unit) {
     // TODO
     val wrapper: Image.() -> Unit = {
         setup()

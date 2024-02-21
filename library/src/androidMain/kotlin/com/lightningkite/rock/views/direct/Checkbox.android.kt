@@ -26,7 +26,7 @@ actual val Checkbox.checked: Writable<Boolean>
     }
 
 @ViewDsl
-actual fun ViewWriter.checkbox(setup: Checkbox.() -> Unit) {
+actual fun ViewWriter.checkboxActual(setup: Checkbox.() -> Unit) {
     return viewElement(factory = ::AndroidCheckBox, wrapper = ::Checkbox) {
         val theme = currentTheme
         reactiveScope {

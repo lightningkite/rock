@@ -12,14 +12,14 @@ import kotlin.time.Duration
 actual typealias NSwapView = HTMLDivElement
 
 @ViewDsl
-actual fun ViewWriter.swapView(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
+actual fun ViewWriter.swapViewActual(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
     classList.add("rock-swap")
     this.asDynamic().__ROCK_ViewWriter__ = split()
     setup(SwapView(this))
 }
 
 @ViewDsl
-actual fun ViewWriter.swapViewDialog(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
+actual fun ViewWriter.swapViewDialogActual(setup: SwapView.() -> Unit): Unit = themedElement<NSwapView>("div") {
     classList.add("rock-swap")
     classList.add("dialog")
     this.asDynamic().__ROCK_ViewWriter__ = split()

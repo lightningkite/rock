@@ -5,6 +5,7 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
+import kotlin.contracts.*
 
 expect class NSpace : NView
 
@@ -12,5 +13,6 @@ expect class NSpace : NView
 value class Space(override val native: NSpace) : RView<NSpace>
 
 @ViewDsl
-expect fun ViewWriter.space(setup: Space.() -> Unit = {}): Unit
+expect fun ViewWriter.spaceActual(setup: Space.()->Unit = {}): Unit
+@OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.space(noinline setup: Space.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; spaceActual(setup) }
 expect fun ViewWriter.space(multiplier: Double, setup: Space.() -> Unit = {})

@@ -7,7 +7,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NExternalLink = NativeLink
 
 @ViewDsl
-actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit): Unit = element(NativeLink()) {
+actual fun ViewWriter.externalLinkActual(setup: ExternalLink.() -> Unit): Unit = element(NativeLink()) {
     handleThemeControl(this) {
         setup(ExternalLink(this))
     }

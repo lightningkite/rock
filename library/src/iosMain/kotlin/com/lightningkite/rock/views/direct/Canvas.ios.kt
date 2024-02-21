@@ -21,7 +21,7 @@ import kotlin.concurrent.AtomicInt
 actual typealias NCanvas = CanvasView
 
 @ViewDsl
-actual fun ViewWriter.canvas(setup: Canvas.() -> Unit): Unit = element(CanvasView()) {
+actual fun ViewWriter.canvasActual(setup: Canvas.() -> Unit): Unit = element(CanvasView()) {
     setup(Canvas(this))
 }
 

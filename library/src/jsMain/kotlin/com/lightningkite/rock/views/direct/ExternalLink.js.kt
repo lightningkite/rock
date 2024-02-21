@@ -8,7 +8,7 @@ import org.w3c.dom.HTMLAnchorElement
 actual typealias NExternalLink = HTMLAnchorElement
 
 @ViewDsl
-actual fun ViewWriter.externalLink(setup: ExternalLink.() -> Unit) =
+actual fun ViewWriter.externalLinkActual(setup: ExternalLink.() -> Unit) =
     themedElementClickable<NExternalLink>("a") {
         classList.add("rock-stack")
         setup(ExternalLink(this))

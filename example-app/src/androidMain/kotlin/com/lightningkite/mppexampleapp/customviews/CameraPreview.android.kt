@@ -15,6 +15,8 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.lightningkite.rock.FileReference
 import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.models.ImageLocal
@@ -33,21 +35,63 @@ actual typealias NCameraPreview = PreviewView
 actual class CameraPreview actual constructor(actual override val native: NCameraPreview) :
     RView<NCameraPreview> {
 
-    private val cameraController = LifecycleCameraController(native.context)
-    init {
-        AndroidAppContext.activityCtx!!.let(cameraController::bindToLifecycle)
-        cameraController.cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        cameraController.isPinchToZoomEnabled = false
-        native.controller = cameraController
+    private val cameraController = LifecycleCameraController(native.context).apply {
+        bindToLifecycle(AndroidAppContext.activityCtx!!)
+        cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+        isPinchToZoomEnabled = false
+        native.controller = this
+
+        setImageAnalysisAnalyzer(AndroidAppContext.executor) { imageProxy ->
+            var pendingAnalyses = analysisPipeline.size
+            val imageProxyRelease = {
+                if (--pendingAnalyses == 0) {
+                    imageProxy.close()
+                }
+            }
+            analysisPipeline.forEach { it(imageProxy, imageProxyRelease) }
+        }
     }
+
+    private val analysisPipeline = mutableListOf<(ImageProxy, () -> Unit) -> Unit>()
 
     // TODO: Implement one-way binding, expose this in an externally immutable way
     val cameraPermission = Property(false)
 
-    private var barcodeResultHandler: (List<String>) -> Unit = {}
-    fun setBarcodeResultHandler(action: (List<String>) -> Unit) {
-        barcodeResultHandler = action
-        setupImageAnalyzer()
+    fun enableBarcodeScanning(resultHandler: (List<String>) -> Unit) {
+        val options = BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_CODE_128,
+                Barcode.FORMAT_CODE_39,
+                Barcode.FORMAT_CODE_93)
+            .build()
+        val barcodeScanner = BarcodeScanning.getClient(options)
+
+        analysisPipeline.add { imageProxy, release ->
+            val mediaImage = imageProxy.image
+            if (mediaImage != null) {
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                barcodeScanner.process(image).addOnSuccessListener { barcodes ->
+                    resultHandler(barcodes.mapNotNull(Barcode::getRawValue))
+                    release()
+                }
+            }
+        }
+    }
+
+    fun enableOCR(resultHandler: (String) -> Unit) {
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+        analysisPipeline.add { imageProxy, release ->
+            val mediaImage = imageProxy.image
+            if (mediaImage != null) {
+                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                recognizer.process(image)
+                    .addOnSuccessListener { visionText ->
+                        resultHandler(visionText.text)
+                        release()
+                    }
+            }
+        }
     }
 
     fun ensurePermissions() {
@@ -60,31 +104,6 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         } else {
             cameraPermission.value = true
         }
-    }
-
-    @OptIn(ExperimentalGetImage::class)
-    fun setupImageAnalyzer() {
-        val options = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(
-                Barcode.FORMAT_CODE_128,
-                Barcode.FORMAT_CODE_39,
-                Barcode.FORMAT_CODE_93)
-            .build()
-        val scanner = BarcodeScanning.getClient(options)
-
-        val analyzer = ImageAnalysis.Analyzer { imageProxy ->
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-                scanner.process(image)
-                    .addOnSuccessListener { barcodes ->
-                        imageProxy.close()
-                        barcodeResultHandler(barcodes.mapNotNull(Barcode::getRawValue))
-                    }
-            }
-        }
-
-        cameraController.setImageAnalysisAnalyzer(AndroidAppContext.executor, analyzer)
     }
 
     private fun timestamp(): String {
@@ -136,7 +155,10 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
 }
 
 actual fun CameraPreview.barcodeHandler(action: (List<String>) -> Unit) =
-    setBarcodeResultHandler(action)
+    enableBarcodeScanning(action)
+
+actual fun CameraPreview.ocrHandler(action: (String) -> Unit) =
+    enableOCR(action)
 
 actual val CameraPreview.hasPermissions: Writable<Boolean>
     get() = cameraPermission

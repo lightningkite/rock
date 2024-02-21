@@ -29,4 +29,5 @@ expect class CameraPreview(native: NCameraPreview) : RView<NCameraPreview> {
 @ViewDsl
 expect fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit = {})
 expect fun CameraPreview.barcodeHandler(action: (List<String>) -> Unit)
+expect fun CameraPreview.ocrHandler(action: (String) -> Unit)
 expect val CameraPreview.hasPermissions: Writable<Boolean>

@@ -3,6 +3,7 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.barcodeHandler
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.cameraPreview
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.hasPermissions
+import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews.ocrHandler
 import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.utilities.isValidVin
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
@@ -33,11 +34,17 @@ object CameraScreen : RockScreen, UseFullScreen {
                 // One-way binding with a Readable on one side would be great here (feature request)
                 cameraPermissions bind hasPermissions
                 ::opacity { if (hasPermissions.await()) 1.0 else 0.0 }
-                barcodeHandler {
+                barcodeHandler { barcodeContents ->
                     // First, remove leading "I" for 18 digit "import" VINs
-                    it.map { if (it.length == 18) it.substring(1) else it }
+                    barcodeContents.map { if (it.length == 18) it.substring(1) else it }
                         .firstOrNull(String::isValidVin)
                         ?.let{ vin.value = it }
+                }
+                ocrHandler { ocrResult ->
+                    ocrResult.split('\n', ' ')
+                        .filter { it.length == 17 }
+                        .firstOrNull(String::isValidVin)
+                        ?.let { vin.value = it }
                 }
                 stack@capture = {
                     capture {

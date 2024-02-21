@@ -68,6 +68,7 @@ kotlin {
                 implementation("androidx.camera:camera-view:$CAMERAX_VERSION")
 
                 implementation("com.google.mlkit:barcode-scanning:17.2.0")
+                implementation("com.google.mlkit:text-recognition:16.0.0")
             }
         }
 //        val commonJvmMain by creating {

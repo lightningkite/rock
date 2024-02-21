@@ -24,7 +24,7 @@ actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit): Unit {
         var contentCol: ContainingView = ContainingView(this)
         var indexcontentscroll: HTMLDivElement = this
         var indexcontent: HTMLDivElement = this
-        val newViews: ViewWriter = this@recyclerView.newViews()
+        val newViews: ViewWriter = this@recyclerViewActual.newViews()
         style.position = "relative"
         element<HTMLDivElement>("div") {
             classList.add("contentScroll")
@@ -94,7 +94,7 @@ actual fun ViewWriter.horizontalRecyclerViewActual(setup: RecyclerView.() -> Uni
         var contentCol: ContainingView = ContainingView(this)
         var indexcontentscroll: HTMLDivElement = this
         var indexcontent: HTMLDivElement = this
-        val newViews: ViewWriter = this@horizontalRecyclerView.newViews()
+        val newViews: ViewWriter = this@horizontalRecyclerViewActual.newViews()
         style.position = "relative"
         element<HTMLDivElement>("div") {
             classList.add("contentScroll")

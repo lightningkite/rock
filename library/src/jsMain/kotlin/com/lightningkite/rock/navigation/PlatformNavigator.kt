@@ -91,7 +91,7 @@ actual object PlatformNavigator : RockNavigator {
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(
-                nextIndex++, "", basePath + path.render()
+                nextIndex++, "", (basePath + path.render()).also { println("pushing state $it") }
             )
             window.history.scrollRestoration = ScrollRestoration.MANUAL
         } else {

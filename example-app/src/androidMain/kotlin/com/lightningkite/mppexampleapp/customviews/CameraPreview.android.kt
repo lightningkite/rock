@@ -57,7 +57,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
     // TODO: Implement one-way binding, expose this in an externally immutable way
     val cameraPermission = Property(false)
 
-    fun enableBarcodeScanning(resultHandler: (List<String>) -> Unit) {
+    fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) {
         val options = BarcodeScannerOptions.Builder()
             .setBarcodeFormats(
                 Barcode.FORMAT_CODE_128,
@@ -71,14 +71,14 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
             if (mediaImage != null) {
                 val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
                 barcodeScanner.process(image).addOnSuccessListener { barcodes ->
-                    resultHandler(barcodes.mapNotNull(Barcode::getRawValue))
+                    resultHandler(barcodes.mapNotNull(Barcode::getRawValue), imageProxy.imageInfo.timestamp)
                     release()
                 }
             }
         }
     }
 
-    fun enableOCR(resultHandler: (String) -> Unit) {
+    fun enableOCR(resultHandler: (String, Long) -> Unit) {
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
         analysisPipeline.add { imageProxy, release ->
@@ -87,7 +87,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
                 val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
                 recognizer.process(image)
                     .addOnSuccessListener { visionText ->
-                        resultHandler(visionText.text)
+                        resultHandler(visionText.text, imageProxy.imageInfo.timestamp)
                         release()
                     }
             }
@@ -154,10 +154,10 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
     }
 }
 
-actual fun CameraPreview.barcodeHandler(action: (List<String>) -> Unit) =
+actual fun CameraPreview.barcodeHandler(action: (List<String>, Long) -> Unit) =
     enableBarcodeScanning(action)
 
-actual fun CameraPreview.ocrHandler(action: (String) -> Unit) =
+actual fun CameraPreview.ocrHandler(action: (String, Long) -> Unit) =
     enableOCR(action)
 
 actual val CameraPreview.hasPermissions: Writable<Boolean>

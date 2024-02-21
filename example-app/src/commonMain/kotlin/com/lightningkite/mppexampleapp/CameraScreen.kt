@@ -34,13 +34,13 @@ object CameraScreen : RockScreen, UseFullScreen {
                 // One-way binding with a Readable on one side would be great here (feature request)
                 cameraPermissions bind hasPermissions
                 ::opacity { if (hasPermissions.await()) 1.0 else 0.0 }
-                barcodeHandler { barcodeContents ->
+                barcodeHandler { barcodeResult, _ ->
                     // First, remove leading "I" for 18 digit "import" VINs
-                    barcodeContents.map { if (it.length == 18) it.substring(1) else it }
+                    barcodeResult.map { if (it.length == 18) it.substring(1) else it }
                         .firstOrNull(String::isValidVin)
                         ?.let{ vin.value = it }
                 }
-                ocrHandler { ocrResult ->
+                ocrHandler { ocrResult, _ ->
                     ocrResult.split('\n', ' ')
                         .filter { it.length == 17 }
                         .firstOrNull(String::isValidVin)

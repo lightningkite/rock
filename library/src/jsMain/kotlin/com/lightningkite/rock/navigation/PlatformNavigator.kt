@@ -4,14 +4,17 @@ import com.lightningkite.rock.FallbackRoute
 import com.lightningkite.rock.decodeURIComponent
 import com.lightningkite.rock.encodeURIComponent
 import com.lightningkite.rock.reactive.*
+import kotlinx.browser.document
 import kotlinx.browser.window
-import org.w3c.dom.Location
-import org.w3c.dom.MANUAL
-import org.w3c.dom.PopStateEvent
-import org.w3c.dom.ScrollRestoration
+import org.w3c.dom.*
 import org.w3c.dom.url.URLSearchParams
 
+external interface BaseUrlScript { val baseUrl: String }
+
 actual object PlatformNavigator : RockNavigator {
+    var basePath = (document.getElementById("baseUrlLocation") as? HTMLScriptElement)?.innerText?.let {
+        JSON.parse<BaseUrlScript>(it).baseUrl
+    } ?: "/"
 
     private lateinit var _routes: Routes
     actual override var routes: Routes
@@ -27,7 +30,7 @@ actual object PlatformNavigator : RockNavigator {
                     rendered?.listenables?.forEach { rerunOn(it) }
                     rendered?.urlLikePath?.let {
                         if(window.location.urlLike() != it) {
-                            window.history.replaceState(currentIndex, "", it.render())
+                            window.history.replaceState(currentIndex, "", basePath + it.render())
                         }
                     }
                 }
@@ -35,7 +38,7 @@ actual object PlatformNavigator : RockNavigator {
         }
 
     private fun Location.urlLike() = UrlLikePath(
-        segments = pathname.split('/').filter { it.isNotBlank() },
+        segments = pathname.removePrefix(basePath).split('/').filter { it.isNotBlank() },
         parameters = search.trimStart('?').split('&').filter { it.isNotBlank() }.associate { it.substringBefore('=') to decodeURIComponent(it.substringAfter('=')) }
     )
 
@@ -88,11 +91,11 @@ actual object PlatformNavigator : RockNavigator {
         if (pushState) {
             currentIndex = nextIndex
             window.history.pushState(
-                nextIndex++, "", path.render()
+                nextIndex++, "", basePath + path.render()
             )
             window.history.scrollRestoration = ScrollRestoration.MANUAL
         } else {
-            window.history.replaceState(currentIndex, "", path.render())
+            window.history.replaceState(currentIndex, "", basePath + path.render())
             window.history.scrollRestoration = ScrollRestoration.MANUAL
         }
         _currentScreen.value = rockScreen

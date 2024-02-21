@@ -2,6 +2,7 @@ package com.lightningkite.rock
 
 import kotlinx.browser.document
 import kotlinx.browser.window
+import org.w3c.dom.DataTransfer
 import org.w3c.dom.HTMLInputElement
 
 actual object ExternalServices {
@@ -20,4 +21,5 @@ actual object ExternalServices {
     actual fun requestFiles(mimeTypes: List<String>, onResult: (List<FileReference>)->Unit) = requestFileInput(mimeTypes, { multiple = true }, { onResult(it) })
     actual fun requestCaptureSelf(mimeTypes: List<String>, onResult: (FileReference?)->Unit) = requestFileInput(mimeTypes, { setAttribute("capture", "user") }, { onResult(it.firstOrNull()) })
     actual fun requestCaptureEnvironment(mimeTypes: List<String>, onResult: (FileReference?)->Unit) = requestFileInput(mimeTypes, { setAttribute("capture", "environment") }, { onResult(it.firstOrNull()) })
+    actual fun setClipboardText(value: String) { window.navigator.clipboard.writeText(value) }
 }

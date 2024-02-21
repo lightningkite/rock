@@ -2,18 +2,18 @@ package com.lightningkite.rock.navigation
 
 import com.lightningkite.rock.decodeURIComponent
 import com.lightningkite.rock.encodeURIComponent
-import com.lightningkite.rock.reactive.Property
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.StructureKind
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.EmptySerializersModule
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.properties.Properties
-import kotlinx.serialization.properties.decodeFromStringMap
-import kotlinx.serialization.properties.encodeToStringMap
 import kotlinx.serialization.serializer
 
-var UrlProperties: Properties = Properties
+var DefaultSerializersModule: SerializersModule = EmptySerializersModule()
+val DefaultJson: Json by lazy { Json { serializersModule = DefaultSerializersModule } }
+val UrlProperties: Properties by lazy { Properties(DefaultSerializersModule) }
 
 @Serializable
 private data class Wrapper<T>(val value: T)

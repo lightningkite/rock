@@ -1,6 +1,9 @@
 package com.lightningkite.rock
 
 import android.app.Activity
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build.VERSION
@@ -156,5 +159,9 @@ actual object ExternalServices {
                 }
             }
         }
+    }
+    actual fun setClipboardText(value: String) {
+        (AndroidAppContext.activityCtx?.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+            .setPrimaryClip(ClipData.newPlainText(value, value))
     }
 }

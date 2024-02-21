@@ -1,6 +1,7 @@
 package com.lightningkite.rock.reactive
 
 import com.lightningkite.rock.PlatformStorage
+import com.lightningkite.rock.navigation.DefaultJson
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
@@ -18,7 +19,7 @@ class PersistentProperty<T>(
     private var once: T = defaultValue
         private set(value) {
             field = value
-            PlatformStorage.set(key, Json.encodeToString(serializer, value))
+            PlatformStorage.set(key, DefaultJson.encodeToString(serializer, value))
             listeners.toList().forEach { it() }
         }
 
@@ -39,7 +40,7 @@ class PersistentProperty<T>(
         val stored = PlatformStorage.get(key)
         if (stored != null)
             try {
-                once = Json.decodeFromString(serializer, stored)
+                once = DefaultJson.decodeFromString(serializer, stored)
             } catch (e: Exception) { }
         initialized = true
     }

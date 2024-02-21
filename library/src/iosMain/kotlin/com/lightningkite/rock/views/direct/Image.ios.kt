@@ -4,14 +4,16 @@ import com.lightningkite.rock.fetch
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.toNSData
 import com.lightningkite.rock.views.*
-import platform.UIKit.UIImage
-import platform.UIKit.UIImageView
-import platform.UIKit.UIViewContentMode
-import platform.UIKit.accessibilityLabel
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.readValue
+import platform.CoreGraphics.CGRectZero
+import platform.UIKit.*
 import platform.UniformTypeIdentifiers.UTTypeImage
 import platform.UniformTypeIdentifiers.loadDataRepresentationForContentType
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
+import platform.objc.sel_registerName
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NImage = UIImageView
@@ -90,3 +92,74 @@ actual inline var Image.description: String?
     set(value) {
         native.accessibilityLabel = value
     }
+
+@ViewDsl
+actual fun ViewWriter.zoomableImage(setup: Image.() -> Unit)  = element(PanZoomImageView()) {
+    handleTheme(this, viewDraws = true)
+    setup(Image(imageView))
+    imageView.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private class MyImageView: UIImageView(CGRectZero.readValue()) {
+
+    var onImageChange: ((UIImage?)->Unit)? = null
+
+    override fun setImage(image: UIImage?) {
+        super.setImage(image)
+        onImageChange?.invoke(image)
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+private class PanZoomImageView: UIScrollView(CGRectZero.readValue()), UIScrollViewDelegateProtocol {
+
+    val imageView = MyImageView()
+
+    init {
+
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
+        imageView.onImageChange = {
+            setZoomScale(minimumZoomScale, false)
+        }
+        calculationContext.onRemove { imageView.onImageChange = null }
+        addSubview(imageView)
+
+        NSLayoutConstraint.activateConstraints(listOf(
+            imageView.widthAnchor.constraintEqualToAnchor(widthAnchor),
+            imageView.heightAnchor.constraintEqualToAnchor(heightAnchor),
+            imageView.centerXAnchor.constraintEqualToAnchor(centerXAnchor),
+            imageView.centerYAnchor.constraintEqualToAnchor(centerYAnchor),
+        ))
+
+
+        val doubleTapRecognizer = UITapGestureRecognizer(this, sel_registerName("handleDoubleTap:"))
+        doubleTapRecognizer.numberOfTapsRequired = 2UL
+        addGestureRecognizer(doubleTapRecognizer)
+
+        minimumZoomScale = 1.0
+        maximumZoomScale = 4.0
+        showsHorizontalScrollIndicator = false
+        showsVerticalScrollIndicator = false
+
+        delegate = this
+
+    }
+
+
+    override fun viewForZoomingInScrollView(scrollView: UIScrollView): UIView? {
+        return imageView
+    }
+
+    @ObjCAction
+    fun handleDoubleTap(sender: UITapGestureRecognizer){
+        val midZoom = (maximumZoomScale - minimumZoomScale) / 2.0 + minimumZoomScale
+        if (zoomScale < midZoom) {
+            setZoomScale(maximumZoomScale, true)
+        } else {
+            setZoomScale(minimumZoomScale, true)
+        }
+    }
+
+}

@@ -3,6 +3,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.dom.HTMLVideoElement
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.NView
 import com.lightningkite.rock.views.ViewDsl
@@ -26,7 +27,7 @@ actual inline var Video.source: VideoSource?
             null -> native.src = ""
             is VideoRemote -> native.src = value.url
             is VideoRaw -> native.src = URL.createObjectURL(Blob(arrayOf(value.data)))
-            is VideoResource -> native.src = value.relativeUrl
+            is VideoResource -> native.src = PlatformNavigator.basePath + value.relativeUrl
             is VideoLocal -> native.src = URL.createObjectURL(value.file)
             else -> {}
         }

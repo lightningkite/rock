@@ -2,6 +2,7 @@ package com.lightningkite.rock.views
 
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.PlatformNavigator
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLLinkElement
@@ -38,7 +39,13 @@ object DynamicCSS {
 //        style.visibility = if (value) "visible" else "hidden"
         style(
             ".visibleOnParentHover",
-            mapOf("visibility" to "hidden", "width" to "max-content", "height" to "max-content")
+            mapOf(
+                "visibility" to "hidden",
+                "width" to "max-content",
+                "height" to "max-content",
+                "max-width" to "unset",
+                "max-height" to "unset",
+            )
         )
         style(":hover>.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
@@ -531,8 +538,8 @@ object DynamicCSS {
                 "scrollbar-width" to "thin",
                 "scrollbar-gutter" to "auto",
                 "flex-shrink" to "0",
-                "max-width" to "calc(100% - var(--margin, 0) * 2 + 1)",
-                "max-height" to "calc(100% - var(--margin, 0) * 2 + 1)",
+                "max-width" to "calc(100% - var(--margin, 0) * 2 - 0.1px)",
+                "max-height" to "calc(100% - var(--margin, 0) * 2 - 0.1px)",
                 "min-height" to "0",
                 "min-width" to "0",
                 "margin" to "0px",
@@ -812,16 +819,16 @@ object DynamicCSS {
         }
         if (font.direct != null) {
             font.direct.normal?.let {
-                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: normal;font-weight: normal;src:url('${it}');}")
+                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: normal;font-weight: normal;src:url('${PlatformNavigator.basePath + it}');}")
             }
             font.direct.bold?.let {
-                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: normal;font-weight: bold;src:url('${it}');}")
+                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: normal;font-weight: bold;src:url('${PlatformNavigator.basePath + it}');}")
             }
             font.direct.italic?.let {
-                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: italic;font-weight: normal;src:url('${it}');}")
+                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: italic;font-weight: normal;src:url('${PlatformNavigator.basePath + it}');}")
             }
             font.direct.boldItalic?.let {
-                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: italic;font-weight: bold;src:url('${it}');}")
+                rule("@font-face {font-family: '${font.cssFontFamilyName}';font-style: italic;font-weight: bold;src:url('${PlatformNavigator.basePath + it}');}")
             }
         }
         return font.cssFontFamilyName

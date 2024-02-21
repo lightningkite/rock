@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.Blob
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlinx.dom.addClass
@@ -25,7 +26,7 @@ actual inline var Image.source: ImageSource?
             null -> native.src = ""
             is ImageRemote -> native.src = value.url
             is ImageRaw -> native.src = URL.createObjectURL(Blob(arrayOf(value.data)))
-            is ImageResource -> native.src = value.relativeUrl
+            is ImageResource -> native.src = PlatformNavigator.basePath + value.relativeUrl
             is ImageLocal -> native.src = URL.createObjectURL(value.file)
             is ImageVector -> native.src = value.toWeb()
             else -> {}
@@ -46,3 +47,14 @@ actual inline var Image.description: String?
     set(value) {
         native.alt = value ?: ""
     }
+
+@ViewDsl
+actual fun ViewWriter.zoomableImage(setup: Image.() -> Unit) {
+    // TODO
+    val wrapper: Image.() -> Unit = {
+        setup()
+        scaleType = ImageScaleType.Fit
+    }
+
+    image(wrapper)
+}

@@ -184,4 +184,7 @@ actual object ExternalServices {
         currentPresenter(controller)
         return
     }
+    actual fun setClipboardText(value: String) {
+        UIPasteboard.generalPasteboard.string = value
+    }
 }

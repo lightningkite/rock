@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.navigation.render
@@ -25,7 +26,7 @@ actual inline var Link.to: RockScreen
         this.native.asDynamic().__ROCK__screen = value
         val navigator = (this.native.asDynamic().__ROCK__navigator as RockNavigator)
         navigator.routes.render(value)?.let {
-            native.href = it.urlLikePath.render()
+            native.href = PlatformNavigator.basePath + it.urlLikePath.render()
         }
         native.onclick = {
             it.preventDefault()

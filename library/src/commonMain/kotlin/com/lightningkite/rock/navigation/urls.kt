@@ -12,8 +12,15 @@ import kotlinx.serialization.properties.Properties
 import kotlinx.serialization.serializer
 
 var DefaultSerializersModule: SerializersModule = EmptySerializersModule()
-val DefaultJson: Json by lazy { Json { serializersModule = DefaultSerializersModule } }
-val UrlProperties: Properties by lazy { Properties(DefaultSerializersModule) }
+    set(value) {
+        field = value
+        DefaultJsonCurrent = Json { serializersModule = DefaultSerializersModule }
+        UrlPropertiesCurrent = Properties(DefaultSerializersModule)
+    }
+private var DefaultJsonCurrent: Json = Json { serializersModule = DefaultSerializersModule }
+val DefaultJson: Json get() = DefaultJsonCurrent
+private var UrlPropertiesCurrent: Properties = Properties(DefaultSerializersModule)
+val UrlProperties: Properties get() = UrlPropertiesCurrent
 
 @Serializable
 private data class Wrapper<T>(val value: T)

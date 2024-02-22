@@ -1,5 +1,6 @@
 package com.lightningkite.rock.navigation
 
+import com.lightningkite.rock.encodeURIComponent
 import com.lightningkite.rock.reactive.Constant
 import com.lightningkite.rock.reactive.Listenable
 import com.lightningkite.rock.reactive.Readable
@@ -28,6 +29,9 @@ data class UrlLikePath(
     companion object {
         val EMPTY = UrlLikePath(listOf(), mapOf())
     }
+
+    fun render() = segments.joinToString("/") + (parameters.takeUnless { it.isEmpty() }?.entries?.joinToString("&", "?") { "${it.key}=${encodeURIComponent(it.value)}" } ?: "")
+
 }
 
 interface RockScreen {

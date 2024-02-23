@@ -3,6 +3,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.RockNavigator
+import com.lightningkite.rock.reactive.invoke
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

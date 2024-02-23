@@ -5,8 +5,10 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.PopoverPreferredDirection
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.ViewModifierDsl3
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.exists
 
 @ViewModifierDsl3
 expect fun ViewWriter.hasPopover(requireClick: Boolean = false, preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewWriter.()->Unit): ViewWrapper
@@ -37,6 +39,11 @@ fun ViewWriter.sizeConstraints(
     height = height
 ))
 @ViewModifierDsl3
+@Deprecated("No longer needed - just tell the parent what its spacing value should be.")
 expect val ViewWriter.marginless: ViewWrapper
 @ViewModifierDsl3
+@Deprecated("No longer needed - just tell the parent what its spacing value should be.")
 expect val ViewWriter.withDefaultPadding: ViewWrapper
+
+@ViewModifierDsl3
+expect fun ViewWriter.onlyWhen(default: Boolean = true, condition: suspend ()->Boolean): ViewWrapper

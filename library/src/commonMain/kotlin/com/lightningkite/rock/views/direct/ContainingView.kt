@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.views.NView
 import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
@@ -22,4 +23,4 @@ expect fun ViewWriter.colActual(setup: ContainingView.()->Unit = {}): Unit
 expect fun ViewWriter.rowActual(setup: ContainingView.()->Unit = {}): Unit
 @OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.row(noinline setup: ContainingView.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; rowActual(setup) }
 
-expect var ContainingView.spacingMultiplier: Float
+expect var ContainingView.spacing: Dimension

@@ -16,7 +16,7 @@ import kotlin.math.min
 object PongSampleScreen : RockScreen {
 
     override fun ViewWriter.render() = stack {
-        marginless - canvas {
+        canvas {
             val dg = PongDelegate()
             val c = currentTheme
             reactiveScope {

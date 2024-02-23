@@ -5,8 +5,8 @@ import kotlin.js.JsName
 data class Theme(
     val title: FontAndStyle = FontAndStyle(systemDefaultFont),
     val body: FontAndStyle = FontAndStyle(systemDefaultFont),
-    val elevation: Dimension = 2.px,
-    val cornerRadii: CornerRadii = CornerRadii(8.px),
+    val elevation: Dimension = 1.px,
+    val cornerRadii: CornerRadii = CornerRadii.RatioOfSpacing(1f),
     val spacing: Dimension = 0.5.rem,
     val foreground: Paint = Color.black,
     val outline: Paint = Color.black,

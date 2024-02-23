@@ -59,9 +59,7 @@ actual typealias NView = HTMLElement
 actual var NView.exists: Boolean
     get() = throw NotImplementedError()
     set(value) {
-//        hidden = !value
-        if(animationsEnabled) animateHidden(!value)
-        else hidden = !value
+        hidden = !value
     }
 
 actual var NView.visible: Boolean

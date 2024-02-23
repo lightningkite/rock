@@ -114,32 +114,45 @@ object LayoutExamplesScreen : RockScreen {
 
             card - col {
                 h2("Custom spacing test")
+                val showExtra = Property(false)
+                row {
+                    checkbox { checked bind showExtra }
+                    text("Show extra view")
+                }
                 card - row {
-                    spacingMultiplier = 0f
+                    spacing = 0.rem
                     text("0.0")
                     important - stack { space() }
-                    important - stack { space() }
+                    onlyWhen { showExtra.await() } - important - stack {
+                        space()
+                    }
                     important - stack { space() }
                 }
                 card - row {
-                    spacingMultiplier = 0.5f
+                    spacing = 0.5.rem
                     text("0.5")
                     important - stack { space() }
-                    important - stack { space() }
+                    onlyWhen { showExtra.await() } - important - stack {
+                        space()
+                    }
                     important - stack { space() }
                 }
                 card - row {
-                    spacingMultiplier = 1f
+                    spacing = 1.rem
                     text("1.0")
                     important - stack { space() }
-                    important - stack { space() }
+                    onlyWhen { showExtra.await() } - important - stack {
+                        space()
+                    }
                     important - stack { space() }
                 }
                 card - row {
-                    spacingMultiplier = 2f
+                    spacing = 2.rem
                     text("2.0")
                     important - stack { space() }
-                    important - stack { space() }
+                    onlyWhen { showExtra.await() } - important - stack {
+                        space()
+                    }
                     important - stack { space() }
                 }
             }

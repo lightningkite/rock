@@ -61,16 +61,16 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             swapping(
                 current = { appNavFactory.await() },
-                views = { it(this, setup) in marginless }
+                views = { it(this, setup)  }
             )
-        } in marginless
+        } 
         dismissBackground {
             val nav = navigator.dialog
             ::exists { nav.currentScreen.await() != null }
             onClick { nav.dismiss() }
             navigatorViewDialog() in tweakTheme { it.dialog() }
-        } in marginless
-    } in marginless
+        } 
+    } 
 }
 
 private fun ViewWriter.navGroupColumn(readable: Readable<List<NavElement>>) {
@@ -220,7 +220,7 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>) {
                 }
                 Unit
             }
-        } in weight(1f) in marginless
+        } in weight(1f) 
     }
 }
 
@@ -228,6 +228,7 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val showMenu = Property(false)
     col {
+        spacing = 0.px
         row {
             setup(appNav)
             toggleButton {
@@ -254,15 +255,15 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
                 navGroupActions(appNav.actionsProperty)
             } in withDefaultPadding
             ::exists { appNav.existsProperty.await() }
-        } in bar in marginless
+        } in bar 
         row {
             col {
                 navGroupColumn(appNav.navItemsProperty)
                 ::exists { showMenu.await() && appNav.existsProperty.await() }
-            } in bar in marginless
-            navigatorView(navigator) in weight(1f) in marginless
+            } in bar 
+            navigatorView(navigator) in weight(1f) 
         } in weight(1f)
-    } in marginless
+    } 
 }
 
 
@@ -270,6 +271,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     // Nav 2 top, horizontal
     col {
+        spacing = 0.px
         row {
             setup(appNav)
             button {
@@ -315,14 +317,15 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
                 } in card
             }
             ::exists { appNav.existsProperty.await() }
-        } in bar in marginless
-        navigatorView(navigator) in weight(1f) in marginless
-    } in marginless
+        } in bar 
+        navigatorView(navigator) in weight(1f) 
+    } 
 }
 
 fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     col {
+        spacing = 0.px
 // Nav 3 top and bottom (top)
         row {
             setup(appNav)
@@ -343,20 +346,22 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 navGroupActions(appNav.actionsProperty)
             }
             ::exists { appNav.existsProperty.await() }
-        } in bar in marginless
-        navigatorView(navigator) in weight(1f) in marginless
+        } in bar 
+        navigatorView(navigator) in weight(1f) 
         //Nav 3 - top and bottom (bottom/tabs)
         row {
+            spacing = 0.px
             ::exists { appNav.existsProperty.await() && !SoftInputOpen.await() }
             navGroupTabs(appNav.navItemsProperty)
-        } in marginless
+        } 
 
-    } in marginless
+    } 
 }
 
 fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     col {
+        spacing = 0.px
 // Nav 4 left and top - add dropdown for user info
         row {
             setup(appNav)
@@ -400,7 +405,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             }
 
             ::exists { appNav.existsProperty.await() }
-        } in bar in marginless
+        } in bar 
         row {
             col {
                 navGroupColumn(appNav.navItemsProperty)
@@ -409,7 +414,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             separator {
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             }
-            navigatorView(navigator) in weight(1f) in marginless
+            navigatorView(navigator) in weight(1f) 
         } in weight(1f)
-    } in marginless
+    } 
 }

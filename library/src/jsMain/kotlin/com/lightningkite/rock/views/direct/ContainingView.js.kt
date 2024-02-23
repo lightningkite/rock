@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.views.DynamicCSS
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -28,15 +29,15 @@ actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = themed
     setup(ContainingView(this))
 }
 
-actual var ContainingView.spacingMultiplier: Float
+actual var ContainingView.spacing: Dimension
     get() {
-        return native.style.getPropertyValue("--spacingMultiplier").toFloatOrNull() ?: 1f
+        return Dimension(native.style.getPropertyValue("--spacing").takeUnless { it.isBlank() } ?: "0px")
     }
     set(value) {
-        native.style.setProperty("--spacingMultiplier", value.toString())
-        val cn = "spacingMultiplierOf${value.toString().replace(".", "_")}"
-        DynamicCSS.styleIfMissing(".$cn > *", mapOf(
-            "--parentSpacingMultiplier" to value.toString()
+        native.style.setProperty("--spacing", value.value)
+        val cn = "spacingOf${value.value.replace(".", "_").filter { it.isLetterOrDigit() || it == '_' }}"
+        DynamicCSS.styleIfMissing(".$cn > *, .$cn > .hidingContainer > *", mapOf(
+            "--parentSpacing" to value.value
         ))
-        native.className = native.className.split(' ').filter { !it.startsWith("spacingMultiplierOf") }.plus(cn).joinToString(" ")
+        native.className = native.className.split(' ').filter { !it.startsWith("spacingOf") }.plus(cn).joinToString(" ")
     }

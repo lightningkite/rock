@@ -19,7 +19,7 @@ actual fun ViewWriter.radioButtonActual(setup: RadioButton.() -> Unit): Unit {
     radioToggleButton {
         icon(Icon.done, "") {
             ::visible.invoke { checked.await() }
-        } in marginless
+        } 
         setup(RadioButton(this.native))
     }
 }

@@ -14,6 +14,7 @@ import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.PopoverPreferredDirection
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.*
 import java.util.*
 
@@ -141,5 +142,14 @@ actual fun ViewWriter.hasPopover(
     setup: ViewWriter.() -> Unit,
 ): ViewWrapper {
 //    TODO("Not yet implemented")
+    return ViewWrapper
+}
+
+@ViewModifierDsl3
+actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend ()->Boolean): ViewWrapper {
+    beforeNextElementSetup {
+        exists = true
+        ::exists.invoke(condition)
+    }
     return ViewWrapper
 }

@@ -37,7 +37,7 @@ class NavLinkBottomTab(viewWriter: ViewWriter): NavLink {
     val countHolder: ContainingView
     init {
         with(viewWriter) {
-            marginless - expanding - link {
+            expanding - link {
                 link = this
                 compact - col {
                     centered - stack {
@@ -238,7 +238,7 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>, setup: Contain
                     }
                     Unit
                 }
-            } in weight(1f) in marginless
+            } in weight(1f) 
         }
-    } in marginless
+    } 
 }

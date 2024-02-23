@@ -36,5 +36,5 @@ fun ViewWriter.navigatorViewDialog() {
                     with(screen) { render() }
             }
         )
-    } in marginless
+    } 
 }

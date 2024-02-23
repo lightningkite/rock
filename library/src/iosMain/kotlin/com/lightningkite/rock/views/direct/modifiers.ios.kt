@@ -4,6 +4,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.*
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 
@@ -132,3 +133,11 @@ actual val ViewWriter.withDefaultPadding: ViewWrapper
         return ViewWrapper
     }
 // End
+@ViewModifierDsl3
+actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend ()->Boolean): ViewWrapper {
+    beforeNextElementSetup {
+        exists = true
+        ::exists.invoke(condition)
+    }
+    return ViewWrapper
+}

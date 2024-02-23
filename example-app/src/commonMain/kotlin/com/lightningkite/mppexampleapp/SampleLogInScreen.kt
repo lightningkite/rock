@@ -22,7 +22,7 @@ object SampleLogInScreen : RockScreen {
                 source = Resources.imagesSolera
                 scaleType = ImageScaleType.Crop
 //                opacity = 0.5
-            } in marginless
+            } 
             col {
                 space {} in weight(1f)
                 col {
@@ -58,7 +58,7 @@ object SampleLogInScreen : RockScreen {
                 } in card in sizedBox(SizeConstraints(maxWidth = 50.rem)) in gravity(Align.Center, Align.Center)
                 space {} in weight(1f)
             } in scrolls in withDefaultPadding
-        } in marginless
+        } 
     }
 
     private suspend fun ViewWriter.fakeLogin(email: Property<String>) {

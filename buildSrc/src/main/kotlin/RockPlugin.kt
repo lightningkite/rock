@@ -74,9 +74,27 @@ expect object Resources {
                         .sortedBy { it.key }
                         .joinToString("\n    ") {
                             when (val r = it.value) {
-                                is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"common/${r.normal.relativeFile}\", bold = ${r.bold?.relativeFile?.let { "\"common/$it\"" }}, italic = ${r.italic?.relativeFile?.let { "\"common/$it\"" }}, boldItalic = ${r.boldItalic?.relativeFile?.let { "\"common/$it\"" }}))"
-                                is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"common/${r.relativeFile}\")"
-                                is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"common/${r.relativeFile}\").blob()"
+                                is Resource.Font -> "actual val ${r.name}: Font = Font(cssFontFamilyName = \"${r.name}\", direct = FontDirect(normal = \"common/${
+                                    r.normal.relativeFile.toString().replace(File.separatorChar, '/')
+                                }\", bold = ${
+                                    r.bold?.relativeFile?.toString()?.replace(File.separatorChar, '/')
+                                        ?.let { "\"common/$it\"" }
+                                }, italic = ${
+                                    r.italic?.relativeFile?.toString()?.replace(File.separatorChar, '/')
+                                        ?.let { "\"common/$it\"" }
+                                }, boldItalic = ${
+                                    r.boldItalic?.relativeFile?.toString()?.replace(File.separatorChar, '/')
+                                        ?.let { "\"common/$it\"" }
+                                }))"
+
+                                is Resource.Image -> "actual val ${r.name}: ImageResource = ImageResource(\"common/${
+                                    r.relativeFile.toString().replace(File.separatorChar, '/')
+                                }\")"
+
+                                is Resource.Binary -> "actual suspend fun ${r.name}(): Blob = fetch(\"common/${
+                                    r.relativeFile.toString().replace(File.separatorChar, '/')
+                                }\").blob()"
+
                                 else -> ""
                             }
                         }

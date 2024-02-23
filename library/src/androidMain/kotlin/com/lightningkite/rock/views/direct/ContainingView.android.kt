@@ -7,7 +7,9 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.LinearLayoutCompat
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.LinearGradient
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -59,15 +61,23 @@ private fun LinearGradient.orientation(): GradientDrawable.Orientation {
 }
 
 interface HasSpacingMultiplier {
-    val spacingMultiplier: Property<Float>
+    val spacingOverride: Property<Dimension?>
 }
 
 class SlightlyModifiedFrameLayout(context: Context): FrameLayout(context), HasSpacingMultiplier {
-    override val spacingMultiplier: Property<Float> = Property(1f)
+    override val spacingOverride: Property<Dimension?> = Property(null)
+    var spacing: Int = 0
+        set(value) {
+            field = value
+        }
 }
 
 class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context), HasSpacingMultiplier {
-    override val spacingMultiplier: Property<Float> = Property(1f)
+    override val spacingOverride: Property<Dimension?> = Property(null)
+    var spacing: Int = 0
+        set(value) {
+            field = value
+        }
     override fun generateDefaultLayoutParams(): LayoutParams? {
         if (orientation == HORIZONTAL) {
             return LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
@@ -78,6 +88,6 @@ class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context
     }
 }
 
-actual var ContainingView.spacingMultiplier: Float
-    get() = (native as HasSpacingMultiplier).spacingMultiplier.value
-    set(value) { (native as HasSpacingMultiplier).spacingMultiplier.value = value }
+actual var ContainingView.spacing: Dimension
+    get() = (native as HasSpacingMultiplier).spacingOverride.value ?: 0.px
+    set(value) { (native as HasSpacingMultiplier).spacingOverride.value = value }

@@ -23,7 +23,7 @@ fun ViewWriter.navBottomBar(show: Readable<Boolean> = Constant(true), navElement
     row {
         ::exists { show.await() && !SoftInputOpen.await() }
         navGroupTabs(shared { navElements() })
-    } in marginless
+    } 
 }
 
 fun ViewWriter.navSideBar(navElements: suspend () -> List<NavElement>) {
@@ -34,12 +34,12 @@ fun ViewWriter.appBase(routes: Routes, mainLayout: ContainingView.() -> Unit) {
     stack {
         val navigator = PlatformNavigator
         PlatformNavigator.routes = routes
-        mainLayout() in marginless
+        mainLayout() 
         dismissBackground {
             val nav = navigator.dialog
             ::exists { nav.currentScreen.await() != null }
             onClick { nav.dismiss() }
             navigatorViewDialog() in tweakTheme { it.dialog() }
-        } in marginless
-    } in marginless
+        } 
+    } 
 }

@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.handleTheme
@@ -28,7 +29,7 @@ actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = elemen
     setup(ContainingView(this))
 }
 
-actual var ContainingView.spacingMultiplier: Float
+actual var ContainingView.spacing: Dimension
     get() = when(native) {
         is LinearLayout -> native.spacingMultiplier.toFloat()
         is FrameLayout -> native.spacingMultiplier.toFloat()

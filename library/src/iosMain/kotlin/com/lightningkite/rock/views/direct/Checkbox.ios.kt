@@ -19,7 +19,7 @@ actual fun ViewWriter.checkboxActual(setup: Checkbox.() -> Unit): Unit {
     toggleButton {
         icon(Icon.done, "") {
             ::visible.invoke { checked.await() }
-        } in marginless
+        } 
         setup(Checkbox(this.native))
     }
 }

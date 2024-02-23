@@ -15,6 +15,7 @@ import android.widget.Spinner
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.content.res.ResourcesCompat
 import com.lightningkite.rock.R
+import com.lightningkite.rock.models.dp
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
@@ -113,7 +114,7 @@ actual fun ViewWriter.selectActual(setup: Select.() -> Unit) {
             setLayerGravity(1, Gravity.END or Gravity.CENTER_VERTICAL)
             setLayerInsetEnd(1, it.spacing.value.toInt())
         },background = {
-            native.setPopupBackgroundDrawable(it.backgroundDrawable(true))
+            native.setPopupBackgroundDrawable(it.backgroundDrawable(8.dp.value, true))
         }) {
             native.viewWriter = newViews()
             setup(this)

@@ -32,7 +32,7 @@ object DynamicCSS {
             "box-sizing" to "border-box",
             "line-height" to "unset",
             "overflow-x" to "visible",
-            "--spacingMultiplier" to "1",
+            "--parentSpacing" to "var(--spacing)"
         ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
@@ -56,16 +56,16 @@ object DynamicCSS {
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(
             "body", mapOf(
-                "height" to "100vh",
-                "max-height" to "100vh",
+                "height" to "100svh",
+                "max-height" to "100svh",
                 "max-width" to "100vw",
+                "overflow" to "hidden"
             )
         )
 
         style(
             "body > div", mapOf(
-                "height" to "100vh",
-                "max-height" to "100vh",
+                "height" to "100%",
                 "max-width" to "100vw",
             )
         )
@@ -445,7 +445,6 @@ object DynamicCSS {
                 "opacity" to "0.4",
                 "transform" to "rotate(-45deg) scale(0,0)",
                 "transition-property" to "opacity, transform",
-                "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
             )
         )
@@ -481,7 +480,6 @@ object DynamicCSS {
                 "opacity" to "0.4",
                 "transform" to "scale(0,0)",
                 "transition-property" to "opacity, transform",
-                "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
             )
         )
@@ -499,30 +497,10 @@ object DynamicCSS {
         )
 
         style(
-            ".crowd > *", mapOf(
-                "margin" to "0px !important",
-                "--margin" to "0px !important",
-            )
-        )
-
-        style(
             ".rock-label.rock-label", mapOf(
                 "display" to "flex",
                 "flex-direction" to "column",
                 "align-items" to "stretch",
-            )
-        )
-
-        style(
-            ".rock-label.rock-label > :nth-child(1):nth-child(1):nth-child(1)", mapOf(
-                "font-size" to "0.8rem",
-                "margin-bottom" to "0px",
-            )
-        )
-
-        style(
-            ".rock-label.rock-label > :nth-child(2):nth-child(2):nth-child(2)", mapOf(
-                "margin-top" to "0.25rem",
             )
         )
 
@@ -549,12 +527,10 @@ object DynamicCSS {
                 "scrollbar-width" to "thin",
                 "scrollbar-gutter" to "auto",
                 "flex-shrink" to "0",
-                "max-width" to "calc(100% - var(--margin, 0) * 2)",
-                "max-height" to "calc(100% - var(--margin, 0) * 2)",
+                "max-width" to "calc(100%)",
+                "max-height" to "calc(100%)",
                 "min-height" to "0",
                 "min-width" to "0",
-                "margin" to "0px",
-                "--margin" to "0px",
                 "padding" to "0",
             )
         )
@@ -698,16 +674,12 @@ object DynamicCSS {
 //        style(
 //            ".rock-row > [hidden]", mapOf(
 //                "width" to "0px !important",
-//                "margin-left" to "0px !important",
-//                "margin-right" to "0px !important",
 //                "transform" to "scaleX(0)",
 //            )
 //        )
 //        style(
 //            ".rock-col > [hidden]", mapOf(
 //                "height" to "0px !important",
-//                "margin-top" to "0px !important",
-//                "margin-bottom" to "0px !important",
 //                "transform" to "scaleY(0)",
 //            )
 //        )
@@ -985,14 +957,8 @@ object DynamicCSS {
             return includeSelectors.asSequence().flatMap { plus.asSequence().map { p -> "$it$p" } }.joinToString(", ")
         }
         style(
-            sel(".mightTransition:not(.isRoot)", ".forcePadding"), mapOf(
-                "padding" to "calc(${theme.spacing.value} * var(--spacingMultiplier, 1.0))",
-            )
-        )
-        style(
-            sel(".mightTransition:not(.marginless)",  ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
-                "margin" to "calc(var(--nextMargin, ${theme.spacing.value}) * var(--parentSpacingMultiplier, 1.0))",
-                "--margin" to "calc(var(--nextMargin, ${theme.spacing.value}) * var(--parentSpacingMultiplier, 1.0))",
+            sel(".mightTransition:not(.isRoot)", ".forcePadding:not(.cancelForcePadding)"), mapOf(
+                "padding" to "var(--spacing, 0px)",
             )
         )
         style(
@@ -1011,22 +977,19 @@ object DynamicCSS {
             }
         )
         style(
-            if (includeMaybeTransition) sel(".mightTransition:not(.marginless)") else sel(".transition:not(.marginless)"),
+            if (includeMaybeTransition) sel(".mightTransition") else sel(".transition"),
             mapOf(
                 "outline-width" to theme.outlineWidth.value,
                 "box-shadow" to theme.elevation.toBoxShadow(),
                 "outline-style" to if (theme.outlineWidth != 0.px) "solid" else "none",
             )
         )
-        style(sel("> *"), mapOf(
-            "--nextMargin" to theme.spacing.value,
-        ))
         style(
-            sel(".mightTransition:not(.marginless)"), mapOf(
-                "border-top-left-radius" to theme.cornerRadii.topLeft.value,
-                "border-top-right-radius" to theme.cornerRadii.topRight.value,
-                "border-bottom-left-radius" to theme.cornerRadii.bottomLeft.value,
-                "border-bottom-right-radius" to theme.cornerRadii.bottomRight.value,
+            sel(".mightTransition"), mapOf(
+                "border-radius" to when(val it = theme.cornerRadii) {
+                    is CornerRadii.Constant -> "calc(min(var(--parentSpacing, 0px), ${it.value.value}))"
+                    is CornerRadii.RatioOfSpacing -> "calc(var(--parentSpacing, 0px) * ${it.value})"
+                },
             )
         )
         style(
@@ -1042,6 +1005,8 @@ object DynamicCSS {
         style(
             sel(""), mapOf(
                 "color" to theme.foreground.toCss(),
+                "--spacing" to theme.spacing.value,
+                "gap" to "var(--spacing, 0.0)",
                 "font-family" to font(theme.body.font),
                 "font-weight" to if (theme.body.bold) "bold" else "normal",
                 "font-style" to if (theme.body.italic) "italic" else "normal",
@@ -1054,8 +1019,6 @@ object DynamicCSS {
         style(
             sel(".dismissBackground"), mapOf(
                 "border-radius" to "0",
-                "margin" to "0px",
-                "--margin" to "0px",
                 "outline-width" to "0",
             ) + when (val it = theme.background.applyAlpha(0.5f)) {
                 is Color -> mapOf("background-color" to it.toCss())
@@ -1080,177 +1043,6 @@ fun js(vararg entries: Pair<String, Any?>): dynamic {
     val out = js("{}")
     for (entry in entries) out[entry.first] = entry.second
     return out
-}
-
-private var tempId = 0
-fun HTMLElement.animateHidden(value: Boolean) {
-    val prev = this.asDynamic().__rock__goalHidden ?: hidden
-    if (value == prev) return
-
-    classList.add("animatingShowHide")
-
-    val myStyle = window.getComputedStyle(this)
-    val transitionTime = myStyle.transitionDuration.let { Duration.parse(it) }
-    val totalTime = transitionTime.inWholeMilliseconds.toDouble()
-    var oldAnimTime = totalTime
-    (this.asDynamic().__rock__hiddenAnim as? Animation)?.let {
-//        it.commitStyles()
-        oldAnimTime = it.currentTime
-        it.cancel()
-    }
-    (this.asDynamic().__rock__hiddenAnim2 as? Animation)?.let {
-        it.cancel()
-    }
-    this.asDynamic().__rock__goalHidden = value
-    hidden = false
-    val parent = generateSequence(this) { it.parentElement as? HTMLElement }.drop(1)
-        .firstOrNull { !it.classList.contains("toggle-button") } ?: return
-    val parentStyle = window.getComputedStyle(parent)
-    val x =
-        parentStyle.display == "flex" && parentStyle.flexDirection.contains("row")// && myStyle.width.none { it.isDigit() }
-    val y =
-        parentStyle.display == "flex" && parentStyle.flexDirection.contains("column")// && myStyle.height.none { it.isDigit() }
-
-    val before = js("{}")
-    val after = js("{}")
-    val full = if(value) before else after
-    val fullTransform = ArrayList<String>()
-    val gone = if(value) after else before
-    val goneTransform = ArrayList<String>()
-
-    var fullWidth = ""
-    var fullHeight = ""
-    var marginLeft = ""
-    var marginRight = ""
-    var marginTop = ""
-    var marginBottom = ""
-    var paddingLeft = ""
-    var paddingRight = ""
-    var paddingTop = ""
-    var paddingBottom = ""
-    if(hidden) {
-        hidden = false
-        fullWidth = myStyle.width
-        fullHeight = myStyle.height
-        marginLeft = myStyle.marginLeft
-        marginRight = myStyle.marginRight
-        marginTop = myStyle.marginTop
-        marginBottom = myStyle.marginBottom
-        paddingLeft = myStyle.paddingLeft
-        paddingRight = myStyle.paddingRight
-        paddingTop = myStyle.paddingTop
-        paddingBottom = myStyle.paddingBottom
-        hidden = true
-    } else {
-        fullWidth = myStyle.width
-        fullHeight = myStyle.height
-        marginLeft = myStyle.marginLeft
-        marginRight = myStyle.marginRight
-        marginTop = myStyle.marginTop
-        marginBottom = myStyle.marginBottom
-        paddingLeft = myStyle.paddingLeft
-        paddingRight = myStyle.paddingRight
-        paddingTop = myStyle.paddingTop
-        paddingBottom = myStyle.paddingBottom
-    }
-
-    if(x) {
-        goneTransform.add("scaleX(0)")
-        fullTransform.add("scaleX(1)")
-        gone.marginLeft = "0px"
-        gone.paddingLeft = "0px"
-        gone.marginRight = "0px"
-        gone.paddingRight = "0px"
-        full.marginLeft = marginLeft
-        full.paddingLeft = paddingLeft
-        full.marginRight = marginRight
-        full.paddingRight = paddingRight
-        gone.width = "0px"
-        full.width = fullWidth
-    }
-    if(y) {
-        goneTransform.add("scaleY(0)")
-        fullTransform.add("scaleY(1)")
-        gone.marginTop = "0px"
-        gone.paddingTop = "0px"
-        gone.marginBottom = "0px"
-        gone.paddingBottom = "0px"
-        full.marginTop = marginTop
-        full.paddingTop = paddingTop
-        full.marginBottom = marginBottom
-        full.paddingBottom = paddingBottom
-        gone.height = "0px"
-        full.height = fullHeight
-    }
-    if(!x && !y) {
-        full.opacity = "1"
-        gone.opacity = "0"
-    }
-//    gone.transform = goneTransform.takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none"
-//    full.transform = fullTransform.takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none"
-
-//    this.animate(
-//        arrayOf(
-//            js("transform" to ((if(value) fullTransform else goneTransform).takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none")),
-//            js("transform" to ((if(value) goneTransform else fullTransform).takeIf { it.isNotEmpty() }?.joinToString(" ") ?: "none")),
-//        ),
-//        js(
-//            "duration" to totalTime,
-////            "easing" to "cubic-bezier(0.5, 1, 0.89, 1)"
-////            "easing" to "cubic-bezier(0, 0.55, 0.45, 1)"
-//            "easing" to "cubic-bezier(0.16, 1, 0.3, 1)"
-////            "easing" to "cubic-bezier(0.33, 1, 0.68, 1)"
-//        )
-//    ).let {
-//        it.currentTime = (totalTime - oldAnimTime).coerceAtLeast(0.0)
-//        it.onfinish = { ev ->
-//            if(this.asDynamic().__rock__hiddenAnim2 == it) {
-//                this.asDynamic().__rock__hiddenAnim2 = null
-//            }
-//        }
-//        it.oncancel = { ev ->
-//            if(this.asDynamic().__rock__hiddenAnim2 == it) {
-//                this.asDynamic().__rock__hiddenAnim2 = null
-//            }
-//        }
-//        it.onremove = { ev ->
-//            if(this.asDynamic().__rock__hiddenAnim2 == it) {
-//                this.asDynamic().__rock__hiddenAnim2 = null
-//            }
-//        }
-//        this.asDynamic().__rock__hiddenAnim2 = it
-//    }
-
-    this.animate(
-        arrayOf(before, after),
-        js(
-            "duration" to totalTime
-        )
-    ).let {
-        it.currentTime = (totalTime - oldAnimTime).coerceAtLeast(0.0)
-        it.onfinish = { ev ->
-            if(this.asDynamic().__rock__hiddenAnim == it) {
-                hidden = value
-                classList.remove("animatingShowHide")
-                this.asDynamic().__rock__hiddenAnim = null
-            }
-        }
-        it.oncancel = { ev ->
-            if(this.asDynamic().__rock__hiddenAnim == it) {
-                hidden = value
-                classList.remove("animatingShowHide")
-                this.asDynamic().__rock__hiddenAnim = null
-            }
-        }
-        it.onremove = { ev ->
-            if(this.asDynamic().__rock__hiddenAnim == it) {
-                hidden = value
-                classList.remove("animatingShowHide")
-                this.asDynamic().__rock__hiddenAnim = null
-            }
-        }
-        this.asDynamic().__rock__hiddenAnim = it
-    }
 }
 
 @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")

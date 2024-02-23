@@ -17,6 +17,7 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
+import kotlin.math.min
 import kotlin.math.roundToInt
 import android.widget.TextView as AndroidTextView
 import com.lightningkite.rock.models.Paint as RockPaint
@@ -47,54 +48,6 @@ val NView.hovered: Readable<Boolean>
             return this@hovered.isHovered
         }
     }
-
-
-//actual val Select.selected: Writable<String?>
-//    get() {
-//        return this@selected.native.stringNullableWritable(
-//            addNativeListener = {
-//                this@selected.native.onItemSelectedListener = object : OnItemSelectedListener {
-//                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-//                        NativeListeners.listeners.get(this@selected.native)?.forEach { action -> action() }
-//                    }
-//
-//                    override fun onNothingSelected(parent: AdapterView<*>?) {}
-//                }
-//            },
-//            getString = { this@selected.native.selectedItem.toString() },
-//            setString = { value ->
-//                val adapter = this@selected.native.adapter
-//                val count = adapter.count
-//                var counter = 0
-//                while (counter < count) {
-//                    val item = adapter.getItem(counter).toString()
-//                    if (item == value) {
-//                        break
-//                    }
-//                    counter++
-//                }
-//
-//                if (counter < count) {
-//                    this@selected.native.setSelection(counter)
-//                }
-//            }
-//        )
-//    }
-//actual var Select.options: List<WidgetOption>
-//    get() {
-//        val adapter = native.adapter
-//        val options = mutableListOf<WidgetOption>()
-//        val count = adapter.count
-//        var counter = 0
-//        while (counter < count) {
-//            adapter.getItem(counter)?.let { options.add(it as WidgetOption) }
-//            counter++
-//        }
-//        return options
-//    }
-//    set(value) {
-//        native.adapter = ArrayAdapter(native.context, android.R.layout.simple_list_item_1, value)
-//    }
 
 
 fun View.addLayoutChangeListener(listener: () -> Unit): () -> Unit {
@@ -160,7 +113,6 @@ inline fun <T : NView> ViewWriter.handleTheme(
     view.calculationContext.reactiveScope {
         val theme = currentTheme()
 
-        val viewMarginless = viewIsMarginless[view] ?: false
         val viewForcePadding = viewHasPadding[view] ?: false
 
         val shouldTransition = when (transition) {
@@ -171,29 +123,19 @@ inline fun <T : NView> ViewWriter.handleTheme(
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
         val usePadding = mightTransition && !isRoot || viewForcePadding
-        val useMargins = (viewDraws || parentIsSwap || mightTransition) && !viewMarginless
 
-        val borders = !viewMarginless
-
-        if (useMargins) {
-            if(changedThemes) {
-                view.setMarginAll((parentTheme().spacing.value * ((view.parent as? HasSpacingMultiplier)?.spacingMultiplier?.await() ?: 1f)).toInt())
-            } else {
-                view.setMarginAll((theme.spacing.value * ((view.parent as? HasSpacingMultiplier)?.spacingMultiplier?.await() ?: 1f)).toInt())
-            }
-        } else {
-            view.setMarginAll(0)
-        }
         if (usePadding) {
-            view.setPaddingAll((theme.spacing.value * ((view as? HasSpacingMultiplier)?.spacingMultiplier?.await() ?: 1f)).toInt())
+            view.setPaddingAll(theme.spacing.value.toInt())
         } else {
             view.setPaddingAll(0)
         }
 
+        val parentSpacing = ((view.parent as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value
+
         if (viewLoads && view.androidCalculationContext.loading.await()) {
 
             val backgroundDrawable = theme.backgroundDrawable(
-                borders, view.isClickable, view.background,
+                parentSpacing, view.isClickable, view.background,
                 customDrawable = customDrawable
             )
             val animation = ValueAnimator.ofFloat(0f, 1f)
@@ -215,7 +157,7 @@ inline fun <T : NView> ViewWriter.handleTheme(
             animation.start()
             animator = animation
             view.background = backgroundDrawable
-            view.elevation = if (useBackground && borders) theme.elevation.value else 0f
+            view.elevation = if (useBackground && parentSpacing > 0f) theme.elevation.value else 0f
             if (useBackground) {
                 background(theme)
             } else {
@@ -227,15 +169,15 @@ inline fun <T : NView> ViewWriter.handleTheme(
             animator = null
             if (useBackground) {
                 val backgroundDrawable = theme.backgroundDrawable(
-                    borders, view.isClickable, view.background,
+                    parentSpacing, view.isClickable, view.background,
                     customDrawable = customDrawable
                 )
                 view.background = backgroundDrawable
-                view.elevation = if (borders) theme.elevation.value else 0f
+                view.elevation = if (parentSpacing > 0f) theme.elevation.value else 0f
                 background(theme)
             } else if (view.isClickable) {
                 view.elevation = 0f
-                view.background = theme.rippleDrawableOnly(borders, view.background)
+                view.background = theme.rippleDrawableOnly(parentSpacing, view.background)
                 backgroundRemove()
             } else {
                 view.elevation = 0f
@@ -248,7 +190,7 @@ inline fun <T : NView> ViewWriter.handleTheme(
 }
 
 fun Theme.rippleDrawableOnly(
-    borders: Boolean,
+    parentSpacing: Float,
     existingBackground: Drawable? = null,
 ): LayerDrawable {
     val rippleColor = ColorStateList.valueOf(hover().background.colorInt())
@@ -257,44 +199,30 @@ fun Theme.rippleDrawableOnly(
     } ?: RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
     preparing.setDrawable(0, GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
-        if (borders) {
-            cornerRadii = floatArrayOf(
-                this@rippleDrawableOnly.cornerRadii.topLeft.value,
-                this@rippleDrawableOnly.cornerRadii.topLeft.value,
-                this@rippleDrawableOnly.cornerRadii.topRight.value,
-                this@rippleDrawableOnly.cornerRadii.topRight.value,
-                this@rippleDrawableOnly.cornerRadii.bottomLeft.value,
-                this@rippleDrawableOnly.cornerRadii.bottomLeft.value,
-                this@rippleDrawableOnly.cornerRadii.bottomRight.value,
-                this@rippleDrawableOnly.cornerRadii.bottomRight.value
-            )
-            colors = intArrayOf(background.applyAlpha(0.01f).colorInt(), background.applyAlpha(0.01f).colorInt())
+        val cr = when(val it = this@rippleDrawableOnly.cornerRadii) {
+            is CornerRadii.Constant -> min(parentSpacing, it.value.value)
+            is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
         }
+        cornerRadii = floatArrayOf(cr, cr, cr, cr, cr, cr, cr, cr)
+        colors = intArrayOf(background.applyAlpha(0.01f).colorInt(), background.applyAlpha(0.01f).colorInt())
     })
     return preparing
 }
 
 fun Theme.backgroundDrawable(
-    borders: Boolean,
+    parentSpacing: Float,
     clickable: Boolean = false,
     existingBackground: Drawable? = null,
     customDrawable: LayerDrawable.(Theme) -> Unit = {},
 ): LayerDrawable {
     val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
-        if (borders) {
-            cornerRadii = floatArrayOf(
-                this@backgroundDrawable.cornerRadii.topLeft.value,
-                this@backgroundDrawable.cornerRadii.topLeft.value,
-                this@backgroundDrawable.cornerRadii.topRight.value,
-                this@backgroundDrawable.cornerRadii.topRight.value,
-                this@backgroundDrawable.cornerRadii.bottomLeft.value,
-                this@backgroundDrawable.cornerRadii.bottomLeft.value,
-                this@backgroundDrawable.cornerRadii.bottomRight.value,
-                this@backgroundDrawable.cornerRadii.bottomRight.value
-            )
-            setStroke(outlineWidth.value.toInt(), outline.colorInt())
+        val cr = when(val it = this@backgroundDrawable.cornerRadii) {
+            is CornerRadii.Constant -> min(parentSpacing, it.value.value)
+            is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
         }
+        cornerRadii = floatArrayOf(cr, cr, cr, cr, cr, cr, cr, cr)
+        setStroke(outlineWidth.value.toInt(), outline.colorInt())
 
         when (this@backgroundDrawable.background) {
             is Color -> {

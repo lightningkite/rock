@@ -28,7 +28,12 @@ object DynamicCSS {
 
     init {
         // basis rules
-        style("*", mapOf("box-sizing" to "border-box", "line-height" to "unset", /*"overflow" to "hidden"*/))
+        style("*", mapOf(
+            "box-sizing" to "border-box",
+            "line-height" to "unset",
+            "overflow-x" to "visible",
+            "--spacingMultiplier" to "1",
+        ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
         style("h3", mapOf("font-size" to "1.4rem"))
@@ -294,6 +299,12 @@ object DynamicCSS {
         style(
             ".rock-col > .hEnd", mapOf(
                 "align-self" to "end",
+            )
+        )
+
+        style(
+            "img", mapOf(
+                "overflow" to "hidden",
             )
         )
 
@@ -620,6 +631,7 @@ object DynamicCSS {
         style(
             ".scroll-vertical", mapOf(
                 "overflow-y" to "auto",
+                "overflow-x" to "hidden",
             )
         )
 
@@ -632,6 +644,7 @@ object DynamicCSS {
         style(
             ".scroll-horizontal", mapOf(
                 "overflow-x" to "auto",
+                "overflow-y" to "hidden",
             )
         )
 
@@ -834,6 +847,17 @@ object DynamicCSS {
         return font.cssFontFamilyName
     }
 
+    private val styleOnces = HashSet<String>()
+    fun styleIfMissing(selector: String, map: Map<String, String>) {
+        if(styleOnces.add(selector)) {
+            val wrapSelector = selector//":not(.unrock) $selector"
+            rule(
+                """$wrapSelector { ${map.entries.joinToString("; ") { "${it.key}: ${it.value}" }} }""",
+                0
+            )
+        }
+    }
+
     fun style(selector: String, map: Map<String, String>) {
         val wrapSelector = selector//":not(.unrock) $selector"
         rule(
@@ -962,13 +986,13 @@ object DynamicCSS {
         }
         style(
             sel(".mightTransition:not(.isRoot)", ".forcePadding"), mapOf(
-                "padding" to theme.spacing.value,
+                "padding" to "calc(${theme.spacing.value} * var(--spacingMultiplier, 1.0))",
             )
         )
         style(
             sel(".mightTransition:not(.marginless)",  ".viewDraws:not(.marginless)", ".forcePadding"), mapOf(
-                "margin" to "var(--nextMargin, ${theme.spacing.value})",
-                "--margin" to "var(--nextMargin, ${theme.spacing.value})",
+                "margin" to "calc(var(--nextMargin, ${theme.spacing.value}) * var(--parentSpacingMultiplier, 1.0))",
+                "--margin" to "calc(var(--nextMargin, ${theme.spacing.value}) * var(--parentSpacingMultiplier, 1.0))",
             )
         )
         style(

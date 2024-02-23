@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.LinearLayoutCompat
 import com.lightningkite.rock.models.LinearGradient
+import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 
@@ -57,7 +58,16 @@ private fun LinearGradient.orientation(): GradientDrawable.Orientation {
     }
 }
 
-class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context) {
+interface HasSpacingMultiplier {
+    val spacingMultiplier: Property<Float>
+}
+
+class SlightlyModifiedFrameLayout(context: Context): FrameLayout(context), HasSpacingMultiplier {
+    override val spacingMultiplier: Property<Float> = Property(1f)
+}
+
+class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context), HasSpacingMultiplier {
+    override val spacingMultiplier: Property<Float> = Property(1f)
     override fun generateDefaultLayoutParams(): LayoutParams? {
         if (orientation == HORIZONTAL) {
             return LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
@@ -67,3 +77,7 @@ class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context
         return null
     }
 }
+
+actual var ContainingView.spacingMultiplier: Float
+    get() = (native as HasSpacingMultiplier).spacingMultiplier.value
+    set(value) { (native as HasSpacingMultiplier).spacingMultiplier.value = value }

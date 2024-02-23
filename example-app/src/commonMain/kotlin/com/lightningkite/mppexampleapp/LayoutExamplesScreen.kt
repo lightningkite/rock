@@ -113,6 +113,38 @@ object LayoutExamplesScreen : RockScreen {
             }
 
             card - col {
+                h2("Custom spacing test")
+                card - row {
+                    spacingMultiplier = 0f
+                    text("0.0")
+                    important - stack { space() }
+                    important - stack { space() }
+                    important - stack { space() }
+                }
+                card - row {
+                    spacingMultiplier = 0.5f
+                    text("0.5")
+                    important - stack { space() }
+                    important - stack { space() }
+                    important - stack { space() }
+                }
+                card - row {
+                    spacingMultiplier = 1f
+                    text("1.0")
+                    important - stack { space() }
+                    important - stack { space() }
+                    important - stack { space() }
+                }
+                card - row {
+                    spacingMultiplier = 2f
+                    text("2.0")
+                    important - stack { space() }
+                    important - stack { space() }
+                    important - stack { space() }
+                }
+            }
+
+            card - col {
                 h2 { content = "Max Size / Image Interaction" }
                 image {
                     source = ImageRemote("https://picsum.photos/seed/test/1920/1080")

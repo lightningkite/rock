@@ -12,3 +12,5 @@ actual fun gc(): GCInfo {
 
 actual fun assertMainThread() {
 }
+
+actual fun Throwable.printStackTrace2() = printStackTrace()

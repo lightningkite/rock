@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.views.DynamicCSS
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import org.w3c.dom.HTMLDivElement
@@ -26,3 +27,16 @@ actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = themed
     classList.add("rock-row")
     setup(ContainingView(this))
 }
+
+actual var ContainingView.spacingMultiplier: Float
+    get() {
+        return native.style.getPropertyValue("--spacingMultiplier").toFloatOrNull() ?: 1f
+    }
+    set(value) {
+        native.style.setProperty("--spacingMultiplier", value.toString())
+        val cn = "spacingMultiplierOf${value.toString().replace(".", "_")}"
+        DynamicCSS.styleIfMissing(".$cn > *", mapOf(
+            "--parentSpacingMultiplier" to value.toString()
+        ))
+        native.className = native.className.split(' ').filter { !it.startsWith("spacingMultiplierOf") }.plus(cn).joinToString(" ")
+    }

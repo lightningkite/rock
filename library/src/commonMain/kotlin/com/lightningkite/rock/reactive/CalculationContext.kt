@@ -13,7 +13,11 @@ interface CalculationContext {
         notifyComplete(result)
     }
     fun notifyComplete(result: Result<Unit>) {
-        result.onFailure { if(it !is CancelledException) it.printStackTrace() }
+        result.onFailure {
+            if(it !is CancelledException) {
+                it.printStackTrace2()
+            }
+        }
     }
     fun onRemove(action: () -> Unit)
     companion object {

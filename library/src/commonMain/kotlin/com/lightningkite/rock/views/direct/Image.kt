@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.models.ImageScaleType
 import com.lightningkite.rock.models.ImageSource
 import com.lightningkite.rock.views.NView

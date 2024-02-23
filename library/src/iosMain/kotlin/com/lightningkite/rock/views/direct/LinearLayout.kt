@@ -24,6 +24,12 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
+    var spacingMultiplier: Double = 1.0
+        set(value) {
+            field = value
+            sizeCache.clear()
+            informParentOfSizeChange()
+        }
 
 //    init { setUserInteractionEnabled(false) }
 
@@ -43,7 +49,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 //        it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
 //            return
 //        }
-//        val m = it.extensionMargin ?: 0.0
+//        val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
 //        if(it.extensionWeight != null && it.extensionWeight!! > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
 //            return
 //        }
@@ -69,12 +75,12 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         val measuredSize = Size()
 
         val sizes = calcSizes(sizeLocal, false)
-        measuredSize.primary += padding
+        measuredSize.primary += padding * spacingMultiplier
         for (size in sizes) {
             measuredSize.primary += size.primary + size.margin * 2
-            measuredSize.secondary = max(measuredSize.secondary, size.secondary + padding * 2 + size.margin * 2)
+            measuredSize.secondary = max(measuredSize.secondary, size.secondary + padding * spacingMultiplier * 2 + size.margin * 2)
         }
-        measuredSize.primary += padding
+        measuredSize.primary += padding * spacingMultiplier
 
         debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()} from ${sizes.joinToString { it.primary.toInt().toString() }}" }
         return measuredSize.objc
@@ -92,10 +98,10 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     }
 
     fun calcSizes(size: Size, includeWeighted: Boolean): List<Size> = sizeCache.getOrPut(size to includeWeighted) {
-//        let size = padding.shrinkSize(size)
+//        let size = padding * spacingMultiplier.shrinkSize(size)
         val remaining = size.copy()
-        remaining.primary -= padding * 2
-        remaining.secondary -= padding * 2
+        remaining.primary -= padding * spacingMultiplier * 2
+        remaining.secondary -= padding * spacingMultiplier * 2
 
         var totalWeight = 0f
 
@@ -107,7 +113,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
                 out[index] = Size(0.0, 0.0)
                 return@forEachIndexed
             }
-            val m = it.extensionMargin ?: 0.0
+            val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
             it.extensionWeight?.let {
                 totalWeight += it
                 remaining.primary -= 2 * m
@@ -120,7 +126,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
                 it.primaryMin?.let { required.primary = required.primary.coerceAtLeast(it.value) }
                 it.secondaryMin?.let { required.secondary = required.secondary.coerceAtLeast(it.value) }
                 it.primary?.let { required.primary = it.value }
-                it.secondary?.let { required.secondary = it.value }
+                it.secondary?.let { required.secondary = it.value.coerceAtMost(remaining.secondary - m * 2) }
             }
             required.margin = m
             required.primary = required.primary.coerceAtLeast(0.0)
@@ -133,7 +139,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         subviews.forEachIndexed { index, it ->
             it as UIView
             if(out[index] != null) return@forEachIndexed
-            val m = it.extensionMargin ?: 0.0
+            val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
             val w = it.extensionWeight!!.toDouble()
             val available = ((w / totalWeight) * remaining.primary).coerceAtLeast(0.0)
             val required = it.sizeThatFits2(Size(available, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
@@ -155,7 +161,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 
     override fun layoutSubviews() {
         val mySize = bounds.useContents { size.local }
-        var primary = padding
+        var primary = padding * spacingMultiplier
         val sizes = calcSizes(frame.useContents { size.local }, true)
         subviews.zip(sizes) { view, size ->
             view as UIView
@@ -164,12 +170,12 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             val ps = primary + m
             val a = view.secondaryAlign ?: Align.Stretch
             val offset = when(a) {
-                Align.Start -> m + padding
-                Align.Stretch -> m + padding
-                Align.End -> mySize.secondary - m - padding - size.secondary
+                Align.Start -> m + padding * spacingMultiplier
+                Align.Stretch -> m + padding * spacingMultiplier
+                Align.End -> mySize.secondary - m - padding * spacingMultiplier - size.secondary
                 Align.Center -> (mySize.secondary - size.secondary) / 2
             }
-            val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * 2 else size.secondary
+            val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * spacingMultiplier * 2 else size.secondary
             val oldSize = view.bounds.useContents { this.size.width to this.size.height }
             val widthSize = if(horizontal) size.primary else secondarySize
             val heightSize = if(horizontal) secondarySize else size.primary
@@ -186,7 +192,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             }
             primary += size.primary + 2 * m
         }
-        primary += padding
+        primary += padding * spacingMultiplier
     }
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {

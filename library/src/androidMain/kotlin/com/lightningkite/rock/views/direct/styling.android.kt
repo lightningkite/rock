@@ -175,18 +175,17 @@ inline fun <T : NView> ViewWriter.handleTheme(
 
         val borders = !viewMarginless
 
-        if(parentIsSwap) println("parentIsSwap! ${useMargins}")
         if (useMargins) {
             if(changedThemes) {
-                view.setMarginAll(parentTheme().spacing.value.toInt())
+                view.setMarginAll((parentTheme().spacing.value * ((view.parent as? HasSpacingMultiplier)?.spacingMultiplier?.await() ?: 1f)).toInt())
             } else {
-                view.setMarginAll(theme.spacing.value.toInt())
+                view.setMarginAll((theme.spacing.value * ((view.parent as? HasSpacingMultiplier)?.spacingMultiplier?.await() ?: 1f)).toInt())
             }
         } else {
             view.setMarginAll(0)
         }
         if (usePadding) {
-            view.setPaddingAll(theme.spacing.value.toInt())
+            view.setPaddingAll((theme.spacing.value * ((view as? HasSpacingMultiplier)?.spacingMultiplier?.await() ?: 1f)).toInt())
         } else {
             view.setPaddingAll(0)
         }

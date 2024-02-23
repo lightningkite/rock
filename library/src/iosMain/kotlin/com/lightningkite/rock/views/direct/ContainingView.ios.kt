@@ -27,3 +27,17 @@ actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = elemen
     handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
+
+actual var ContainingView.spacingMultiplier: Float
+    get() = when(native) {
+        is LinearLayout -> native.spacingMultiplier.toFloat()
+        is FrameLayout -> native.spacingMultiplier.toFloat()
+        else -> 1f
+    }
+    set(value) {
+        when(native) {
+            is LinearLayout -> native.spacingMultiplier = value.toDouble()
+            is FrameLayout -> native.spacingMultiplier = value.toDouble()
+            else -> 1f
+        }
+    }

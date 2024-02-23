@@ -11,3 +11,16 @@ actual fun gc(): GCInfo {
 
 actual fun assertMainThread() {
 }
+
+actual fun Throwable.printStackTrace2() {
+    val stack = this.asDynamic().stack
+    if (stack is String) {
+        val error = js("Error()")
+        error.name = this.toString().substringBefore(':')
+        error.message = this.message?.substringAfter(':')
+        error.stack = stack
+        console.error(error)
+    } else {
+        console.log(this)
+    }
+}

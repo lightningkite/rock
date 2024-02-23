@@ -22,11 +22,17 @@ class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtoc
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
+    var spacingMultiplier: Double = 1.0
+        set(value) {
+            field = value
+            sizeCache.clear()
+            informParentOfSizeChange()
+        }
 
     private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, sizeCache)
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(spacingMultiplier, size, sizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(spacingMultiplier, sizeCache)
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(spacingMultiplier, view, sizeCache)
     override fun didAddSubview(subview: UIView) {
         super.didAddSubview(subview)
         sizeCache.clear()

@@ -19,7 +19,7 @@ interface RockPluginExtension {
 class RockPlugin : Plugin<Project> {
     override fun apply(project: Project) = with(project) {
         val ext = extensions.create("rock", RockPluginExtension::class.java)
-        tasks.create("commonResources", Task::class.java).apply {
+        tasks.create("rockResourcesCommon", Task::class.java).apply {
             group = "build"
             val resourceFolder = project.file("src/commonMain/resources")
             inputs.files(resourceFolder)
@@ -54,8 +54,8 @@ expect object Resources {
             }
         }
 
-        tasks.create("jsResources", Copy::class.java).apply {
-            dependsOn("commonResources")
+        tasks.create("rockResourcesJs", Copy::class.java).apply {
+            dependsOn("rockResourcesCommon")
             group = "build"
             from("src/commonMain/resources")
             into("src/jsMain/resources/common")
@@ -95,8 +95,8 @@ actual object Resources {
             }
         }
 
-        tasks.create("iosResources").apply {
-            dependsOn("commonResources")
+        tasks.create("rockResourcesIos").apply {
+            dependsOn("rockResourcesCommon")
             group = "build"
 
             afterEvaluate {
@@ -210,8 +210,8 @@ actual object Resources {
             }
         }
 
-        tasks.create("androidResources").apply {
-            dependsOn("commonResources")
+        tasks.create("rockResourcesAndroid").apply {
+            dependsOn("rockResourcesCommon")
             group = "build"
             val resourceFolder = project.file("src/commonMain/resources")
             inputs.files(resourceFolder)
@@ -313,6 +313,14 @@ actual object Resources {
                     )
                 }
             }
+        }
+
+        tasks.create("rockResourcesAll").apply {
+            group = "build"
+            dependsOn("rockResourcesCommon")
+            dependsOn("rockResourcesJs")
+            dependsOn("rockResourcesIos")
+            dependsOn("rockResourcesAndroid")
         }
 
         Unit

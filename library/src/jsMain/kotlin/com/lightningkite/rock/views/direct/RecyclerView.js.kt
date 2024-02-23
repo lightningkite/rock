@@ -434,7 +434,7 @@ class RecyclerController(
                 val child = children.get(index) as? org.w3c.dom.HTMLElement ?: continue
                 val bounds = child.getBoundingClientRect()
                 val style = window.getComputedStyle(child)
-                val margin = style.marginStart.removeSuffix("px").toDouble()
+                val margin = style.marginStart.removeSuffix("px").toDoubleOrNull() ?: 0.0
                 if (bounds.end + margin < (outerBounds.start - beyondEdge)) {
                     // We're scrolling down and this fell out the top
                     scrollAmount += bounds.size
@@ -455,7 +455,7 @@ class RecyclerController(
             val child = children.get(index) as? org.w3c.dom.HTMLElement ?: continue
             val bounds = child.getBoundingClientRect()
             val style = window.getComputedStyle(child)
-            val margin = style.marginStart.removeSuffix("px").toDouble()
+            val margin = style.marginStart.removeSuffix("px").toDoubleOrNull() ?: 0.0
             if (bounds.start - margin > (outerBounds.end + beyondEdge) ) {
                 // We're scrolling up and this fell out the bottom
                 canRecycle.add(child)
@@ -548,7 +548,7 @@ class RecyclerController(
         val neededOnTop = (children.get(0) as? org.w3c.dom.HTMLElement)?.let { child ->
             val bounds = child.getBoundingClientRect()
             val style = window.getComputedStyle(child)
-            val margin = style.marginStart.removeSuffix("px").toDouble()
+            val margin = style.marginStart.removeSuffix("px").toDoubleOrNull() ?: 0.0
 //            println("bounds.start - margin - outerBounds.start: ${bounds.start} - $margin - ${outerBounds.start}")
             (bounds.start - margin - (outerBounds.start - beyondEdge)).coerceAtLeast(0.0)
         } ?: 0.0
@@ -556,7 +556,7 @@ class RecyclerController(
         val neededOnBottom = (contentCol.native.lastElementChild as? org.w3c.dom.HTMLElement)?.let { child ->
             val bounds = child.getBoundingClientRect()
             val style = window.getComputedStyle(child)
-            val margin = style.marginEnd.removeSuffix("px").toDouble()
+            val margin = style.marginEnd.removeSuffix("px").toDoubleOrNull() ?: 0.0
 //            println("outerBounds.end - bounds.end - margin: ${outerBounds.end} - ${bounds.end} - $margin")
             ((outerBounds.end + beyondEdge) - bounds.end - margin).coerceAtLeast(0.0)
         } ?: (outerBounds.size + beyondEdge * 2)

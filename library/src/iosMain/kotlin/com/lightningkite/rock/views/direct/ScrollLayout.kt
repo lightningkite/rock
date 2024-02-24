@@ -27,7 +27,7 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         setNeedsLayout()
     }
 
-    data class Size(var primary: Double = 0.0, var secondary: Double = 0.0, var margin: Double = 0.0) {
+    data class Size(var primary: Double = 0.0, var secondary: Double = 0.0) {
     }
     val Size.objc get() = CGSizeMake(if(horizontal) primary else secondary, if(horizontal) secondary else primary)
     val CGSize.local get() = Size(if(horizontal) width else height, if(horizontal) height else width)
@@ -48,8 +48,8 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
 
         val subsize = calcSizes(size, true)
         measuredSize.primary += padding
-        measuredSize.primary += subsize.primary + subsize.margin * 2
-        measuredSize.secondary = max(measuredSize.secondary, subsize.secondary + padding * 2 + subsize.margin * 2)
+        measuredSize.primary += subsize.primary
+        measuredSize.secondary = max(measuredSize.secondary, subsize.secondary + padding * 2)
         measuredSize.primary += padding
 
         return measuredSize.objc
@@ -79,19 +79,16 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
                 it.primary?.let { required.primary = it.value }
                 it.secondary?.let { required.secondary = it.value }
             }
-            val m = it.extensionMargin ?: 0.0
-            required.margin = m
             required.primary = required.primary.coerceAtLeast(0.0)
             required.secondary = required.secondary.coerceAtLeast(0.0)
 
-            remaining.secondary = remaining.secondary.coerceAtLeast(required.secondary + 2 * m)
+            remaining.secondary = remaining.secondary.coerceAtLeast(required.secondary)
             it.extensionWeight?.let { w ->
                 totalWeight += w
                 required.primary = (-w).toDouble()
             } ?: run {
                 remaining.primary -= required.primary
             }
-            remaining.primary -= m * 2
             required
         } ?: size
     }
@@ -106,16 +103,15 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         if(size.primary >= 9999.0) {
             size = calcSizes(frame.useContents { this.size.local }, false)
         }
-        val m = view.extensionMargin ?: 0.0
-        val ps = primary + m
+        val ps = primary
         val a = view.secondaryAlign ?: Align.Stretch
         val offset = when(a) {
-            Align.Start -> m + padding
-            Align.Stretch -> m + padding
-            Align.End -> mySize.secondary - m - padding - size.secondary
-            Align.Center -> (mySize.secondary - size.secondary - 2 * m) / 2
+            Align.Start -> padding
+            Align.Stretch -> padding
+            Align.End -> mySize.secondary - padding - size.secondary
+            Align.Center -> (mySize.secondary - size.secondary) / 2
         }
-        val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * 2 else size.secondary
+        val secondarySize = if(a == Align.Stretch) mySize.secondary - padding * 2 else size.secondary
         val oldSize = view.bounds.useContents { this.size.width to this.size.height }
         val widthSize = if(horizontal) size.primary else secondarySize
         val heightSize = if(horizontal) secondarySize else size.primary
@@ -130,7 +126,7 @@ class ScrollLayout: UIScrollView(CGRectZero.readValue()), UIViewWithSizeOverride
         if(oldSize.first != widthSize || oldSize.second != heightSize) {
             view.layoutSubviews()
         }
-        primary += size.primary + 2 * m
+        primary += size.primary
         primary += padding
         setContentSize(
             CGSizeMake(

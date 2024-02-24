@@ -3,10 +3,12 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
+import com.lightningkite.rock.views.direct.spacingOverride
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGSizeMake
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
+import kotlin.math.min
 
 fun Color.toUiColor(): UIColor = UIColor(
     red = red.toDouble(),
@@ -51,7 +53,7 @@ fun ViewWriter.handleTheme(
         val theme = currentTheme()
 
         val viewMarginless = view.extensionMarginless ?: false
-        val viewForcePadding = /*view.extensionForcePadding ?: */false
+        val viewForcePadding = view.extensionForcePadding ?: false
         val shouldTransition = when (transition) {
             ViewWriter.TransitionNextView.No -> false
             ViewWriter.TransitionNextView.Yes -> true
@@ -59,30 +61,22 @@ fun ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = mightTransition && !isRoot || viewForcePadding
-        val useMargins = (viewDraws || mightTransition || parentIsSwap) && !viewMarginless
+        val usePadding = mightTransition && !isRoot || viewForcePadding || parentIsSwap
 
         val borders = !viewMarginless
 
-        if (useMargins) {
-            if (changedThemes) {
-                view.extensionMargin = parentTheme().spacing.value
-            } else {
-                view.extensionMargin = theme.spacing.value
-            }
-        } else {
-            view.extensionMargin = 0.0
-        }
         if (usePadding) {
-            view.extensionPadding = theme.spacing.value
+            view.extensionPadding = (view?.spacingOverride?.await() ?: theme.spacing).value
         } else {
             view.extensionPadding = 0.0
         }
+
+        val parentSpacing = (view.superview?.spacingOverride?.await() ?: theme.spacing).value
         val loading = viewLoads && view.iosCalculationContext.loading.await()
 
         animateAfterFirst {
             if (loading) {
-                applyThemeBackground(theme, view, borders)
+                applyThemeBackground(theme, view, parentSpacing, borders)
                 if (!useBackground) view.layer.apply {
                     shadowColor = null
                     shadowOpacity = 0f
@@ -107,7 +101,7 @@ fun ViewWriter.handleTheme(
                 cancelAnimation?.invoke()
                 cancelAnimation = null
                 if (useBackground) {
-                    applyThemeBackground(theme, view, borders)
+                    applyThemeBackground(theme, view, parentSpacing, borders)
                     background(theme)
                 } else {
                     view.layer.apply {
@@ -132,8 +126,13 @@ fun ViewWriter.handleTheme(
 private fun applyThemeBackground(
     theme: Theme,
     view: NView,
+    parentSpacing: Double,
     borders: Boolean
 ) {
+    val cr = when(val it = theme.cornerRadii) {
+        is CornerRadii.Constant -> min(parentSpacing, it.value.value)
+        is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
+    }
     when (val b = theme.background) {
         is Color -> {
             view.layer.apply {
@@ -141,12 +140,7 @@ private fun applyThemeBackground(
                 if (borders) {
                     borderWidth = theme.outlineWidth.value
                     borderColor = theme.outline.closestColor().toUiColor().CGColor
-                    cornerRadius = listOf(
-                        theme.cornerRadii.topLeft.value,
-                        theme.cornerRadii.topRight.value,
-                        theme.cornerRadii.bottomLeft.value,
-                        theme.cornerRadii.bottomRight.value
-                    ).max()
+                    cornerRadius = cr
                     shadowColor = UIColor.grayColor.CGColor
                     shadowOpacity = 1f
                     shadowOffset = CGSizeMake(0.0, theme.elevation.value)
@@ -161,12 +155,7 @@ private fun applyThemeBackground(
                 if (borders) {
                     borderWidth = theme.outlineWidth.value
                     borderColor = theme.outline.closestColor().toUiColor().CGColor
-                    cornerRadius = listOf(
-                        theme.cornerRadii.topLeft.value,
-                        theme.cornerRadii.topRight.value,
-                        theme.cornerRadii.bottomLeft.value,
-                        theme.cornerRadii.bottomRight.value
-                    ).max()
+                    cornerRadius = cr
                     shadowColor = UIColor.grayColor.CGColor
                     shadowOpacity = 1f
                     shadowOffset = CGSizeMake(0.0, theme.elevation.value)
@@ -181,12 +170,7 @@ private fun applyThemeBackground(
                 if (borders) {
                     borderWidth = theme.outlineWidth.value
                     borderColor = theme.outline.closestColor().toUiColor().CGColor
-                    cornerRadius = listOf(
-                        theme.cornerRadii.topLeft.value,
-                        theme.cornerRadii.topRight.value,
-                        theme.cornerRadii.bottomLeft.value,
-                        theme.cornerRadii.bottomRight.value
-                    ).max()
+                    cornerRadius = cr
                     shadowColor = UIColor.grayColor.CGColor
                     shadowOpacity = 1f
                     shadowOffset = CGSizeMake(0.0, theme.elevation.value)

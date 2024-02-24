@@ -35,9 +35,9 @@ actual class NVideo: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProt
         set(value) { extensionPadding = value }
 
     private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(1.0, size, sizeCache)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews(1.0, sizeCache)
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(1.0, view, sizeCache)
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, sizeCache)
     override fun didAddSubview(subview: UIView) {
         super.didAddSubview(subview)
         sizeCache.clear()

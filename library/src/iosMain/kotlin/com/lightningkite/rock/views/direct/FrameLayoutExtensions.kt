@@ -13,30 +13,29 @@ import kotlin.math.max
 
 
 @OptIn(ExperimentalForeignApi::class)
-fun UIView.frameLayoutLayoutSubviews(spacingMultiplier: Double, sizeCache: MutableMap<Size, List<Size>>) {
+fun UIView.frameLayoutLayoutSubviews(sizeCache: MutableMap<Size, List<Size>>) {
     val mySize = bounds.useContents { size.local }
-    var padding = extensionPadding?.times(spacingMultiplier) ?: 0.0
-    subviews.zip(frameLayoutCalcSizes(spacingMultiplier, frame.useContents { size.local }, sizeCache)) { view, size ->
+    var padding = extensionPadding ?: 0.0
+    subviews.zip(frameLayoutCalcSizes(frame.useContents { size.local }, sizeCache)) { view, size ->
         view as UIView
         if (view.hidden) return@zip
-        val m = view.extensionMargin?.times(spacingMultiplier) ?: 0.0
         val h = view.extensionHorizontalAlign ?: Align.Stretch
         val v = view.extensionVerticalAlign ?: Align.Stretch
         val offsetH = when (h) {
-            Align.Start -> m + padding
-            Align.Stretch -> m + padding
-            Align.End -> mySize.width - m - padding - size.width
+            Align.Start -> padding
+            Align.Stretch -> padding
+            Align.End -> mySize.width - padding - size.width
             Align.Center -> (mySize.width - size.width) / 2
         }
         val offsetV = when (v) {
-            Align.Start -> m + padding
-            Align.Stretch -> m + padding
-            Align.End -> mySize.height - m - padding - size.height
+            Align.Start -> padding
+            Align.Stretch -> padding
+            Align.End -> mySize.height - padding - size.height
             Align.Center -> (mySize.height - size.height) / 2
         }
-        val widthSize = if (h == Align.Stretch) mySize.width - m * 2 - padding * 2 else size.width
+        val widthSize = if (h == Align.Stretch) mySize.width - padding * 2 else size.width
         val heightSize =
-            if (v == Align.Stretch) mySize.height - m * 2 - padding * 2 else size.height
+            if (v == Align.Stretch) mySize.height - padding * 2 else size.height
         val oldSize = view.bounds.useContents { this.size.width to this.size.height }
         view.setFrame(
             CGRectMake(
@@ -53,23 +52,23 @@ fun UIView.frameLayoutLayoutSubviews(spacingMultiplier: Double, sizeCache: Mutab
 }
 
 @OptIn(ExperimentalForeignApi::class)
-fun UIView.frameLayoutSizeThatFits(spacingMultiplier: Double, size: CValue<CGSize>, sizeCache: MutableMap<Size, List<Size>>): CValue<CGSize> {
+fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>, sizeCache: MutableMap<Size, List<Size>>): CValue<CGSize> {
     val size = size.local
     val measuredSize = Size()
 
-    val sizes = frameLayoutCalcSizes(spacingMultiplier, size, sizeCache)
-    val padding = extensionPadding?.times(spacingMultiplier) ?: 0.0
+    val sizes = frameLayoutCalcSizes(size, sizeCache)
+    val padding = extensionPadding ?: 0.0
     for (size in sizes) {
-        measuredSize.width = max(measuredSize.width, size.width + padding * 2 + size.margin * 2)
-        measuredSize.height = max(measuredSize.height, size.height + padding * 2 + size.margin * 2)
+        measuredSize.width = max(measuredSize.width, size.width + padding * 2)
+        measuredSize.height = max(measuredSize.height, size.height + padding * 2)
     }
 
     return measuredSize.objc
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun UIView.frameLayoutCalcSizes(spacingMultiplier: Double, size: Size, sizeCache: MutableMap<Size, List<Size>>): List<Size> = sizeCache.getOrPut(size) {
-    val padding = extensionPadding?.times(spacingMultiplier) ?: 0.0
+private fun UIView.frameLayoutCalcSizes(size: Size, sizeCache: MutableMap<Size, List<Size>>): List<Size> = sizeCache.getOrPut(size) {
+    val padding = extensionPadding ?: 0.0
 //        let size = padding.shrinkSize(size)
 //    val remaining = size.copy()
     val remaining = size.copy(width = size.width - 2 * padding, height = size.height - 2 * padding)
@@ -77,29 +76,27 @@ private fun UIView.frameLayoutCalcSizes(spacingMultiplier: Double, size: Size, s
     return subviews.map {
         it as UIView
         if(it.hidden) return@map Size(0.0, 0.0)
-        val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
 //        val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
 //         TODO: This line is more accurate
-        val required = it.sizeThatFits2(remaining.copy(width = remaining.width - 2 * m, height = remaining.height - 2 * m).objc, it.extensionSizeConstraints).local
+        val required = it.sizeThatFits2(remaining.copy(width = remaining.width, height = remaining.height).objc, it.extensionSizeConstraints).local
         it.extensionSizeConstraints?.let {
             it.maxWidth?.let { required.width = required.width.coerceAtMost(it.value) }
             it.maxHeight?.let { required.height = required.height.coerceAtMost(it.value) }
             it.minWidth?.let { required.width = required.width.coerceAtLeast(it.value) }
             it.minHeight?.let { required.height = required.height.coerceAtLeast(it.value) }
-            it.width?.let { required.width = it.value.coerceAtMost(remaining.width - m * 2) }
-            it.height?.let { required.height = it.value.coerceAtMost(remaining.height - m * 2) }
+            it.width?.let { required.width = it.value.coerceAtMost(remaining.width) }
+            it.height?.let { required.height = it.value.coerceAtMost(remaining.height) }
         }
-        required.margin = m
         required.width = required.width.coerceAtLeast(0.0)//.coerceAtMost(size.width - 2 * m)
         required.height = required.height.coerceAtLeast(0.0)//.coerceAtMost(size.height - 2 * m)
 
-        remaining.width = remaining.width.coerceAtLeast(required.width + 2 * m)
-        remaining.height = remaining.height.coerceAtLeast(required.height + 2 * m)
+        remaining.width = remaining.width.coerceAtLeast(required.width)
+        remaining.height = remaining.height.coerceAtLeast(required.height)
         required
     }
 }
 
-fun UIView.frameLayoutSubviewDidChangeSizing(spacingMultiplier: Double, child: UIView?, sizeCache: MutableMap<Size, List<Size>>) {
+fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?, sizeCache: MutableMap<Size, List<Size>>) {
     val it = child ?: return
     sizeCache.clear()
 //    if(it.hidden) return
@@ -115,7 +112,7 @@ fun UIView.frameLayoutSubviewDidChangeSizing(spacingMultiplier: Double, child: U
     informParentOfSizeChange()
 }
 
-data class Size(var width: Double = 0.0, var height: Double = 0.0, var margin: Double = 0.0) {
+data class Size(var width: Double = 0.0, var height: Double = 0.0) {
 }
 
 @OptIn(ExperimentalForeignApi::class)

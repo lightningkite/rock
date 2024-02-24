@@ -1,9 +1,12 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.px
+import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.handleTheme
+import platform.CoreGraphics.CGFloat
 import platform.UIKit.UIView
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -18,27 +21,38 @@ actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit): Unit = elem
 @ViewDsl
 actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = false
-    handleTheme(this, viewDraws = false)
+    handleTheme(this, viewDraws = false) {
+        gap = (spacingOverride.value ?: it.spacing).value
+    }
     setup(ContainingView(this))
 }
 
 @ViewDsl
 actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = true
-    handleTheme(this, viewDraws = false)
+    handleTheme(this, viewDraws = false) {
+        gap = (spacingOverride.value ?: it.spacing).value
+    }
     setup(ContainingView(this))
 }
 
 actual var ContainingView.spacing: Dimension
     get() = when(native) {
-        is LinearLayout -> native.spacingMultiplier.toFloat()
-        is FrameLayout -> native.spacingMultiplier.toFloat()
-        else -> 1f
+        is LinearLayout -> native.spacingOverride.value ?: 0.px
+        is FrameLayout -> native.spacingOverride.value ?: 0.px
+        else -> 0.px
     }
     set(value) {
         when(native) {
-            is LinearLayout -> native.spacingMultiplier = value.toDouble()
-            is FrameLayout -> native.spacingMultiplier = value.toDouble()
-            else -> 1f
+            is LinearLayout -> native.spacingOverride.value = value
+            is FrameLayout -> native.spacingOverride.value = value
+            else -> {}
         }
+    }
+
+val UIView.spacingOverride: Property<Dimension?>?
+    get() = when(this) {
+        is LinearLayout -> spacingOverride
+        is FrameLayout -> spacingOverride
+        else -> null
     }

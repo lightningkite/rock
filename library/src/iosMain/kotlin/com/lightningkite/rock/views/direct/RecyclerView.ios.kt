@@ -166,11 +166,11 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
     var ready = false
     var suppressRemeasure = false
     private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(1.0, size, sizeCache)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews(1.0, sizeCache)
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
     override fun subviewDidChangeSizing(view: UIView?) {
         if(suppressRemeasure) return
-        frameLayoutSubviewDidChangeSizing(1.0, view, sizeCache)
+        frameLayoutSubviewDidChangeSizing(view, sizeCache)
         // Remeasure self
         if(lastInputHeight != -1.0) {
             val size = sizeThatFits(CGSizeMake(lastInputWidth, lastInputHeight))

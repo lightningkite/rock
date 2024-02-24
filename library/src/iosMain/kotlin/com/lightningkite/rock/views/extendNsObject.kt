@@ -53,9 +53,6 @@ class ExtensionProperty<A: NSObject, B>: ReadWriteProperty<A, B?> {
 private val UIViewWeight = ExtensionProperty<UIView, Float>()
 var UIView.extensionWeight: Float? by UIViewWeight
 
-private val UIViewMargin = ExtensionProperty<UIView, Double>()
-var UIView.extensionMargin: Double? by UIViewMargin
-
 private val UIViewPadding = ExtensionProperty<UIView, Double>()
 var UIView.extensionPadding: Double? by UIViewPadding
 

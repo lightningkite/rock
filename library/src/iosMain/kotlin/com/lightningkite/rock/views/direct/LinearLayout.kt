@@ -3,8 +3,10 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
@@ -24,12 +26,20 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
-    var spacingMultiplier: Double = 1.0
+    var gap: Double = 0.0
         set(value) {
             field = value
-            sizeCache.clear()
+            debugDescriptionInfo2 = "(gap=$field)"
+            setNeedsLayout()
             informParentOfSizeChange()
         }
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).apply {
+        addListener {
+            value?.value?.let {
+                gap = it
+            }
+        }
+    }
 
 //    init { setUserInteractionEnabled(false) }
 
@@ -49,7 +59,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 //        it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
 //            return
 //        }
-//        val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
+//        val m = it.extensionMargin ?: 0.0
 //        if(it.extensionWeight != null && it.extensionWeight!! > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
 //            return
 //        }
@@ -57,7 +67,7 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         informParentOfSizeChange()
     }
 
-    data class Size(var primary: Double = 0.0, var secondary: Double = 0.0, var margin: Double = 0.0) {
+    data class Size(var primary: Double = 0.0, var secondary: Double = 0.0) {
     }
     val Size.objc get() = CGSizeMake(if(horizontal) primary else secondary, if(horizontal) secondary else primary)
     val CGSize.local get() = Size(if(horizontal) width else height, if(horizontal) height else width)
@@ -75,12 +85,20 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         val measuredSize = Size()
 
         val sizes = calcSizes(sizeLocal, false)
-        measuredSize.primary += padding * spacingMultiplier
-        for (size in sizes) {
-            measuredSize.primary += size.primary + size.margin * 2
-            measuredSize.secondary = max(measuredSize.secondary, size.secondary + padding * spacingMultiplier * 2 + size.margin * 2)
+        measuredSize.primary += padding
+        var first = true
+        subviews.zip(sizes) { view, size ->
+            view as UIView
+            if(view.hidden) return@zip
+            if(first) {
+                first = false
+            } else {
+                measuredSize.primary += gap
+            }
+            measuredSize.primary += size.primary
+            measuredSize.secondary = max(measuredSize.secondary, size.secondary + padding * 2)
         }
-        measuredSize.primary += padding * spacingMultiplier
+        measuredSize.primary += padding
 
         debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()} from ${sizes.joinToString { it.primary.toInt().toString() }}" }
         return measuredSize.objc
@@ -98,58 +116,58 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     }
 
     fun calcSizes(size: Size, includeWeighted: Boolean): List<Size> = sizeCache.getOrPut(size to includeWeighted) {
-//        let size = padding * spacingMultiplier.shrinkSize(size)
+//        let size = padding.shrinkSize(size)
         val remaining = size.copy()
-        remaining.primary -= padding * spacingMultiplier * 2
-        remaining.secondary -= padding * spacingMultiplier * 2
+        remaining.primary -= padding * 2
+        remaining.secondary -= padding * 2
 
         var totalWeight = 0f
 
         val out = arrayOfNulls<Size?>(subviews.size)
 
+        var first = true
         subviews.forEachIndexed { index, it ->
             it as UIView
             if(it.hidden) {
                 out[index] = Size(0.0, 0.0)
                 return@forEachIndexed
             }
-            val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
+            if(first) {
+                first = false
+            } else {
+                remaining.primary -= gap
+            }
             it.extensionWeight?.let {
                 totalWeight += it
-                remaining.primary -= 2 * m
                 return@forEachIndexed
             }
-            val required = it.sizeThatFits2(Size(remaining.primary - m * 2, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
+            val required = it.sizeThatFits2(Size(remaining.primary, remaining.secondary).objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
                 it.primaryMin?.let { required.primary = required.primary.coerceAtLeast(it.value) }
                 it.secondaryMin?.let { required.secondary = required.secondary.coerceAtLeast(it.value) }
                 it.primary?.let { required.primary = it.value }
-                it.secondary?.let { required.secondary = it.value.coerceAtMost(remaining.secondary - m * 2) }
+                it.secondary?.let { required.secondary = it.value.coerceAtMost(remaining.secondary) }
             }
-            required.margin = m
             required.primary = required.primary.coerceAtLeast(0.0)
             required.secondary = required.secondary.coerceAtLeast(0.0)
             remaining.primary -= required.primary
-            remaining.primary -= 2 * m
             out[index] = required
         }
 
         subviews.forEachIndexed { index, it ->
             it as UIView
             if(out[index] != null) return@forEachIndexed
-            val m = it.extensionMargin?.times(spacingMultiplier) ?: 0.0
             val w = it.extensionWeight!!.toDouble()
             val available = ((w / totalWeight) * remaining.primary).coerceAtLeast(0.0)
-            val required = it.sizeThatFits2(Size(available, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
+            val required = it.sizeThatFits2(Size(available, remaining.secondary).objc, it.extensionSizeConstraints).local
 //            val required = it.sizeThatFits2(Size(1000.0, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
                 it.secondaryMin?.let { required.secondary = required.secondary.coerceAtLeast(it.value) }
                 it.secondary?.let { required.secondary = it.value }
             }
-            required.margin = m
 //            required.primary = if(includeWeighted) available else 0.0
             required.primary = if(includeWeighted) available else required.primary
             required.secondary = required.secondary.coerceAtLeast(0.0)
@@ -161,21 +179,26 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 
     override fun layoutSubviews() {
         val mySize = bounds.useContents { size.local }
-        var primary = padding * spacingMultiplier
+        var primary = padding
         val sizes = calcSizes(frame.useContents { size.local }, true)
+        var first = true
         subviews.zip(sizes) { view, size ->
             view as UIView
             if(view.hidden) return@zip
-            val m = size.margin
-            val ps = primary + m
+            if(first) {
+                first = false
+            } else {
+                primary += gap
+            }
+            val ps = primary
             val a = view.secondaryAlign ?: Align.Stretch
             val offset = when(a) {
-                Align.Start -> m + padding * spacingMultiplier
-                Align.Stretch -> m + padding * spacingMultiplier
-                Align.End -> mySize.secondary - m - padding * spacingMultiplier - size.secondary
+                Align.Start -> padding
+                Align.Stretch -> padding
+                Align.End -> mySize.secondary - padding - size.secondary
                 Align.Center -> (mySize.secondary - size.secondary) / 2
             }
-            val secondarySize = if(a == Align.Stretch) mySize.secondary - m * 2 - padding * spacingMultiplier * 2 else size.secondary
+            val secondarySize = if(a == Align.Stretch) mySize.secondary - padding * 2 else size.secondary
             val oldSize = view.bounds.useContents { this.size.width to this.size.height }
             val widthSize = if(horizontal) size.primary else secondarySize
             val heightSize = if(horizontal) secondarySize else size.primary
@@ -190,9 +213,9 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             if(oldSize.first != widthSize || oldSize.second != heightSize) {
                 view.layoutSubviews()
             }
-            primary += size.primary + 2 * m
+            primary += size.primary
         }
-        primary += padding * spacingMultiplier
+        primary += padding
     }
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {

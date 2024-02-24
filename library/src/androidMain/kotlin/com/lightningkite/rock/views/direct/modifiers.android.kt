@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ScrollView
-import androidx.appcompat.widget.LinearLayoutCompat
+
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import com.lightningkite.rock.ViewWrapper
@@ -44,9 +44,9 @@ actual val ViewWriter.withDefaultPadding: ViewWrapper
 actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         try {
-            val lp = (lparams as LinearLayoutCompat.LayoutParams)
+            val lp = (lparams as SimplifiedLinearLayout.LayoutParams)
             lp.weight = amount
-            if((this.parent as LinearLayoutCompat).orientation == LinearLayoutCompat.HORIZONTAL) {
+            if((this.parent as SimplifiedLinearLayout).orientation == SimplifiedLinearLayout.HORIZONTAL) {
                 lp.width = 0
             } else {
                 lp.height = 0
@@ -75,18 +75,18 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
             Align.End -> Gravity.BOTTOM
             else -> Gravity.CENTER_VERTICAL
         }
-        if (params is LinearLayoutCompat.LayoutParams)
+        if (params is SimplifiedLinearLayout.LayoutParams)
             params.gravity = horizontalGravity or verticalGravity
         else if (params is FrameLayout.LayoutParams)
             params.gravity = horizontalGravity or verticalGravity
         else
             println("Unknown layout params kind ${params::class.qualifiedName}; I am ${this::class.qualifiedName}")
-        if (horizontal == Align.Stretch && (this.parent as? LinearLayoutCompat)?.orientation != LinearLayoutCompat.HORIZONTAL) {
+        if (horizontal == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.orientation != SimplifiedLinearLayout.HORIZONTAL) {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
         } else if(params.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT
         }
-        if (vertical == Align.Stretch && (this.parent as? LinearLayoutCompat)?.orientation != LinearLayoutCompat.VERTICAL) {
+        if (vertical == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.orientation != SimplifiedLinearLayout.VERTICAL) {
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
         } else if(params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT

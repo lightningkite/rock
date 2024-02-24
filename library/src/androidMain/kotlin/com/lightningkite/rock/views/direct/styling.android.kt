@@ -122,10 +122,10 @@ inline fun <T : NView> ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = mightTransition && !isRoot || viewForcePadding
+        val usePadding = mightTransition && !isRoot || viewForcePadding || parentIsSwap
 
         if (usePadding) {
-            view.setPaddingAll(theme.spacing.value.toInt())
+            view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt())
         } else {
             view.setPaddingAll(0)
         }

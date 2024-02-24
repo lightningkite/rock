@@ -6,11 +6,12 @@ import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.appcompat.widget.LinearLayoutCompat
+
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.LinearGradient
 import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 
@@ -29,11 +30,13 @@ actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit) = viewElemen
 @ViewDsl
 actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
-        val l = native as LinearLayoutCompat
-        l.orientation = LinearLayoutCompat.VERTICAL
+        val l = native as SlightlyModifiedLinearLayout
+        l.orientation = SimplifiedLinearLayout.VERTICAL
         l.gravity = Gravity.CENTER_HORIZONTAL
         l.setLayoutTransition(LayoutTransition())
-        handleTheme(l, viewDraws = false)
+        handleTheme(l, viewDraws = false) { t, v ->
+            v.gap = (v.spacingOverride.value ?: t.spacing).value.toInt()
+        }
         setup(ContainingView(l))
     }
 }
@@ -41,11 +44,13 @@ actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit) {
 @ViewDsl
 actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
-        val l = native as LinearLayoutCompat
-        l.orientation = LinearLayoutCompat.HORIZONTAL
+        val l = native as SlightlyModifiedLinearLayout
+        l.orientation = SimplifiedLinearLayout.HORIZONTAL
         l.gravity = Gravity.CENTER_VERTICAL
         l.setLayoutTransition(LayoutTransition())
-        handleTheme(l, viewDraws = false)
+        handleTheme(l, viewDraws = false) { t, v ->
+            v.gap = (v.spacingOverride.value ?: t.spacing).value.toInt()
+        }
         setup(ContainingView(l))
     }
 }
@@ -64,25 +69,23 @@ interface HasSpacingMultiplier {
     val spacingOverride: Property<Dimension?>
 }
 
-class SlightlyModifiedFrameLayout(context: Context): FrameLayout(context), HasSpacingMultiplier {
-    override val spacingOverride: Property<Dimension?> = Property(null)
-    var spacing: Int = 0
-        set(value) {
-            field = value
-        }
+class SlightlyModifiedFrameLayout(context: Context) : FrameLayout(context), HasSpacingMultiplier {
+    override val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
 }
 
-class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context), HasSpacingMultiplier {
-    override val spacingOverride: Property<Dimension?> = Property(null)
-    var spacing: Int = 0
-        set(value) {
-            field = value
+class SlightlyModifiedLinearLayout(context: Context) : SimplifiedLinearLayout(context), HasSpacingMultiplier {
+    override val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).apply {
+        addListener {
+            value?.value?.toInt()?.let {
+                this@SlightlyModifiedLinearLayout.gap = it
+            }
         }
+    }
     override fun generateDefaultLayoutParams(): LayoutParams? {
         if (orientation == HORIZONTAL) {
-            return LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
+            return LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
         } else if (orientation == VERTICAL) {
-            return LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            return LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
         return null
     }
@@ -90,4 +93,6 @@ class SlightlyModifiedLinearLayout(context: Context): LinearLayoutCompat(context
 
 actual var ContainingView.spacing: Dimension
     get() = (native as HasSpacingMultiplier).spacingOverride.value ?: 0.px
-    set(value) { (native as HasSpacingMultiplier).spacingOverride.value = value }
+    set(value) {
+        (native as HasSpacingMultiplier).spacingOverride.value = value
+    }

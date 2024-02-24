@@ -28,7 +28,7 @@ object AndroidAppContext {
     lateinit var applicationCtx: Context
     val res: Resources by lazy { applicationCtx.resources }
     val density: Float by lazy { res.displayMetrics.density }
-    val oneRem: Float by lazy { density * 12 }
+    val oneRem: Float by lazy { density * 14 }
     var autoCompleteLayoutResource: Int = android.R.layout.simple_list_item_1
     var ktorClient: HttpClient = HttpClient() {
         install(WebSockets)

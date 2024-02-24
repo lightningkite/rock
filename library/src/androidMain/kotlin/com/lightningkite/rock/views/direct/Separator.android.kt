@@ -3,7 +3,8 @@ package com.lightningkite.rock.views.direct
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.view.View
-import androidx.appcompat.widget.LinearLayoutCompat
+import android.view.ViewGroup
+
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.lparams
@@ -12,17 +13,17 @@ import com.lightningkite.rock.views.lparams
 @ViewDsl
 actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit {
     val c = currentView
-    if(c !is LinearLayoutCompat) throw IllegalStateException("Separators can only be used inside rows or columns")
-    viewElement(factory = { NSeparator(it, c.orientation == LinearLayoutCompat.HORIZONTAL) }, wrapper = ::Separator) {
+    if(c !is SimplifiedLinearLayout) throw IllegalStateException("Separators can only be used inside rows or columns")
+    viewElement(factory = { NSeparator(it, c.orientation == SimplifiedLinearLayout.HORIZONTAL) }, wrapper = ::Separator) {
         handleTheme(native) { it, v ->
             v.background = ColorDrawable(it.foreground.closestColor().colorInt())
             v.alpha = 0.25f
             val size = it.outlineWidth.value.coerceAtLeast(1f).toInt()
             v.thickness = size
-            (v.parent as? LinearLayoutCompat)?.let {
+            (v.parent as? SimplifiedLinearLayout)?.let {
                 v.lparams.run {
-                    width = if(it.orientation == LinearLayoutCompat.HORIZONTAL) size else LinearLayoutCompat.LayoutParams.MATCH_PARENT
-                    height = if(it.orientation == LinearLayoutCompat.HORIZONTAL) LinearLayoutCompat.LayoutParams.MATCH_PARENT else size
+                    width = if(it.orientation == SimplifiedLinearLayout.HORIZONTAL) size else ViewGroup.LayoutParams.MATCH_PARENT
+                    height = if(it.orientation == SimplifiedLinearLayout.HORIZONTAL) ViewGroup.LayoutParams.MATCH_PARENT else size
                 }
             }
         }

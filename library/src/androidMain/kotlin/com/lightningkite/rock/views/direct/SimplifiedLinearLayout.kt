@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewDebug
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.appcompat.widget.LinearLayoutCompat
+
 
 
 /**
@@ -40,15 +40,12 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
         return false
     }
     
-    var childMargin: Int = 0
+    var gap: Int = 0
         set(value) {
             field = value
             requestLayout()
         }
-    private val LayoutParams.leftMargin: Int get() = if(useMargins) childMargin else 0
-    private val LayoutParams.rightMargin: Int get() = if(useMargins) childMargin else 0
-    private val LayoutParams.topMargin: Int get() = if(useMargins) childMargin else 0
-    private val LayoutParams.bottomMargin: Int get() = if(useMargins) childMargin else 0
+
 
     override fun getBaseline(): Int {
         if (mBaselineAlignedChildIndex < 0) {
@@ -93,7 +90,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
             }
         }
         val lp = child.layoutParams as LayoutParams
-        return childTop + lp.topMargin + childBaseline
+        return childTop + /*lp.topMargin +*/ childBaseline
     }
 
     var baselineAlignedChildIndex: Int
@@ -198,6 +195,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 ++i
                 continue
             }
+            if (i > 0) mTotalLength += gap
             nonSkippedChildCount++
             val lp = child.layoutParams as LayoutParams
             totalWeight += lp.weight
@@ -207,7 +205,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 // laid out using excess space. These views will get measured
                 // later if we have space to distribute.
                 val totalLength = mTotalLength
-                mTotalLength = Math.max(totalLength, totalLength + lp.topMargin + lp.bottomMargin)
+                mTotalLength = Math.max(totalLength, totalLength)
                 skippedMeasure = true
             } else {
                 if (useExcessSpace) {
@@ -238,8 +236,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 }
                 val totalLength = mTotalLength
                 mTotalLength = Math.max(
-                    totalLength, (totalLength + childHeight + lp.topMargin +
-                            lp.bottomMargin + getNextLocationOffset(child))
+                    totalLength, (totalLength + childHeight + getNextLocationOffset(child))
                 )
                 if (useLargestChild) {
                     largestChildHeight = Math.max(childHeight, largestChildHeight)
@@ -273,7 +270,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 matchWidth = true
                 matchWidthLocally = true
             }
-            val margin = lp.leftMargin + lp.rightMargin
+            val margin = 0
             val measuredWidth = child.measuredWidth + margin
             maxWidth = Math.max(maxWidth, measuredWidth)
             childState = combineMeasuredStates(childState, child.measuredState)
@@ -317,8 +314,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 // Account for negative margins
                 val totalLength = mTotalLength
                 mTotalLength = Math.max(
-                    totalLength, (totalLength + largestChildHeight +
-                            lp.topMargin + lp.bottomMargin + getNextLocationOffset(child))
+                    totalLength, (totalLength + largestChildHeight + getNextLocationOffset(child))
                 )
                 ++i
             }
@@ -374,7 +370,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                     )
                     val childWidthMeasureSpec = getChildMeasureSpec(
                         widthMeasureSpec,
-                        paddingLeft + paddingRight + lp.leftMargin + lp.rightMargin,
+                        paddingLeft + paddingRight,
                         lp.width
                     )
                     child.measure(childWidthMeasureSpec, childHeightMeasureSpec)
@@ -385,7 +381,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                                 and (MEASURED_STATE_MASK shr MEASURED_HEIGHT_STATE_SHIFT))
                     )
                 }
-                val margin = lp.leftMargin + lp.rightMargin
+                val margin = 0
                 val measuredWidth = child.measuredWidth + margin
                 maxWidth = Math.max(maxWidth, measuredWidth)
                 val matchWidthLocally = widthMode != MeasureSpec.EXACTLY &&
@@ -398,7 +394,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 val totalLength = mTotalLength
                 mTotalLength = Math.max(
                     totalLength, (totalLength + child.measuredHeight +
-                            lp.topMargin + lp.bottomMargin + getNextLocationOffset(child))
+                            getNextLocationOffset(child))
                 )
             }
 
@@ -470,7 +466,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                     lp.height = child.measuredHeight
 
                     // Remeasue with new dimensions
-                    measureChildWithMargins(child, uniformMeasureSpec, 0, heightMeasureSpec, 0)
+                    measureChild(child, uniformMeasureSpec, heightMeasureSpec)
                     lp.height = oldHeight
                 }
             }
@@ -536,6 +532,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 ++i
                 continue
             }
+            if (i > 0) mTotalLength += gap
             nonSkippedChildCount++
             val lp = child.layoutParams as LayoutParams
             totalWeight += lp.weight
@@ -544,15 +541,6 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 // Optimization: don't bother measuring children who are only
                 // laid out using excess space. These views will get measured
                 // later if we have space to distribute.
-                if (isExactly) {
-                    mTotalLength += lp.leftMargin + lp.rightMargin
-                } else {
-                    val totalLength = mTotalLength
-                    mTotalLength = Math.max(
-                        totalLength, (totalLength +
-                                lp.leftMargin + lp.rightMargin)
-                    )
-                }
 
                 // Baseline alignment requires to measure widgets to obtain the
                 // baseline offset (in particular for TextViews). The following
@@ -598,13 +586,13 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                     usedExcessSpace += childWidth
                 }
                 if (isExactly) {
-                    mTotalLength += (childWidth + lp.leftMargin + lp.rightMargin
+                    mTotalLength += (childWidth
                             + getNextLocationOffset(child))
                 } else {
                     val totalLength = mTotalLength
                     mTotalLength = Math.max(
-                        totalLength, (totalLength + childWidth + lp.leftMargin
-                                + lp.rightMargin + getNextLocationOffset(child))
+                        totalLength, (totalLength + childWidth
+                                 + getNextLocationOffset(child))
                     )
                 }
                 if (useLargestChild) {
@@ -619,7 +607,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 matchHeight = true
                 matchHeightLocally = true
             }
-            val margin = lp.topMargin + lp.bottomMargin
+            val margin = 0
             val childHeight = child.measuredHeight + margin
             childState = combineMeasuredStates(childState, child.measuredState)
             if (baselineAligned) {
@@ -706,13 +694,12 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 nonSkippedChildCount++
                 val lp = child.layoutParams as LayoutParams
                 if (isExactly) {
-                    mTotalLength += (largestChildWidth + lp.leftMargin + lp.rightMargin +
+                    mTotalLength += (largestChildWidth  +
                             getNextLocationOffset(child))
                 } else {
                     val totalLength = mTotalLength
                     mTotalLength = Math.max(
-                        totalLength, (totalLength + largestChildWidth +
-                                lp.leftMargin + lp.rightMargin + getNextLocationOffset(child))
+                        totalLength, (totalLength + largestChildWidth + getNextLocationOffset(child))
                     )
                 }
                 ++i
@@ -781,7 +768,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                     )
                     val childHeightMeasureSpec = getChildMeasureSpec(
                         heightMeasureSpec,
-                        paddingTop + paddingBottom + lp.topMargin + lp.bottomMargin,
+                        paddingTop + paddingBottom,
                         lp.height
                     )
                     child.measure(childWidthMeasureSpec, childHeightMeasureSpec)
@@ -793,18 +780,17 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                     )
                 }
                 if (isExactly) {
-                    mTotalLength += (child.measuredWidth + lp.leftMargin + lp.rightMargin +
+                    mTotalLength += (child.measuredWidth +
                             getNextLocationOffset(child))
                 } else {
                     val totalLength = mTotalLength
                     mTotalLength = Math.max(
-                        totalLength, (totalLength + child.measuredWidth +
-                                lp.leftMargin + lp.rightMargin + getNextLocationOffset(child))
+                        totalLength, (totalLength + child.measuredWidth + getNextLocationOffset(child))
                     )
                 }
                 val matchHeightLocally = heightMode != MeasureSpec.EXACTLY &&
                         lp.height == ViewGroup.LayoutParams.MATCH_PARENT
-                val margin = lp.topMargin + lp.bottomMargin
+                val margin = 0
                 val childHeight = child.measuredHeight + margin
                 maxHeight = Math.max(maxHeight, childHeight)
                 alternativeMaxHeight = Math.max(
@@ -925,7 +911,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                     lp.width = child.measuredWidth
 
                     // Remeasure with new dimensions
-                    measureChildWithMargins(child, widthMeasureSpec, 0, uniformMeasureSpec, 0)
+                    measureChild(child, widthMeasureSpec, uniformMeasureSpec)
                     lp.width = oldWidth
                 }
             }
@@ -976,9 +962,9 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
         widthMeasureSpec: Int, totalWidth: Int, heightMeasureSpec: Int,
         totalHeight: Int
     ) {
-        measureChildWithMargins(
-            child, widthMeasureSpec, totalWidth,
-            heightMeasureSpec, totalHeight
+        measureChild(
+            child, widthMeasureSpec,
+            heightMeasureSpec
         )
     }
 
@@ -1065,19 +1051,17 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 val layoutDirection = layoutDirection
                 val absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection)
                 when (absoluteGravity and Gravity.HORIZONTAL_GRAVITY_MASK) {
-                    Gravity.CENTER_HORIZONTAL -> childLeft = (paddingLeft + ((childSpace - childWidth) / 2)
-                            + lp.leftMargin) - lp.rightMargin
+                    Gravity.CENTER_HORIZONTAL -> childLeft = (paddingLeft + ((childSpace - childWidth) / 2))
 
-                    Gravity.RIGHT -> childLeft = childRight - childWidth - lp.rightMargin
-                    Gravity.LEFT -> childLeft = paddingLeft + lp.leftMargin
-                    else -> childLeft = paddingLeft + lp.leftMargin
+                    Gravity.RIGHT -> childLeft = childRight - childWidth
+                    Gravity.LEFT -> childLeft = paddingLeft
+                    else -> childLeft = paddingLeft
                 }
-                childTop += lp.topMargin
                 setChildFrame(
                     child, childLeft, childTop + getLocationOffset(child),
                     childWidth, childHeight
                 )
-                childTop += childHeight + lp.bottomMargin + getNextLocationOffset(child)
+                childTop += childHeight + gap + getNextLocationOffset(child)
                 i += getChildrenSkipCount(child, i)
             }
             i++
@@ -1162,7 +1146,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 }
                 when (gravity and Gravity.VERTICAL_GRAVITY_MASK) {
                     Gravity.TOP -> {
-                        childTop = paddingTop + lp.topMargin
+                        childTop = paddingTop
                         if (childBaseline != -1) {
                             childTop += maxAscent!![INDEX_TOP] - childBaseline
                         }
@@ -1179,11 +1163,10 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                         //         childTop = paddingTop + (childSpace - childHeight) / 2;
                         //     }
                         // } else {
-                        childTop = (paddingTop + ((childSpace - childHeight) / 2)
-                                + lp.topMargin) - lp.bottomMargin
+                        childTop = (paddingTop + ((childSpace - childHeight) / 2))
 
                     Gravity.BOTTOM -> {
-                        childTop = childBottom - childHeight - lp.bottomMargin
+                        childTop = childBottom - childHeight
                         if (childBaseline != -1) {
                             val descent = child.measuredHeight - childBaseline
                             childTop -= (maxDescent!![INDEX_BOTTOM] - descent)
@@ -1192,12 +1175,11 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
 
                     else -> childTop = paddingTop
                 }
-                childLeft += lp.leftMargin
                 setChildFrame(
                     child, childLeft + getLocationOffset(child), childTop,
                     childWidth, childHeight
                 )
-                childLeft += (childWidth + lp.rightMargin +
+                childLeft += (childWidth + gap +
                         getNextLocationOffset(child))
                 i += getChildrenSkipCount(child, childIndex)
             }
@@ -1311,7 +1293,7 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
     }
 
     override fun getAccessibilityClassName(): CharSequence {
-        return LinearLayout::class.java.name
+        return "LinearLayout"
     }
 
     /**
@@ -1404,8 +1386,8 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
     }
 
     companion object {
-        val HORIZONTAL = 0
-        val VERTICAL = 1
+        const val HORIZONTAL = 0
+        const val VERTICAL = 1
         private const val VERTICAL_GRAVITY_COUNT = 4
 
         private const val INDEX_CENTER_VERTICAL = 0

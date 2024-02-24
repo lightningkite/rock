@@ -626,6 +626,7 @@
 				DEVELOPMENT_TEAM = EF4N5K3F2Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Rock Example App/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to take pictures.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -658,6 +659,7 @@
 				DEVELOPMENT_TEAM = EF4N5K3F2Q;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Rock Example App/Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is used to take pictures.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;

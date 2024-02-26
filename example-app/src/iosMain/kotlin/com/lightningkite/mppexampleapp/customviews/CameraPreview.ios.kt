@@ -8,12 +8,9 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.direct.handleThemeControl
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ObjCClass
-import kotlinx.cinterop.readValue
+import kotlinx.cinterop.*
 import platform.AVFoundation.*
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGRectZero
 import platform.QuartzCore.CALayer
@@ -88,19 +85,24 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 class PreviewView() : UIView(CGRectZero.readValue()) {
 
-    fun setCaptureSession(session: AVCaptureSession) {
-        // For testing
-        val blueSquare = CALayer()
-        blueSquare.frame = CGRectMake(50.0, 50.0, 100.0, 100.0)
-        blueSquare.backgroundColor = UIColor.blueColor.CGColor
-        layer.addSublayer(blueSquare)
+    private var videoPreviewLayer: AVCaptureVideoPreviewLayer? = null
 
+    override fun layoutSubviews() {
+        super.layoutSubviews()
+
+        videoPreviewLayer?.apply {
+            frame = this@PreviewView.bounds
+        }
+    }
+
+    fun setCaptureSession(session: AVCaptureSession) {
         // The docs suggest using this as the backing layer of the view; however, I can't find a way
         // to set the layerClass class property through the Kotlin/Obj-c interop so this is a workaround
-        val videoPreviewLayer = AVCaptureVideoPreviewLayer.layerWithSession(session)
-        videoPreviewLayer.frame = CGRectMake(50.0, 150.0, 100.0, 100.0)
-        videoPreviewLayer.backgroundColor = UIColor.darkGrayColor.CGColor
-        layer.addSublayer(videoPreviewLayer)
+        videoPreviewLayer = AVCaptureVideoPreviewLayer.layerWithSession(session).apply {
+            frame = this@PreviewView.bounds
+            backgroundColor = UIColor.darkGrayColor.CGColor // For testing
+            this@PreviewView.layer.addSublayer(this)
+        }
     }
 }
 

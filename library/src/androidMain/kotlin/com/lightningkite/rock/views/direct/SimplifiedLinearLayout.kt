@@ -433,9 +433,9 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 }
             }
         }
-        if (!allFillParent && widthMode != MeasureSpec.EXACTLY) {
-            maxWidth = alternativeMaxWidth
-        }
+//        if (!allFillParent && widthMode != MeasureSpec.EXACTLY) {
+//            maxWidth = alternativeMaxWidth
+//        }
         maxWidth += paddingLeft + paddingRight
 
         // Check against our minimum width
@@ -873,9 +873,9 @@ open class SimplifiedLinearLayout(context: Context?, attrs: AttributeSet?, defSt
                 }
             }
         }
-        if (!allFillParent && heightMode != MeasureSpec.EXACTLY) {
-            maxHeight = alternativeMaxHeight
-        }
+//        if (!allFillParent && heightMode != MeasureSpec.EXACTLY) {
+//            maxHeight = alternativeMaxHeight
+//        }
         maxHeight += paddingTop + paddingBottom
 
         // Check against our minimum height

@@ -14,7 +14,7 @@ import com.lightningkite.rock.views.lparams
 actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit {
     val c = currentView
     if(c !is SimplifiedLinearLayout) throw IllegalStateException("Separators can only be used inside rows or columns")
-    viewElement(factory = { NSeparator(it, c.orientation == SimplifiedLinearLayout.HORIZONTAL) }, wrapper = ::Separator) {
+    viewElement(factory = { NSeparator(it, !c.vertical) }, wrapper = ::Separator) {
         handleTheme(native) { it, v ->
             v.background = ColorDrawable(it.foreground.closestColor().colorInt())
             v.alpha = 0.25f
@@ -22,8 +22,8 @@ actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit {
             v.thickness = size
             (v.parent as? SimplifiedLinearLayout)?.let {
                 v.lparams.run {
-                    width = if(it.orientation == SimplifiedLinearLayout.HORIZONTAL) size else ViewGroup.LayoutParams.MATCH_PARENT
-                    height = if(it.orientation == SimplifiedLinearLayout.HORIZONTAL) ViewGroup.LayoutParams.MATCH_PARENT else size
+                    width = if(!it.vertical) size else ViewGroup.LayoutParams.MATCH_PARENT
+                    height = if(!it.vertical) ViewGroup.LayoutParams.MATCH_PARENT else size
                 }
             }
         }

@@ -31,8 +31,7 @@ actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit) = viewElemen
 actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
         val l = native as SlightlyModifiedLinearLayout
-        l.orientation = SimplifiedLinearLayout.VERTICAL
-        l.gravity = Gravity.CENTER_HORIZONTAL
+        l.vertical = true
         l.setLayoutTransition(LayoutTransition())
         handleTheme(l, viewDraws = false) { t, v ->
             v.gap = (v.spacingOverride.value ?: t.spacing).value.toInt()
@@ -45,8 +44,7 @@ actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit) {
 actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
         val l = native as SlightlyModifiedLinearLayout
-        l.orientation = SimplifiedLinearLayout.HORIZONTAL
-        l.gravity = Gravity.CENTER_VERTICAL
+        l.vertical = false
         l.setLayoutTransition(LayoutTransition())
         handleTheme(l, viewDraws = false) { t, v ->
             v.gap = (v.spacingOverride.value ?: t.spacing).value.toInt()
@@ -80,14 +78,6 @@ class SlightlyModifiedLinearLayout(context: Context) : SimplifiedLinearLayout(co
                 this@SlightlyModifiedLinearLayout.gap = it
             }
         }
-    }
-    override fun generateDefaultLayoutParams(): LayoutParams? {
-        if (orientation == HORIZONTAL) {
-            return LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        } else if (orientation == VERTICAL) {
-            return LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        }
-        return null
     }
 }
 

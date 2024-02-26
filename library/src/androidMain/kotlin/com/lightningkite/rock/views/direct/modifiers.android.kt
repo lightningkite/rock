@@ -46,7 +46,7 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
         try {
             val lp = (lparams as SimplifiedLinearLayout.LayoutParams)
             lp.weight = amount
-            if((this.parent as SimplifiedLinearLayout).orientation == SimplifiedLinearLayout.HORIZONTAL) {
+            if(!(this.parent as SimplifiedLinearLayout).vertical) {
                 lp.width = 0
             } else {
                 lp.height = 0
@@ -81,12 +81,12 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
             params.gravity = horizontalGravity or verticalGravity
         else
             println("Unknown layout params kind ${params::class.qualifiedName}; I am ${this::class.qualifiedName}")
-        if (horizontal == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.orientation != SimplifiedLinearLayout.HORIZONTAL) {
+        if (horizontal == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.vertical != false) {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
         } else if(params.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT
         }
-        if (vertical == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.orientation != SimplifiedLinearLayout.VERTICAL) {
+        if (vertical == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.vertical != true) {
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
         } else if(params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT

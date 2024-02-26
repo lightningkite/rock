@@ -1,0 +1,48 @@
+package com.lightningkite.rock.views.direct
+
+import com.lightningkite.rock.Blob
+import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.PlatformNavigator
+import com.lightningkite.rock.views.ViewDsl
+import com.lightningkite.rock.views.ViewWriter
+import kotlinx.dom.addClass
+import kotlinx.dom.appendElement
+import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLImageElement
+import org.w3c.dom.get
+import org.w3c.dom.svg.SVGElement
+import org.w3c.dom.svg.SVGSVGElement
+import org.w3c.dom.url.URL
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NIconView = HTMLDivElement
+
+@ViewDsl
+actual fun ViewWriter.iconActual(setup: IconView.() -> Unit): Unit =
+    themedElement<NIconView>("div") {
+        this.setAttribute("role", "img")
+        addClass(".viewDraws")
+        setup(IconView(this))
+    }
+
+actual inline var IconView.source: Icon?
+    get() = native.asDynamic().__ROCK__icon as? Icon
+    set(value) {
+        native.asDynamic().__ROCK__icon = value
+        native.innerHTML = ""
+        value?.let {
+            native.renderSvgIcon(value)
+        }
+    }
+
+actual inline var IconView.description: String?
+    get() = (native.firstElementChild as SVGSVGElement).getElementsByTagName("title").get(0)?.innerHTML
+    set(value) {
+        (native.firstElementChild as? SVGSVGElement)?.getElementsByTagName("title")?.get(0)?.let {
+            it.innerHTML = value ?: ""
+        } ?: (native.firstElementChild as? SVGSVGElement)?.let {
+            it.appendElement("title") {
+                innerHTML = value ?: ""
+            }
+        }
+    }

@@ -65,6 +65,37 @@ interface CalculationContext {
     }
 }
 
+fun CalculationContext.sub(): SubCalculationContext = SubCalculationContext(this)
+
+class SubCalculationContext(val parent: CalculationContext) : CalculationContext, Cancellable {
+//    override fun notifyStart() {
+//        super.notifyStart()
+//    }
+
+    init {
+        parent.onRemove {
+            cancel()
+        }
+    }
+
+    val onRemoveSet = ArrayList<()->Unit>()
+    override fun onRemove(action: () -> Unit) {
+        onRemoveSet.add(action)
+    }
+    override fun cancel() {
+        onRemoveSet.forEach { it() }
+        onRemoveSet.clear()
+    }
+
+//    override fun notifyComplete(result: Result<Unit>) {
+//        super.notifyComplete(result)
+//    }
+//
+//    override fun notifyLongComplete(result: Result<Unit>) {
+//        super.notifyLongComplete(result)
+//    }
+}
+
 object CalculationContextStack {
     val stack = ArrayList<CalculationContext>()
     fun current() = stack.lastOrNull() ?: throw IllegalStateException("CalculationContextStack.onRemove called outside of a builder.")

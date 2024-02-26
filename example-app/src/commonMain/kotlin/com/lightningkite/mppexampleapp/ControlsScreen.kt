@@ -9,6 +9,7 @@ import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
+import com.lightningkite.rock.views.l2.icon
 import kotlinx.datetime.*
 
 @Routable("controls")
@@ -40,10 +41,10 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Toggle Buttons" }
                 row {
                     space {} in weight(1f)
-                    toggleButton { checked bind booleanContent; text { content = "Sample" } }
-                    toggleButton { checked bind booleanContent; text { content = "Card" } } in card
-                    toggleButton { checked bind booleanContent; text { content = "Important" } } in important
-                    toggleButton { checked bind booleanContent; text { content = "Critical" } } in critical
+                    toggleButton { checked bind booleanContent; row { icon(Icon.starFilled, "star"); centered - text { content = "Sample" } } }
+                    toggleButton { checked bind booleanContent; row { icon(Icon.starFilled, "star"); centered - text { content = "Card" } } } in card
+                    toggleButton { checked bind booleanContent; row { icon(Icon.starFilled, "star"); centered - text { content = "Important" } } } in important
+                    toggleButton { checked bind booleanContent; row { icon(Icon.starFilled, "star"); centered - text { content = "Critical" } } } in critical
                     space {} in weight(1f)
                 } in scrollsHorizontally
             } in card

@@ -22,7 +22,7 @@ fun ViewWriter.navLayout(
 fun ViewWriter.navBottomBar(show: Readable<Boolean> = Constant(true), navElements: suspend () -> List<NavElement>) {
     row {
         ::exists { show.await() && !SoftInputOpen.await() }
-        navGroupTabs(shared { navElements() })
+        navGroupTabs(shared { navElements() }) {}
     } 
 }
 
@@ -34,6 +34,7 @@ fun ViewWriter.appBase(routes: Routes, mainLayout: ContainingView.() -> Unit) {
     stack {
         val navigator = PlatformNavigator
         PlatformNavigator.routes = routes
+        this@appBase.navigator = navigator
         mainLayout() 
         dismissBackground {
             val nav = navigator.dialog

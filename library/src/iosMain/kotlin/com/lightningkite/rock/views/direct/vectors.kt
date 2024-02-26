@@ -291,6 +291,10 @@ private fun CGMutablePathRef.render(pathData: String, translateX: CGFloat = 0.0,
     }
 }
 
+class CAShapeLayerScaling: CAShapeLayer() {
+
+}
+
 @OptIn(ExperimentalForeignApi::class)
 fun ImageVector.caLayer(): CALayer {
     val layer = CALayer()

@@ -3,16 +3,13 @@ package com.lightningkite.rock.views.l2
 import com.lightningkite.rock.models.Icon
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.reactive.shared
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
 @ViewDsl
-fun ViewWriter.icon(icon: Icon, description: String, setup: Image.()->Unit = {}) {
-    image {
-        val currentTheme = currentTheme
-        ::source { icon.toImageSource(currentTheme().foreground) }
+fun ViewWriter.icon(icon: Icon, description: String, setup: IconView.()->Unit = {}) {
+    icon {
+        source = icon
         this.description = description
         setup(this)
     }

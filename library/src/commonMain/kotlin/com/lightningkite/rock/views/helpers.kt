@@ -2,12 +2,7 @@ package com.lightningkite.rock.views
 
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewModifierDsl3
-import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.direct.*
 
 @ViewModifierDsl3 val ViewWriter.centered get() = gravity(Align.Center, Align.Center)
@@ -19,7 +14,7 @@ import com.lightningkite.rock.views.direct.*
 @ViewModifierDsl3 fun ViewWriter.maxHeight(height: Dimension) = sizedBox(SizeConstraints(maxHeight = height))
 
 @ViewDsl
-fun ViewWriter.icon(icon: suspend ()->Icon, description: String, setup: Image.()->Unit = {}) {
+fun ViewWriter.icon(icon: suspend ()->Icon, description: String, setup: ImageView.()->Unit = {}) {
     image {
         val currentTheme = currentTheme
         ::source { icon().toImageSource(currentTheme().foreground) }

@@ -10,16 +10,16 @@ import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.url.URL
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NImage = HTMLImageElement
+actual typealias NImageView = HTMLImageElement
 
 @ViewDsl
-actual fun ViewWriter.imageActual(setup: Image.() -> Unit): Unit =
-    themedElement<NImage>("img") {
+actual fun ViewWriter.imageActual(setup: ImageView.() -> Unit): Unit =
+    themedElement<NImageView>("img") {
         addClass(".viewDraws")
-        setup(Image(this))
+        setup(ImageView(this))
     }
 
-actual inline var Image.source: ImageSource?
+actual inline var ImageView.source: ImageSource?
     get() = TODO()
     set(value) {
         when (value) {
@@ -32,7 +32,7 @@ actual inline var Image.source: ImageSource?
             else -> {}
         }
     }
-actual inline var Image.scaleType: ImageScaleType
+actual inline var ImageView.scaleType: ImageScaleType
     get() = TODO()
     set(value) {
         native.style.objectFit = when (value) {
@@ -42,16 +42,16 @@ actual inline var Image.scaleType: ImageScaleType
             ImageScaleType.NoScale -> "none"
         }
     }
-actual inline var Image.description: String?
+actual inline var ImageView.description: String?
     get() = native.alt
     set(value) {
         native.alt = value ?: ""
     }
 
 @ViewDsl
-actual fun ViewWriter.zoomableImageActual(setup: Image.() -> Unit) {
+actual fun ViewWriter.zoomableImageActual(setup: ImageView.() -> Unit) {
     // TODO
-    val wrapper: Image.() -> Unit = {
+    val wrapper: ImageView.() -> Unit = {
         setup()
         scaleType = ImageScaleType.Fit
     }

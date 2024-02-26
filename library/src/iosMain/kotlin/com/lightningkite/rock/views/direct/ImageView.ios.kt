@@ -16,16 +16,16 @@ import platform.darwin.dispatch_get_main_queue
 import platform.objc.sel_registerName
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NImage = UIImageView
+actual typealias NImageView = UIImageView
 
 @ViewDsl
-actual fun ViewWriter.imageActual(setup: Image.() -> Unit): Unit = element(NImage()) {
+actual fun ViewWriter.imageActual(setup: ImageView.() -> Unit): Unit = element(NImageView()) {
     handleTheme(this, viewDraws = true, viewLoads = true)
     this.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
-    setup(Image(this))
+    setup(ImageView(this))
 }
 
-actual inline var Image.source: ImageSource?
+actual inline var ImageView.source: ImageSource?
     get() = TODO()
     set(value) {
         when (value) {
@@ -73,7 +73,7 @@ actual inline var Image.source: ImageSource?
             else -> {}
         }
     }
-actual inline var Image.scaleType: ImageScaleType
+actual inline var ImageView.scaleType: ImageScaleType
     get() = TODO()
     set(value) {
         when (value) {
@@ -87,16 +87,16 @@ actual inline var Image.scaleType: ImageScaleType
             ImageScaleType.NoScale -> native.contentMode = UIViewContentMode.UIViewContentModeCenter
         }
     }
-actual inline var Image.description: String?
+actual inline var ImageView.description: String?
     get() = TODO()
     set(value) {
         native.accessibilityLabel = value
     }
 
 @ViewDsl
-actual fun ViewWriter.zoomableImageActual(setup: Image.() -> Unit)  = element(PanZoomImageView()) {
+actual fun ViewWriter.zoomableImageActual(setup: ImageView.() -> Unit)  = element(PanZoomImageView()) {
     handleTheme(this, viewDraws = true)
-    setup(Image(imageView))
+    setup(ImageView(imageView))
     imageView.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
 }
 

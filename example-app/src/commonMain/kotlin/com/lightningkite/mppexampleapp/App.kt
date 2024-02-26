@@ -1,7 +1,5 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.mppexampleapp.UseFullScreen
-import com.lightningkite.rock.ExternalServices
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.*
@@ -22,19 +20,11 @@ fun ViewWriter.app() {
         appName = "Rock Sample App"
         ::navItems {
             listOf(
-                NavItem("Home", Icon.home, RootScreen),
-                NavItem("Themes", Icon.sync, ThemesScreen),
-                NavItem("Controls", Icon.settings, ControlsScreen),
-                NavItem("Navigation", Icon.menu, NavigationScreen),
-                NavItem("Forms", Icon.done, FormsScreen)
-            )
-        }
-        ::currentUser { UserInfo("Test User", null, Icon.person) }
-
-        ::userLinks {
-            listOf(
-                NavItem("Root", Icon.home, RootScreen),
-                NavItem("Log Out", Icon.home, SampleLogInScreen),
+                NavLink("Home", Icon.home, RootScreen),
+                NavLink("Themes", Icon.sync, ThemesScreen),
+                NavLink("Controls", Icon.settings, ControlsScreen),
+                NavLink("Navigation", Icon.menu, NavigationScreen),
+                NavLink("Forms", Icon.done, FormsScreen)
             )
         }
 
@@ -43,14 +33,14 @@ fun ViewWriter.app() {
         }
 
         actions = listOf(
-            Action(
-                title = "Search",
-                icon = Icon.search,
+            NavAction(
+                title = { "Search" },
+                icon = { Icon.search },
                 onSelect = {}
             ),
-            ExternalNav(
-                title = "Open on GitHub",
-                icon = Icon.star,
+            NavExternal(
+                title = { "Open on GitHub" },
+                icon = { Icon.star },
                 to = {
                     val className =
                         navigator.currentScreen.await()?.let { it::class.toString().removePrefix("class ") } ?: "App"

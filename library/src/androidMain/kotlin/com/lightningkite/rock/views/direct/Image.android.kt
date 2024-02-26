@@ -6,7 +6,6 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.BitmapDrawable
 import android.os.Handler
 import android.os.Looper
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.lightningkite.rock.R
 import com.lightningkite.rock.models.*
@@ -26,10 +25,11 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import androidx.annotation.Nullable
 import androidx.appcompat.widget.AppCompatImageView
+import android.widget.ImageView as AImageView
 
-actual typealias NImage = ImageView
+actual typealias NImageView = AImageView
 
-actual var Image.source: ImageSource?
+actual var ImageView.source: ImageSource?
     get() = TODO()
     set(value) {
         native.tag = value
@@ -90,30 +90,30 @@ actual var Image.source: ImageSource?
             }
         }
     }
-actual var Image.scaleType: ImageScaleType
+actual var ImageView.scaleType: ImageScaleType
     get() {
         return when (this.native.scaleType) {
-            ImageView.ScaleType.MATRIX -> ImageScaleType.NoScale
-            ImageView.ScaleType.FIT_XY -> ImageScaleType.Stretch
-            ImageView.ScaleType.FIT_START -> ImageScaleType.Fit
-            ImageView.ScaleType.FIT_CENTER -> ImageScaleType.Fit
-            ImageView.ScaleType.FIT_END -> ImageScaleType.Fit
-            ImageView.ScaleType.CENTER -> ImageScaleType.Fit
-            ImageView.ScaleType.CENTER_CROP -> ImageScaleType.Crop
-            ImageView.ScaleType.CENTER_INSIDE -> ImageScaleType.NoScale
+            AImageView.ScaleType.MATRIX -> ImageScaleType.NoScale
+            AImageView.ScaleType.FIT_XY -> ImageScaleType.Stretch
+            AImageView.ScaleType.FIT_START -> ImageScaleType.Fit
+            AImageView.ScaleType.FIT_CENTER -> ImageScaleType.Fit
+            AImageView.ScaleType.FIT_END -> ImageScaleType.Fit
+            AImageView.ScaleType.CENTER -> ImageScaleType.Fit
+            AImageView.ScaleType.CENTER_CROP -> ImageScaleType.Crop
+            AImageView.ScaleType.CENTER_INSIDE -> ImageScaleType.NoScale
             else -> ImageScaleType.Fit
         }
     }
     set(value) {
-        val scaleType: ImageView.ScaleType = when (value) {
-            ImageScaleType.Fit -> ImageView.ScaleType.FIT_CENTER
-            ImageScaleType.Crop -> ImageView.ScaleType.CENTER_CROP
-            ImageScaleType.Stretch -> ImageView.ScaleType.FIT_XY
-            ImageScaleType.NoScale -> ImageView.ScaleType.CENTER_INSIDE
+        val scaleType: AImageView.ScaleType = when (value) {
+            ImageScaleType.Fit -> AImageView.ScaleType.FIT_CENTER
+            ImageScaleType.Crop -> AImageView.ScaleType.CENTER_CROP
+            ImageScaleType.Stretch -> AImageView.ScaleType.FIT_XY
+            ImageScaleType.NoScale -> AImageView.ScaleType.CENTER_INSIDE
         }
         this.native.scaleType = scaleType
     }
-actual var Image.description: String?
+actual var ImageView.description: String?
     get() {
         return native.contentDescription.toString()
     }
@@ -122,8 +122,8 @@ actual var Image.description: String?
     }
 
 @ViewDsl
-actual fun ViewWriter.imageActual(setup: Image.() -> Unit) {
-    return viewElement(factory = ::ImageView, wrapper = ::Image) {
+actual fun ViewWriter.imageActual(setup: ImageView.() -> Unit) {
+    return viewElement(factory = ::AImageView, wrapper = ::ImageView) {
         handleTheme(native, viewDraws = true, viewLoads = true)
         setup(this)
     }
@@ -131,8 +131,8 @@ actual fun ViewWriter.imageActual(setup: Image.() -> Unit) {
 
 
 @ViewDsl
-actual fun ViewWriter.zoomableImageActual(setup: Image.() -> Unit) {
-    return viewElement(::ZoomClass, wrapper = ::Image){
+actual fun ViewWriter.zoomableImageActual(setup: ImageView.() -> Unit) {
+    return viewElement(::ZoomClass, wrapper = ::ImageView){
         handleTheme(native, viewDraws = true)
         setup(this)
     }

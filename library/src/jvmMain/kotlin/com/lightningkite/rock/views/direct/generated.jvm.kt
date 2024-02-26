@@ -6,7 +6,6 @@ import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.canvas.DrawingContext2D
 import kotlinx.datetime.*
 
 
@@ -36,15 +35,15 @@ actual inline var ExternalLink.newTab: Boolean
     get() = TODO()
     set(value) { }
 
-@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NImage = HTMLElement
-@ViewDsl actual fun ViewWriter.imageActual(setup: Image.() -> Unit): Unit = todo("image")
-actual inline var Image.source: ImageSource?
+@Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NImageView = HTMLElement
+@ViewDsl actual fun ViewWriter.imageActual(setup: ImageView.() -> Unit): Unit = todo("image")
+actual inline var ImageView.source: ImageSource?
     get() = TODO()
     set(value) { }
-actual inline var Image.scaleType: ImageScaleType
+actual inline var ImageView.scaleType: ImageScaleType
     get() = TODO()
     set(value) { }
-actual inline var Image.description: String?
+actual inline var ImageView.description: String?
     get() = TODO()
     set(value) { }
 

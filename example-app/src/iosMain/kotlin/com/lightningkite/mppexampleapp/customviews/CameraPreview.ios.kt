@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalForeignApi::class)
-
 package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.customviews
 
 import com.lightningkite.rock.models.ImageLocal
@@ -11,6 +9,7 @@ import com.lightningkite.rock.views.ViewWriter
 import kotlinx.cinterop.*
 import kotlinx.coroutines.sync.Mutex
 import platform.AVFoundation.*
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectZero
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
@@ -24,6 +23,8 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
 
     private val sessionQueue = dispatch_queue_create("session queue", null)
     private val captureSession = AVCaptureSession().also(native::setCaptureSession)
+    private val captureDevice = AVCaptureDevice.defaultDeviceWithDeviceType(AVCaptureDeviceTypeBuiltInWideAngleCamera,
+        AVMediaTypeVideo, AVCaptureDevicePositionBack)
 
     val cameraPermission = Property(false)
 
@@ -61,8 +62,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         captureSession.beginConfiguration()
 
         try {
-            AVCaptureDevice.defaultDeviceWithDeviceType(AVCaptureDeviceTypeBuiltInWideAngleCamera,
-                    AVMediaTypeVideo, AVCaptureDevicePositionBack)?.let {
+            captureDevice?.let {
                 AVCaptureDeviceInput.deviceInputWithDevice(it, null)?.let {
                     if (captureSession.canAddInput(it)) {
                         captureSession.addInput(it)
@@ -75,6 +75,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         captureSession.startRunning()
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) = dispatch_async(sessionQueue) {
         val metadataOutputQueue = dispatch_queue_create("metadata objects queue", null)
         val metadataOutput = AVCaptureMetadataOutput()
@@ -92,25 +93,29 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
                             didOutputMetadataObjects: List<*>,
                             fromConnection: AVCaptureConnection
                         ) {
-                            println("Processing metadata result")
                             // Ignore and discard new results while results are being processed
                             if (barcodeResultHandlerMutex.tryLock()) {
-                                val barcodes = didOutputMetadataObjects
-                                    .filterIsInstance<AVMetadataMachineReadableCodeObject>()
-                                    .mapNotNull { it.stringValue }
-                                resultHandler(barcodes, 0)
-                                barcodeResultHandlerMutex.unlock()
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    val barcodes = didOutputMetadataObjects
+                                        .filterIsInstance<AVMetadataMachineReadableCodeObject>()
+                                        .mapNotNull { it.stringValue }
+                                    resultHandler(barcodes, 0)
+                                    barcodeResultHandlerMutex.unlock()
+                                }
                             }
                         }
                     }, metadataOutputQueue)
 
-                    val idealTypes = setOf(AVMetadataObjectTypeCode39Code,
+                    metadataObjectTypes = listOf(AVMetadataObjectTypeCode39Code,
                         AVMetadataObjectTypeCode93Code,
                         AVMetadataObjectTypeCode128Code)
-                    val supportedTypes = availableMetadataObjectTypes
-                        .intersect(idealTypes)
-                        .toList()
-                    metadataObjectTypes = supportedTypes
+
+                    rectOfInterest = cValue<CGRect> {
+                        origin.x = 0.0
+                        origin.y = 0.0
+                        size.width = 1.0
+                        size.height = 1.0
+                    }
                 }
             }
         } finally {
@@ -122,7 +127,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
     }
 }
 
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@OptIn(ExperimentalForeignApi::class)
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 class PreviewView() : UIView(CGRectZero.readValue()) {
 
@@ -136,6 +141,7 @@ class PreviewView() : UIView(CGRectZero.readValue()) {
         }
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     fun setCaptureSession(session: AVCaptureSession) {
         // The docs suggest using this as the backing layer of the view; however, I can't find a way
         // to set the layerClass class property through the Kotlin/Obj-c interop so this is a workaround

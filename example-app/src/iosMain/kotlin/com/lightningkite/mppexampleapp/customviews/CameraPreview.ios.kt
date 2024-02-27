@@ -75,7 +75,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         captureSession.startRunning()
     }
 
-    fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) {
+    fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) = dispatch_async(sessionQueue) {
         val metadataOutputQueue = dispatch_queue_create("metadata objects queue", null)
         val metadataOutput = AVCaptureMetadataOutput()
 
@@ -92,6 +92,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
                             didOutputMetadataObjects: List<*>,
                             fromConnection: AVCaptureConnection
                         ) {
+                            println("Processing metadata result")
                             // Ignore and discard new results while results are being processed
                             if (barcodeResultHandlerMutex.tryLock()) {
                                 val barcodes = didOutputMetadataObjects
@@ -106,7 +107,10 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
                     val idealTypes = setOf(AVMetadataObjectTypeCode39Code,
                         AVMetadataObjectTypeCode93Code,
                         AVMetadataObjectTypeCode128Code)
-                    metadataObjectTypes = availableMetadataObjectTypes.intersect(idealTypes).toList()
+                    val supportedTypes = availableMetadataObjectTypes
+                        .intersect(idealTypes)
+                        .toList()
+                    metadataObjectTypes = supportedTypes
                 }
             }
         } finally {

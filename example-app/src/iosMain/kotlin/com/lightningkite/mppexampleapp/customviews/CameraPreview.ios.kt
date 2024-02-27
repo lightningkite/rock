@@ -9,7 +9,6 @@ import com.lightningkite.rock.views.ViewWriter
 import kotlinx.cinterop.*
 import kotlinx.coroutines.sync.Mutex
 import platform.AVFoundation.*
-import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectZero
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
@@ -75,47 +74,24 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         captureSession.startRunning()
     }
 
-    @OptIn(ExperimentalForeignApi::class)
-    fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) = dispatch_async(sessionQueue) {
-        val metadataOutputQueue = dispatch_queue_create("metadata objects queue", null)
-        val metadataOutput = AVCaptureMetadataOutput()
+    private val metadataOutputQueue by lazy { dispatch_queue_create("metadata objects queue", null) }
+    private val metadataOutput by lazy { AVCaptureMetadataOutput() }
+    private var metadataDelegate: AVCaptureMetadataOutputObjectsDelegateProtocol? = null
 
+    fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) = dispatch_async(sessionQueue) {
         captureSession.beginConfiguration()
 
         try {
             if (captureSession.canAddOutput(metadataOutput)) {
                 captureSession.addOutput(metadataOutput)
                 metadataOutput.apply {
-                    val barcodeResultHandlerMutex = Mutex()
-                    setMetadataObjectsDelegate(object : NSObject(), AVCaptureMetadataOutputObjectsDelegateProtocol {
-                        override fun captureOutput(
-                            output: AVCaptureOutput,
-                            didOutputMetadataObjects: List<*>,
-                            fromConnection: AVCaptureConnection
-                        ) {
-                            // Ignore and discard new results while results are being processed
-                            if (barcodeResultHandlerMutex.tryLock()) {
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    val barcodes = didOutputMetadataObjects
-                                        .filterIsInstance<AVMetadataMachineReadableCodeObject>()
-                                        .mapNotNull { it.stringValue }
-                                    resultHandler(barcodes, 0)
-                                    barcodeResultHandlerMutex.unlock()
-                                }
-                            }
-                        }
-                    }, metadataOutputQueue)
+                    metadataDelegate = MetadataBarcodeDelegate(resultHandler).also {
+                        setMetadataObjectsDelegate(it, metadataOutputQueue)
+                    }
 
                     metadataObjectTypes = listOf(AVMetadataObjectTypeCode39Code,
                         AVMetadataObjectTypeCode93Code,
                         AVMetadataObjectTypeCode128Code)
-
-                    rectOfInterest = cValue<CGRect> {
-                        origin.x = 0.0
-                        origin.y = 0.0
-                        size.width = 1.0
-                        size.height = 1.0
-                    }
                 }
             }
         } finally {
@@ -149,6 +125,27 @@ class PreviewView() : UIView(CGRectZero.readValue()) {
             frame = this@PreviewView.bounds
             backgroundColor = UIColor.darkGrayColor.CGColor // For testing
             this@PreviewView.layer.addSublayer(this)
+        }
+    }
+}
+
+// IntelliJ was having weird issues with an anonymous object implementing an Obj-C protocol so this class is a workaround
+class MetadataBarcodeDelegate(private val barcodeHandler: (List<String>, Long) -> Unit) : NSObject(),
+    AVCaptureMetadataOutputObjectsDelegateProtocol {
+
+    private val barcodeResultHandlerMutex = Mutex()
+
+    override fun captureOutput(output: AVCaptureOutput, didOutputMetadataObjects: List<*>,
+                               fromConnection: AVCaptureConnection) {
+        // Ignore and discard new results while results are being processed
+        if (barcodeResultHandlerMutex.tryLock()) {
+            dispatch_async(dispatch_get_main_queue()) {
+                val barcodes = didOutputMetadataObjects
+                    .filterIsInstance<AVMetadataMachineReadableCodeObject>()
+                    .mapNotNull { it.stringValue }
+                barcodeHandler(barcodes, 0)
+                barcodeResultHandlerMutex.unlock()
+            }
         }
     }
 }

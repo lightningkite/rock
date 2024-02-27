@@ -9,11 +9,9 @@ import com.lightningkite.rock.views.RView
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import kotlinx.cinterop.*
+import kotlinx.coroutines.sync.Mutex
 import platform.AVFoundation.*
-import platform.CoreGraphics.CGRect
-import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGRectZero
-import platform.QuartzCore.CALayer
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
 import platform.darwin.*
@@ -77,6 +75,45 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
         captureSession.startRunning()
     }
 
+    fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) {
+        val metadataOutputQueue = dispatch_queue_create("metadata objects queue", null)
+        val metadataOutput = AVCaptureMetadataOutput()
+
+        captureSession.beginConfiguration()
+
+        try {
+            if (captureSession.canAddOutput(metadataOutput)) {
+                captureSession.addOutput(metadataOutput)
+                metadataOutput.apply {
+                    val barcodeResultHandlerMutex = Mutex()
+                    setMetadataObjectsDelegate(object : NSObject(), AVCaptureMetadataOutputObjectsDelegateProtocol {
+                        override fun captureOutput(
+                            output: AVCaptureOutput,
+                            didOutputMetadataObjects: List<*>,
+                            fromConnection: AVCaptureConnection
+                        ) {
+                            // Ignore and discard new results while results are being processed
+                            if (barcodeResultHandlerMutex.tryLock()) {
+                                val barcodes = didOutputMetadataObjects
+                                    .filterIsInstance<AVMetadataMachineReadableCodeObject>()
+                                    .mapNotNull { it.stringValue }
+                                resultHandler(barcodes, 0)
+                                barcodeResultHandlerMutex.unlock()
+                            }
+                        }
+                    }, metadataOutputQueue)
+
+                    val idealTypes = setOf(AVMetadataObjectTypeCode39Code,
+                        AVMetadataObjectTypeCode93Code,
+                        AVMetadataObjectTypeCode128Code)
+                    metadataObjectTypes = availableMetadataObjectTypes.intersect(idealTypes).toList()
+                }
+            }
+        } finally {
+            captureSession.commitConfiguration()
+        }
+    }
+
     actual fun capture(error: () -> Unit, success: (ImageLocal) -> Unit) {
     }
 }
@@ -111,8 +148,8 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) = element(P
     setup(CameraPreview(this))
 }
 
-actual fun CameraPreview.barcodeHandler(action: (List<String>, Long) -> Unit) {
-}
+actual fun CameraPreview.barcodeHandler(action: (List<String>, Long) -> Unit) =
+    enableBarcodeScanning(action)
 
 actual fun CameraPreview.ocrHandler(action: (String, Long) -> Unit) {
 }

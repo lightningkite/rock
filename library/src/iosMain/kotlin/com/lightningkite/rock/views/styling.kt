@@ -3,7 +3,6 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
-import com.lightningkite.rock.views.direct.spacingOverride
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGSizeMake
 import platform.UIKit.UIColor

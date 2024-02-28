@@ -15,8 +15,8 @@ actual fun ViewWriter.spaceActual(setup: Space.() -> Unit): Unit = element<NSpac
     val getter = currentTheme
     val s = Space(this)
     s.reactiveScope {
-        style.width = (getter().spacing * 4).value
-        style.height = (getter().spacing * 4).value
+        style.width = (getter().spacing).value
+        style.height = (getter().spacing).value
     }
     setup(s)
 }

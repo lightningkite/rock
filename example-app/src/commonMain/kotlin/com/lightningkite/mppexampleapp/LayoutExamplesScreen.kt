@@ -155,6 +155,22 @@ object LayoutExamplesScreen : RockScreen {
                     }
                     important - stack { space() }
                 }
+                card - button {
+                    spacing = 0.rem
+                    text("spacing = 0.rem")
+                }
+                card - button {
+                    spacing = 0.5.rem
+                    text("spacing = 0.5.rem")
+                }
+                card - button {
+                    spacing = 1.rem
+                    text("spacing = 1.rem")
+                }
+                card - button {
+                    spacing = 2.rem
+                    text("spacing = 2.rem")
+                }
             }
 
             card - col {

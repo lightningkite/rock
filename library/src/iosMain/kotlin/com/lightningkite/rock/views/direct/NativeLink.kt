@@ -15,6 +15,9 @@ import platform.QuartzCore.CATextLayer
 import platform.UIKit.*
 import platform.objc.sel_registerName
 import kotlin.math.max
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
+import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.reactive.Property
 
 //private val UIViewLayoutParams = ExtensionProperty<UIView, LayoutParams>()
 //val UIView.layoutParams: LayoutParams by UIViewLayoutParams
@@ -22,10 +25,12 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class NativeLink: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
+class NativeLink: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    override fun getSpacingOverrideProperty() = spacingOverride
 
     private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)

@@ -12,7 +12,7 @@ import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.calculationContext
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class NViewPager(context: Context) : FrameLayout(context) {
+actual class NViewPager(context: Context) : SlightlyModifiedFrameLayout(context) {
     lateinit var viewWriter: ViewWriter
     val pager = ViewPager2(context)
     val page = Property(0)

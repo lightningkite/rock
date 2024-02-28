@@ -9,12 +9,12 @@ import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NButton = FrameLayout
+actual typealias NButton = SlightlyModifiedFrameLayout
 
 @ViewDsl
 actual fun ViewWriter.buttonActual(setup: Button.() -> Unit) {
-    viewElement(factory = ::FrameLayout, wrapper = ::ContainingView) {
-        val frame = native as FrameLayout
+    viewElement(factory = ::SlightlyModifiedFrameLayout, wrapper = ::ContainingView) {
+        val frame = native as SlightlyModifiedFrameLayout
         native.minimumWidth = 2.rem.value.toInt()
         native.minimumHeight = 2.rem.value.toInt()
         native.isClickable = true

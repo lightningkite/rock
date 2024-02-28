@@ -19,7 +19,7 @@ actual fun DismissBackground.onClick(action: suspend () -> Unit) {
 actual typealias NDismissBackground = ViewGroup
 
 @ViewDsl
-actual fun ViewWriter.dismissBackgroundActual(setup: DismissBackground.() -> Unit) = element(FrameLayout(context)) {
+actual fun ViewWriter.dismissBackgroundActual(setup: DismissBackground.() -> Unit) = element(SlightlyModifiedFrameLayout(context)) {
     handleTheme(this) { it, view ->
         view.setBackgroundColor(it.background.closestColor().copy(alpha = 0.5f).toInt())
     }

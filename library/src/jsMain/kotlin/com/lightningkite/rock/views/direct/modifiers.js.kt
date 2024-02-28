@@ -1,15 +1,14 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.ViewWrapper
-import com.lightningkite.rock.dom.getChild
 import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.*
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @ViewModifierDsl3
@@ -18,7 +17,7 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit
 ): ViewWrapper {
-    containsNext<HTMLDivElement>("div") {
+    wrapNext<HTMLDivElement>("div") {
         onclick = {
             // TODO
         }
@@ -161,7 +160,7 @@ actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend () -> Boolea
                     classList.add("animatingShowHide")
 
                     val myStyle = window.getComputedStyle(child)
-                    val transitionTime = myStyle.transitionDuration.let { Duration.parse(it) }
+                    val transitionTime = myStyle.transitionDuration.let { Duration.parseOrNull(it) } ?: 150.milliseconds
                     val totalTime = transitionTime.inWholeMilliseconds.toDouble()
                     var oldAnimTime = totalTime
                     (this.asDynamic().__rock__hiddenAnim as? Animation)?.let {

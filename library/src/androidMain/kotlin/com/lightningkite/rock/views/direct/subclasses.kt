@@ -4,6 +4,6 @@ import android.content.Context
 import android.widget.FrameLayout
 import com.lightningkite.rock.navigation.RockNavigator
 
-class LinkFrameLayout(context: Context): FrameLayout(context) {
+class LinkFrameLayout(context: Context): SlightlyModifiedFrameLayout(context) {
     lateinit var navigator: RockNavigator
 }

@@ -11,15 +11,19 @@ import platform.UIKit.*
 import platform.objc.sel_registerName
 import com.lightningkite.rock.objc.UIResponderWithOverridesProtocol
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.Property
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithOverridesProtocol,
-    UIViewWithSizeOverridesProtocol {
+    UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    override fun getSpacingOverrideProperty() = spacingOverride
     private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
     override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)

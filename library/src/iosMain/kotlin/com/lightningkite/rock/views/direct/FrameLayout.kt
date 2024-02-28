@@ -6,6 +6,7 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
@@ -20,11 +21,12 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
+class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
     var padding: Double
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
     val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    override fun getSpacingOverrideProperty() = spacingOverride
 
     private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)

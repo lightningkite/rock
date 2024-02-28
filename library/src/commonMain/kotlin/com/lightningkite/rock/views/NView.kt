@@ -2,6 +2,7 @@ package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.CalculationContext
 
 
@@ -18,6 +19,7 @@ expect var NView.nativeRotation: Angle
 expect var NView.opacity: Double
 expect var NView.exists: Boolean
 expect var NView.visible: Boolean
+expect var NView.spacing: Dimension
 expect fun NView.clearNViews()
 expect fun NView.addNView(child: NView)
 expect fun NView.removeNView(child: NView)

@@ -11,7 +11,7 @@ import com.lightningkite.rock.views.*
 import java.util.WeakHashMap
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class NSwapView(context: Context): FrameLayout(context) {
+actual class NSwapView(context: Context): SlightlyModifiedFrameLayout(context) {
     lateinit var viewWriter: ViewWriter
 }
 

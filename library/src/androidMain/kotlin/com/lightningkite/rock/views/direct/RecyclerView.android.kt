@@ -9,13 +9,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import androidx.recyclerview.widget.RecyclerView as AndroidRecyclerView
 
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class NRecyclerView(context: Context) : AndroidRecyclerView(context) {
+actual class NRecyclerView(context: Context) : AndroidRecyclerView(context), HasSpacingMultiplier {
+    override val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
     lateinit var viewWriter: ViewWriter
 
     val firstVisibleIndex = Property(0)

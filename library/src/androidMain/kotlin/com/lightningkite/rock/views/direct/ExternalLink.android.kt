@@ -8,7 +8,7 @@ import com.lightningkite.rock.views.ViewWriter
 import java.util.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NExternalLink = FrameLayout
+actual typealias NExternalLink = SlightlyModifiedFrameLayout
 
 actual var ExternalLink.to: String
     get() {
@@ -40,5 +40,5 @@ actual var ExternalLink.newTab: Boolean
 
 @ViewDsl
 actual fun ViewWriter.externalLinkActual(setup: ExternalLink.() -> Unit) {
-    viewElement(factory = ::FrameLayout, wrapper = ::ExternalLink, setup = setup)
+    viewElement(factory = ::SlightlyModifiedFrameLayout, wrapper = ::ExternalLink, setup = setup)
 }

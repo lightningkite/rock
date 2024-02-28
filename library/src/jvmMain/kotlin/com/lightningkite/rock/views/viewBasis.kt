@@ -3,6 +3,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.dom.HTMLElement
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.Theme
 import com.lightningkite.rock.reactive.*
 
@@ -23,6 +24,12 @@ actual var NView.exists: Boolean
     }
 
 actual var NView.visible: Boolean
+    get() = throw NotImplementedError()
+    set(value) {
+        TODO()
+    }
+
+actual var NView.spacing: Dimension
     get() = throw NotImplementedError()
     set(value) {
         TODO()

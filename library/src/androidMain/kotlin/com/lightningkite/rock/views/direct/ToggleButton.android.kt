@@ -10,7 +10,7 @@ import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual class NToggleButton(context: Context): FrameLayout(context), View.OnClickListener {
+actual class NToggleButton(context: Context): SlightlyModifiedFrameLayout(context), View.OnClickListener {
     val checked = Property(false)
     init { setOnClickListener(this) }
 

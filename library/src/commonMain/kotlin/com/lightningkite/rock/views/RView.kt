@@ -2,6 +2,7 @@ package com.lightningkite.rock.views
 
 import com.lightningkite.rock.launch
 import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
@@ -29,6 +30,9 @@ var RView<*>.exists: Boolean
 var RView<*>.visible: Boolean
     get() = native.visible
     set(value) { native.visible = value }
+var RView<*>.spacing: Dimension
+    get() = native.spacing
+    set(value) { native.spacing = value }
 
 fun <T> ViewWriter.forEach(items: Readable<List<T>>, render: ViewWriter.(T)->Unit) = with(split()) {
     calculationContext.reactiveScope {

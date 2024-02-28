@@ -69,11 +69,11 @@ interface HasSpacingMultiplier {
     val spacingOverride: Property<Dimension?>
 }
 
-class SlightlyModifiedFrameLayout(context: Context) : FrameLayout(context), HasSpacingMultiplier {
+open  class SlightlyModifiedFrameLayout(context: Context) : FrameLayout(context), HasSpacingMultiplier {
     override val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
 }
 
-class SlightlyModifiedLinearLayout(context: Context) : SimplifiedLinearLayout(context), HasSpacingMultiplier {
+open class SlightlyModifiedLinearLayout(context: Context) : SimplifiedLinearLayout(context), HasSpacingMultiplier {
     override val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).apply {
         addListener {
             value?.value?.toInt()?.let {

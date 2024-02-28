@@ -6,6 +6,7 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
@@ -20,7 +21,7 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol {
+class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
     private val sizeCache = HashMap<Pair<Size, Boolean>, List<Size>>()
     var horizontal: Boolean = true
     var padding: Double
@@ -33,13 +34,8 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             setNeedsLayout()
             informParentOfSizeChange()
         }
-    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).apply {
-        addListener {
-            value?.value?.let {
-                gap = it
-            }
-        }
-    }
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    override fun getSpacingOverrideProperty() = spacingOverride
 
 //    init { setUserInteractionEnabled(false) }
 

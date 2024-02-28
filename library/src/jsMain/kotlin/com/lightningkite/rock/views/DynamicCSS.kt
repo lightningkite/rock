@@ -180,8 +180,6 @@ object DynamicCSS {
             "display" to "grid",
             "grid-template-columns" to "100%",
             "grid-template-rows" to "100%",
-            "overflow" to "hidden",
-            "background" to "red",
         ))
         style(".hidingContainer > *", mapOf(
             "grid-column-start" to "1",

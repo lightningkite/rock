@@ -11,8 +11,11 @@ import com.lightningkite.rock.Cancellable
 import com.lightningkite.rock.RockActivity
 import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.views.direct.HasSpacingMultiplier
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
@@ -113,6 +116,12 @@ actual var NView.visible: Boolean
         } else {
             View.INVISIBLE
         }
+    }
+
+actual var NView.spacing: Dimension
+    get() = (this as? HasSpacingMultiplier)?.spacingOverride?.value ?: 0.px
+    set(value) {
+        (this as? HasSpacingMultiplier)?.spacingOverride?.value = value
     }
 
 actual fun NView.clearNViews() {

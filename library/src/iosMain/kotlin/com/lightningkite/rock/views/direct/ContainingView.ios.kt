@@ -49,10 +49,3 @@ actual var ContainingView.spacing: Dimension
             else -> {}
         }
     }
-
-val UIView.spacingOverride: Property<Dimension?>?
-    get() = when(this) {
-        is LinearLayout -> spacingOverride
-        is FrameLayout -> spacingOverride
-        else -> null
-    }

@@ -3,8 +3,12 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.Cancellable
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.views.direct.FrameLayout
+import com.lightningkite.rock.views.direct.LinearLayout
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
 import platform.CoreGraphics.CGAffineTransformRotate
@@ -12,6 +16,7 @@ import platform.UIKit.*
 import platform.darwin.NSObject
 import platform.objc.sel_registerName
 import kotlin.experimental.ExperimentalNativeApi
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
 
 actual fun NView.removeNView(child: NView) {
     child.removeFromSuperview()
@@ -127,6 +132,16 @@ actual var NView.visible: Boolean
         animateIfAllowed {
             alpha = if (value) 1.0 else 0.0
         }
+    }
+
+@OptIn(ExperimentalForeignApi::class)
+val UIView.spacingOverride: Property<Dimension?>?
+    get() = (this as? UIViewWithSpacingRulesProtocol)?.getSpacingOverrideProperty() as? Property<Dimension?>
+
+actual var NView.spacing: Dimension
+    get() = spacingOverride?.value ?: 0.px
+    set(value) {
+        spacingOverride?.value = value
     }
 
 actual var NView.opacity: Double

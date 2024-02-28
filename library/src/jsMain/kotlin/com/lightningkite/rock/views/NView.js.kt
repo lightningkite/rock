@@ -3,6 +3,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.Cancellable
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Angle
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.CalculationContext
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -66,6 +67,19 @@ actual var NView.visible: Boolean
     get() = throw NotImplementedError()
     set(value) {
         style.visibility = if (value) "visible" else "hidden"
+    }
+
+actual var NView.spacing: Dimension
+    get() {
+        return Dimension(style.getPropertyValue("--spacing").takeUnless { it.isBlank() } ?: "0px")
+    }
+    set(value) {
+        style.setProperty("--spacing", value.value)
+        val cn = "spacingOf${value.value.replace(".", "_").filter { it.isLetterOrDigit() || it == '_' }}"
+        DynamicCSS.styleIfMissing(".$cn > *, .$cn > .hidingContainer > *", mapOf(
+            "--parentSpacing" to value.value
+        ))
+        className = className.split(' ').filter { !it.startsWith("spacingOf") }.plus(cn).joinToString(" ")
     }
 
 actual var NView.opacity: Double

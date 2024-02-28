@@ -780,6 +780,7 @@ object DynamicCSS {
         style(".contentScroll", mapOf(
             "scrollbar-width" to "none",
             "overflow-anchor" to "none",
+            "padding" to "inherit",
         ))
         style(".contentScroll > *", mapOf(
             "overflow-anchor" to "revert",

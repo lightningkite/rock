@@ -2,6 +2,7 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.dp
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
@@ -61,16 +62,16 @@ actual fun ViewWriter.platformSpecific() {
             var version = 2
             onClick {
                 val v = version++
-                if (v % 2 == 0) data.value = (0..100).map { "Item $it (v$v)" }.toList()
-                else data.value = (0..50).map { "Item $it (v$v)" }.toList()
+                if (v % 2 == 0) data.value = (0..50).map { "Item $it (v$v)" }.toList()
+                else data.value = (0..20).map { "Item $it (v$v)" }.toList()
             }
         }
         var rv: RecyclerView? = null
-        expanding - recyclerView {
+        expanding - horizontalRecyclerView {
             rv = this
-            columns = 5
+            columns = 1
             children(data) { obs ->
-                card - stack {
+                card - sizeConstraints(minWidth = 100.dp, minHeight = 100.dp) - stack {
                     text {
                         ::content { obs.await() }
                     }

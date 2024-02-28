@@ -782,6 +782,8 @@ object DynamicCSS {
         ))
         style(".contentScroll > *", mapOf(
             "overflow-anchor" to "revert",
+            "max-width" to "unset",
+            "max-height" to "unset",
         ))
         style(".viewPager", mapOf(
             "overflow-x" to "scroll",

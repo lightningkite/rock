@@ -22,7 +22,7 @@ object ReactivityScreen : RockScreen {
             col {
                 h1 { content = "This screen demonstrates various forms of reactivity." }
                 text { content = "Note the use of the multi-layer 'Readable' in `fetching`." }
-            } in withDefaultPadding
+            } in padded
 
             col {
                 h2 { content = "Data" }

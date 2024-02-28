@@ -45,7 +45,7 @@ actual fun <T> Select.bind(
                 return convertView
             } else {
                 with(native.viewWriter) {
-                    withDefaultPadding - text {
+                    padded - text {
                         content = render(list[position])
                     }
                 }

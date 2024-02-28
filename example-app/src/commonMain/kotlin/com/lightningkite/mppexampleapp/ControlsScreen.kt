@@ -18,7 +18,7 @@ object ControlsScreen : RockScreen {
         val booleanContent = Property(true)
         col {
 
-            h1 { content = "Controls" } in withDefaultPadding in hasPopover {
+            h1 { content = "Controls" } in padded in hasPopover {
                 text {
                     content = "Pop over!"
                 } in card
@@ -57,7 +57,7 @@ object ControlsScreen : RockScreen {
                             h3 { content = "Example Setting" } in weight(1f)
                             switch { checked bind booleanContent; }
                         }
-                    } in withDefaultPadding
+                    } in padded
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
@@ -87,7 +87,7 @@ object ControlsScreen : RockScreen {
                             h3 { content = "Example Setting" } in weight(1f)
                             checkbox { checked bind booleanContent }
                         }
-                    } in withDefaultPadding
+                    } in padded
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
@@ -118,7 +118,7 @@ object ControlsScreen : RockScreen {
                             h3 { content = "Example Setting" } in weight(1f)
                             radioButton { checked bind selected.equalTo(1) }
                         }
-                    } in withDefaultPadding
+                    } in padded
                     stack {
                         row {
                             h3 { content = "Example Setting" } in weight(1f)
@@ -144,7 +144,7 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Activity Indicators" }
                 row {
                     space {} in weight(1f)
-                    stack { activityIndicator { } } in withDefaultPadding
+                    stack { activityIndicator { } } in padded
                     stack { activityIndicator { } } in card
                     stack { activityIndicator { } } in important
                     stack { activityIndicator { } } in critical
@@ -158,7 +158,7 @@ object ControlsScreen : RockScreen {
                 h2 { content = "Drop Downs" }
                 val options = shared { listOf("Apple", "Banana", "Crepe") }
                 val value = Property("Apple")
-                select { bind(value, data = options, render = { it }) } in withDefaultPadding
+                select { bind(value, data = options, render = { it }) } in padded
                 select { bind(value, data = options, render = { it }) } in card
                 select { bind(value, data = options, render = { it }) } in important
                 select { bind(value, data = options, render = { it }) } in critical

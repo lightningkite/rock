@@ -57,7 +57,7 @@ object SampleLogInScreen : RockScreen {
                     } in important
                 } in card in sizedBox(SizeConstraints(maxWidth = 50.rem)) in gravity(Align.Center, Align.Center)
                 space {} in weight(1f)
-            } in scrolls in withDefaultPadding
+            } in scrolls in padded
         } 
     }
 

@@ -125,7 +125,7 @@ actual val ViewWriter.marginless: ViewWrapper
     }
 
 @ViewModifierDsl3
-actual val ViewWriter.withDefaultPadding: ViewWrapper
+actual val ViewWriter.padded: ViewWrapper
     get() {
         beforeNextElementSetup {
             extensionForcePadding = true

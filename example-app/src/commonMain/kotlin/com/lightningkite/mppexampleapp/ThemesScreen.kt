@@ -19,7 +19,7 @@ object ThemesScreen : RockScreen {
                 h2 { content = "Theme Sampling" }
                 row {
                     space {} in weight(1f)
-                    text { content = "Sample" } in withDefaultPadding
+                    text { content = "Sample" } in padded
                     text { content = "Card" } in card
                     text { content = "Important" } in important
                     text { content = "Critical" } in critical

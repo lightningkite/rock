@@ -36,7 +36,7 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>)
             is NavGroup -> {
                 col {
                     spacing = 0.px
-                    withDefaultPadding - row {
+                    padded - row {
                         centered - navElementIconAndCountHorizontal(it)
                         centered - text { ::content { it.title() } }
                     }

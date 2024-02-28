@@ -72,11 +72,9 @@ class ViewWriter(
     private inline fun <T : NView> stackUse(item: T, action: T.() -> Unit) =
         CalculationContextStack.useIn(item.calculationContext) {
             stack.add(item)
-            println("Add $item to stack")
             try {
                 action(item)
             } finally {
-                println("Remove $item from stack")
                 stack.removeLast()
             }
         }
@@ -155,7 +153,6 @@ class ViewWriter(
     fun <T : NView> wrapNext(element: T, setup: T.() -> Unit): ViewWrapper {
         stack.lastOrNull()?.addNView(element) ?: run { rootCreated = element }
         stack.add(element)
-        println("Add $element to stack")
         val beforeCopy = if (beforeNextElementSetupList.isNotEmpty()) beforeNextElementSetupList.toList() else listOf()
         beforeNextElementSetupList = ArrayList()
         val afterCopy = if (afterNextElementSetupList.isNotEmpty()) afterNextElementSetupList.toList() else listOf()
@@ -163,11 +160,9 @@ class ViewWriter(
         CalculationContextStack.useIn(element.calculationContext) {
             val oldPop = popCount
             popCount = 0
-            println("POP FREEZE")
             beforeCopy.forEach { it(element) }
             setup(element)
             afterCopy.forEach { it(element) }
-            println("POP RESUME")
             popCount = oldPop
         }
         popCount++
@@ -194,7 +189,6 @@ class ViewWriter(
             }
             while (toPop > 0) {
                 val item = stack.removeLast()
-                println("Remove $item from stack")
                 toPop--
             }
 //            wrapperToDoList.clear()

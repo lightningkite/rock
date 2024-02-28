@@ -283,7 +283,7 @@ class RecyclerController(
             forSingleRenderer.reactiveScope {
                 suppress = true
                 scrollingContainer.scrollStart = lastDefaultPos
-                val list = value.data.await()
+                val list = value.data.await().toList()
                 minIndex = 0
                 maxIndex = list.size - 1
                 dataCopy.value = list
@@ -487,7 +487,7 @@ class RecyclerController(
                     with(newViews) {
                         val p = Property(index)
                         root.withoutAnimation {
-                            dataAndRenderer.renderAny(newViews, shared { dataCopy.await()[p.await()] })
+                            dataAndRenderer.renderAny(newViews, shared { dataCopy.await()[p.await().coerceIn(minIndex, maxIndex)] })
                         }
                         rootCreated!!.also {
                             it.asDynamic().__ROCK__property = p

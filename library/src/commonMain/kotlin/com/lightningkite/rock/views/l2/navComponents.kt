@@ -15,37 +15,54 @@ fun ViewWriter.navGroupColumn(elements: Readable<List<NavElement>>, setup: Conta
 }
 private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>) {
     forEach(readable) {
+        fun ViewWriter.display(navElement: NavElement) {
+            row {
+                centered - navElementIconAndCountHorizontal(navElement)
+                text { ::content { navElement.title() } } in gravity(Align.Center, Align.Center)
+                space(1.0)
+            }
+        }
         when (it) {
             is NavAction -> button {
-                text { ::content { it.title() } }
+                display(it)
                 onClick { it.onSelect() }
             }
 
             is NavExternal -> externalLink {
                 ::to { it.to() }
-                text { ::content { it.title() } }
+                display(it)
             }
 
             is NavGroup -> {
                 col {
-                    h3 { ::content { it.title() } }
+                    spacing = 0.px
+                    withDefaultPadding - row {
+                        centered - navElementIconAndCountHorizontal(it)
+                        centered - text { ::content { it.title() } }
+                    }
                     row {
-                        space()
+                        spacing = 0.px
+                        space(1.0)
                         col {
+                            spacing = 0.px
                             navGroupColumnInner(shared { it.children() })
                         }
                     }
                 }
             }
 
+            is NavCustom -> {
+                it.long(this)
+            }
+
             is NavLink -> link {
                 ::to { it.destination() }
-                text { ::content { it.title() } }
+                display(it)
             } in maybeThemeFromLast { existing ->
                 if (navigator.currentScreen.await()
                         ?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination())
                 )
-                    existing.down()
+                    existing.selected()
                 else
                     null
             }
@@ -64,20 +81,14 @@ private fun ViewWriter.navGroupActionsInner(readable: Readable<List<NavElement>>
         when (it) {
             is NavAction -> button {
 //                text { ::content { it.title() } }
-                icon {
-                    ::source { it.icon() }
-                    ::description { it.title() }
-                }
+                navElementIconAndCount(it)
                 onClick { it.onSelect() }
             }
 
             is NavExternal -> externalLink {
                 ::to { it.to() }
 //                text { ::content { it.title() } }
-                icon {
-                    ::source { it.icon() }
-                    ::description { it.title() }
-                }
+                navElementIconAndCount(it)
             }
 
             is NavGroup -> {
@@ -86,13 +97,14 @@ private fun ViewWriter.navGroupActionsInner(readable: Readable<List<NavElement>>
                 }
             }
 
+            is NavCustom -> {
+                it.square(this)
+            }
+
             is NavLink -> link {
                 ::to { it.destination() }
 //                text { ::content { it.title() } }
-                icon {
-                    ::source { it.icon() }
-                    ::description { it.title() }
-                }
+                navElementIconAndCount(it)
             } in maybeThemeFromLast { existing ->
                 if (navigator.currentScreen.await()
                         ?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination())
@@ -124,6 +136,10 @@ private fun ViewWriter.navGroupTopInner(readable: Readable<List<NavElement>>) {
                 text { ::content { it.title() } }
             }
 
+            is NavCustom -> {
+                it.square(this)
+            }
+
             is NavGroup -> button {
                 text { ::content { it.title() } }
             } in hasPopover {
@@ -138,15 +154,50 @@ private fun ViewWriter.navGroupTopInner(readable: Readable<List<NavElement>>) {
     }
 }
 
+fun ViewWriter.navElementIconAndCount(navElement: NavElement) {
+    stack {
+        icon {
+            ::source { navElement.icon() }
+        } in gravity(Align.Center, Align.Center)
+        navElement.count?.let { count ->
+            gravity(Align.End, Align.Start) - compact - critical - stack {
+                exists = false
+                ::exists { count() != null }
+                space(0.01)
+                centered - text {
+                    ::content { count()?.takeIf { it > 0 }?.toString() ?: "" }
+                    textSize = 0.75.rem
+                }
+            }
+        }
+    }
+}
+
+fun ViewWriter.navElementIconAndCountHorizontal(navElement: NavElement) {
+    row {
+        centered - icon {
+            ::source { navElement.icon().copy(width = 1.5.rem, height = 1.5.rem) }
+        }
+        navElement.count?.let { count ->
+            centered  - compact - critical - stack {
+                exists = false
+                ::exists { count() != null }
+                space(0.01)
+                centered - text {
+                    ::content { count()?.takeIf { it > 0 }?.toString() ?: "" }
+                }
+            }
+        }
+    }
+}
+
 fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>, setup: ContainingView.()->Unit) {
     row {
         spacing = 0.px
         setup()
         fun ViewWriter.display(navElement: NavElement) {
             compact - col {
-                icon {
-                    ::source { navElement.icon() }
-                } in gravity(Align.Center, Align.Center)
+                centered - navElementIconAndCount(navElement)
                 subtext { ::content { navElement.title() } } in gravity(Align.Center, Align.Center)
             }
         }
@@ -167,6 +218,10 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>, setup: Contain
                     onClick { }  // TODO: select dialog
                 }
 
+                is NavCustom -> {
+                    it.tall(this)
+                }
+
                 is NavLink -> {
                     link {
                         display(it)
@@ -175,7 +230,7 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>, setup: Contain
                         if (navigator.currentScreen.await()?.let { navigator.routes.render(it) }?.urlLikePath?.segments == navigator.routes.render(
                                 it.destination()
                             )?.urlLikePath?.segments)
-                            (existing.bar() ?: existing).down()
+                            (existing.bar() ?: existing).selected()
                         else
                             existing.bar() ?: existing
                     }

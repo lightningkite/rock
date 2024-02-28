@@ -85,13 +85,17 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
             ) in weight(1f)
             navGroupActions(appNav.actionsProperty)
             ::exists { appNav.existsProperty.await() }
-        } in bar 
-        row {
-            navGroupColumn(appNav.navItemsProperty) {
-                ::exists { showMenu.await() && appNav.existsProperty.await() }
-            } in bar 
-            navigatorView(navigator) in weight(1f) 
-        } in weight(1f)
+        } in bar
+        expanding - stack {
+            navigatorView(navigator)
+            row {
+                onlyWhen(false) { showMenu.await() && appNav.existsProperty.await() }
+                scrolls - bar - navGroupColumn(appNav.navItemsProperty) {
+                    spacing = 0.px
+                }
+                weight(2f) - space()
+            }
+        }
     } 
 }
 
@@ -183,10 +187,9 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             ::exists { appNav.existsProperty.await() }
         } in bar 
         row {
-            navGroupColumn(appNav.navItemsProperty) {
-                ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
-            }
-            separator {
+            spacing = 0.px
+            nav - scrolls - navGroupColumn(appNav.navItemsProperty) {
+                spacing = 0.px
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             }
             navigatorView(navigator) in weight(1f) 

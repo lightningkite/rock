@@ -54,6 +54,7 @@ object DynamicCSS {
         )
         style(":hover>.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
+
         style(
             "body", mapOf(
                 "height" to "100svh",
@@ -142,25 +143,54 @@ object DynamicCSS {
                 "animation" to "spin 2s infinite linear !important",
             )
         )
+        style(".rock-swap", mapOf(
+            "display" to "grid",
+            "grid-template-columns" to "100%",
+            "grid-template-rows" to "100%",
+        ))
+        style(".rock-swap > *", mapOf(
+            "grid-column-start" to "1",
+            "grid-column-end" to "1",
+            "grid-row-start" to "1",
+            "grid-row-end" to "1",
+            "align-self" to "stretch",
+            "justify-self" to "stretch",
+        ))
 
-        style(
-            ".rock-swap", mapOf(
-                "display" to "block",
-                "position" to "relative",
-            )
-        )
+//        style(
+//            ".rock-swap", mapOf(
+//                "display" to "block",
+//                "position" to "relative",
+//            )
+//        )
+//
+//        style(
+//            ".rock-swap > *", mapOf(
+//                "position" to "absolute",
+//                "top" to "0",
+//                "left" to "0",
+//                "right" to "0",
+//                "bottom" to "0",
+//                "max-width" to "100%",
+//                "max-height" to "100%",
+//            )
+//        )
 
-        style(
-            ".rock-swap > *", mapOf(
-                "position" to "absolute",
-                "top" to "0",
-                "left" to "0",
-                "right" to "0",
-                "bottom" to "0",
-                "max-width" to "100%",
-                "max-height" to "100%",
-            )
-        )
+        style(".hidingContainer", mapOf(
+            "display" to "grid",
+            "grid-template-columns" to "100%",
+            "grid-template-rows" to "100%",
+            "overflow" to "hidden",
+            "background" to "red",
+        ))
+        style(".hidingContainer > *", mapOf(
+            "grid-column-start" to "1",
+            "grid-column-end" to "1",
+            "grid-row-start" to "1",
+            "grid-row-end" to "1",
+            "align-self" to "stretch",
+            "justify-self" to "stretch",
+        ))
 
         style(
             ".rock-stack", mapOf(
@@ -1000,6 +1030,11 @@ object DynamicCSS {
                 "text-transform" to if (theme.title.allCaps) "uppercase" else "none",
                 "line-height" to theme.title.lineSpacingMultiplier.toString(),
                 "letter-spacing" to theme.title.additionalLetterSpacing.toString(),
+            )
+        )
+        style(
+            sel(".icon"), mapOf(
+                "color" to theme.icon.toCss()
             )
         )
         style(

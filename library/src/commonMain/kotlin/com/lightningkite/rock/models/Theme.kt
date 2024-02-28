@@ -9,6 +9,7 @@ data class Theme(
     val cornerRadii: CornerRadii = CornerRadii.RatioOfSpacing(1f),
     val spacing: Dimension = 0.5.rem,
     val foreground: Paint = Color.black,
+    val iconOverride: Paint? = null,
     val outline: Paint = Color.black,
     val outlineWidth: Dimension = 0.px,
     val background: Paint = Color.white,
@@ -39,7 +40,7 @@ data class Theme(
         )
     },
     val unselected: (Theme.() -> Theme) = { this },
-    val selected: (Theme.() -> Theme) = { this.important(this) },
+    val selected: (Theme.() -> Theme) = { this.down(this) },
     val disabled: (Theme.() -> Theme) = {
         copy(
             foreground = this.foreground.applyAlpha(alpha = 0.25f),
@@ -54,6 +55,7 @@ data class Theme(
             outline = this.foreground.closestColor().highlight(1f)
         )
     },
+    val nav: (Theme.() -> Theme?) = bar,
     val important: (Theme.() -> Theme) = {
         copy(
             foreground = this.background,
@@ -84,6 +86,8 @@ data class Theme(
         )
     },
 ) {
+    val icon: Paint get() = iconOverride ?: foreground
+
     @JsName("dialogDirect")
     inline fun dialog() = dialog(this)
     @JsName("hoverDirect")
@@ -104,6 +108,8 @@ data class Theme(
     inline fun important() = important(this)
     @JsName("criticalDirect")
     inline fun critical() = critical(this)
+    @JsName("navDirect")
+    inline fun nav() = nav(this)
     @JsName("warningDirect")
     inline fun warning() = warning(this)
     @JsName("dangerDirect")
@@ -121,6 +127,7 @@ data class Theme(
         out = out * 31 + cornerRadii.hashCode()
         out = out * 31 + spacing.hashCode()
         out = out * 31 + foreground.hashCode()
+        out = out * 31 + iconOverride.hashCode()
         out = out * 31 + outline.hashCode()
         out = out * 31 + outlineWidth.hashCode()
         out = out * 31 + background.hashCode()
@@ -134,6 +141,7 @@ data class Theme(
                 this.cornerRadii == other.cornerRadii &&
                 this.spacing == other.spacing &&
                 this.foreground == other.foreground &&
+                this.iconOverride == other.iconOverride &&
                 this.outline == other.outline &&
                 this.outlineWidth == other.outlineWidth &&
                 this.background == other.background

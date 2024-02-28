@@ -50,6 +50,7 @@ var ViewWriter.navigator by viewWriterAddonLateInit<RockNavigator>()
 @ViewModifierDsl3 val ViewWriter.unselected: ViewWrapper get() = themeFromLast { it.unselected() }
 @ViewModifierDsl3 val ViewWriter.disabled: ViewWrapper get() = themeFromLast { it.disabled() }
 @ViewModifierDsl3 val ViewWriter.bar: ViewWrapper get() = themeFromLast { it.bar() }
+@ViewModifierDsl3 val ViewWriter.nav: ViewWrapper get() = themeFromLast { it.nav() }
 @ViewModifierDsl3 val ViewWriter.important: ViewWrapper get() = themeFromLast { it.important() }
 @ViewModifierDsl3 val ViewWriter.critical: ViewWrapper get() = themeFromLast { it.critical() }
 @ViewModifierDsl3 val ViewWriter.warning: ViewWrapper get() = themeFromLast { it.warning() }

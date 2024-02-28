@@ -178,7 +178,7 @@ fun launchGlobal(action: suspend () -> Unit): Cancellable {
         override fun resumeWith(result: Result<Unit>) {
             result.onFailure { ex : Throwable ->
                 println("launchGlobal $action experienced an exception:")
-                ex.printStackTrace()
+                ex.printStackTrace2()
             }
         }
     })

@@ -215,7 +215,11 @@ actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend () -> Boolea
                         gone.marginRight = "calc($gap / -2.0)"
                         gone.paddingRight = "0px"
                         gone.width = "0px"
+                        gone.minWidth = "0px"
+                        gone.maxWidth = "0px"
                         full.width = fullWidth
+                        full.minWidth = fullWidth
+                        full.maxWidth = fullWidth
                     }
                     if (y) {
                         goneTransform.add("scaleY(0)")
@@ -225,18 +229,22 @@ actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend () -> Boolea
                         gone.marginBottom = "calc($gap / -2.0)"
                         gone.paddingBottom = "0px"
                         gone.height = "0px"
+                        gone.minHeight = "0px"
+                        gone.maxHeight = "0px"
                         full.height = fullHeight
+                        full.minHeight = fullHeight
+                        full.maxHeight = fullHeight
                     }
                     if (!x && !y) {
                         full.opacity = "1"
                         gone.opacity = "0"
                     }
                     goneTransform.takeUnless { it.isEmpty() }?.let {
-                        gone.transform = it.joinToString(" ")
+//                        gone.transform = it.joinToString(" ")
 //                        gone.transformOrigin = "top left"
                     }
                     fullTransform.takeUnless { it.isEmpty() }?.let {
-                        full.transform = it.joinToString(" ")
+//                        full.transform = it.joinToString(" ")
 //                        full.transformOrigin = "top left"
                     }
                     this.animate(

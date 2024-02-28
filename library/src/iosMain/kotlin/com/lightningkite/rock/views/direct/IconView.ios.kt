@@ -64,7 +64,7 @@ actual class NIconView(): NView(CGRectMake(0.0,0.0,0.0,0.0)) {
 @ViewDsl
 actual fun ViewWriter.iconActual(setup: IconView.() -> Unit): Unit = element(NIconView()) {
     handleTheme(this, viewDraws = true, viewLoads = true) { theme ->
-        this.iconPaint = theme.foreground
+        this.iconPaint = theme.icon
     }
     this.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
     setup(IconView(this))

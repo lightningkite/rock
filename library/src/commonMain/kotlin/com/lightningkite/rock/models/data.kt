@@ -1,7 +1,9 @@
 package com.lightningkite.rock.models
 
 import com.lightningkite.rock.FileReference
+import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.navigation.RockScreen
+import com.lightningkite.rock.views.ViewWriter
 import kotlin.jvm.JvmInline
 
 class AnimationId
@@ -201,6 +203,15 @@ data class NavAction(
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
     val onSelect: suspend () -> Unit,
+) : NavElement
+
+data class NavCustom(
+    override val title: suspend () -> String = { "" },
+    override val icon: suspend () -> Icon = { Icon.moreHoriz },
+    override val count: (suspend () -> Int?)? = null,
+    val square: ViewWriter.()->Unit,
+    val long: ViewWriter.()->Unit,
+    val tall: ViewWriter.()->Unit,
 ) : NavElement
 
 data class Action(

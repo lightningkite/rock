@@ -21,7 +21,8 @@ actual typealias NIconView = HTMLDivElement
 actual fun ViewWriter.iconActual(setup: IconView.() -> Unit): Unit =
     themedElement<NIconView>("div") {
         this.setAttribute("role", "img")
-        addClass(".viewDraws")
+        addClass("viewDraws")
+        addClass("icon")
         setup(IconView(this))
     }
 

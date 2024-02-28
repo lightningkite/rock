@@ -9,6 +9,7 @@ import com.lightningkite.rock.views.l2.*
 val appTheme = Property<Theme>(
     MaterialLikeTheme(
         primary = Color(1f, 0.2f, 0.2f, 0.2f),
+        secondary = Color.blue,
         title = FontAndStyle(font = Resources.fontsMontserrat),
         body = FontAndStyle(font = Resources.fontsMontserrat),
     )
@@ -20,8 +21,8 @@ fun ViewWriter.app() {
         appName = "Rock Sample App"
         ::navItems {
             listOf(
-                NavLink("Home", Icon.home, RootScreen),
-                NavLink("Themes", Icon.sync, ThemesScreen),
+                NavLink(title = { "Home" }, icon = { Icon.home }, count = { 1 }) { RootScreen },
+                NavLink({ "Themes" }, { Icon.sync }, count = { 0 }) { ThemesScreen },
                 NavLink("Controls", Icon.settings, ControlsScreen),
                 NavLink("Navigation", Icon.menu, NavigationScreen),
                 NavLink("Forms", Icon.done, FormsScreen)

@@ -57,7 +57,7 @@ actual var IconView.description: String?
 actual fun ViewWriter.iconActual(setup: IconView.() -> Unit) {
     return viewElement(factory = ::NIconView, wrapper = ::IconView) {
         handleTheme(native, viewDraws = true, viewLoads = true) { t, v ->
-            v.iconPaint = t.foreground
+            v.iconPaint = t.icon
         }
         setup(this)
     }

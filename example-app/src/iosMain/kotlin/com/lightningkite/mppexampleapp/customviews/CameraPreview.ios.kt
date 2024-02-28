@@ -10,7 +10,6 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.sync.Mutex
 import platform.AVFoundation.*
 import platform.CoreGraphics.CGRectZero
-import platform.UIKit.UIColor
 import platform.UIKit.UIView
 import platform.darwin.*
 
@@ -89,9 +88,12 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
                         setMetadataObjectsDelegate(it, metadataOutputQueue)
                     }
 
-                    metadataObjectTypes = listOf(AVMetadataObjectTypeCode39Code,
+                    // Only set object types from the pool of available object types to avoid fatal exception when
+                    // camera access is not established
+                    val requestedObjectTypes = setOf(AVMetadataObjectTypeCode39Code,
                         AVMetadataObjectTypeCode93Code,
                         AVMetadataObjectTypeCode128Code)
+                    metadataObjectTypes = availableMetadataObjectTypes.intersect(requestedObjectTypes).toList()
                 }
             }
         } finally {
@@ -123,7 +125,7 @@ class PreviewView() : UIView(CGRectZero.readValue()) {
         // to set the layerClass class property through the Kotlin/Obj-c interop so this is a workaround
         videoPreviewLayer = AVCaptureVideoPreviewLayer.layerWithSession(session).apply {
             frame = this@PreviewView.bounds
-            backgroundColor = UIColor.darkGrayColor.CGColor // For testing
+            videoGravity = AVLayerVideoGravityResizeAspectFill
             this@PreviewView.layer.addSublayer(this)
         }
     }

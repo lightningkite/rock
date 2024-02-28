@@ -19,7 +19,7 @@ object CameraScreen : RockScreen, UseFullScreen {
         val vin = Property("")
         val cameraPermissions = Property(false)
 
-        val showGuidance = Property(true)
+        val showGuidance = Property(false)
         val currentStep = Property(0)
         val products = Property(mutableListOf<ImageLocal>())
         val steps = Constant(listOf(

@@ -210,8 +210,8 @@ data class NavCustom(
     override val icon: suspend () -> Icon = { Icon.moreHoriz },
     override val count: (suspend () -> Int?)? = null,
     val square: ViewWriter.()->Unit,
-    val long: ViewWriter.()->Unit,
-    val tall: ViewWriter.()->Unit,
+    val long: ViewWriter.()->Unit = square,
+    val tall: ViewWriter.()->Unit = square,
 ) : NavElement
 
 data class Action(

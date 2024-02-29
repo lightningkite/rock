@@ -10,7 +10,19 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.sync.Mutex
 import platform.AVFoundation.*
 import platform.CoreGraphics.CGRectZero
+import platform.CoreMedia.CMGetAttachment
+import platform.CoreMedia.CMSampleBufferGetImageBuffer
+import platform.CoreMedia.CMSampleBufferRef
+import platform.CoreMedia.kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix
+import platform.Foundation.NSError
+import platform.ImageIO.kCGImagePropertyOrientationDownMirrored
+import platform.ImageIO.kCGImagePropertyOrientationLeftMirrored
+import platform.ImageIO.kCGImagePropertyOrientationRightMirrored
+import platform.ImageIO.kCGImagePropertyOrientationUpMirrored
+import platform.UIKit.UIDevice
+import platform.UIKit.UIDeviceOrientation
 import platform.UIKit.UIView
+import platform.Vision.*
 import platform.darwin.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -78,9 +90,7 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
     private var metadataDelegate: AVCaptureMetadataOutputObjectsDelegateProtocol? = null
 
     fun enableBarcodeScanning(resultHandler: (List<String>, Long) -> Unit) = dispatch_async(sessionQueue) {
-        captureSession.beginConfiguration()
-
-        try {
+        captureSession.configure {
             if (captureSession.canAddOutput(metadataOutput)) {
                 captureSession.addOutput(metadataOutput)
                 metadataOutput.apply {
@@ -96,8 +106,27 @@ actual class CameraPreview actual constructor(actual override val native: NCamer
                     metadataObjectTypes = availableMetadataObjectTypes.intersect(requestedObjectTypes).toList()
                 }
             }
-        } finally {
-            captureSession.commitConfiguration()
+        }
+    }
+
+    private val rawVideoOutputQueue by lazy { dispatch_queue_create("raw video objects queue", null) }
+    private val rawVideoOutput by lazy {
+        AVCaptureVideoDataOutput().apply {
+            alwaysDiscardsLateVideoFrames = true
+        }
+    }
+    private var rawVideoDelegate: AVCaptureVideoDataOutputSampleBufferDelegateProtocol? = null
+
+    fun enableOCR(resultHandler: (String, Long) -> Unit) = dispatch_async(sessionQueue) {
+        captureSession.configure {
+            if (captureSession.canAddOutput(rawVideoOutput)) {
+                captureSession.addOutput(rawVideoOutput)
+                rawVideoOutput.apply {
+                    rawVideoDelegate = VNImageRequestCaptureBufferDelegate(resultHandler).also {
+                        setSampleBufferDelegate(it, rawVideoOutputQueue)
+                    }
+                }
+            }
         }
     }
 
@@ -141,14 +170,60 @@ class MetadataBarcodeDelegate(private val barcodeHandler: (List<String>, Long) -
                                fromConnection: AVCaptureConnection) {
         // Ignore and discard new results while results are being processed
         if (barcodeResultHandlerMutex.tryLock()) {
+            val barcodes = didOutputMetadataObjects
+                .filterIsInstance<AVMetadataMachineReadableCodeObject>()
+                .mapNotNull { it.stringValue }
             dispatch_async(dispatch_get_main_queue()) {
-                val barcodes = didOutputMetadataObjects
-                    .filterIsInstance<AVMetadataMachineReadableCodeObject>()
-                    .mapNotNull { it.stringValue }
                 barcodeHandler(barcodes, 0)
                 barcodeResultHandlerMutex.unlock()
             }
         }
+    }
+}
+
+class VNImageRequestCaptureBufferDelegate(private val ocrHandler: (String, Long) -> Unit) : NSObject(),
+    AVCaptureVideoDataOutputSampleBufferDelegateProtocol {
+    @OptIn(ExperimentalForeignApi::class)
+    override fun captureOutput(output: AVCaptureOutput, didOutputSampleBuffer: CMSampleBufferRef?,
+                               fromConnection: AVCaptureConnection) {
+        // Prepare CaptureSession data for VNImageRequestHandler
+        val cameraIntrinsicData = CMGetAttachment(didOutputSampleBuffer,
+            kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix, null)
+        val requestHandlerOptions: Map<Any?, *> = mapOf(VNImageOptionCameraIntrinsics to cameraIntrinsicData)
+        val orientation = when (UIDevice.currentDevice.orientation) {
+            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown -> kCGImagePropertyOrientationRightMirrored
+            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft -> kCGImagePropertyOrientationDownMirrored
+            UIDeviceOrientation.UIDeviceOrientationLandscapeRight -> kCGImagePropertyOrientationUpMirrored
+            else -> kCGImagePropertyOrientationLeftMirrored
+        }
+        val pixelBuffer = CMSampleBufferGetImageBuffer(didOutputSampleBuffer)
+
+        val imageRequestHandler = VNImageRequestHandler(pixelBuffer, orientation, requestHandlerOptions)
+        val ocrRequest = VNRecognizeTextRequest { vnRequest: VNRequest?, nsError: NSError? ->
+            val ocrResults: List<VNRecognizedTextObservation> =
+                vnRequest?.results?.filterIsInstance<VNRecognizedTextObservation>() ?: emptyList()
+            val ocrString = ocrResults
+                .flatMap { it.topCandidates(1u).filterIsInstance<VNRecognizedText>() }
+                .map { it.string }
+                .joinToString("\n")
+            dispatch_async(dispatch_get_main_queue()) {
+                ocrHandler(ocrString, 0)
+            }
+        }
+
+        memScoped {
+            var error = alloc<ObjCObjectVar<NSError?>>()
+            imageRequestHandler.performRequests(listOf(ocrRequest), error.ptr)
+        }
+    }
+}
+
+fun AVCaptureSession.configure(configure: () -> Unit) {
+    beginConfiguration()
+    try {
+        configure()
+    } finally {
+        commitConfiguration()
     }
 }
 
@@ -157,11 +232,9 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) = element(P
     setup(CameraPreview(this))
 }
 
-actual fun CameraPreview.onBarcode(action: (List<String>, Long) -> Unit) =
-    enableBarcodeScanning(action)
+actual fun CameraPreview.onBarcode(action: (List<String>, Long) -> Unit) = enableBarcodeScanning(action)
 
-actual fun CameraPreview.onOCR(action: (String, Long) -> Unit) {
-}
+actual fun CameraPreview.onOCR(action: (String, Long) -> Unit) = enableOCR(action)
 
 actual val CameraPreview.hasPermissions: Writable<Boolean>
     get() = cameraPermission

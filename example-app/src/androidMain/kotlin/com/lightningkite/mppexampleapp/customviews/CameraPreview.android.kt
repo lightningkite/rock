@@ -154,10 +154,10 @@ actual fun ViewWriter.cameraPreview(setup: CameraPreview.() -> Unit) {
     }
 }
 
-actual fun CameraPreview.barcodeHandler(action: (List<String>, Long) -> Unit) =
+actual fun CameraPreview.onBarcode(action: (List<String>, Long) -> Unit) =
     enableBarcodeScanning(action)
 
-actual fun CameraPreview.ocrHandler(action: (String, Long) -> Unit) =
+actual fun CameraPreview.onOCR(action: (String, Long) -> Unit) =
     enableOCR(action)
 
 actual val CameraPreview.hasPermissions: Writable<Boolean>

@@ -17,48 +17,83 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit
 ): ViewWrapper {
-    wrapNext<HTMLDivElement>("div") {
-        onclick = {
-            // TODO
+    beforeNextElementSetup {
+        val pos = this
+        var existingElement:  HTMLElement? = null
+        var hoverOriginal = false
+        var hoverPopup = false
+        fun maybeRemoveElement() {
+            if(!hoverOriginal && !hoverPopup) {
+                existingElement?.let { it.parentElement?.removeChild(it) }
+                existingElement = null
+            }
         }
-        style.position = "relative"
-        style.width = "fit-content"
-        style.height = "fit-content"
-        style.lineHeight = "0"
-        element<HTMLDivElement>("div") {
-            if (!requireClick) classList.add("visibleOnParentHover")
-            style.position = "absolute"
-            style.zIndex = "9999"
-            if (preferredDirection.horizontal) {
-                if (preferredDirection.after) {
-                    style.left = "100%"
-                } else {
-                    style.right = "0"
-                }
-                when (preferredDirection.align) {
-                    Align.Start -> style.bottom = "0"
-                    Align.End -> style.top = "0"
-                    else -> {
-                        style.top = "50%"
-                        style.transform = "translateY(-50%)"
+        fun makeElement() {
+            if(existingElement != null) return
+            with(targeting(document.body!!)) {
+                element<HTMLDivElement>("div") {
+                    existingElement = this
+                    style.position = "absolute"
+                    style.zIndex = "999"
+                    style.height = "max-content"
+                    fun reposition() {
+                        val r = pos.getBoundingClientRect()
+                        style.removeProperty("top")
+                        style.removeProperty("left")
+                        style.removeProperty("right")
+                        style.removeProperty("bottom")
+                        style.removeProperty("transform")
+                        if (preferredDirection.horizontal) {
+                            if (preferredDirection.after) {
+                                style.left = "${r.right}px"
+                            } else {
+                                style.right = "${r.left}px"
+                            }
+                            when (preferredDirection.align) {
+                                Align.Start -> style.bottom = "${r.bottom}px"
+                                Align.End -> style.top = "${r.top}px"
+                                else -> {
+                                    style.top = "${(r.top + r.bottom) / 2}px"
+                                    style.transform = "translateY(-50%)"
+                                }
+                            }
+                        } else {
+                            if (preferredDirection.after) {
+                                style.top = "${r.bottom}px"
+                            } else {
+                                style.bottom = "${r.top}px"
+                            }
+                            when (preferredDirection.align) {
+                                Align.Start -> style.right = "${r.right}px"
+                                Align.End -> style.left = "${r.left}px"
+                                else -> {
+                                    style.left = "${(r.left + r.right) / 2}px"
+                                    style.transform = "translateX(-50%)"
+                                }
+                            }
+                        }
                     }
-                }
-            } else {
-                if (preferredDirection.after) {
-                    style.top = "100%"
-                } else {
-                    style.bottom = "0"
-                }
-                when (preferredDirection.align) {
-                    Align.Start -> style.right = "0"
-                    Align.End -> style.left = "0"
-                    else -> {
-                        style.left = "50%"
-                        style.transform = "translateX(-50%)"
+                    reposition()
+                    this.onmouseenter = {
+                        hoverPopup = true
+                        makeElement()
                     }
+                    this.onmouseleave = {
+                        hoverPopup = false
+                        maybeRemoveElement()
+                    }
+                    window.addEventListener("scroll", { reposition() }, true)
+                    setup()
                 }
             }
-            setup()
+        }
+        this.onmouseenter = {
+            hoverOriginal = true
+            makeElement()
+        }
+        this.onmouseleave = {
+            hoverOriginal = false
+            maybeRemoveElement()
         }
     }
     return ViewWrapper

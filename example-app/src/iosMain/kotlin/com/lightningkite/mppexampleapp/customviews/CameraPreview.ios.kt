@@ -10,15 +10,10 @@ import kotlinx.cinterop.*
 import kotlinx.coroutines.sync.Mutex
 import platform.AVFoundation.*
 import platform.CoreGraphics.CGRectZero
-import platform.CoreMedia.CMGetAttachment
 import platform.CoreMedia.CMSampleBufferGetImageBuffer
 import platform.CoreMedia.CMSampleBufferRef
-import platform.CoreMedia.kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix
 import platform.Foundation.NSError
-import platform.ImageIO.kCGImagePropertyOrientationDownMirrored
-import platform.ImageIO.kCGImagePropertyOrientationLeftMirrored
-import platform.ImageIO.kCGImagePropertyOrientationRightMirrored
-import platform.ImageIO.kCGImagePropertyOrientationUpMirrored
+import platform.ImageIO.*
 import platform.UIKit.UIDevice
 import platform.UIKit.UIDeviceOrientation
 import platform.UIKit.UIView
@@ -187,18 +182,15 @@ class VNImageRequestCaptureBufferDelegate(private val ocrHandler: (String, Long)
     override fun captureOutput(output: AVCaptureOutput, didOutputSampleBuffer: CMSampleBufferRef?,
                                fromConnection: AVCaptureConnection) {
         // Prepare CaptureSession data for VNImageRequestHandler
-        val cameraIntrinsicData = CMGetAttachment(didOutputSampleBuffer,
-            kCMSampleBufferAttachmentKey_CameraIntrinsicMatrix, null)
-        val requestHandlerOptions: Map<Any?, *> = mapOf(VNImageOptionCameraIntrinsics to cameraIntrinsicData)
         val orientation = when (UIDevice.currentDevice.orientation) {
-            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown -> kCGImagePropertyOrientationRightMirrored
-            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft -> kCGImagePropertyOrientationDownMirrored
-            UIDeviceOrientation.UIDeviceOrientationLandscapeRight -> kCGImagePropertyOrientationUpMirrored
-            else -> kCGImagePropertyOrientationLeftMirrored
+            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown -> kCGImagePropertyOrientationLeft
+            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft -> kCGImagePropertyOrientationUp
+            UIDeviceOrientation.UIDeviceOrientationLandscapeRight -> kCGImagePropertyOrientationDown
+            else -> kCGImagePropertyOrientationRight
         }
         val pixelBuffer = CMSampleBufferGetImageBuffer(didOutputSampleBuffer)
 
-        val imageRequestHandler = VNImageRequestHandler(pixelBuffer, orientation, requestHandlerOptions)
+        val imageRequestHandler = VNImageRequestHandler(pixelBuffer, orientation, emptyMap<Any?, Any>())
         val ocrRequest = VNRecognizeTextRequest { vnRequest: VNRequest?, nsError: NSError? ->
             val ocrResults: List<VNRecognizedTextObservation> =
                 vnRequest?.results?.filterIsInstance<VNRecognizedTextObservation>() ?: emptyList()
@@ -209,6 +201,9 @@ class VNImageRequestCaptureBufferDelegate(private val ocrHandler: (String, Long)
             dispatch_async(dispatch_get_main_queue()) {
                 ocrHandler(ocrString, 0)
             }
+        }.apply {
+            recognitionLevel = VNRequestTextRecognitionLevelFast
+            usesLanguageCorrection = false
         }
 
         memScoped {

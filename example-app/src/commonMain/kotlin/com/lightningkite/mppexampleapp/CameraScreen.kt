@@ -16,7 +16,8 @@ import com.lightningkite.rock.views.direct.*
 @Routable("camera")
 object CameraScreen : RockScreen, UseFullScreen {
     override fun ViewWriter.render() {
-        val vin = Property("")
+        val vinByBarcode = Property("")
+        val vinByOCR = Property("")
         val cameraPermissions = Property(false)
 
         val showGuidance = Property(false)
@@ -38,13 +39,13 @@ object CameraScreen : RockScreen, UseFullScreen {
                     // First, remove leading "I" for 18 digit "import" VINs
                     barcodeResult.map { if (it.length == 18) it.substring(1) else it }
                         .firstOrNull(String::isValidVin)
-                        ?.let{ vin.value = it }
+                        ?.let{ vinByBarcode.value = it }
                 }
                 onOCR { ocrResult, _ ->
                     ocrResult.split('\n', ' ')
                         .filter { it.length == 17 }
                         .firstOrNull(String::isValidVin)
-                        ?.let { vin.value = it }
+                        ?.let { vinByOCR.value = it }
                 }
                 stack@capture = {
                     capture {
@@ -78,7 +79,10 @@ object CameraScreen : RockScreen, UseFullScreen {
                     } in card in gravity(Align.End, Align.Stretch)
                 }
                 text {
-                    ::content { "VIN: ${vin.await()}" }
+                    ::content { "VIN by barcode: ${vinByBarcode.await()}" }
+                } in card in marginless
+                text {
+                    ::content { "VIN by OCR: ${vinByOCR.await()}" }
                 } in card in marginless
             } in marginless in gravity(Align.Stretch, Align.End)
         } in marginless

@@ -19,7 +19,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NContainingView = ViewGroup
 
 @ViewDsl
-actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit) = viewElement(
+actual inline fun ViewWriter.stackActual(crossinline setup: ContainingView.() -> Unit) = viewElement(
     factory = ::FrameLayout,
     wrapper = ::ContainingView
 ) {
@@ -28,7 +28,7 @@ actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit) = viewElemen
 }
 
 @ViewDsl
-actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit) {
+actual inline fun ViewWriter.colActual(crossinline setup: ContainingView.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
         val l = native as SlightlyModifiedLinearLayout
         l.orientation = SimplifiedLinearLayout.VERTICAL
@@ -42,7 +42,7 @@ actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit) {
 }
 
 @ViewDsl
-actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit) {
+actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedLinearLayout, wrapper = ::ContainingView) {
         val l = native as SlightlyModifiedLinearLayout
         l.orientation = SimplifiedLinearLayout.HORIZONTAL

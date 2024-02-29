@@ -13,6 +13,7 @@ import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.ViewAction
 import kotlinx.datetime.*
+import org.jetbrains.annotations.ApiStatus.Internal
 import java.util.WeakHashMap
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -23,8 +24,8 @@ actual typealias NLocalTimeField = android.view.View
 actual typealias NLocalDateTimeField = android.view.View
 
 
-
-private class LocalDateFieldData(
+@Internal
+class LocalDateFieldData(
     val property: Property<LocalDate?> = Property(null),
     var min: LocalDate? = null,
     var max: LocalDate? = null
@@ -42,10 +43,12 @@ private class LocalDateFieldData(
         }
 }
 
-private val LocalDateFieldMoreData = WeakHashMap<LocalDateField, LocalDateFieldData>()
+@Internal
+val LocalDateFieldMoreData = WeakHashMap<LocalDateField, LocalDateFieldData>()
 
 
-private class LocalTimeFieldData(
+@Internal
+class LocalTimeFieldData(
     val property: Property<LocalTime?> = Property(null),
     var min: LocalTime? = null,
     var max: LocalTime? = null
@@ -63,10 +66,12 @@ private class LocalTimeFieldData(
         }
 }
 
-private val LocalTimeFieldMoreData = WeakHashMap<LocalTimeField, LocalTimeFieldData>()
+@Internal
+val LocalTimeFieldMoreData = WeakHashMap<LocalTimeField, LocalTimeFieldData>()
 
 
-private class LocalDateTimeFieldData(
+@Internal
+class LocalDateTimeFieldData(
     val property: Property<LocalDateTime?> = Property(null),
     var min: LocalDateTime? = null,
     var max: LocalDateTime? = null
@@ -84,7 +89,8 @@ private class LocalDateTimeFieldData(
         }
 }
 
-private val LocalDateTimeFieldMoreData = WeakHashMap<LocalDateTimeField, LocalDateTimeFieldData>()
+@Internal
+val LocalDateTimeFieldMoreData = WeakHashMap<LocalDateTimeField, LocalDateTimeFieldData>()
 
 actual var LocalDateField.range: ClosedRange<LocalDate>?
     get() = LocalDateFieldMoreData[this]?.range ?: throw IllegalStateException()
@@ -126,7 +132,7 @@ actual var LocalDateTimeField.action: Action?
     }
 
 @ViewDsl
-actual fun ViewWriter.localDateFieldActual(setup: LocalDateField.() -> Unit) = button {
+actual inline fun ViewWriter.localDateFieldActual(crossinline setup: LocalDateField.() -> Unit) = button {
     val me = LocalDateField(this.native)
     val d = LocalDateFieldData()
     LocalDateFieldMoreData[me] = d
@@ -142,7 +148,7 @@ actual fun ViewWriter.localDateFieldActual(setup: LocalDateField.() -> Unit) = b
 }
 
 @ViewDsl
-actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit) = button {
+actual inline fun ViewWriter.localTimeFieldActual(crossinline setup: LocalTimeField.() -> Unit) = button {
     val me = LocalTimeField(this.native)
     val d = LocalTimeFieldData()
     LocalTimeFieldMoreData[me] = d
@@ -158,7 +164,7 @@ actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit) = b
 }
 
 @ViewDsl
-actual fun ViewWriter.localDateTimeFieldActual(setup: LocalDateTimeField.() -> Unit) = button {
+actual inline fun ViewWriter.localDateTimeFieldActual(crossinline setup: LocalDateTimeField.() -> Unit) = button {
     val me = LocalDateTimeField(this.native)
     val d = LocalDateTimeFieldData()
     LocalDateTimeFieldMoreData[me] = d

@@ -30,7 +30,7 @@ actual var TextArea.hint: String
     }
 
 @ViewDsl
-actual fun ViewWriter.textAreaActual(setup: TextArea.() -> Unit) {
+actual inline fun ViewWriter.textAreaActual(crossinline setup: TextArea.() -> Unit) {
     return viewElement(factory = ::EditText, wrapper = ::TextArea, setup = {
         handleTheme<TextView>(native, foreground = applyTextColorFromTheme, viewLoads = true)
         setup(this)

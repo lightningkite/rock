@@ -13,13 +13,13 @@ import platform.UIKit.UIView
 actual typealias NContainingView = UIView
 
 @ViewDsl
-actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit): Unit = element(FrameLayout()) {
+actual inline fun ViewWriter.stackActual(crossinline setup: ContainingView.() -> Unit): Unit = element(FrameLayout()) {
     handleTheme(this, viewDraws = false)
     setup(ContainingView(this))
 }
 
 @ViewDsl
-actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
+actual inline fun ViewWriter.colActual(crossinline setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = false
     handleTheme(this, viewDraws = false) {
         gap = (spacingOverride.value ?: it.spacing).value
@@ -28,7 +28,7 @@ actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit): Unit = elemen
 }
 
 @ViewDsl
-actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
+actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = true
     handleTheme(this, viewDraws = false) {
         gap = (spacingOverride.value ?: it.spacing).value

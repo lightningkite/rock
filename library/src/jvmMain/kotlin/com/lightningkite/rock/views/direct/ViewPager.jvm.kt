@@ -11,7 +11,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NViewPager = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.viewPagerActual(setup: ViewPager.() -> Unit) {
+actual inline fun ViewWriter.viewPagerActual(crossinline setup: ViewPager.() -> Unit) {
 }
 
 actual val ViewPager.index: Writable<Int>

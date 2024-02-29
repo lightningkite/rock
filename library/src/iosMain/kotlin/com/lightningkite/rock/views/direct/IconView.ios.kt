@@ -62,7 +62,7 @@ actual class NIconView(): NView(CGRectMake(0.0,0.0,0.0,0.0)) {
 }
 
 @ViewDsl
-actual fun ViewWriter.iconActual(setup: IconView.() -> Unit): Unit = element(NIconView()) {
+actual inline fun ViewWriter.iconActual(crossinline setup: IconView.() -> Unit): Unit = element(NIconView()) {
     handleTheme(this, viewDraws = true, viewLoads = true) { theme ->
         this.iconPaint = theme.icon
     }

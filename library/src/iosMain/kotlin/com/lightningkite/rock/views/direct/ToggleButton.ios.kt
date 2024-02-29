@@ -9,7 +9,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NToggleButton = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.toggleButtonActual(setup: ToggleButton.() -> Unit): Unit = element(FrameLayoutToggleButton()) {
+actual inline fun ViewWriter.toggleButtonActual(crossinline setup: ToggleButton.() -> Unit): Unit = element(FrameLayoutToggleButton()) {
     handleThemeControl(this, { checkedWritable.await() }) {
         setup(ToggleButton(this))
     }

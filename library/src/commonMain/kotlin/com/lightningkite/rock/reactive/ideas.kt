@@ -27,16 +27,24 @@ interface Writable<T> : Readable<T> {
     suspend infix fun set(value: T)
 }
 
+interface ImmediateReadable<out T> : Readable<T> {
+    val value: T
+}
+
+interface ImmediateWritable<T> : Writable<T>, ImmediateReadable<T> {
+    override var value: T
+}
+
 suspend infix fun <T> Writable<T>.modify(action: suspend (T) -> T) {
     set(action(await()))
 }
 
-class LateInitProperty<T>() : Writable<T>, ReadWriteProperty<Any?, T> {
+class LateInitProperty<T>() : ImmediateWritable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = ArrayList<() -> Unit>()
     private var queued = ArrayList<Continuation<T>>()
     private var _value: T? = null
-    var value: T
-        get() = if (ready) _value as T else throw IllegalStateException()
+    override var value: T
+        get() = if (ready) _value as T else throw CancelledException()
         set(value) {
             _value = value
             ready = true
@@ -68,6 +76,10 @@ class LateInitProperty<T>() : Writable<T>, ReadWriteProperty<Any?, T> {
         }
     }
 
+    override fun start(): () -> Unit {
+        return super.start()
+    }
+
     override fun addListener(listener: () -> Unit): () -> Unit {
         listeners.add(listener)
         return {
@@ -84,9 +96,9 @@ class LateInitProperty<T>() : Writable<T>, ReadWriteProperty<Any?, T> {
     }
 }
 
-class Property<T>(startValue: T) : Writable<T>, ReadWriteProperty<Any?, T> {
+class Property<T>(startValue: T) : ImmediateWritable<T>, ReadWriteProperty<Any?, T> {
     private val listeners = ArrayList<() -> Unit>()
-    var value: T = startValue
+    override var value: T = startValue
         set(value) {
             field = value
             listeners.toList().forEach { it() }
@@ -131,7 +143,7 @@ class BasicListenable : Listenable {
     }
 }
 
-class Constant<T>(val value: T) : Readable<T> {
+class Constant<T>(override val value: T) : ImmediateReadable<T> {
     companion object {
         private val NOOP = {}
     }
@@ -140,62 +152,37 @@ class Constant<T>(val value: T) : Readable<T> {
     override suspend fun awaitRaw(): T = value
 }
 
-private class ReactiveScopeData(var rerun: () -> Unit) : CoroutineContext.Element {
-    val removers: HashMap<ResourceUse, () -> Unit> = HashMap()
-    val latestPass: ArrayList<ResourceUse> = ArrayList()
+class ReactiveScopeData(val calculationContext: CalculationContext, var action: suspend ()->Unit, var onLoad: (() -> Unit)? = null) : CoroutineContext.Element {
+    internal val removers: HashMap<ResourceUse, () -> Unit> = HashMap()
+    internal val latestPass: ArrayList<ResourceUse> = ArrayList()
     override val key: CoroutineContext.Key<ReactiveScopeData> = Key
+    internal var previousContext: CoroutineContext? = null
 
-    fun shutdown() {
-        removers.forEach { it.value() }
-        removers.clear()
-        latestPass.clear()
-        rerun = {}
-    }
-
-    object Key : CoroutineContext.Key<ReactiveScopeData>
-}
-
-fun CalculationContext.use(resourceUse: ResourceUse) {
-    val x = resourceUse.start()
-    onRemove { x() }
-}
-
-class Ref<T>(var value: T)
-
-fun CalculationContext.reactiveScope(action: suspend () -> Unit) = reactiveScope(null, action)
-fun CalculationContext.reactiveScope(onLoad: (() -> Unit)?, action: suspend () -> Unit) {
-    var run: () -> Unit = {}
-    val data = ReactiveScopeData {
-        run()
-    }
-    val name = Random.nextInt(1000000)
-    var previousContext: CoroutineContext? = null
-    var actionRef: Ref<suspend () -> Unit> = Ref(action)
-    run = run@{
-        val context: CoroutineContext = EmptyCoroutineContext.childCancellation() + data
+    internal fun run() {
+        val context: CoroutineContext = EmptyCoroutineContext.childCancellation() + this
         previousContext?.cancel()
         previousContext = context
-        data.latestPass.clear()
+        latestPass.clear()
 
         var done = false
         var loadStarted = false
 
-        suspend { actionRef.value() }.startCoroutine(object : Continuation<Unit> {
+        action.startCoroutine(object : Continuation<Unit> {
             override val context: CoroutineContext = context
 
             // called when a coroutine ends. do nothing.
             override fun resumeWith(result: Result<Unit>) {
                 done = true
                 if (loadStarted) {
-                    notifyLongComplete(result)
+                    calculationContext.notifyLongComplete(result)
                 } else {
-                    notifyComplete(result)
+                    calculationContext.notifyComplete(result)
                 }
                 if (previousContext !== context) return
-                for (entry in data.removers.entries.toList()) {
-                    if (entry.key !in data.latestPass) {
+                for (entry in removers.entries.toList()) {
+                    if (entry.key !in latestPass) {
                         entry.value()
-                        data.removers.remove(entry.key)
+                        removers.remove(entry.key)
                     }
                 }
             }
@@ -204,32 +191,148 @@ fun CalculationContext.reactiveScope(onLoad: (() -> Unit)?, action: suspend () -
         if (!done) {
             // start load
             loadStarted = true
-            notifyStart()
+            calculationContext.notifyStart()
             onLoad?.invoke()
         }
     }
-    run()
-    this.onRemove {
-        data.shutdown()
-        run = {}
-        actionRef.value = {}
-        previousContext?.cancel()
-    }
-}
 
-suspend fun rerunOn(listenable: Listenable) {
-    coroutineContext[ReactiveScopeData.Key]?.let { data ->
-        if (!data.removers.containsKey(listenable)) {
-            data.removers[listenable] = listenable.addListener { data.rerun() }
+    internal fun shutdown() {
+        action = {}
+        onLoad = {}
+        removers.forEach { it.value() }
+        removers.clear()
+        latestPass.clear()
+    }
+
+    init {
+        run()
+        calculationContext.onRemove {
+            shutdown()
         }
-        data.latestPass.add(listenable)
+    }
+
+    fun rerunOn(listenable: Listenable) {
+        if (!removers.containsKey(listenable)) {
+            removers[listenable] = listenable.addListener { run() }
+        }
+        latestPass.add(listenable)
+    }
+
+    object Key : CoroutineContext.Key<ReactiveScopeData>{
+        init { println("ReactiveScopeData V4") }
     }
 }
 
-suspend fun <T> Readable<T>.await(): T {
+fun CalculationContext.use(resourceUse: ResourceUse) {
+    val x = resourceUse.start()
+    onRemove { x() }
+}
+
+inline fun CalculationContext.reactiveScope(noinline action: suspend () -> Unit) = reactiveScope(null, action)
+inline fun CalculationContext.reactiveScope(noinline onLoad: (() -> Unit)?, noinline action: suspend () -> Unit) {
+    ReactiveScopeData(this, action, onLoad)
+}
+
+suspend inline fun rerunOn(listenable: Listenable) {
+    coroutineContext[ReactiveScopeData.Key]?.rerunOn(listenable)
+}
+
+suspend inline fun <T> ImmediateReadable<T>.await(): T {
+    rerunOn(this)
+    return value
+}
+
+suspend inline fun <T> Readable<T>.await(): T {
     rerunOn(this)
     return awaitRaw()
 }
+
+//class Ref<T>(var value: T)
+//private class ReactiveScopeData(var rerun: () -> Unit) : CoroutineContext.Element {
+//    val removers: HashMap<ResourceUse, () -> Unit> = HashMap()
+//    val latestPass: ArrayList<ResourceUse> = ArrayList()
+//    override val key: CoroutineContext.Key<ReactiveScopeData> = Key
+//
+//    fun shutdown() {
+//        removers.forEach { it.value() }
+//        removers.clear()
+//        latestPass.clear()
+//        rerun = {}
+//    }
+//
+//    object Key : CoroutineContext.Key<ReactiveScopeData> {
+//        init { println("ReactiveScopeData V1") }
+//    }
+//}
+//fun CalculationContext.reactiveScope(action: suspend () -> Unit) = reactiveScope(null, action)
+//fun CalculationContext.reactiveScope(onLoad: (() -> Unit)?, action: suspend () -> Unit) {
+//    var run: () -> Unit = {}
+//    val data = ReactiveScopeData {
+//        run()
+//    }
+//    val name = Random.nextInt(1000000)
+//    var previousContext: CoroutineContext? = null
+//    var actionRef: Ref<suspend () -> Unit> = Ref(action)
+//    run = run@{
+//        val context: CoroutineContext = EmptyCoroutineContext.childCancellation() + data
+//        previousContext?.cancel()
+//        previousContext = context
+//        data.latestPass.clear()
+//
+//        var done = false
+//        var loadStarted = false
+//
+//        suspend { actionRef.value() }.startCoroutine(object : Continuation<Unit> {
+//            override val context: CoroutineContext = context
+//
+//            // called when a coroutine ends. do nothing.
+//            override fun resumeWith(result: Result<Unit>) {
+//                done = true
+//                if (loadStarted) {
+//                    notifyLongComplete(result)
+//                } else {
+//                    notifyComplete(result)
+//                }
+//                if (previousContext !== context) return
+//                for (entry in data.removers.entries.toList()) {
+//                    if (entry.key !in data.latestPass) {
+//                        entry.value()
+//                        data.removers.remove(entry.key)
+//                    }
+//                }
+//            }
+//        })
+//
+//        if (!done) {
+//            // start load
+//            loadStarted = true
+//            notifyStart()
+//            onLoad?.invoke()
+//        }
+//    }
+//    run()
+//    this.onRemove {
+//        data.shutdown()
+//        run = {}
+//        actionRef.value = {}
+//        previousContext?.cancel()
+//    }
+//}
+//
+//suspend fun rerunOn(listenable: Listenable) {
+//    coroutineContext[ReactiveScopeData.Key]?.let { data ->
+//        if (!data.removers.containsKey(listenable)) {
+//            data.removers[listenable] = listenable.addListener { data.rerun() }
+//        }
+//        data.latestPass.add(listenable)
+//    }
+//}
+//
+//suspend fun <T> Readable<T>.await(): T {
+//    rerunOn(this)
+//    return awaitRaw()
+//}
+
 
 /**
  * Desired behavior for shared:

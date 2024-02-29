@@ -14,7 +14,7 @@ import org.w3c.dom.HTMLSelectElement
 actual typealias NSelect = HTMLSelectElement
 
 @ViewDsl
-actual fun ViewWriter.selectActual(setup: Select.() -> Unit): Unit =
+actual inline fun ViewWriter.selectActual(crossinline setup: Select.() -> Unit): Unit =
     themedElementEditable<NSelect>("select") { setup(Select(this)) }
 //    themedElementClickable<NSelect>("select") { setup(Select(this)) }
 

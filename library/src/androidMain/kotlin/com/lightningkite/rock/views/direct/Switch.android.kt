@@ -25,7 +25,7 @@ actual val Switch.checked: Writable<Boolean>
     }
 
 @ViewDsl
-actual fun ViewWriter.switchActual(setup: Switch.() -> Unit) {
+actual inline fun ViewWriter.switchActual(crossinline setup: Switch.() -> Unit) {
     return viewElement(factory = ::SwitchCompat, wrapper = ::Switch) {
         val theme = currentTheme
         reactiveScope {

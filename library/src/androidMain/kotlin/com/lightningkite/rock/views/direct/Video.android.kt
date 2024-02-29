@@ -15,7 +15,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NVideo = PlayerView
 
 @ViewDsl
-actual fun ViewWriter.videoActual(setup: Video.() -> Unit): Unit = viewElement(factory = ::PlayerView, wrapper = ::Video) {
+actual inline fun ViewWriter.videoActual(crossinline setup: Video.() -> Unit): Unit = viewElement(factory = ::PlayerView, wrapper = ::Video) {
     handleTheme(native, viewDraws = true, viewLoads = true)
     native.player = ExoPlayer.Builder(context).build()
     setup(this)

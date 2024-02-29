@@ -11,7 +11,7 @@ import org.w3c.dom.HTMLButtonElement
 actual typealias NButton = HTMLButtonElement
 
 @ViewDsl
-actual fun ViewWriter.buttonActual(setup: Button.() -> Unit): Unit =
+actual inline fun ViewWriter.buttonActual(crossinline setup: Button.() -> Unit): Unit =
     themedElementClickable<NButton>("button") {
         classList.add("rock-stack")
         setup(Button(this))

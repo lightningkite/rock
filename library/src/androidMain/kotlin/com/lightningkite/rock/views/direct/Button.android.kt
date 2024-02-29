@@ -12,7 +12,7 @@ import com.lightningkite.rock.views.*
 actual typealias NButton = SlightlyModifiedFrameLayout
 
 @ViewDsl
-actual fun ViewWriter.buttonActual(setup: Button.() -> Unit) {
+actual inline fun ViewWriter.buttonActual(crossinline setup: Button.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedFrameLayout, wrapper = ::ContainingView) {
         val frame = native as SlightlyModifiedFrameLayout
         native.minimumWidth = 2.rem.value.toInt()

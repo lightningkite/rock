@@ -88,38 +88,50 @@ data class Theme(
 ) {
     val icon: Paint get() = iconOverride ?: foreground
 
+    private var dialogCache: Theme? = null
     @JsName("dialogDirect")
-    inline fun dialog() = dialog(this)
+    fun dialog() = dialogCache ?: dialog(this).also { dialogCache = it }
+    private var hoverCache: Theme? = null
     @JsName("hoverDirect")
-    inline fun hover() = hover(this)
+    fun hover() = hoverCache ?: hover(this).also { hoverCache = it }
+    private var focusCache: Theme? = null
     @JsName("focusDirect")
-    inline fun focus() = focus(this)
+    fun focus() = focusCache ?: focus(this).also { focusCache = it }
+    private var downCache: Theme? = null
     @JsName("downDirect")
-    inline fun down() = down(this)
+    fun down() = downCache ?: down(this).also { downCache = it }
+    private var selectedCache: Theme? = null
     @JsName("selectedDirect")
-    inline fun selected() = selected(this)
+    fun selected() = selectedCache ?: selected(this).also { selectedCache = it }
+    private var unselectedCache: Theme? = null
     @JsName("unselectedDirect")
-    inline fun unselected() = unselected(this)
+    fun unselected() = unselectedCache ?: unselected(this).also { unselectedCache = it }
+    private var disabledCache: Theme? = null
     @JsName("disabledDirect")
-    inline fun disabled() = disabled(this)
+    fun disabled() = disabledCache ?: disabled(this).also { disabledCache = it }
     @JsName("barDirect")
     inline fun bar() = bar(this)
+    private var importantCache: Theme? = null
     @JsName("importantDirect")
-    inline fun important() = important(this)
+    fun important() = importantCache ?: important(this).also { importantCache = it }
+    private var criticalCache: Theme? = null
     @JsName("criticalDirect")
-    inline fun critical() = critical(this)
+    fun critical() = criticalCache ?: critical(this).also { criticalCache = it }
+    private var navCache: Theme? = null
     @JsName("navDirect")
-    inline fun nav() = nav(this)
+    fun nav() = navCache ?: nav(this).also { navCache = it }
+    private var warningCache: Theme? = null
     @JsName("warningDirect")
-    inline fun warning() = warning(this)
+    fun warning() = warningCache ?: warning(this).also { warningCache = it }
+    private var dangerCache: Theme? = null
     @JsName("dangerDirect")
-    inline fun danger() = danger(this)
+    fun danger() = dangerCache ?: danger(this).also { dangerCache = it }
+    private var affirmativeCache: Theme? = null
     @JsName("affirmativeDirect")
-    inline fun affirmative() = affirmative(this)
+    fun affirmative() = affirmativeCache ?: affirmative(this).also { affirmativeCache = it }
 
     val id: String get() = hashCode().toString()
-
-    override fun hashCode(): Int {
+    private val hashCode: Int = run {
         var out = 0
         out = out * 31 + title.hashCode()
         out = out * 31 + body.hashCode()
@@ -131,8 +143,10 @@ data class Theme(
         out = out * 31 + outline.hashCode()
         out = out * 31 + outlineWidth.hashCode()
         out = out * 31 + background.hashCode()
-        return out
+        out
     }
+
+    override fun hashCode(): Int = hashCode
 
     override fun equals(other: Any?): Boolean {
         return other is Theme && this.title == other.title &&

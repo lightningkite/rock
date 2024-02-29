@@ -25,7 +25,7 @@ actual typealias NRecyclerView = UICollectionView
 
 @OptIn(ExperimentalForeignApi::class)
 @ViewDsl
-actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit): Unit = element(
+actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.() -> Unit): Unit = element(
     UICollectionView(
         CGRectMake(
             0.0,
@@ -61,7 +61,7 @@ actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit): Unit =
 
 @OptIn(ExperimentalForeignApi::class)
 @ViewDsl
-actual fun ViewWriter.horizontalRecyclerViewActual(setup: RecyclerView.() -> Unit): Unit = element(
+actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: RecyclerView.() -> Unit): Unit = element(
     UICollectionView(
         CGRectMake(
             0.0,

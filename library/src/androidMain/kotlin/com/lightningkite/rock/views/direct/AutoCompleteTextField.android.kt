@@ -46,6 +46,6 @@ actual var AutoCompleteTextField.suggestions: List<String>
     }
 
 @ViewDsl
-actual fun ViewWriter.autoCompleteTextFieldActual(setup: AutoCompleteTextField.() -> Unit) {
+actual inline fun ViewWriter.autoCompleteTextFieldActual(crossinline setup: AutoCompleteTextField.() -> Unit) {
     return viewElement(factory = ::AndroidAutocompleteTextView, wrapper = ::AutoCompleteTextField, setup = setup)
 }

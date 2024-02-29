@@ -14,7 +14,7 @@ import platform.darwin.NSObject
 actual typealias NSelect = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.selectActual(setup: Select.() -> Unit): Unit = element(FrameLayout()) {
+actual inline fun ViewWriter.selectActual(crossinline setup: Select.() -> Unit): Unit = element(FrameLayout()) {
     handleTheme(this, viewDraws = false)
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }

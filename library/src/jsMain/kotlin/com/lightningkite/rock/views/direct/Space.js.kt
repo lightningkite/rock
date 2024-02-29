@@ -11,7 +11,7 @@ import org.w3c.dom.HTMLElement
 actual typealias NSpace = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.spaceActual(setup: Space.() -> Unit): Unit = element<NSpace>("span") {
+actual inline fun ViewWriter.spaceActual(crossinline setup: Space.() -> Unit): Unit = element<NSpace>("span") {
     val getter = currentTheme
     val s = Space(this)
     s.reactiveScope {

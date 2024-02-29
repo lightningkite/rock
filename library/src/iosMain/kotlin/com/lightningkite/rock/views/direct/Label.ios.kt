@@ -9,7 +9,7 @@ import platform.UIKit.UIView
 actual typealias NLabel = UIView
 
 @ViewDsl
-actual fun ViewWriter.labelActual(setup: Label.() -> Unit): Unit = col {
+actual inline fun ViewWriter.labelActual(crossinline setup: Label.() -> Unit): Unit = col {
     subtext {  }
     setup(Label(native))
 }

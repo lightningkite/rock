@@ -13,7 +13,7 @@ import platform.darwin.NSObject
 actual typealias NAutoCompleteTextField = UITextField
 
 @ViewDsl
-actual fun ViewWriter.autoCompleteTextFieldActual(setup: AutoCompleteTextField.() -> Unit): Unit = stack {
+actual inline fun ViewWriter.autoCompleteTextFieldActual(crossinline setup: AutoCompleteTextField.() -> Unit): Unit = stack {
     element(UITextField()) {
         smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo

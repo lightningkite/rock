@@ -15,7 +15,7 @@ import kotlin.random.Random
 actual typealias NAutoCompleteTextField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.autoCompleteTextFieldActual(setup: AutoCompleteTextField.() -> Unit): Unit =
+actual inline fun ViewWriter.autoCompleteTextFieldActual(crossinline setup: AutoCompleteTextField.() -> Unit): Unit =
     themedElementEditable<NAutoCompleteTextField>("input") { setup(AutoCompleteTextField(this)) }
 
 actual val AutoCompleteTextField.content: Writable<String>

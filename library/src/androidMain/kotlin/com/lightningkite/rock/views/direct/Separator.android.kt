@@ -11,7 +11,7 @@ import com.lightningkite.rock.views.lparams
 
 
 @ViewDsl
-actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit {
+actual inline fun ViewWriter.separatorActual(crossinline setup: Separator.() -> Unit): Unit {
     val c = currentView
     if(c !is SimplifiedLinearLayout) throw IllegalStateException("Separators can only be used inside rows or columns")
     viewElement(factory = { NSeparator(it, c.orientation == SimplifiedLinearLayout.HORIZONTAL) }, wrapper = ::Separator) {

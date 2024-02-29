@@ -16,7 +16,7 @@ import platform.UIKit.UIDatePickerStyle
 actual typealias NLocalDateField = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.localDateFieldActual(setup: LocalDateField.() -> Unit): Unit = stack {
+actual inline fun ViewWriter.localDateFieldActual(crossinline setup: LocalDateField.() -> Unit): Unit = stack {
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         val p = Property<LocalDate?>(null)
@@ -56,7 +56,7 @@ actual inline var LocalDateField.range: ClosedRange<LocalDate>?
 actual typealias NLocalTimeField = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit): Unit = stack {
+actual inline fun ViewWriter.localTimeFieldActual(crossinline setup: LocalTimeField.() -> Unit): Unit = stack {
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         val p = Property<LocalTime?>(null)
@@ -96,7 +96,7 @@ actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
 actual typealias NLocalDateTimeField = TextFieldInput
 
 @ViewDsl
-actual fun ViewWriter.localDateTimeFieldActual(setup: LocalDateTimeField.() -> Unit): Unit = stack {
+actual inline fun ViewWriter.localDateTimeFieldActual(crossinline setup: LocalDateTimeField.() -> Unit): Unit = stack {
     element(TextFieldInput()) {
         handleTheme(this) { textColor = it.foreground.closestColor().toUiColor() }
         val p = Property<LocalDateTime?>(null)

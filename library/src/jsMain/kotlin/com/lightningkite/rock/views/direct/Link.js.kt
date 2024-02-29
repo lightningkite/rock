@@ -13,7 +13,7 @@ import org.w3c.dom.HTMLAnchorElement
 actual typealias NLink = HTMLAnchorElement
 
 @ViewDsl
-actual fun ViewWriter.linkActual(setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
+actual inline fun ViewWriter.linkActual(crossinline setup: Link.() -> Unit): Unit = themedElementClickable<NLink>("a") {
     this.asDynamic().__ROCK__navigator = navigator
     style.display = "block"
     classList.add("rock-stack")

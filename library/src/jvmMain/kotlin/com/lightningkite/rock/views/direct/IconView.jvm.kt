@@ -10,7 +10,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NIconView = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.iconActual(setup: IconView.() -> Unit) {
+actual inline fun ViewWriter.iconActual(crossinline setup: IconView.() -> Unit) {
 }
 
 actual inline var IconView.source: Icon?

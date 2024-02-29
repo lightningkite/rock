@@ -11,7 +11,7 @@ import platform.UIKit.UISwitch
 actual typealias NSwitch = UISwitch
 
 @ViewDsl
-actual fun ViewWriter.switchActual(setup: Switch.() -> Unit): Unit = element(UISwitch()) {
+actual inline fun ViewWriter.switchActual(crossinline setup: Switch.() -> Unit): Unit = element(UISwitch()) {
     handleTheme(this) {
 
     }

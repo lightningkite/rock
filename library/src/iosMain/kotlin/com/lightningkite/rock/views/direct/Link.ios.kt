@@ -9,7 +9,7 @@ import com.lightningkite.rock.views.navigator
 actual typealias NLink = NativeLink
 
 @ViewDsl
-actual fun ViewWriter.linkActual(setup: Link.() -> Unit): Unit = element(NativeLink()) {
+actual inline fun ViewWriter.linkActual(crossinline setup: Link.() -> Unit): Unit = element(NativeLink()) {
     handleThemeControl(this) {
         setup(Link(this))
         onNavigator = navigator

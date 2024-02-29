@@ -61,7 +61,7 @@ fun View.setMarginAll(margin: Int) {
     (lparams as? MarginLayoutParams)?.setMargins(margin)
 }
 
-internal fun RockPaint.colorInt(): Int = closestColor().toInt()
+fun RockPaint.colorInt(): Int = closestColor().toInt()
 
 val applyTextColorFromThemeHeader: (Theme, AndroidTextView) -> Unit = { theme, textView ->
     textView.setTextColor(theme.foreground.colorInt())

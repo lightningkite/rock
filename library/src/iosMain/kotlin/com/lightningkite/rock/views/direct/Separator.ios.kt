@@ -9,7 +9,7 @@ import platform.UIKit.UIView
 actual typealias NSeparator = UIView
 
 @ViewDsl
-actual fun ViewWriter.separatorActual(setup: Separator.() -> Unit): Unit = element(UIView()) {
+actual inline fun ViewWriter.separatorActual(crossinline setup: Separator.() -> Unit): Unit = element(UIView()) {
     handleTheme(this) {
         backgroundColor = it.foreground.closestColor().toUiColor()
         alpha = 0.25

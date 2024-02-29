@@ -9,7 +9,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NRadioToggleButton = FrameLayoutToggleButton
 
 @ViewDsl
-actual fun ViewWriter.radioToggleButtonActual(setup: RadioToggleButton.() -> Unit): Unit =
+actual inline fun ViewWriter.radioToggleButtonActual(crossinline setup: RadioToggleButton.() -> Unit): Unit =
     element(FrameLayoutToggleButton()) {
         handleThemeControl(this, { checkedWritable.await() }) {
             allowUnselect = false

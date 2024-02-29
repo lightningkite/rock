@@ -13,7 +13,7 @@ import kotlin.js.Date
 actual typealias NLocalDateField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.localDateFieldActual(setup: LocalDateField.() -> Unit): Unit =
+actual inline fun ViewWriter.localDateFieldActual(crossinline setup: LocalDateField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         type = "date"
         setup(LocalDateField(this))
@@ -58,7 +58,7 @@ actual inline var LocalDateField.range: ClosedRange<LocalDate>?
 actual typealias NLocalTimeField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.localTimeFieldActual(setup: LocalTimeField.() -> Unit): Unit =
+actual inline fun ViewWriter.localTimeFieldActual(crossinline setup: LocalTimeField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         type = "time"
         setup(LocalTimeField(this))
@@ -103,7 +103,7 @@ actual inline var LocalTimeField.range: ClosedRange<LocalTime>?
 actual typealias NLocalDateTimeField = HTMLInputElement
 
 @ViewDsl
-actual fun ViewWriter.localDateTimeFieldActual(setup: LocalDateTimeField.() -> Unit): Unit =
+actual inline fun ViewWriter.localDateTimeFieldActual(crossinline setup: LocalDateTimeField.() -> Unit): Unit =
     themedElementEditable<HTMLInputElement>("input") {
         type = "datetime-local"
         setup(LocalDateTimeField(this))

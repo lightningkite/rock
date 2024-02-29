@@ -9,7 +9,7 @@ import com.lightningkite.rock.views.ViewWriter
 actual typealias NActivityIndicator = ProgressBar
 
 @ViewDsl
-actual fun ViewWriter.activityIndicatorActual(setup: ActivityIndicator.() -> Unit) {
+actual inline fun ViewWriter.activityIndicatorActual(crossinline setup: ActivityIndicator.() -> Unit) {
     return viewElement(factory = { ProgressBar(it, null, android.R.attr.progressBarStyleSmall) }, wrapper = ::ActivityIndicator) {
         handleTheme(native, foreground = {
             theme: Theme, progressBar: ProgressBar ->

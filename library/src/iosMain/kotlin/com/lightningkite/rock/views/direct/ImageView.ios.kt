@@ -19,7 +19,7 @@ import platform.objc.sel_registerName
 actual typealias NImageView = UIImageView
 
 @ViewDsl
-actual fun ViewWriter.imageActual(setup: ImageView.() -> Unit): Unit = element(NImageView()) {
+actual inline fun ViewWriter.imageActual(crossinline setup: ImageView.() -> Unit): Unit = element(NImageView()) {
     handleTheme(this, viewDraws = true, viewLoads = true)
     this.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
     setup(ImageView(this))
@@ -94,14 +94,14 @@ actual inline var ImageView.description: String?
     }
 
 @ViewDsl
-actual fun ViewWriter.zoomableImageActual(setup: ImageView.() -> Unit)  = element(PanZoomImageView()) {
+actual inline fun ViewWriter.zoomableImageActual(crossinline setup: ImageView.() -> Unit)  = element(PanZoomImageView()) {
     handleTheme(this, viewDraws = true)
     setup(ImageView(imageView))
     imageView.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private class MyImageView: UIImageView(CGRectZero.readValue()) {
+class MyImageView: UIImageView(CGRectZero.readValue()) {
 
     var onImageChange: ((UIImage?)->Unit)? = null
 
@@ -112,7 +112,7 @@ private class MyImageView: UIImageView(CGRectZero.readValue()) {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private class PanZoomImageView: UIScrollView(CGRectZero.readValue()), UIScrollViewDelegateProtocol {
+class PanZoomImageView: UIScrollView(CGRectZero.readValue()), UIScrollViewDelegateProtocol {
 
     val imageView = MyImageView()
 

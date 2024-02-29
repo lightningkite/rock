@@ -25,7 +25,7 @@ actual val RadioButton.checked: Writable<Boolean>
     }
 
 @ViewDsl
-actual fun ViewWriter.radioButtonActual(setup: RadioButton.() -> Unit) {
+actual inline fun ViewWriter.radioButtonActual(crossinline setup: RadioButton.() -> Unit) {
     return viewElement(factory = ::NRadioButton, wrapper = ::RadioButton) {
         val theme = currentTheme
         reactiveScope {

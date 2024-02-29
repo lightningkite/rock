@@ -7,10 +7,10 @@ import java.lang.ref.WeakReference
 import java.util.WeakHashMap
 
 
-fun <T: NView, W: RView<T>> ViewWriter.viewElement(
+inline fun <T: NView, W: RView<T>> ViewWriter.viewElement(
     factory: (Context) -> T,
     wrapper: (T) -> W,
-    setup: W.() -> Unit,
+    crossinline setup: W.() -> Unit,
 ) {
     val native = factory(context)
     val wrapped = wrapper(native)

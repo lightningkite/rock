@@ -33,7 +33,7 @@ inline fun <T : HTMLElement> ViewWriter.themedElement(name: String, viewDraws: B
 inline fun <T : HTMLElement> ViewWriter.themedElementBackIfChanged(name: String, crossinline setup: T.() -> Unit) = themedElement<T>(name, viewDraws = false, setup = setup)
 
 @ViewDsl
-internal fun ViewWriter.textElement(elementBase: String, setup: TextView.() -> Unit): Unit =
+inline fun ViewWriter.textElement(elementBase: String, crossinline setup: TextView.() -> Unit): Unit =
     element<HTMLDivElement>(elementBase) {
         handleTheme(this, true)
         setup(TextView(this))
@@ -41,7 +41,7 @@ internal fun ViewWriter.textElement(elementBase: String, setup: TextView.() -> U
     }
 
 @ViewDsl
-internal fun ViewWriter.headerElement(elementBase: String, setup: TextView.() -> Unit): Unit =
+inline fun ViewWriter.headerElement(elementBase: String, crossinline setup: TextView.() -> Unit): Unit =
     element<HTMLDivElement>(elementBase) {
         classList.add("title")
         handleTheme(this, true)

@@ -13,7 +13,7 @@ import platform.darwin.NSObject
 actual typealias NTextField = UITextField
 
 @ViewDsl
-actual fun ViewWriter.textFieldActual(setup: TextField.() -> Unit): Unit = stack {
+actual inline fun ViewWriter.textFieldActual(crossinline setup: TextField.() -> Unit): Unit = stack {
     element(UITextField()) {
         smartDashesType = UITextSmartDashesType.UITextSmartDashesTypeNo
         smartQuotesType = UITextSmartQuotesType.UITextSmartQuotesTypeNo

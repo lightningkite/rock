@@ -13,7 +13,7 @@ import org.w3c.dom.events.KeyboardEvent
 actual typealias NToggleButton = HTMLSpanElement
 
 @ViewDsl
-actual fun ViewWriter.toggleButtonActual(setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
+actual inline fun ViewWriter.toggleButtonActual(crossinline setup: ToggleButton.() -> Unit): Unit = element<HTMLLabelElement>("label") {
     classList.add("toggle-button")
     lateinit var input: HTMLInputElement
     element<HTMLInputElement>("input") {

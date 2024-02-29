@@ -19,7 +19,7 @@ import com.lightningkite.rock.views.ViewWriter
 
 actual typealias NTextView = AndroidTextView
 
-fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
+inline fun ViewWriter.textElement(textSize: Float, crossinline setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
         androidText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
@@ -27,7 +27,7 @@ fun ViewWriter.textElement(textSize: Float, setup: TextView.() -> Unit) =
         setup(TextView(androidText))
     }
 
-fun ViewWriter.header(textSize: Float, setup: TextView.() -> Unit) =
+inline fun ViewWriter.header(textSize: Float, crossinline setup: TextView.() -> Unit) =
     viewElement(factory = ::AndroidTextView, wrapper = ::TextView) {
         val androidText = native
         androidText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
@@ -47,28 +47,28 @@ object TextSizes {
 }
 
 @ViewDsl
-actual fun ViewWriter.h1Actual(setup: TextView.() -> Unit): Unit = header(TextSizes.h1, setup)
+actual inline fun ViewWriter.h1Actual(crossinline setup: TextView.() -> Unit): Unit = header(TextSizes.h1, setup)
 
 @ViewDsl
-actual fun ViewWriter.h2Actual(setup: TextView.() -> Unit): Unit = header(TextSizes.h2, setup)
+actual inline fun ViewWriter.h2Actual(crossinline setup: TextView.() -> Unit): Unit = header(TextSizes.h2, setup)
 
 @ViewDsl
-actual fun ViewWriter.h3Actual(setup: TextView.() -> Unit): Unit = header(TextSizes.h3, setup)
+actual inline fun ViewWriter.h3Actual(crossinline setup: TextView.() -> Unit): Unit = header(TextSizes.h3, setup)
 
 @ViewDsl
-actual fun ViewWriter.h4Actual(setup: TextView.() -> Unit): Unit = header(TextSizes.h4, setup)
+actual inline fun ViewWriter.h4Actual(crossinline setup: TextView.() -> Unit): Unit = header(TextSizes.h4, setup)
 
 @ViewDsl
-actual fun ViewWriter.h5Actual(setup: TextView.() -> Unit): Unit = header(TextSizes.h5, setup)
+actual inline fun ViewWriter.h5Actual(crossinline setup: TextView.() -> Unit): Unit = header(TextSizes.h5, setup)
 
 @ViewDsl
-actual fun ViewWriter.h6Actual(setup: TextView.() -> Unit): Unit = header(TextSizes.h6, setup)
+actual inline fun ViewWriter.h6Actual(crossinline setup: TextView.() -> Unit): Unit = header(TextSizes.h6, setup)
 
 @ViewDsl
-actual fun ViewWriter.textActual(setup: TextView.() -> Unit): Unit = textElement(TextSizes.body, setup)
+actual inline fun ViewWriter.textActual(crossinline setup: TextView.() -> Unit): Unit = textElement(TextSizes.body, setup)
 
 @ViewDsl
-actual fun ViewWriter.subtextActual(setup: TextView.() -> Unit): Unit = textElement(TextSizes.subtext, setup)
+actual inline fun ViewWriter.subtextActual(crossinline setup: TextView.() -> Unit): Unit = textElement(TextSizes.subtext, setup)
 actual var TextView.content: String
     get() {
         return native.text.toString()

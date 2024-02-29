@@ -8,7 +8,7 @@ import platform.UIKit.UIView
 actual typealias NWebView = UIView
 
 @ViewDsl
-actual fun ViewWriter.webViewActual(setup: WebView.() -> Unit): Unit = todo("webView")
+actual inline fun ViewWriter.webViewActual(crossinline setup: WebView.() -> Unit): Unit = todo("webView")
 actual inline var WebView.url: String
     get() = TODO()
     set(value) {}

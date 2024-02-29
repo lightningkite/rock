@@ -35,7 +35,7 @@ actual var Link.newTab: Boolean
     }
 
 @ViewDsl
-actual fun ViewWriter.linkActual(setup: Link.() -> Unit) {
+actual inline fun ViewWriter.linkActual(crossinline setup: Link.() -> Unit) {
     return viewElement(factory = ::LinkFrameLayout, wrapper = ::Link) {
         native.navigator = navigator
         // OnClickListener may not be set until after handleTheme() is called, so we must manually set isClickable for

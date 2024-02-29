@@ -76,7 +76,7 @@ class SpacingItemDecoration(var spacing: Int) : AndroidRecyclerView.ItemDecorati
 }
 
 @ViewDsl
-actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit) {
+actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 1, LinearLayoutManager.VERTICAL, false)
@@ -90,7 +90,7 @@ actual fun ViewWriter.recyclerViewActual(setup: RecyclerView.() -> Unit) {
 }
 
 @ViewDsl
-actual fun ViewWriter.horizontalRecyclerViewActual(setup: RecyclerView.() -> Unit) {
+actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: RecyclerView.() -> Unit) {
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 1, LinearLayoutManager.HORIZONTAL, false)

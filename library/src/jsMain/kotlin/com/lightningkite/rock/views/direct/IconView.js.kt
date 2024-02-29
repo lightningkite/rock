@@ -18,7 +18,7 @@ import org.w3c.dom.url.URL
 actual typealias NIconView = HTMLDivElement
 
 @ViewDsl
-actual fun ViewWriter.iconActual(setup: IconView.() -> Unit): Unit =
+actual inline fun ViewWriter.iconActual(crossinline setup: IconView.() -> Unit): Unit =
     themedElement<NIconView>("div") {
         this.setAttribute("role", "img")
         addClass("viewDraws")

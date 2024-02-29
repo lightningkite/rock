@@ -11,20 +11,20 @@ import org.w3c.dom.HTMLElement
 actual typealias NContainingView = HTMLElement
 
 @ViewDsl
-actual fun ViewWriter.stackActual(setup: ContainingView.() -> Unit): Unit =
+actual inline fun ViewWriter.stackActual(crossinline setup: ContainingView.() -> Unit): Unit =
     themedElementBackIfChanged<HTMLDivElement>("div") {
         classList.add("rock-stack")
         setup(ContainingView(this))
     }
 
 @ViewDsl
-actual fun ViewWriter.colActual(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
+actual inline fun ViewWriter.colActual(crossinline setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-col")
     setup(ContainingView(this))
 }
 
 @ViewDsl
-actual fun ViewWriter.rowActual(setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
+actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> Unit): Unit = themedElementBackIfChanged<HTMLDivElement>("div") {
     classList.add("rock-row")
     setup(ContainingView(this))
 }

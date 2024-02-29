@@ -11,7 +11,7 @@ import org.w3c.dom.HTMLTextAreaElement
 actual typealias NTextArea = HTMLTextAreaElement
 
 @ViewDsl
-actual fun ViewWriter.textAreaActual(setup: TextArea.() -> Unit): Unit =
+actual inline fun ViewWriter.textAreaActual(crossinline setup: TextArea.() -> Unit): Unit =
     themedElementEditable<NTextArea>("textarea") { setup(TextArea(this)) }
 
 actual val TextArea.content: Writable<String> get() = native.vprop("input", { value }, { value = it })

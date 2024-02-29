@@ -15,7 +15,7 @@ import org.w3c.files.Blob
 actual typealias NVideo = org.w3c.dom.HTMLVideoElement
 
 @ViewDsl
-actual fun ViewWriter.videoActual(setup: Video.() -> Unit): Unit =
+actual inline fun ViewWriter.videoActual(crossinline setup: Video.() -> Unit): Unit =
     themedElement<NVideo>("video") {
         setup(Video(this))
         controls = true

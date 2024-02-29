@@ -12,7 +12,7 @@ import com.lightningkite.rock.views.canvas.DrawingContext2DImpl
 import kotlin.math.min
 
 @ViewDsl
-actual fun ViewWriter.canvasActual(setup: Canvas.() -> Unit) {
+actual inline fun ViewWriter.canvasActual(crossinline setup: Canvas.() -> Unit) {
     return viewElement(factory = ::NCanvas, wrapper = ::Canvas, setup = setup)
 }
 

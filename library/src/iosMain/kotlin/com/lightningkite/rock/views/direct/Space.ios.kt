@@ -20,7 +20,7 @@ actual class NSpace(): UIView(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
 }
 
 @ViewDsl
-actual fun ViewWriter.spaceActual(setup: Space.() -> Unit): Unit = element(NSpace()) {
+actual inline fun ViewWriter.spaceActual(crossinline setup: Space.() -> Unit): Unit = element(NSpace()) {
     handleTheme(this) {
         extensionSizeConstraints = SizeConstraints(
             minHeight = it.spacing,

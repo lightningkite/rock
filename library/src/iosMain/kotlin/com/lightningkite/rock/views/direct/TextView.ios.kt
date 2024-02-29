@@ -8,7 +8,7 @@ import platform.UIKit.*
 actual typealias NTextView = UILabel
 
 @ViewDsl
-actual fun ViewWriter.h1Actual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.h1Actual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(2.0.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 2.0.rem * 0.6,
@@ -24,7 +24,7 @@ actual fun ViewWriter.h1Actual(setup: TextView.() -> Unit): Unit = element(UILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h2Actual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.h2Actual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.6.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 1.6.rem * 0.6,
@@ -40,7 +40,7 @@ actual fun ViewWriter.h2Actual(setup: TextView.() -> Unit): Unit = element(UILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h3Actual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.h3Actual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.4.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 1.4.rem * 0.6,
@@ -56,7 +56,7 @@ actual fun ViewWriter.h3Actual(setup: TextView.() -> Unit): Unit = element(UILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h4Actual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.h4Actual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.3.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 1.3.rem * 0.6,
@@ -72,7 +72,7 @@ actual fun ViewWriter.h4Actual(setup: TextView.() -> Unit): Unit = element(UILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h5Actual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.h5Actual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.2.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 1.2.rem * 0.6,
@@ -88,7 +88,7 @@ actual fun ViewWriter.h5Actual(setup: TextView.() -> Unit): Unit = element(UILab
 }
 
 @ViewDsl
-actual fun ViewWriter.h6Actual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.h6Actual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.1.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 1.1.rem * 0.6,
@@ -104,7 +104,7 @@ actual fun ViewWriter.h6Actual(setup: TextView.() -> Unit): Unit = element(UILab
 }
 
 @ViewDsl
-actual fun ViewWriter.textActual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.textActual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(1.0.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 1.0.rem * 0.6,
@@ -120,7 +120,7 @@ actual fun ViewWriter.textActual(setup: TextView.() -> Unit): Unit = element(UIL
 }
 
 @ViewDsl
-actual fun ViewWriter.subtextActual(setup: TextView.() -> Unit): Unit = element(UILabel()) {
+actual inline fun ViewWriter.subtextActual(crossinline setup: TextView.() -> Unit): Unit = element(UILabel()) {
     font = UIFont.systemFontOfSize(0.8.rem.value)
     extensionSizeConstraints = SizeConstraints(
         minWidth = 0.8.rem * 0.6,

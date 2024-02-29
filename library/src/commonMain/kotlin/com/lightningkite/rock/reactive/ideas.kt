@@ -219,7 +219,7 @@ class ReactiveScopeData(val calculationContext: CalculationContext, var action: 
     }
 
     object Key : CoroutineContext.Key<ReactiveScopeData>{
-        init { println("ReactiveScopeData V4") }
+        init { println("ReactiveScopeData V5") }
     }
 }
 
@@ -333,7 +333,6 @@ suspend inline fun <T> Readable<T>.await(): T {
 //    return awaitRaw()
 //}
 
-
 /**
  * Desired behavior for shared:
  *
@@ -378,6 +377,7 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                     val listening = listening
 //                    if (listening) println("$this: Recalculating...")
 //                    else println("$this: Starting initial calculation...")
+                    val oldValue = value
                     try {
                         val result = action(ctx)
                         value = result
@@ -389,7 +389,9 @@ fun <T> shared(action: suspend CalculationContext.() -> T): Readable<T> {
                         if (listening) {
 //                            println("$this: Change calculation complete, notifying")
                             // This is a change notification; notify our listeners
-                            listeners.toList().forEach { it() }
+                            if (oldValue != value) {
+                                listeners.toList().forEach { it() }
+                            }
                         } else {
 //                            println("$this: Initial calculation complete")
                             // This is a first result; send to our queue

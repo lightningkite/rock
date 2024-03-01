@@ -33,12 +33,10 @@ object DynamicCSS {
             "line-height" to "unset",
             "overflow-x" to "visible",
             "--parentSpacing" to "var(--spacing)",
-        ))
-        style("div", mapOf(
-            "pointer-events" to "none"
-        ))
-        style(".mightTransition", mapOf(
             "pointer-events" to "auto"
+        ))
+        style("div:not(.mightTransition)", mapOf(
+            "pointer-events" to "none"
         ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))

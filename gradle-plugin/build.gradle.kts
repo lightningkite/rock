@@ -10,8 +10,6 @@ plugins {
     id("org.jetbrains.dokka")
 }
 
-group = "com.lightningkite.rock"
-
 buildscript {
     repositories {
         mavenLocal()

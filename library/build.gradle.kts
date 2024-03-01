@@ -11,7 +11,6 @@ plugins {
     id("signing")
 }
 
-group = "com.lightningkite.rock"
 repositories {
     mavenCentral()
 }

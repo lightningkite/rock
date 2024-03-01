@@ -11,6 +11,8 @@ import com.lightningkite.rock.views.ViewWriter
 @ViewModifierDsl3
 expect fun ViewWriter.hasPopover(requireClick: Boolean = false, preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewWriter.()->Unit): ViewWrapper
 @ViewModifierDsl3
+expect fun ViewWriter.textPopover(message: String): ViewWrapper
+@ViewModifierDsl3
 expect fun ViewWriter.weight(amount: Float): ViewWrapper
 @ViewModifierDsl3
 expect fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper

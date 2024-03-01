@@ -18,10 +18,11 @@ object SampleLogInScreen : RockScreen {
         val email = Property("")
         val password = Property("")
         stack {
+            spacing = 0.rem
             image {
                 source = Resources.imagesSolera
                 scaleType = ImageScaleType.Crop
-//                opacity = 0.5
+                opacity = 0.5
             } 
             col {
                 space {} in weight(1f)

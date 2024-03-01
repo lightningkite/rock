@@ -100,6 +100,10 @@ actual fun NView.clearNViews() {
     innerHTML = ""
 }
 actual fun NView.addNView(child: NView) {
+    // Cursed as fuck
+    if(this.classList.contains("rock-stack")){
+        child.style.zIndex = this.childElementCount.toString()
+    }
     appendChild(child)
 }
 

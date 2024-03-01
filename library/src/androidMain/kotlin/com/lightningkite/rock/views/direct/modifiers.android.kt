@@ -14,6 +14,7 @@ import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.PopoverPreferredDirection
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.*
 import java.util.*
@@ -141,9 +142,30 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit,
 ): ViewWrapper {
-//    TODO("Not yet implemented")
+    beforeNextElementSetup {
+        setOnClickListener {
+            navigator.dialog.navigate(object: RockScreen {
+                override fun ViewWriter.render() {
+                    stack {
+                        centered - stack {
+                            setup()
+                        }
+                    }
+                }
+            })
+        }
+    }
     return ViewWrapper
 }
+
+@ViewModifierDsl3
+actual fun ViewWriter.textPopover(message: String): ViewWrapper {
+    beforeNextElementSetup {
+        tooltipText = message
+    }
+    return ViewWrapper
+}
+
 
 @ViewModifierDsl3
 actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend ()->Boolean): ViewWrapper {

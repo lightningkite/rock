@@ -1,11 +1,9 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.QueryParameter
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
@@ -13,7 +11,7 @@ import com.lightningkite.rock.views.l2.*
 
 
 @Routable("navigation")
-object NavigationScreen : RockScreen {
+object NavigationTestScreen : RockScreen {
 
     override fun ViewWriter.render() {
         col {
@@ -30,41 +28,17 @@ object NavigationScreen : RockScreen {
             row {
                 col {
                     navSelector("Hamburger Menu", ViewWriter::appNavHamburger)
-                    text {
-                        content = "Caption test."
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
                 } in weight(1f)
                 col {
                     navSelector("Top Navigation", ViewWriter::appNavTop)
-                    text {
-                        content = "Caption test."
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
                 } in weight(1f)
             }
             row {
                 col {
                     navSelector("Bottom Tab Navigation", ViewWriter::appNavBottomTabs)
-                    text {
-                        content = "Caption test."
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
                 } in weight(1f)
                 col {
                     navSelector("Top and Left Navigation", ViewWriter::appNavTopAndLeft)
-                    text {
-                        content = "Caption test."
-                    } in gravity(
-                        Align.Center,
-                        Align.Center
-                    )
                 } in weight(1f)
             }
             h2 { content = "Table of Contents" }

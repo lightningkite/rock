@@ -1,19 +1,16 @@
-package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.docs
+package com.lightningkite.mppexampleapp.docs
 
 import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.dp
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
 @Routable("docs/viewpager")
-object ViewPagerScreen: DocScreen {
+object ViewPagerElementScreen: DocScreen {
     override val covers: List<String> = listOf("viewPager", "ViewPager")
 
     override fun ViewWriter.render() {
-        scrolls - col {
+        article {
             h1("View Pager")
             text("You can use a view pager to create an element that scrolls horizontally displaying pages.")
             text("This is frequently used for browsing photos or advertising features.")

@@ -1,8 +1,7 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.mppexampleapp.*
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.docs.VideoScreen
-import com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.docs.ViewPagerScreen
+import com.lightningkite.mppexampleapp.docs.VideoElementScreen
+import com.lightningkite.mppexampleapp.docs.ViewPagerElementScreen
 import com.lightningkite.rock.Routable
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.*
@@ -14,7 +13,6 @@ import com.lightningkite.rock.views.card
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.icon
 import com.lightningkite.rock.views.minus
-import com.lightningkite.rock.views.reactiveScope
 
 @Routable("/")
 object RootScreen : RockScreen {
@@ -49,13 +47,13 @@ object RootScreen : RockScreen {
                 } in card
 
                 linkScreen(PlatformSpecificScreen)
-                linkScreen(VideoScreen)
-                linkScreen(ViewPagerScreen)
+                linkScreen(VideoElementScreen)
+                linkScreen(ViewPagerElementScreen)
                 linkScreen(TwoPaneTestScreen)
                 linkScreen(ThemesScreen)
                 linkScreen(ControlsScreen)
                 linkScreen(FormsScreen)
-                linkScreen(NavigationScreen)
+                linkScreen(NavigationTestScreen)
                 linkScreen(LayoutExamplesScreen)
                 linkScreen(VectorsTestScreen)
                 linkScreen(SampleLogInScreen)

@@ -6,11 +6,10 @@ import com.lightningkite.deployhelpers.standardPublishing
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
+    signing
     `maven-publish`
     id("org.jetbrains.dokka")
 }
-
-group = "com.lightningkite.rock"
 
 buildscript {
     repositories {
@@ -70,4 +69,10 @@ standardPublishing {
 tasks.create("publishLocally", Copy::class.java) {
     from(file("src/main/kotlin/RockPlugin.kt"))
     into(rootProject.file("buildSrc/src/main/kotlin"))
+}
+
+afterEvaluate {
+    tasks.getByName("publishLightningkite-rockPluginMarkerMavenPublicationToSonatypeRepository").dependsOn(tasks.getByName("signPluginMavenPublication"))
+    tasks.getByName("publishLightningkite-rockPluginMarkerMavenPublicationToSonatypeRepository").dependsOn(tasks.getByName("signLightningkite-rockPluginMarkerMavenPublication"))
+    tasks.getByName("publishPluginMavenPublicationToSonatypeRepository").dependsOn(tasks.getByName("signLightningkite-rockPluginMarkerMavenPublication"))
 }

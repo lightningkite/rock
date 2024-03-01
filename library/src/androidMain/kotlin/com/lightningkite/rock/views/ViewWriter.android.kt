@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -16,6 +17,7 @@ import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.direct.HasSpacingMultiplier
+import com.lightningkite.rock.views.direct.RockLayoutTransition
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import java.lang.RuntimeException
@@ -95,12 +97,24 @@ actual var NView.opacity: Double
     }
 
     set(value) {
-        this.alpha = value.toFloat()
+        if (animationsEnabled) {
+            ValueAnimator.ofFloat(this.alpha, value.toFloat()).apply { addUpdateListener {
+                this@opacity.alpha = animatedValue as Float
+            } }.start()
+        } else {
+            this.alpha = value.toFloat()
+        }
     }
+
+private fun NView.assertLayoutTransitionReady() {
+    val animateHost = (parent as? ViewGroup)
+    if (animateHost?.layoutTransition == null) animateHost?.layoutTransition = RockLayoutTransition()
+}
 
 actual var NView.exists: Boolean
     get() = visibility == View.VISIBLE
     set(value) {
+        assertLayoutTransitionReady()
         visibility = if (value) {
             View.VISIBLE
         } else {

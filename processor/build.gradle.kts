@@ -11,8 +11,6 @@ plugins {
     `maven-publish`
 }
 
-group = "com.lightningkite.rock"
-
 val kotlinVersion:String by project
 val kspVersion:String by project
 dependencies {

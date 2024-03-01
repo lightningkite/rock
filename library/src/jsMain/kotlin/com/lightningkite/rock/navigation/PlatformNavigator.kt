@@ -16,6 +16,10 @@ actual object PlatformNavigator : RockNavigator {
         JSON.parse<BaseUrlScript>(it).baseUrl
     } ?: "/"
 
+    override fun isStackEmpty(): Boolean = false
+    override fun restoreStack(navStack: Array<String>) {}
+    override fun saveStack(): Array<String> = arrayOf()
+
     private lateinit var _routes: Routes
     actual override var routes: Routes
         get() = _routes

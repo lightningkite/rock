@@ -7,7 +7,7 @@ data class Theme(
     val body: FontAndStyle = FontAndStyle(systemDefaultFont),
     val elevation: Dimension = 1.px,
     val cornerRadii: CornerRadii = CornerRadii.RatioOfSpacing(1f),
-    val spacing: Dimension = 0.5.rem,
+    val spacing: Dimension = 1.rem,
     val foreground: Paint = Color.black,
     val iconOverride: Paint? = null,
     val outline: Paint = Color.black,

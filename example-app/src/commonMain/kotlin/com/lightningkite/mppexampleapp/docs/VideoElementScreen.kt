@@ -1,21 +1,18 @@
-package com.lightningkite.mppexampleapp.com.lightningkite.mppexampleapp.docs
+package com.lightningkite.mppexampleapp.docs
 
 import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.VideoRemote
-import com.lightningkite.rock.models.dp
 import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
 @Routable("docs/video")
-object VideoScreen: DocScreen {
+object VideoElementScreen: DocScreen {
     override val covers: List<String> = listOf("video", "Video")
 
     override fun ViewWriter.render() {
-        scrolls - col {
+        article {
             h1("Video")
             text("You can use the video element to render video, streamed from a remote source or locally.")
             val time = Property(0.0)

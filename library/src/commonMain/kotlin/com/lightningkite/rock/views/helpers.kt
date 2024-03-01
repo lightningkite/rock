@@ -10,7 +10,7 @@ import com.lightningkite.rock.views.direct.*
 @ViewModifierDsl3 operator fun ViewWrapper.minus(unit: Unit) = Unit
 @ViewModifierDsl3 operator fun ViewWrapper.minus(wrapper: ViewWrapper) = ViewWrapper
 
-@ViewModifierDsl3 fun ViewWriter.maxWidthCentered(width: Dimension) = centered - sizedBox(SizeConstraints(maxWidth = width))
+@ViewModifierDsl3 fun ViewWriter.maxWidthCentered(width: Dimension) = gravity(Align.Center, Align.Stretch) - sizedBox(SizeConstraints(maxWidth = width))
 @ViewModifierDsl3 fun ViewWriter.maxHeight(height: Dimension) = sizedBox(SizeConstraints(maxHeight = height))
 
 @ViewDsl

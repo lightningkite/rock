@@ -32,7 +32,13 @@ object DynamicCSS {
             "box-sizing" to "border-box",
             "line-height" to "unset",
             "overflow-x" to "visible",
-            "--parentSpacing" to "var(--spacing)"
+            "--parentSpacing" to "var(--spacing)",
+        ))
+        style("div", mapOf(
+            "pointer-events" to "none"
+        ))
+        style(".mightTransition", mapOf(
+            "pointer-events" to "auto"
         ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
@@ -347,11 +353,6 @@ object DynamicCSS {
         )
 
         style(
-            "button", mapOf(
-                "position" to "relative",
-            )
-        )
-        style(
             "button.loading:after", mapOf(
                 "opacity" to "0.5 !important",
                 "content" to "\"\"",
@@ -593,6 +594,25 @@ object DynamicCSS {
         )
 
         style(
+            ".icon", mapOf(
+                "display" to "grid",
+                "grid-template-columns" to "100%",
+                "grid-template-rows" to "100%",
+            )
+        )
+
+        style(
+            ".icon > *", mapOf(
+                "grid-column-start" to "1",
+                "grid-column-end" to "1",
+                "grid-row-start" to "1",
+                "grid-row-end" to "1",
+                "align-self" to "stretch",
+                "justify-self" to "stretch",
+            )
+        )
+
+        style(
             ".recycler", mapOf(
                 "overflow-y" to "auto"
             )
@@ -750,6 +770,7 @@ object DynamicCSS {
         style(
             ".dismissBackground", mapOf(
                 "z-index" to "998",
+                "pointer-events" to "auto"
             )
         )
         style(

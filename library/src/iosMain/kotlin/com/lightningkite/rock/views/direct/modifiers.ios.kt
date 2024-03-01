@@ -4,9 +4,13 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.*
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
+import platform.UIKit.UITapGestureRecognizer
+import platform.darwin.NSObject
+import platform.objc.sel_registerName
 
 
 //@Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -65,7 +69,24 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.() -> Unit
 ): ViewWrapper {
-    // TODO
+    beforeNextElementSetup {
+        val actionHolder = object : NSObject() {
+            @ObjCAction
+            fun eventHandler() {
+                navigator.dialog.navigate(object : RockScreen {
+                    override fun ViewWriter.render() {
+                        stack {
+                            centered - stack {
+                                setup()
+                            }
+                        }
+                    }
+                })
+            }
+        }
+        val rec = UITapGestureRecognizer(actionHolder, sel_registerName("eventHandler"))
+        addGestureRecognizer(rec)
+    }
     return ViewWrapper
 }
 
@@ -135,9 +156,10 @@ actual val ViewWriter.padded: ViewWrapper
         }
         return ViewWrapper
     }
+
 // End
 @ViewModifierDsl3
-actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend ()->Boolean): ViewWrapper {
+actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend () -> Boolean): ViewWrapper {
     beforeNextElementSetup {
         exists = true
         ::exists.invoke(condition)

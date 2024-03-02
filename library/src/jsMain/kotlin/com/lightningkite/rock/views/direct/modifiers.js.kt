@@ -48,10 +48,10 @@ actual fun ViewWriter.hasPopover(
                             if (preferredDirection.after) {
                                 style.left = "${r.right}px"
                             } else {
-                                style.right = "${r.left}px"
+                                style.right = "${window.innerWidth - r.left}px"
                             }
                             when (preferredDirection.align) {
-                                Align.Start -> style.bottom = "${r.bottom}px"
+                                Align.Start -> style.bottom = "${window.innerHeight - r.bottom}px"
                                 Align.End -> style.top = "${r.top}px"
                                 else -> {
                                     style.top = "${(r.top + r.bottom) / 2}px"
@@ -62,10 +62,10 @@ actual fun ViewWriter.hasPopover(
                             if (preferredDirection.after) {
                                 style.top = "${r.bottom}px"
                             } else {
-                                style.bottom = "${r.top}px"
+                                style.bottom = "${window.innerHeight - r.top}px"
                             }
                             when (preferredDirection.align) {
-                                Align.Start -> style.right = "${r.right}px"
+                                Align.Start -> style.right = "${window.innerWidth - r.right}px"
                                 Align.End -> style.left = "${r.left}px"
                                 else -> {
                                     style.left = "${(r.left + r.right) / 2}px"

@@ -35,9 +35,6 @@ object DynamicCSS {
             "--parentSpacing" to "var(--spacing)",
             "pointer-events" to "auto"
         ))
-        style("div:not(.mightTransition)", mapOf(
-            "pointer-events" to "none"
-        ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
         style("h3", mapOf("font-size" to "1.4rem"))

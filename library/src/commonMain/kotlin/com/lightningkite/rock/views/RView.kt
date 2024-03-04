@@ -7,6 +7,7 @@ import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
+import kotlin.jvm.JvmInline
 
 
 /**
@@ -33,6 +34,9 @@ var RView<*>.visible: Boolean
 var RView<*>.spacing: Dimension
     get() = native.spacing
     set(value) { native.spacing = value }
+var RView<*>.ignoreInteraction: Boolean
+    get() = native.ignoreInteraction
+    set(value) { native.ignoreInteraction = value }
 
 fun <T> ViewWriter.forEach(items: Readable<List<T>>, render: ViewWriter.(T)->Unit) = with(split()) {
     calculationContext.reactiveScope {

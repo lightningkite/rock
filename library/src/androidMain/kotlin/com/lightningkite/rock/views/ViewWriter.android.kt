@@ -106,6 +106,13 @@ actual var NView.opacity: Double
         }
     }
 
+actual var NView.ignoreInteraction: Boolean
+    get() = !isClickable
+    set(value) {
+        isClickable = !value
+        isFocusable = !value
+    }
+
 private fun NView.assertLayoutTransitionReady() {
     val animateHost = (parent as? ViewGroup)
     if (animateHost?.layoutTransition == null) animateHost?.layoutTransition = RockLayoutTransition()

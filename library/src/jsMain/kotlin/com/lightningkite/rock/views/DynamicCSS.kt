@@ -33,7 +33,6 @@ object DynamicCSS {
             "line-height" to "unset",
             "overflow-x" to "visible",
             "--parentSpacing" to "var(--spacing)",
-            "pointer-events" to "auto"
         ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
@@ -55,6 +54,13 @@ object DynamicCSS {
         )
         style(":hover>.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
+
+        style(".noInteraction.noInteraction", mapOf(
+            "pointer-events" to "none"
+        ))
+        style(".noInteraction > *", mapOf(
+            "pointer-events" to "auto"
+        ))
 
         style(
             "body", mapOf(
@@ -773,16 +779,6 @@ object DynamicCSS {
                 "z-index" to "999",
             )
         )
-//        style(
-//            "div:not(.mightTransition):not(.mightTransition)", mapOf(
-//                "pointer-events" to "none",
-//            )
-//        )
-//        style(
-//            "div:not(.mightTransition) > *", mapOf(
-//                "pointer-events" to "all",
-//            )
-//        )
 //        recyclerView
 //        contentScroll
 //        content

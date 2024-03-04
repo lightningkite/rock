@@ -20,6 +20,7 @@ expect var NView.opacity: Double
 expect var NView.exists: Boolean
 expect var NView.visible: Boolean
 expect var NView.spacing: Dimension
+expect var NView.ignoreInteraction: Boolean
 expect fun NView.clearNViews()
 expect fun NView.addNView(child: NView)
 expect fun NView.removeNView(child: NView)

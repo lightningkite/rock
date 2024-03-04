@@ -35,6 +35,10 @@ actual var NView.spacing: Dimension
         TODO()
     }
 
+actual var NView.ignoreInteraction: Boolean
+    get() = TODO()
+    set(value) { }
+
 actual var NView.nativeRotation: Angle
     get() = throw NotImplementedError()
     set(value) {

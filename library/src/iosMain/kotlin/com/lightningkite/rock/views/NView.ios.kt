@@ -138,6 +138,10 @@ actual var NView.visible: Boolean
 val UIView.spacingOverride: Property<Dimension?>?
     get() = (this as? UIViewWithSpacingRulesProtocol)?.getSpacingOverrideProperty() as? Property<Dimension?>
 
+actual var NView.ignoreInteraction: Boolean
+    get() = !this.userInteractionEnabled
+    set(value) { userInteractionEnabled = !value }
+
 actual var NView.spacing: Dimension
     get() = spacingOverride?.value ?: 0.px
     set(value) {

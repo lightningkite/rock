@@ -82,6 +82,10 @@ actual var NView.spacing: Dimension
         className = className.split(' ').filter { !it.startsWith("spacingOf") }.plus(cn).joinToString(" ")
     }
 
+actual var NView.ignoreInteraction: Boolean
+    get() = this.classList.contains("noInteraction")
+    set(value) { if(value) this.classList.add("noInteraction") else this.classList.remove("noInteraction") }
+
 actual var NView.opacity: Double
     get() = throw NotImplementedError()
     set(value) {

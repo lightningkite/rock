@@ -72,7 +72,8 @@ tasks.create("publishLocally", Copy::class.java) {
 }
 
 afterEvaluate {
-    tasks.getByName("publishLightningkite-rockPluginMarkerMavenPublicationToSonatypeRepository").dependsOn(tasks.getByName("signPluginMavenPublication"))
-    tasks.getByName("publishLightningkite-rockPluginMarkerMavenPublicationToSonatypeRepository").dependsOn(tasks.getByName("signLightningkite-rockPluginMarkerMavenPublication"))
-    tasks.getByName("publishPluginMavenPublicationToSonatypeRepository").dependsOn(tasks.getByName("signLightningkite-rockPluginMarkerMavenPublication"))
+    tasks.filter { it.name.startsWith("publish") && it.name.contains("PluginMarkerMavenPublication") }.forEach {
+        it.dependsOn("signPluginMavenPublication")
+    }
+    tasks.getByName("signLightningkite-rockPluginMarkerMavenPublication").dependsOn("publishPluginMavenPublicationToMavenLocal")
 }

@@ -34,12 +34,16 @@ fun ViewWriter.confirmDanger(
         override val title: Readable<String> = Constant(title)
         override fun ViewWriter.render() {
             stack {
+                ignoreInteraction = true
                 centered - card - col {
                     h2(title)
                     text(body)
                     row {
                         button {
                             h6("Cancel")
+                            onClick {
+                                navigator.dismiss()
+                            }
                         }
                         button {
                             h6(actionName)
@@ -62,7 +66,9 @@ fun ViewWriter.alert(
         override val title: Readable<String> = Constant(title)
         override fun ViewWriter.render() {
             stack {
+                ignoreInteraction = true
                 centered - card - col {
+//                    ignoreInteraction = false
                     h2(title)
                     text(body)
                     row {

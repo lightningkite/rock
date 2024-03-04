@@ -75,5 +75,6 @@ afterEvaluate {
     tasks.filter { it.name.startsWith("publish") && it.name.contains("PluginMarkerMavenPublication") }.forEach {
         it.dependsOn("signPluginMavenPublication")
     }
-    tasks.findByName("signLightningkite-rockPluginMarkerMavenPublication")?.dependsOn("publishPluginMavenPublicationToMavenLocal")
+    tasks.findByName("publishPluginMavenPublicationToMavenLocal")?.dependsOn("signLightningkite-rockPluginMarkerMavenPublication")
+    tasks.findByName("publishPluginMavenPublicationToSonatypeRepository")?.dependsOn("signLightningkite-rockPluginMarkerMavenPublication")
 }

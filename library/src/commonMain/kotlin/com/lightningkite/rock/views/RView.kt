@@ -7,6 +7,7 @@ import com.lightningkite.rock.reactive.CalculationContext
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
+import kotlin.jvm.JvmInline
 
 
 /**

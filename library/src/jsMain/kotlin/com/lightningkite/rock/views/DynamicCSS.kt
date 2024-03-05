@@ -825,6 +825,9 @@ object DynamicCSS {
             )
         )
 //        recyclerView
+        style(".recyclerView", mapOf(
+            "position" to "relative"
+        ))
 //        contentScroll
 //        content
 //        barScroll

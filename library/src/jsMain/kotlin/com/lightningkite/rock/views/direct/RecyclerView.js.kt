@@ -1,19 +1,14 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.Dimension
-import com.lightningkite.rock.models.compareToImpl
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.*
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = HTMLDivElement
@@ -116,7 +111,26 @@ class RecyclerController2(
     }
     val fakeScroll = (document.createElement("div") as HTMLDivElement).apply {
         classList.add("barScroll")
+        style.position = "absolute"
+        if(vertical) {
+            style.width = "1rem"
+            style.right = "0px"
+            style.top = "0px"
+            style.bottom = "0px"
+            style.overflowY = "scroll"
+        } else {
+            style.height = "1rem"
+            style.bottom = "0px"
+            style.left = "0px"
+            style.right = "0px"
+            style.overflowX = "scroll"
+        }
     }
+    val fakeScrollInner = (document.createElement("div") as HTMLDivElement).apply {
+        style.size = "${reservedScrollingSpace}px"
+        style.maxWidth = "unset"
+        style.maxHeight = "unset"
+    }.also { fakeScroll.addNView(it) }
     val capView = (document.createElement("div") as HTMLDivElement).apply {
         style.size = "1px"
         style.start = "${reservedScrollingSpace}px"
@@ -224,6 +238,7 @@ class RecyclerController2(
             contentHolder.scrollStart = value.toDouble()
         }
     val mainStartPosition = reservedScrollingSpace / 2
+    var suppressFakeScroll = true
 
     init {
         contentHolder.onscroll = { ev ->
@@ -257,7 +272,65 @@ class RecyclerController2(
             }
             Unit
         }
+        fakeScroll.onscroll = event@{ ev ->
+            if(suppressFakeScroll) {
+                suppressFakeScroll = false
+                return@event Unit
+            }
+            if(allSubviews.isEmpty()) return@event Unit
+            val numElements = data.max - data.min + 1
+            val partialStart = fakeScroll.scrollStart / fakeScrollInner.scrollHeight * numElements
+            val newStart = partialStart.toInt().coerceIn(data.min, data.max) // floor?
+            val startIndexPartial =
+                allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
+            val currentStart = allSubviews[0].index
+            val currentEnd = allSubviews.last().index
+            var diff = (newStart - currentStart)
+            if(diff > data.max - currentEnd) {
+                diff = data.max - currentEnd
+                if(diff != 0) {
+                    for(subview in allSubviews) {
+                        val newIndex = subview.index + diff
+                        subview.index = newIndex
+                        subview.element.withoutAnimation {
+                            subview.property.value = data.get(newIndex)
+                        }
+                    }
+                }
+                viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+                contentHolder.style.size =
+                    allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+            } else {
+                if(diff != 0) {
+                    for(subview in allSubviews) {
+                        val newIndex = subview.index + diff
+                        subview.index = newIndex
+                        subview.element.withoutAnimation {
+                            subview.property.value = data.get(newIndex)
+                        }
+                    }
+                }
+                val firstHiddenRatio = (partialStart % 1.0)
+                viewportOffset += ((firstHiddenRatio - startIndexPartial % 1.0) * allSubviews[0].size).toInt()
+            }
+            Unit
+        }
         window.setTimeout({ ready() }, 1)
+    }
+
+    private fun updateFakeScroll() {
+        if(allSubviews.isEmpty()) return
+        val startIndexPartial =
+            allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
+        val endIndexPartial = allSubviews.last()
+            .let { it.index + (viewportOffset + viewportSize - it.startPosition) / it.size.toDouble() }
+        println("$startIndexPartial - $endIndexPartial")
+        val numElements = data.max - data.min + 1
+        val viewedRatio = ((endIndexPartial - startIndexPartial) / numElements).coerceAtLeast(0.01).coerceAtMost(1.0)
+        suppressFakeScroll = true
+        fakeScrollInner.style.size = "${100 / viewedRatio}%"
+        fakeScroll.scrollStart = startIndexPartial / numElements * viewportSize / viewedRatio
     }
 
     fun ready() {
@@ -317,18 +390,21 @@ class RecyclerController2(
         }
     }
 
+    fun makeSubview(index: Int, atStart: Boolean): Subview {
+        val property = Property<Any?>(data[index])
+        dataAndRenderer.renderAny(newViews, property)
+        val element = newViews.rootCreated!!
+        return Subview(
+            property = property,
+            element = element,
+            index = index,
+        ).also { if(atStart)allSubviews.add(0, it) else allSubviews.add(it); contentHolder.addNView(it.element) }
+    }
+
     fun makeFirst(): Subview? {
         if(data.max < data.min) return null
         viewportOffset = reservedScrollingSpace / 2
-        val nextIndex = 0
-        val property = Property<Any?>(data[nextIndex])
-        dataAndRenderer.renderAny(newViews, property)
-        val elementInner = newViews.rootCreated!!
-        val element = Subview(
-            property = property,
-            element = elementInner,
-            index = nextIndex,
-        ).also { allSubviews.add(it); contentHolder.addNView(it.element) }
+        val element = makeSubview(data.min, false)
         element.measure()
         element.startPosition = reservedScrollingSpace / 2
         return element
@@ -345,6 +421,7 @@ class RecyclerController2(
             val v = allSubviews.lastOrNull()?.index ?: -1
             if(v != it.value) it.value = v
         }
+        updateFakeScroll()
     }
 
     fun populateDown() {
@@ -363,16 +440,7 @@ class RecyclerController2(
                 }
                 allSubviews.removeFirst()
                 allSubviews.add(it)
-            } ?: run {
-                val property = Property<Any?>(data[nextIndex])
-                dataAndRenderer.renderAny(newViews, property)
-                val element = newViews.rootCreated!!
-                Subview(
-                    property = property,
-                    element = element,
-                    index = nextIndex,
-                ).also { allSubviews.add(it); contentHolder.addNView(it.element) }
-            }
+            } ?: makeSubview(nextIndex, false)
             element.measure()
             bottom = element.placeAfter(bottom)
             anchor = element
@@ -395,16 +463,7 @@ class RecyclerController2(
                 }
                 allSubviews.removeLast()
                 allSubviews.add(0, it)
-            } ?: run {
-                val property = Property<Any?>(data[nextIndex])
-                dataAndRenderer.renderAny(newViews, property)
-                val element = newViews.rootCreated!!
-                Subview(
-                    property = property,
-                    element = element,
-                    index = nextIndex,
-                ).also { allSubviews.add(0, it); contentHolder.addNView(it.element) }
-            }
+            } ?: makeSubview(nextIndex, true)
             element.measure()
             top = element.placeBefore(top)
             anchor = element

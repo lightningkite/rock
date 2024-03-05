@@ -136,7 +136,12 @@ actual var NView.visible: Boolean
 
 @OptIn(ExperimentalForeignApi::class)
 val UIView.spacingOverride: Property<Dimension?>?
-    get() = (this as? UIViewWithSpacingRulesProtocol)?.getSpacingOverrideProperty() as? Property<Dimension?>
+    get() = (this as? UIViewWithSpacingRulesProtocol)
+        .also { println("A: $it") }
+        ?.getSpacingOverrideProperty()
+        .also { println("B: $it") }
+        ?.let { it as? Property<Dimension?> }
+        .also { println("C: $it") }
 
 actual var NView.ignoreInteraction: Boolean
     get() = !this.userInteractionEnabled

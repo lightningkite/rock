@@ -3,6 +3,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.PlatformNavigator
+import com.lightningkite.rock.views.direct.reservedScrollingSpace
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLLinkElement
@@ -54,6 +55,26 @@ object DynamicCSS {
         )
         style(":hover>.visibleOnParentHover", mapOf("visibility" to "visible"))
         style(":hover.visibleOnParentHover", mapOf("visibility" to "visible"))
+
+        style(".swapImage", mapOf(
+            "display" to "grid",
+            "grid-template-columns" to "100%",
+            "grid-template-rows" to "100%",
+            "overflow" to "hidden",
+        ))
+        style(".swapImage > *", mapOf(
+            "grid-column-start" to "1",
+            "grid-column-end" to "1",
+            "grid-row-start" to "1",
+            "grid-row-end" to "1",
+            "align-self" to "stretch",
+            "justify-self" to "stretch",
+            "object-fit" to "contain",
+        ))
+        style(".swapImage.scaleType-Fit > img", mapOf("object-fit" to "contain"))
+        style(".swapImage.scaleType-Crop > img", mapOf("object-fit" to "cover"))
+        style(".swapImage.scaleType-Stretch > img", mapOf("object-fit" to "fill"))
+        style(".swapImage.scaleType-NoScale > img", mapOf("object-fit" to "none"))
 
         style(".noInteraction.noInteraction", mapOf(
             "pointer-events" to "none"
@@ -136,6 +157,29 @@ object DynamicCSS {
             )
         )
 
+        style(".contentScroll-V",  mapOf(
+            "width" to "100%",
+            "position" to "relative",
+            "overflow-y" to "scroll",
+            "overflow-anchor" to "none",
+        ))
+        style(".contentScroll-H",  mapOf(
+            "height" to "100%",
+            "position" to "relative",
+            "overflow-x" to "scroll",
+            "overflow-anchor" to "revert",
+        ))
+        style(".contentScroll-V > *",  mapOf(
+            "position" to "absolute",
+            "max-height" to "unset",
+            "width" to "100%",
+        ))
+        style(".contentScroll-H > *",  mapOf(
+            "max-width" to "unset",
+            "position" to "absolute",
+            "height" to "100%",
+        ))
+
         style(
             ".spinner", mapOf(
                 "width" to "32px !important",
@@ -163,6 +207,7 @@ object DynamicCSS {
             "align-self" to "stretch",
             "justify-self" to "stretch",
         ))
+
 
 //        style(
 //            ".rock-swap", mapOf(
@@ -1000,7 +1045,7 @@ object DynamicCSS {
             return includeSelectors.asSequence().flatMap { plus.asSequence().map { p -> "$it$p" } }.joinToString(", ")
         }
         style(
-            sel(".mightTransition:not(.isRoot)", ".forcePadding:not(.cancelForcePadding)"), mapOf(
+            sel(".mightTransition:not(.isRoot):not(.swapImage)", ".forcePadding:not(.cancelForcePadding):not(.swapImage)"), mapOf(
                 "padding" to "var(--spacing, 0px)",
             )
         )
@@ -1028,7 +1073,7 @@ object DynamicCSS {
             )
         )
         style(
-            sel(".mightTransition"), mapOf(
+            sel(".mightTransition", ".swapImage"), mapOf(
                 "border-radius" to when(val it = theme.cornerRadii) {
                     is CornerRadii.Constant -> "calc(min(var(--parentSpacing, 0px), ${it.value.value}))"
                     is CornerRadii.RatioOfSpacing -> "calc(var(--parentSpacing, 0px) * ${it.value})"

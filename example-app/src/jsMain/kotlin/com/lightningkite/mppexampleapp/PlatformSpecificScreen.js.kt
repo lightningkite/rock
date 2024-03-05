@@ -56,7 +56,6 @@ actual fun ViewWriter.platformSpecific() {
 //    }
 
     col {
-        var controller: RecyclerController? = null
         button {
             text("Alter Data")
             var version = 2

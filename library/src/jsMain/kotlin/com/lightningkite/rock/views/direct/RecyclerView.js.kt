@@ -270,6 +270,9 @@ class RecyclerController2(
         val element: HTMLElement,
         var index: Int,
     ) {
+//        val column: Int get() = index % columns
+//        val row: Int get() = index / columns
+
         var startPosition: Int = 0
             set(value) {
                 field = value
@@ -296,6 +299,15 @@ class RecyclerController2(
             set(value) {
                 element.exists = value
             }
+
+        fun placeBefore(top: Int): Int {
+            startPosition = top - size - spacing
+            return top - size - spacing
+        }
+        fun placeAfter(bottom: Int): Int {
+            startPosition = bottom + spacing
+            return bottom + size + spacing
+        }
     }
 
     fun shift(by: Int) {
@@ -362,8 +374,7 @@ class RecyclerController2(
                 ).also { allSubviews.add(it); contentHolder.addNView(it.element) }
             }
             element.measure()
-            element.startPosition = bottom + spacing
-            bottom += element.size + spacing
+            bottom = element.placeAfter(bottom)
             anchor = element
         }
     }
@@ -395,8 +406,7 @@ class RecyclerController2(
                 ).also { allSubviews.add(0, it); contentHolder.addNView(it.element) }
             }
             element.measure()
-            element.startPosition = top - element.size - spacing
-            top -= element.size + spacing
+            top = element.placeBefore(top)
             anchor = element
         }
     }
@@ -420,8 +430,7 @@ class RecyclerController2(
         var bottom = allSubviews[startingIndex].let { anchor -> anchor.startPosition + anchor.size }
         for (index in (startingIndex + 1)..allSubviews.lastIndex) {
             val element = allSubviews[index]
-            element.startPosition = bottom + spacing
-            bottom += element.size + spacing
+            bottom = element.placeAfter(bottom)
         }
     }
 
@@ -429,8 +438,7 @@ class RecyclerController2(
         var top = allSubviews[startingIndex].let { anchor -> anchor.startPosition }
         for (index in (startingIndex - 1)downTo 0) {
             val element = allSubviews[index]
-            element.startPosition = top - element.size - spacing
-            top -= element.size + spacing
+            top = element.placeBefore(top)
         }
     }
 }

@@ -12,4 +12,5 @@ actual typealias NActivityIndicator = HTMLSpanElement
 actual inline fun ViewWriter.activityIndicatorActual(crossinline setup: ActivityIndicator.() -> Unit): Unit =
     themedElement<HTMLSpanElement>("span") {
         addClass("spinner")
+        setup(ActivityIndicator(this))
     }

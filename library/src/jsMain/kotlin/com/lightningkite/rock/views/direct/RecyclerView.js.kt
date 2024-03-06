@@ -1,6 +1,5 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
@@ -42,19 +41,32 @@ actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: Rec
 }
 
 actual var RecyclerView.columns: Int
-    get() = (native.asDynamic().__ROCK__controller as RecyclerControllerInterface).columns
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController2).columns
     set(value) {
-        (native.asDynamic().__ROCK__controller as RecyclerControllerInterface).columns = value
+        (native.asDynamic().__ROCK__controller as RecyclerController2).columns = value
     }
 
 actual fun <T> RecyclerView.children(
     items: Readable<List<T>>,
     render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit {
-    (native.asDynamic().__ROCK__controller as RecyclerControllerInterface).dataAndRenderer = DataAndRenderer(
-        data = items,
-        renderer = render
-    )
+    (native.asDynamic().__ROCK__controller as RecyclerController2).let {
+        reactiveScope { 
+            it.data = items.await().asIndexed()
+        }
+        it.renderer = ItemRenderer<T>(
+            create = { value ->
+                val prop = Property(value)
+                render(it.newViews, prop)
+                it.newViews.rootCreated!!.also {
+                    it.asDynamic().__ROCK_prop__ = prop
+                }
+            },
+            update = { element, value ->
+                (element.asDynamic().__ROCK_prop__ as Property<T>).value = value
+            }
+        )
+    }
 }
 
 actual fun RecyclerView.scrollToIndex(
@@ -62,22 +74,35 @@ actual fun RecyclerView.scrollToIndex(
     align: Align?,
     animate: Boolean
 ) {
-    (native.asDynamic().__ROCK__controller as RecyclerControllerInterface).jump(index, align ?: Align.Center)
+    (native.asDynamic().__ROCK__controller as RecyclerController2).jump(index, align ?: Align.Center)
 }
 
 actual val RecyclerView.firstVisibleIndex: Readable<Int>
-    get() = (native.asDynamic().__ROCK__controller as RecyclerControllerInterface).firstVisible
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController2).firstVisible
 
 actual val RecyclerView.lastVisibleIndex: Readable<Int>
-    get() = (native.asDynamic().__ROCK__controller as RecyclerControllerInterface).lastVisible
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController2).lastVisible
 
-interface Indexed<T> {
+interface Indexed<out T> {
     val min: Int
     val max: Int
     operator fun get(index: Int): T
+    companion object {
+        val EMPTY = object: Indexed<Nothing> {
+            override val max: Int
+                get() = -1
+            override val min: Int
+                get() = 0
+            override fun get(index: Int): Nothing {
+                throw IndexOutOfBoundsException()
+            }
+            override fun copy(): Indexed<Nothing> = this
+        }
+    }
+    fun copy(): Indexed<T> 
 }
 
-fun <T> List<T>.asIndexed() = object : Indexed<T> {
+fun <T> List<T>.asIndexed(): Indexed<T> = object : Indexed<T> {
     override val min: Int
         get() = 0
     override val max: Int
@@ -86,23 +111,17 @@ fun <T> List<T>.asIndexed() = object : Indexed<T> {
     override fun get(index: Int): T {
         return this@asIndexed.get(index)
     }
-}
 
-interface RecyclerControllerInterface {
-    val firstVisible: Readable<Int>
-    val lastVisible: Readable<Int>
-    fun jump(index: Int, align: Align)
-    var dataAndRenderer: DataAndRenderer<*>
-    var columns: Int
+    override fun copy(): Indexed<T> = this@asIndexed.toList().asIndexed()
 }
 
 class RecyclerController2(
     val root: HTMLDivElement,
     val newViews: ViewWriter,
     val vertical: Boolean = true
-) : RecyclerControllerInterface {
-    override val firstVisible = Property(0)
-    override val lastVisible = Property(0)
+)  {
+    val firstVisible = Property(0)
+    val lastVisible = Property(0)
 
     val contentHolder = (document.createElement("div") as HTMLDivElement).apply {
         classList.add("contentScroll-${if (vertical) "V" else "H"}")
@@ -178,10 +197,8 @@ class RecyclerController2(
         set(value) {
             if (vertical) top = value else left = value
         }
-
-    val forSingleRenderer = CalculationContext.Standard()
-
-    override var columns: Int = 1
+    
+    var columns: Int = 1
         set(value) {
             field = value
             allSubviews.forEach {
@@ -190,20 +207,16 @@ class RecyclerController2(
             allSubviews.clear()
             ready()
         }
-    override var dataAndRenderer: DataAndRenderer<*> = DataAndRenderer<Int>(Constant(listOf())) { space(10.0) }
+    var renderer: ItemRenderer<*> = ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
         set(value) {
             field = value
             allSubviews.forEach {
                 it.element.shutdown()
+                contentHolder.removeChild(it.element)
             }
             allSubviews.clear()
-            forSingleRenderer.cancel()
-            forSingleRenderer.reactiveScope {
-                data = value.data.await().toList().asIndexed()
-                ready()
-            }
         }
-    var data: Indexed<*> = ArrayList<Any?>().asIndexed()
+    var data: Indexed<*> = Indexed.EMPTY
         set(value) {
             field = value
             if(allSubviews.isNotEmpty()) {
@@ -221,7 +234,9 @@ class RecyclerController2(
                     it.index += shift
                     if (it.index in value.min..value.max) {
                         it.visible = true
-                        it.property.value = value[it.index]
+                        it.element.withoutAnimation {
+                            renderer.updateAny(it.element, value[it.index])
+                        }
                     } else {
                         it.visible = false
                     }
@@ -309,7 +324,7 @@ class RecyclerController2(
                         val newIndex = subview.index + diff
                         subview.index = newIndex
                         subview.element.withoutAnimation {
-                            subview.property.value = data.get(newIndex)
+                            renderer.updateAny(subview.element, data[newIndex])
                         }
                     }
                 }
@@ -323,7 +338,7 @@ class RecyclerController2(
                         val newIndex = subview.index + diff
                         subview.index = newIndex
                         subview.element.withoutAnimation {
-                            subview.property.value = data.get(newIndex)
+                            renderer.updateAny(subview.element, data[newIndex])
                         }
                     }
                 }
@@ -334,7 +349,7 @@ class RecyclerController2(
         }
         window.setTimeout({ ready() }, 1)
     }
-    override fun jump(index: Int, align: Align) {
+    fun jump(index: Int, align: Align) {
         if(allSubviews.isEmpty()) return
         if(index !in data.min..data.max) return
         val existingIndex = when(align) {
@@ -349,7 +364,9 @@ class RecyclerController2(
             if(it.index == index) target = it
             if (it.index in data.min..data.max) {
                 it.visible = true
-                it.property.value = data[it.index]
+                it.element.withoutAnimation {
+                    renderer.updateAny(it.element, data[it.index])
+                }
             } else {
                 it.visible = false
             }
@@ -380,7 +397,6 @@ class RecyclerController2(
     }
 
     inner class Subview(
-        val property: Property<Any?>,
         val element: HTMLElement,
         var index: Int,
     ) {
@@ -432,11 +448,8 @@ class RecyclerController2(
     }
 
     fun makeSubview(index: Int, atStart: Boolean): Subview {
-        val property = Property<Any?>(data[index])
-        dataAndRenderer.renderAny(newViews, property)
-        val element = newViews.rootCreated!!
+        val element = renderer.createAny(data[index])
         return Subview(
-            property = property,
             element = element,
             index = index,
         ).also { if(atStart)allSubviews.add(0, it) else allSubviews.add(it); contentHolder.addNView(it.element) }
@@ -477,7 +490,7 @@ class RecyclerController2(
             }?.also {
                 it.index = nextIndex
                 it.element.withoutAnimation {
-                    it.property.value = data[nextIndex]
+                    renderer.updateAny(it.element, data[nextIndex])
                 }
                 allSubviews.removeFirst()
                 allSubviews.add(it)
@@ -500,7 +513,7 @@ class RecyclerController2(
             }?.also {
                 it.index = nextIndex
                 it.element.withoutAnimation {
-                    it.property.value = data[nextIndex]
+                    renderer.updateAny(it.element, data[nextIndex])
                 }
                 allSubviews.removeLast()
                 allSubviews.add(0, it)
@@ -546,9 +559,12 @@ class RecyclerController2(
 
 val reservedScrollingSpace = 10_000
 
-class DataAndRenderer<T>(val data: Readable<List<T>>, val renderer: ViewWriter.(Readable<T>) -> Unit) {
+class ItemRenderer<T>(
+    val create: (T) -> HTMLElement,
+    val update: (HTMLElement, T) -> Unit
+) {
     @Suppress("UNCHECKED_CAST")
-    fun renderAny(writer: ViewWriter, readable: Readable<*>) {
-        (renderer as ViewWriter.(Readable<Any?>) -> Unit).invoke(writer, readable)
-    }
+    fun createAny(t: Any?) = create(t as T)
+    @Suppress("UNCHECKED_CAST")
+    fun updateAny(element: HTMLElement, t: Any?) = update(element, t as T)
 }

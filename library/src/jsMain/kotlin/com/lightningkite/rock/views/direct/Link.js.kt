@@ -1,11 +1,13 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockNavigator
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.navigation.render
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
 import com.lightningkite.rock.views.navigator
 import org.w3c.dom.HTMLAnchorElement
 
@@ -30,6 +32,10 @@ actual inline var Link.to: RockScreen
         native.onclick = {
             it.preventDefault()
             navigator.navigate(value)
+            (native.asDynamic().__ROCK__onNavigate as? suspend ()->Unit)?.let {
+                println("launchingmanucan")
+                calculationContext.launchManualCancel(it)
+            }
         }
     }
 actual inline var Link.newTab: Boolean
@@ -37,3 +43,6 @@ actual inline var Link.newTab: Boolean
     set(value) {
         native.target = if (value) "_blank" else "_self"
     }
+actual fun Link.onNavigate(action: suspend () -> Unit): Unit {
+    native.asDynamic().__ROCK__onNavigate = action
+}

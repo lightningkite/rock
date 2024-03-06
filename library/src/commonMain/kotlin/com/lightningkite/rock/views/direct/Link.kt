@@ -18,3 +18,4 @@ expect fun ViewWriter.linkActual(setup: Link.()->Unit = {}): Unit
 @OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.link(noinline setup: Link.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; linkActual(setup) }
 expect var Link.to: RockScreen
 expect var Link.newTab: Boolean
+expect fun Link.onNavigate(action: suspend () -> Unit)

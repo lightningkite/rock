@@ -89,11 +89,14 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
         expanding - stack {
             navigatorView(navigator)
             row {
+                ignoreInteraction = true
                 onlyWhen(false) { showMenu.await() && appNav.existsProperty.await() }
-                scrolls - bar - navGroupColumn(appNav.navItemsProperty) {
+                scrolls - bar - navGroupColumn(appNav.navItemsProperty, { showMenu set false }) {
                     spacing = 0.px
                 }
-                weight(2f) - space()
+                weight(2f) - space {
+                    ignoreInteraction = true
+                }
             }
         }
     } 

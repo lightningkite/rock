@@ -7,13 +7,13 @@ import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
 
-fun ViewWriter.navGroupColumn(elements: Readable<List<NavElement>>, setup: ContainingView.()->Unit = {}) {
+fun ViewWriter.navGroupColumn(elements: Readable<List<NavElement>>, onNavigate: suspend ()->Unit = {}, setup: ContainingView.()->Unit = {}) {
     col {
-        navGroupColumnInner(elements)
+        navGroupColumnInner(elements, onNavigate)
         setup()
     }
 }
-private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>) {
+private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>, onNavigate: suspend ()->Unit = {}) {
     forEach(readable) {
         fun ViewWriter.display(navElement: NavElement) {
             row {
@@ -31,6 +31,7 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>)
             is NavExternal -> externalLink {
                 ::to { it.to() }
                 display(it)
+                this.onNavigate(onNavigate)
             }
 
             is NavGroup -> {
@@ -58,6 +59,7 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>)
             is NavLink -> link {
                 ::to { it.destination() }
                 display(it)
+                this.onNavigate(onNavigate)
             } in maybeThemeFromLast { existing ->
                 if (navigator.currentScreen.await()
                         ?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination())

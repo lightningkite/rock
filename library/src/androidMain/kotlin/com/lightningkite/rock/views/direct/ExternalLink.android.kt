@@ -3,12 +3,14 @@ package com.lightningkite.rock.views.direct
 import android.content.Intent
 import android.net.Uri
 import android.widget.FrameLayout
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
 import java.util.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NExternalLink = SlightlyModifiedFrameLayout
+actual typealias NExternalLink = LinkFrameLayout
 
 actual var ExternalLink.to: String
     get() {
@@ -20,6 +22,7 @@ actual var ExternalLink.to: String
             val url = if(!value.startsWith("http")) "http://$value" else value
             val temp = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             view.context.startActivity(temp)
+            calculationContext.launchManualCancel { native.onNavigate() }
 //            val intent = Intent().apply {
 //                action = Intent.ACTION_VIEW
 //                categories?.add(Intent.CATEGORY_APP_BROWSER)
@@ -37,8 +40,11 @@ actual var ExternalLink.newTab: Boolean
     set(value) {
         native.tag = value
     }
+actual fun ExternalLink.onNavigate(action: suspend () -> Unit): Unit {
+    native.onNavigate = action
+}
 
 @ViewDsl
 actual inline fun ViewWriter.externalLinkActual(crossinline setup: ExternalLink.() -> Unit) {
-    viewElement(factory = ::SlightlyModifiedFrameLayout, wrapper = ::ExternalLink, setup = setup)
+    viewElement(factory = ::LinkFrameLayout, wrapper = ::ExternalLink, setup = setup)
 }

@@ -17,3 +17,4 @@ expect fun ViewWriter.externalLinkActual(setup: ExternalLink.()->Unit = {}): Uni
 @OptIn(ExperimentalContracts::class) @ViewDsl inline fun ViewWriter.externalLink(noinline setup: ExternalLink.() -> Unit = {}) { contract { callsInPlace(setup, InvocationKind.EXACTLY_ONCE) }; externalLinkActual(setup) }
 expect var ExternalLink.to: String
 expect var ExternalLink.newTab: Boolean
+expect fun ExternalLink.onNavigate(action: suspend () -> Unit)

@@ -4,6 +4,7 @@ package com.lightningkite.rock
 
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import com.lightningkite.rock.views.AndroidAppContext
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -66,7 +67,9 @@ actual suspend fun fetch(
                                         it.length
                                     } ?: -1L
                             val type = AndroidAppContext.applicationCtx.contentResolver.getType(body.content.uri)
-                                ?: "application/octet-stream"
+                                ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                                    MimeTypeMap.getFileExtensionFromUrl(body.content.uri.toString())
+                                ) ?: "application/octet-stream"
                             contentType(ContentType.parse(type))
                             setBody(
                                 AndroidAppContext.applicationCtx.contentResolver.openInputStream(body.content.uri)!!

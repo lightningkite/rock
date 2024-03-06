@@ -103,8 +103,6 @@ class RecyclerController2(
 ) : RecyclerControllerInterface {
     override val firstVisible = Property(0)
     override val lastVisible = Property(0)
-    override fun jump(index: Int, align: Align) {
-    }
 
     val contentHolder = (document.createElement("div") as HTMLDivElement).apply {
         classList.add("contentScroll-${if (vertical) "V" else "H"}")
@@ -220,7 +218,6 @@ class RecyclerController2(
                     (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
                 } else 0
                 allSubviews.forEach {
-                    println("Shift ${it.index} by $shift")
                     it.index += shift
                     if (it.index in value.min..value.max) {
                         it.visible = true
@@ -260,7 +257,6 @@ class RecyclerController2(
             field = value
             contentHolder.scrollStart = value.toDouble()
         }
-    val mainStartPosition = reservedScrollingSpace / 2
     var suppressFakeScroll = true
 
     init {
@@ -278,11 +274,9 @@ class RecyclerController2(
                 }
                 if (allSubviews.last().index >= data.max) {
                     capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
-//                    contentHolder.style.size = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
                     defaultShift = false
                 } else {
                     capView.style.start = reservedScrollingSpace.let { "${it}px" }
-//                    contentHolder.style.size = reservedScrollingSpace.let { "${it}px" }
                 }
                 if(defaultShift) {
                     if (viewportOffset > reservedScrollingSpace * 3 / 4) {
@@ -339,6 +333,32 @@ class RecyclerController2(
             Unit
         }
         window.setTimeout({ ready() }, 1)
+    }
+    override fun jump(index: Int, align: Align) {
+        if(allSubviews.isEmpty()) return
+        if(index !in data.min..data.max) return
+        val existingIndex = when(align) {
+            Align.Start -> allSubviews.first().index
+            Align.End -> allSubviews.last().index
+            else -> (allSubviews.first().index + allSubviews.last().index) / 2
+        }
+        var target: Subview? = null
+        val shift = (index - existingIndex).coerceAtMost(data.max - allSubviews.last().index).coerceAtLeast(data.min - allSubviews.first().index)
+        allSubviews.forEach {
+            it.index += shift
+            if(it.index == index) target = it
+            if (it.index in data.min..data.max) {
+                it.visible = true
+                it.property.value = data[it.index]
+            } else {
+                it.visible = false
+            }
+        }
+        when(align) {
+            Align.Start -> viewportOffset = allSubviews.first().startPosition
+            Align.End -> viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+            else -> target?.let { viewportOffset = it.startPosition + it.size / 2 - viewportSize / 2 }
+        }
     }
 
     private fun updateFakeScroll() {

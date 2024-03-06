@@ -61,10 +61,11 @@ actual fun ViewWriter.platformSpecific() {
             var version = 2
             onClick {
                 val v = version++
-                when (v % 3) {
+                when (v % 4) {
                     0 -> data.value = (0..50).map { "Item $it (v$v)" }.toList()
                     1 -> data.value = (0..20).map { "Item $it (v$v)" }.toList()
                     2 -> data.value = listOf()
+                    3 -> data.value = (0..3).map { "Item $it (v$v)" }.toList()
                 }
             }
         }

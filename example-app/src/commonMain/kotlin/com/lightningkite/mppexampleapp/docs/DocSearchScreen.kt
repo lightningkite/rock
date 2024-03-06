@@ -38,6 +38,7 @@ object DocSearchScreen : RockScreen {
                         NavigationScreen,
                         VideoElementScreen,
                         ViewPagerElementScreen,
+                        IconsScreen,
                         ViewModifiersScreen,
                         LayoutScreen,
                     ).mapNotNull {

@@ -6,6 +6,7 @@ import com.lightningkite.rock.reactive.reactiveScope
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGSizeMake
 import platform.UIKit.UIColor
+import platform.UIKit.UIImageView
 import platform.UIKit.UIView
 import kotlin.math.min
 
@@ -60,12 +61,13 @@ fun ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = mightTransition && !isRoot || viewForcePadding || parentIsSwap
+        val usePadding = (mightTransition && !isRoot || viewForcePadding || parentIsSwap)/* && view !is UIImageView*/
 
         val borders = !viewMarginless
 
         if (usePadding) {
-            view.extensionPadding = (view?.spacingOverride?.await() ?: theme.spacing).value
+            println("Awaiting spacingOverride")
+            view.extensionPadding = (view.spacingOverride?.await() ?: theme.spacing).value
         } else {
             view.extensionPadding = 0.0
         }
@@ -102,6 +104,21 @@ fun ViewWriter.handleTheme(
                 if (useBackground) {
                     applyThemeBackground(theme, view, parentSpacing, borders)
                     background(theme)
+                } else if(view is UIImageView) {
+                    val cr = when(val it = theme.cornerRadii) {
+                        is CornerRadii.Constant -> min(parentSpacing, it.value.value)
+                        is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
+                    }
+                    view.layer.apply {
+                        backgroundColor = null
+                        borderWidth = 0.0
+                        borderColor = null
+                        cornerRadius = cr
+                        shadowColor = null
+                        shadowOpacity = 0f
+                        shadowOffset = CGSizeMake(0.0, 0.0)
+                        shadowRadius = 0.0
+                    }
                 } else {
                     view.layer.apply {
                         backgroundColor = null

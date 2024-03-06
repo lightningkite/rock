@@ -5,12 +5,9 @@ import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
+import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.*
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = HTMLDivElement
@@ -19,67 +16,11 @@ actual typealias NRecyclerView = HTMLDivElement
 actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.() -> Unit): Unit {
     themedElement<HTMLDivElement>("div", viewDraws = false) {
         classList.add("recyclerView")
-        var scrollingContainer: HTMLDivElement = this
-        var sizingContainer: HTMLDivElement = this
-        var contentCol: ContainingView = ContainingView(this)
-        var indexcontentscroll: HTMLDivElement = this
-        var indexcontent: HTMLDivElement = this
-        val newViews: ViewWriter = this@recyclerViewActual.newViews()
-        style.position = "relative"
-        element<HTMLDivElement>("div") {
-            classList.add("contentScroll")
-            scrollingContainer = this
-            style.position = "absolute"
-            style.left = "0"
-            style.right = "0"
-            style.top = "0"
-            style.bottom = "0"
-            style.overflowY = "scroll"
-            element<HTMLDivElement>("div") {
-                style.position = "relative"
-                classList.add("content")
-                style.maxHeight = "unset"
-                style.height = "${reservedScrollingSpace}px"
-                sizingContainer = this
-
-                col {
-                    contentCol = this
-                    native.style.position = "absolute"
-                    native.style.width = "100%"
-                    native.style.top = "${reservedScrollingSpace / 2}px"
-                }
-            }
-            scrollTop = reservedScrollingSpace / 2
-        }
-        element<HTMLDivElement>("div") {
-            classList.add("barScroll")
-            indexcontentscroll = this
-            onscroll = { ev ->
-                ev.preventDefault()
-            }
-            style.position = "absolute"
-            style.right = "0px"
-            style.top = "0"
-            style.bottom = "0"
-            style.width = "20px"
-            style.overflowY = "scroll"
-            element<HTMLDivElement>("div") {
-                classList.add("barContent")
-                indexcontent = this
-                style.maxHeight = "unset"
-                style.height = "${reservedScrollingSpace}px"
-                style.width = "10px"
-            }
-        }
-
-        this.asDynamic().__ROCK__controller = RecyclerController(
+        val newViews: ViewWriter = newViews()
+        this.asDynamic().__ROCK__controller = RecyclerController2(
             root = this,
-            scrollingContainer = scrollingContainer,
-            sizingContainer = sizingContainer,
-            contentCol = contentCol,
-            indexcontentscroll = indexcontentscroll,
-            indexcontent = indexcontent,
             newViews = newViews,
+            vertical = true
         )
         setup(RecyclerView(this))
     }
@@ -87,69 +28,11 @@ actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.
 
 @ViewDsl
 actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: RecyclerView.() -> Unit): Unit {
-    themedElement<HTMLDivElement>("div") {
+    themedElement<HTMLDivElement>("div", viewDraws = false) {
         classList.add("recyclerView")
-        var scrollingContainer: HTMLDivElement = this
-        var sizingContainer: HTMLDivElement = this
-        var contentCol: ContainingView = ContainingView(this)
-        var indexcontentscroll: HTMLDivElement = this
-        var indexcontent: HTMLDivElement = this
-        val newViews: ViewWriter = this@horizontalRecyclerViewActual.newViews()
-        style.position = "relative"
-        element<HTMLDivElement>("div") {
-            classList.add("contentScroll")
-            scrollingContainer = this
-            style.position = "absolute"
-            style.left = "0"
-            style.right = "0"
-            style.top = "0"
-            style.bottom = "0"
-            style.overflowX = "scroll"
-            element<HTMLDivElement>("div") {
-                style.position = "relative"
-                classList.add("content")
-                style.maxWidth = "unset"
-                style.width = "${reservedScrollingSpace}px"
-                style.height = "100%"
-                sizingContainer = this
-
-                row {
-                    contentCol = this
-                    native.style.position = "absolute"
-                    native.style.height = "100%"
-                    native.style.left = "${reservedScrollingSpace / 2}px"
-                }
-            }
-            scrollLeft = reservedScrollingSpace / 2
-        }
-        element<HTMLDivElement>("div") {
-            classList.add("barScroll")
-            indexcontentscroll = this
-            onscroll = { ev ->
-                ev.preventDefault()
-            }
-            style.position = "absolute"
-            style.bottom = "0px"
-            style.left = "0"
-            style.right = "0"
-            style.height = "20px"
-            style.overflowX = "scroll"
-            element<HTMLDivElement>("div") {
-                classList.add("barContent")
-                indexcontent = this
-                style.maxWidth = "unset"
-                style.width = "${reservedScrollingSpace}px"
-                style.height = "10px"
-            }
-        }
-
-        this.asDynamic().__ROCK__controller = RecyclerController(
+        val newViews: ViewWriter = newViews()
+        this.asDynamic().__ROCK__controller = RecyclerController2(
             root = this,
-            scrollingContainer = scrollingContainer,
-            sizingContainer = sizingContainer,
-            contentCol = contentCol,
-            indexcontentscroll = indexcontentscroll,
-            indexcontent = indexcontent,
             newViews = newViews,
             vertical = false
         )
@@ -158,19 +41,32 @@ actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: Rec
 }
 
 actual var RecyclerView.columns: Int
-    get() = (native.asDynamic().__ROCK__controller as RecyclerController).columns
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController2).columns
     set(value) {
-        (native.asDynamic().__ROCK__controller as RecyclerController).columns = value
+        (native.asDynamic().__ROCK__controller as RecyclerController2).columns = value
     }
 
 actual fun <T> RecyclerView.children(
     items: Readable<List<T>>,
     render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit {
-    (native.asDynamic().__ROCK__controller as RecyclerController).dataAndRenderer = DataAndRenderer(
-        data = items,
-        renderer = render
-    )
+    (native.asDynamic().__ROCK__controller as RecyclerController2).let {
+        it.renderer = ItemRenderer<T>(
+            create = { value ->
+                val prop = Property(value)
+                render(it.newViews, prop)
+                it.newViews.rootCreated!!.also {
+                    it.asDynamic().__ROCK_prop__ = prop
+                }
+            },
+            update = { element, value ->
+                (element.asDynamic().__ROCK_prop__ as Property<T>).value = value
+            }
+        )
+        reactiveScope {
+            it.data = items.await().asIndexed()
+        }
+    }
 }
 
 actual fun RecyclerView.scrollToIndex(
@@ -178,489 +74,575 @@ actual fun RecyclerView.scrollToIndex(
     align: Align?,
     animate: Boolean
 ) {
-    (native.asDynamic().__ROCK__controller as RecyclerController).jump(index, align ?: Align.Center)
+    (native.asDynamic().__ROCK__controller as RecyclerController2).jump(index, align ?: Align.Center)
 }
 
 actual val RecyclerView.firstVisibleIndex: Readable<Int>
-    get() = (native.asDynamic().__ROCK__controller as RecyclerController).firstVisible
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController2).firstVisible
 
 actual val RecyclerView.lastVisibleIndex: Readable<Int>
-    get() = (native.asDynamic().__ROCK__controller as RecyclerController).lastVisible
+    get() = (native.asDynamic().__ROCK__controller as RecyclerController2).lastVisible
 
-
-
-
-val reservedScrollingSpace = 10_000.0
-
-class DataAndRenderer<T>(val data: Readable<List<T>>, val renderer: ViewWriter.(Readable<T>)->Unit) {
-    @Suppress("UNCHECKED_CAST")
-    fun renderAny(writer: ViewWriter, readable: Readable<*>) {
-        (renderer as ViewWriter.(Readable<Any?>)->Unit).invoke(writer, readable)
+interface Indexed<out T> {
+    val min: Int
+    val max: Int
+    operator fun get(index: Int): T
+    companion object {
+        val EMPTY = object: Indexed<Nothing> {
+            override val max: Int
+                get() = -1
+            override val min: Int
+                get() = 0
+            override fun get(index: Int): Nothing {
+                throw IndexOutOfBoundsException()
+            }
+            override fun copy(): Indexed<Nothing> = this
+        }
     }
+    fun copy(): Indexed<T> 
 }
-class RecyclerController(
+
+fun <T> List<T>.asIndexed(): Indexed<T> = object : Indexed<T> {
+    override val min: Int
+        get() = 0
+    override val max: Int
+        get() = this@asIndexed.size - 1
+
+    override fun get(index: Int): T {
+        return this@asIndexed.get(index)
+    }
+
+    override fun copy(): Indexed<T> = this@asIndexed.toList().asIndexed()
+}
+
+fun <T> Indexed<T>.columned(count: Int): Indexed<Indexed<T>> = object: Indexed<Indexed<T>> {
+    val original = this@columned
+    override val min: Int
+        get() = original.min / count
+    override val max: Int
+        get() = original.max / count
+    override fun get(index: Int): Indexed<T> {
+        val basis = index * count
+        return object: Indexed<T> {
+            override val max: Int
+                get() = (count - 1).coerceAtMost(original.max - basis)
+            override val min: Int
+                get() = (0).coerceAtLeast(original.min - basis)
+            override fun get(index: Int): T = original.get(index + basis)
+            override fun copy(): Indexed<T> = this
+        }
+    }
+    override fun copy(): Indexed<Indexed<T>> = original.copy().columned(count)
+}
+
+fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
+    create = { data ->
+        (document.createElement("div") as HTMLDivElement).apply {
+            classList.add("recyclerViewGridSub")
+            repeat(count) {
+                if(it in data.min..data.max) {
+                    addNView(this@columned.create(data[it]))
+                } else {
+                    addNView((document.createElement("div") as HTMLDivElement).apply {
+                        classList.add("placeholder")
+                    })
+                }
+            }
+        }
+    },
+    update = { element, data ->
+        repeat(count) {
+            val child = (element.children[it] as HTMLElement)
+            if(it in data.min..data.max) {
+                val sub = data[it]
+                if (child.classList.contains("placeholder")) {
+                    element.replaceChild(child, this.create(sub))
+                } else {
+                    this.update(child, sub)
+                }
+                child.style.visibility = "visible"
+            } else {
+                child.style.visibility = "hidden"
+            }
+        }
+    }
+)
+
+class RecyclerController2(
     val root: HTMLDivElement,
-    var sizingContainer: HTMLDivElement,
-    var scrollingContainer: HTMLDivElement,
-    var indexcontentscroll: HTMLDivElement,
-    var indexcontent: HTMLDivElement,
-    var contentCol: ContainingView,
     val newViews: ViewWriter,
     val vertical: Boolean = true
-) {
-    var columns = 1
-        set(value) {
-//            println("Changing to $value columns")
-            suppress = true
-            field = value
-//            println("Clearing native views")
-            contentCol.native.clearNViews()
-//            println("Cleared native views")
-            scrollingContainer.scrollStart = lastDefaultPos
-            firstIndex = 0
-            lastIndex = -value
-            reserved.clear()
-            suppress = false
-//            println("Existing views should be empty, but is ${contentCol.native.listNViews().size}")
-//            println("Rerunning scrolling")
-            correctScrollBoundaries()
-        }
-//    var beyondEdge: Double = 0.0
-    var beyondEdge: Double = 200.0
-
-    private var NView.scrollStart
-        get() = if(vertical) scrollTop else scrollLeft
-        set(value) { if(vertical) scrollTop = value else scrollLeft = value }
-    private val NView.clientSize
-        get() = if(vertical) clientHeight else clientWidth
-    private val NView.scrollSize
-        get() = if(vertical) scrollHeight else scrollWidth
-    private val DOMRect.size
-        get() = if(vertical) height else width
-    private val DOMRect.start
-        get() = if(vertical) top else left
-    private val DOMRect.end
-        get() = if(vertical) bottom else right
-    private val CSSStyleDeclaration.marginStart
-        get() = if(vertical) marginTop else marginLeft
-    private val CSSStyleDeclaration.marginEnd
-        get() = if(vertical) marginBottom else marginRight
-    private var CSSStyleDeclaration.size
-        get() = if(vertical) height else width
-        set(value) { if (vertical) height = value else width = value }
-    private var CSSStyleDeclaration.start
-        get() = if(vertical) top else left
-        set(value) { if (vertical) top = value else left = value }
-
-
-    var dataCopy = Property<List<*>>(listOf<Any?>())
+)  {
     val firstVisible = Property(0)
     val lastVisible = Property(0)
-    var firstIndex = 0
-    var lastIndex = -1
-    val minIndexProperty = Property(-40)
-    var minIndex by minIndexProperty
-    val maxIndexProperty = Property(40)
-    var maxIndex by maxIndexProperty
-    var suppress = false
-    var lastDefaultPos = reservedScrollingSpace / 2
-    val forSingleRenderer = CalculationContext.Standard()
-    var dataAndRenderer: DataAndRenderer<*> = DataAndRenderer<Int>(Constant(listOf())) { space(10.0) }
-        set(value) {
-            suppress = true
-            field = value
-            // Gotta dump the whole thing now, reset ALL the state
-            contentCol.native.clearNViews()
-            lastDefaultPos = reservedScrollingSpace / 2
-            firstIndex = 0
-            lastIndex = -columns
-            minIndex = 0
-            maxIndex = 0
-            dataCopy.value = emptyList<Unit>()
-            reserved.clear()
-            forSingleRenderer.cancel()
-            suppress = false
-            forSingleRenderer.reactiveScope {
-                suppress = true
-                scrollingContainer.scrollStart = lastDefaultPos
-                val list = value.data.await().toList()
-                minIndex = 0
-                maxIndex = list.size - 1
-                dataCopy.value = list
-                suppress = false
-                correctScrollBoundaries()
-            }
+
+    val contentHolder = (document.createElement("div") as HTMLDivElement).apply {
+        classList.add("contentScroll-${if (vertical) "V" else "H"}")
+    }
+    val fakeScroll = (document.createElement("div") as HTMLDivElement).apply {
+        classList.add("barScroll")
+        style.position = "absolute"
+        if(vertical) {
+            style.width = "1rem"
+            style.right = "0px"
+            style.top = "0px"
+            style.bottom = "0px"
+            style.overflowY = "scroll"
+        } else {
+            style.height = "1rem"
+            style.bottom = "0px"
+            style.left = "0px"
+            style.right = "0px"
+            style.overflowX = "scroll"
         }
+    }
+    val fakeScrollInner = (document.createElement("div") as HTMLDivElement).apply {
+        style.size = "${reservedScrollingSpace}px"
+        style.maxWidth = "unset"
+        style.maxHeight = "unset"
+    }.also { fakeScroll.addNView(it) }
+    val capView = (document.createElement("div") as HTMLDivElement).apply {
+        style.size = "1px"
+        style.start = "${reservedScrollingSpace}px"
+        style.backgroundColor = "rbga(1, 1, 1, 0.01)"
+    }
 
     init {
-        root.calculationContext.onRemove {
-            reserved.forEach { it.shutdown() }
+        root.addNView(contentHolder)
+        root.addNView(fakeScroll)
+        contentHolder.addNView(capView)
+        ResizeObserver { entries, obs ->
+            val newSize = root.clientSize
+            if (viewportSize != newSize) {
+                viewportSize = newSize
+            }
+        }.observe(root)
+    }
+
+    private var NView.scrollStart
+        get() = if (vertical) scrollTop else scrollLeft
+        set(value) {
+            if (vertical) scrollTop = value else scrollLeft = value
+        }
+    private val NView.offsetStart
+        get() = if (vertical) offsetTop else offsetLeft
+    private val NView.clientSize
+        get() = if (vertical) clientHeight else clientWidth
+    private val NView.scrollSize
+        get() = if (vertical) scrollHeight else scrollWidth
+    private val DOMRect.size
+        get() = if (vertical) height else width
+    private val DOMRect.start
+        get() = if (vertical) top else left
+    private val DOMRect.end
+        get() = if (vertical) bottom else right
+    private val CSSStyleDeclaration.marginStart
+        get() = if (vertical) marginTop else marginLeft
+    private val CSSStyleDeclaration.marginEnd
+        get() = if (vertical) marginBottom else marginRight
+    private var CSSStyleDeclaration.size
+        get() = if (vertical) height else width
+        set(value) {
+            if (vertical) height = value else width = value
+        }
+    private var CSSStyleDeclaration.start
+        get() = if (vertical) top else left
+        set(value) {
+            if (vertical) top = value else left = value
+        }
+    
+    var columns: Int = 1
+        set(value) {
+            if(value != field) {
+                field = value
+                if(columns == 1) {
+                    rendererDirect = renderer
+                    dataDirect = data
+                } else {
+                    rendererDirect = renderer.columned(columns)
+                    dataDirect = data.columned(columns)
+                }
+            }
+        }
+    var data: Indexed<*> = Indexed.EMPTY
+        set(value) {
+            field = value
+            if(columns == 1) {
+                dataDirect = value
+            } else {
+                dataDirect = value.columned(columns)
+            }
+        }
+    var renderer: ItemRenderer<*> = ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
+        set(value) {
+            field = value
+            data = Indexed.EMPTY
+            if(columns == 1) {
+                rendererDirect = value
+            } else {
+                rendererDirect = value.columned(columns)
+            }
+        }
+    var rendererDirect: ItemRenderer<*> = ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
+        set(value) {
+            dataDirect = Indexed.EMPTY
+            field = value
+            allSubviews.forEach {
+                it.element.shutdown()
+                contentHolder.removeChild(it.element)
+            }
+            allSubviews.clear()
+            populate()
+        }
+    var dataDirect: Indexed<*> = Indexed.EMPTY
+        set(value) {
+            field = value
+            if(allSubviews.isNotEmpty()) {
+                // Shift into range
+                val outOfBoundsBottom = allSubviews.last().index > value.max
+                val outOfBoundsTop = allSubviews.first().index < value.min
+                val shift = if(outOfBoundsBottom && outOfBoundsTop) {
+                    value.min - allSubviews.first().index
+                } else if(outOfBoundsTop) {
+                    value.min - allSubviews.first().index
+                } else if (outOfBoundsBottom) {
+                    (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
+                } else 0
+                allSubviews.forEach {
+                    it.index += shift
+                    if (it.index in value.min..value.max) {
+                        it.visible = true
+                        it.element.withoutAnimation {
+                            rendererDirect.updateAny(it.element, value[it.index])
+                        }
+                    } else {
+                        it.visible = false
+                    }
+                }
+                if(shift > 0) {
+                    // Force to top
+                    viewportOffset = allSubviews.first().startPosition
+                } else if(shift < 0) {
+                    // Force to bottom
+                    viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                }
+            } else {
+                populate()
+            }
+        }
+    var spacing: Int = 0
+        set(value) {
+            if (value != field) {
+                field = value
+                relayout()
+            }
         }
 
-        ResizeObserver { entries, obs ->
-            scrollHandler()
-        }.observe(contentCol.native)
-        scrollingContainer.onscroll = { ev ->
-            scrollHandler()
+    val allSubviews: ArrayList<Subview> = ArrayList()
+
+    var viewportSize: Int = 0
+        set(value) {
+            field = value
+            relayout()
+        }
+    var viewportOffset: Int = 0
+        set(value) {
+            field = value
+            contentHolder.scrollStart = value.toDouble()
+        }
+    var suppressFakeScroll = true
+
+    init {
+        contentHolder.onscroll = { ev ->
+            viewportOffset = contentHolder.scrollStart.toInt()
+            populate()
+            if (allSubviews.isNotEmpty()) {
+                var defaultShift = true
+                if (allSubviews.first().index <= dataDirect.min) {
+                    // shift and attach to top
+                    if(allSubviews.first().startPosition > 100) {
+                        shift(-allSubviews.first().startPosition)
+                    }
+                    defaultShift = false
+                }
+                if (allSubviews.last().index >= dataDirect.max) {
+                    capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+                    defaultShift = false
+                } else {
+                    capView.style.start = reservedScrollingSpace.let { "${it}px" }
+                }
+                if(defaultShift) {
+                    if (viewportOffset > reservedScrollingSpace * 3 / 4) {
+                        shift(reservedScrollingSpace / -4)
+                    } else if (viewportOffset < reservedScrollingSpace / 4) {
+                        shift(reservedScrollingSpace / 4)
+                    }
+                }
+            }
             Unit
         }
-        indexcontentscroll.onscroll = onscroll@{ ev ->
-            if(fakeScrollSuppress) {
-                fakeScrollSuppress = false
-                return@onscroll Unit
+        fakeScroll.onscroll = event@{ ev ->
+            if(suppressFakeScroll) {
+                suppressFakeScroll = false
+                return@event Unit
             }
-            val index = ((indexcontentscroll.scrollStart / (reservedScrollingSpace - indexcontentscroll.clientSize)) * (maxIndex - minIndex)).roundToInt() + minIndex
-            jump(
-                index = index
-            )
+            if(allSubviews.isEmpty()) return@event Unit
+            val numElements = dataDirect.max - dataDirect.min + 1
+            val partialStart = fakeScroll.scrollStart / fakeScrollInner.scrollHeight * numElements
+            val newStart = partialStart.toInt().coerceIn(dataDirect.min, dataDirect.max) // floor?
+            val startIndexPartial =
+                allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
+            val currentStart = allSubviews[0].index
+            val currentEnd = allSubviews.last().index
+            var diff = (newStart - currentStart)
+            if(diff > dataDirect.max - currentEnd) {
+                diff = dataDirect.max - currentEnd
+                if(diff != 0) {
+                    for(subview in allSubviews) {
+                        val newIndex = subview.index + diff
+                        subview.index = newIndex
+                        subview.element.withoutAnimation {
+                            rendererDirect.updateAny(subview.element, dataDirect[newIndex])
+                        }
+                    }
+                }
+                viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+                contentHolder.style.size =
+                    allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+            } else {
+                if(diff != 0) {
+                    for(subview in allSubviews) {
+                        val newIndex = subview.index + diff
+                        subview.index = newIndex
+                        subview.element.withoutAnimation {
+                            rendererDirect.updateAny(subview.element, dataDirect[newIndex])
+                        }
+                    }
+                }
+                val firstHiddenRatio = (partialStart % 1.0)
+                viewportOffset += ((firstHiddenRatio - startIndexPartial % 1.0) * allSubviews[0].size).toInt()
+            }
+            Unit
+        }
+        window.setTimeout({ ready() }, 1)
+    }
+    fun jump(index: Int, align: Align) {
+        if(allSubviews.isEmpty()) return
+        if(index !in dataDirect.min..dataDirect.max) return
+        val existingIndex = when(align) {
+            Align.Start -> allSubviews.first().index
+            Align.End -> allSubviews.last().index
+            else -> (allSubviews.first().index + allSubviews.last().index) / 2
+        }
+        var target: Subview? = null
+        val shift = (index - existingIndex).coerceAtMost(dataDirect.max - allSubviews.last().index).coerceAtLeast(dataDirect.min - allSubviews.first().index)
+        allSubviews.forEach {
+            it.index += shift
+            if(it.index == index) target = it
+            if (it.index in dataDirect.min..dataDirect.max) {
+                it.visible = true
+                it.element.withoutAnimation {
+                    rendererDirect.updateAny(it.element, dataDirect[it.index])
+                }
+            } else {
+                it.visible = false
+            }
+        }
+        when(align) {
+            Align.Start -> viewportOffset = allSubviews.first().startPosition
+            Align.End -> viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+            else -> target?.let { viewportOffset = it.startPosition + it.size / 2 - viewportSize / 2 }
         }
     }
 
-    var fakeScrollSuppress = false
-    fun updateFakeScroll() {
-        fakeScrollSuppress = true
-        val index = (firstIndex + lastIndex) / 2.0
-        val scrollStart = ((index - minIndex) / (maxIndex - minIndex) * (reservedScrollingSpace - indexcontentscroll.clientSize))
-        indexcontentscroll.scrollStart = scrollStart
+    private fun updateFakeScroll() {
+        if(allSubviews.isEmpty()) return
+        val startIndexPartial =
+            allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
+        val endIndexPartial = allSubviews.last()
+            .let { it.index + (viewportOffset + viewportSize - it.startPosition) / it.size.toDouble() }
+        val numElements = dataDirect.max - dataDirect.min + 1
+        val viewedRatio = ((endIndexPartial - startIndexPartial) / numElements).coerceAtLeast(0.01).coerceAtMost(2.0)
+        suppressFakeScroll = true
+        fakeScrollInner.style.size = "${100 / viewedRatio}%"
+        fakeScroll.scrollStart = startIndexPartial / numElements * viewportSize / viewedRatio
     }
 
-    fun jump(index: Int, align: Align = Align.Center) {
-        val shift = when(align) {
-            Align.Start -> {
-                scrollingContainer.scrollStart = lastDefaultPos
-                index - firstIndex
+    fun ready() {
+        spacing = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
+        populate()
+    }
+
+    inner class Subview(
+        val element: HTMLElement,
+        var index: Int,
+    ) {
+//        val column: Int get() = index % columns
+//        val row: Int get() = index / columns
+
+        var startPosition: Int = 0
+            set(value) {
+                field = value
+                element.style.start = "${value}px"
             }
-            Align.End -> {
-                val visibleRows = (lastIndex - firstIndex + 1).div(columns).coerceAtLeast(1)
-                scrollingContainer.scrollStart = lastDefaultPos + (root.getBoundingClientRect().size) / visibleRows + beyondEdge * 2
-                index - lastIndex
+        var size: Int = -1
+
+        init {
+            ResizeObserver { entries, obs ->
+                val newSize = element.scrollSize
+                if (size != newSize) {
+                    measure()
+                    relayout()
+                }
+            }.observe(element)
+        }
+
+        fun measure() {
+            size = element.scrollSize
+        }
+
+        var visible: Boolean
+            get() = element.exists
+            set(value) {
+                element.exists = value
             }
+
+        fun placeBefore(top: Int): Int {
+            startPosition = top - size - spacing
+            return top - size - spacing
+        }
+        fun placeAfter(bottom: Int): Int {
+            startPosition = bottom + spacing
+            return bottom + size + spacing
+        }
+    }
+
+    fun shift(by: Int) {
+        viewportOffset += by
+        for (view in allSubviews) {
+            view.startPosition += by
+        }
+    }
+
+    fun makeSubview(index: Int, atStart: Boolean): Subview {
+        val element = rendererDirect.createAny(dataDirect[index])
+        return Subview(
+            element = element,
+            index = index,
+        ).also { if(atStart)allSubviews.add(0, it) else allSubviews.add(it); contentHolder.addNView(it.element) }
+    }
+
+    fun makeFirst(): Subview? {
+        if(dataDirect.max < dataDirect.min) return null
+        viewportOffset = reservedScrollingSpace / 2
+        val element = makeSubview(dataDirect.min, false)
+        element.measure()
+        element.startPosition = reservedScrollingSpace / 2
+        return element
+    }
+
+    fun populate() {
+        populateDown()
+        populateUp()
+        firstVisible.let {
+            val v = allSubviews.firstOrNull()?.index?.times(columns) ?: -1
+            if(v != it.value) it.value = v
+        }
+        lastVisible.let {
+            val v = allSubviews.lastOrNull()?.index?.times(columns)?.plus(columns - 1) ?: -1
+            if(v != it.value) it.value = v
+        }
+        updateFakeScroll()
+    }
+
+    fun populateDown() {
+        var anchor = allSubviews.lastOrNull() ?: makeFirst() ?: return
+        var bottom = anchor.startPosition + anchor.size
+        while ((bottom < viewportSize + viewportOffset)) {
+            val nextIndex = anchor.index + 1
+            if (nextIndex > dataDirect.max) break
+            // Get the element to place
+            val element: Subview = allSubviews.first().takeIf {
+                (it.startPosition + it.size < viewportOffset)
+            }?.also {
+                it.index = nextIndex
+                it.element.withoutAnimation {
+                    rendererDirect.updateAny(it.element, dataDirect[nextIndex])
+                }
+                allSubviews.removeFirst()
+                allSubviews.add(it)
+            } ?: makeSubview(nextIndex, false)
+            element.measure()
+            bottom = element.placeAfter(bottom)
+            anchor = element
+        }
+    }
+
+    fun populateUp() {
+        var anchor = allSubviews.firstOrNull() ?: makeFirst() ?: return
+        var top = anchor.startPosition
+        while ((top > viewportOffset)) {
+            val nextIndex = anchor.index - 1
+            if (nextIndex < dataDirect.min) break
+            // Get the element to place
+            val element: Subview = allSubviews.last().takeIf {
+                it.startPosition > viewportOffset + viewportSize
+            }?.also {
+                it.index = nextIndex
+                it.element.withoutAnimation {
+                    rendererDirect.updateAny(it.element, dataDirect[nextIndex])
+                }
+                allSubviews.removeLast()
+                allSubviews.add(0, it)
+            } ?: makeSubview(nextIndex, true)
+            element.measure()
+            top = element.placeBefore(top)
+            anchor = element
+        }
+    }
+
+    val anchorPosition: Align = Align.Start
+    fun relayout() {
+        if (allSubviews.isEmpty()) return
+        when (anchorPosition) {
+            Align.Start -> relayoutDown(0)
+            Align.End -> relayoutUp(allSubviews.lastIndex)
             else -> {
-                val visibleRows = (lastIndex - firstIndex + 1).div(columns).coerceAtLeast(1)
-                scrollingContainer.scrollStart = lastDefaultPos + (root.getBoundingClientRect().size) / visibleRows / 2 + beyondEdge
-                index - (firstIndex + lastIndex) / 2
+                val centeredIndex = allSubviews.size / 2
+                relayoutUp(centeredIndex)
+                relayoutDown(centeredIndex)
             }
         }
-
-        if(shift != 0) {
-            root.withoutAnimation {
-                for (view in contentCol.native.listNViews()) {
-                    if(columns == 1) {
-                        val p = view.asDynamic().__ROCK__property as? Property<Int> ?: continue
-                        val newValue = p.value + shift
-                        if (newValue < minIndex || newValue > maxIndex) contentCol.native.removeChild(view)
-                        else p.value = newValue
-                    } else {
-                        val ps = view.asDynamic().__ROCK__properties as? Array<Property<Int>> ?: continue
-                        for(p in ps) {
-                            p.value = p.value + shift
-                        }
-                    }
-                }
-            }
-            firstIndex = (firstIndex + shift).coerceAtLeast(minIndex)
-            lastIndex = (lastIndex + shift).coerceAtMost(maxIndex)
-            updateFakeScroll()
-        }
-        scrollHandler()
+        populate()
     }
 
-    fun correctScrollBoundaries() {
-        // If this runs twice at the beginning then the scroll offset gets messed up
-        // Correct for being out-of-bounds
-        val shift = if(lastIndex > maxIndex) {
-//            println("SHIFT FIX ($maxIndex - $lastIndex).div($columns).times($columns)")
-            (maxIndex - lastIndex).div(columns).times(columns)
-        } else if(firstIndex < minIndex) {
-//            println("SHIFT FIX ($minIndex - $firstIndex).div($columns).times($columns)")
-            (minIndex - firstIndex).div(columns).times(columns)
-        } else {
-//            println("SHIFT FIX zero")
-            0
-        }
-        if(shift != 0) {
-            root.withoutAnimation {
-                for (view in contentCol.native.listNViews()) {
-                    if(columns == 1) {
-                        val p = view.asDynamic().__ROCK__property as? Property<Int> ?: continue
-                        val newValue = p.value + shift
-//                        println("shift ${p.value} -> $newValue")
-                        if(newValue < minIndex || newValue > maxIndex) {
-//                            println("Removed a view in shift")
-                            contentCol.native.removeChild(view)
-                        }
-                        else p.value = newValue
-                    } else {
-                        val ps = view.asDynamic().__ROCK__properties as? Array<Property<Int>> ?: continue
-                        var min = 100000000
-                        var max = -100000000
-                        for(p in ps) {
-                            p.value = p.value + shift
-                            min = min(min, p.value)
-                            max = max(max, p.value)
-                        }
-                        if(max < minIndex || min > maxIndex) {
-//                            println("Removed a view in shift")
-                            contentCol.native.removeChild(view)
-                        }
-                    }
-                }
-            }
-            firstIndex = (firstIndex + shift).coerceAtLeast(minIndex.div(columns).times(columns))
-            lastIndex = (lastIndex + shift).coerceAtMost(maxIndex.plus(columns - 1).div(columns).times(columns))
-            updateFakeScroll()
-        }
-        scrollHandler()
-    }
-
-    val reserved = ArrayList<HTMLElement>()
-    fun scrollHandler() = with(scrollingContainer) {
-        if (suppress) {
-            return Unit
-        }
-        suppress = true
-        val outerBounds = root.getBoundingClientRect()
-        val children = contentCol.native.children
-
-        // Handle huge scroll
-        if (abs(scrollStart - lastDefaultPos) > (outerBounds.size + beyondEdge * 2) * 3 / 4) {
-            scrollStart = scrollStart.coerceIn(
-                lastDefaultPos - (outerBounds.size + beyondEdge * 2) * 3 / 4,
-                lastDefaultPos + (outerBounds.size + beyondEdge * 2) * 3 / 4,
-            )
-//            println("Capping scroll")
-        }
-        val beforeScroll = scrollStart
-
-        var scrollAmount = 0.0
-        val canRecycle = ArrayList<NView>()
-
-        // Handle top falloff first
-        val extra = 10
-        if (lastIndex != maxIndex) {
-            for (index in 0..<children.length) {
-                val child = children.get(index) as? org.w3c.dom.HTMLElement ?: continue
-                val bounds = child.getBoundingClientRect()
-                val style = window.getComputedStyle(child)
-                val margin = style.marginStart.removeSuffix("px").toDoubleOrNull() ?: 0.0
-                if (bounds.end + margin < (outerBounds.start - beyondEdge - extra)) {
-                    // We're scrolling down and this fell out the top
-                    scrollAmount += bounds.size
-                    scrollAmount += style.marginStart.removeSuffix("px").toInt()
-                    scrollAmount += style.marginEnd.removeSuffix("px").toInt()
-                    canRecycle.add(child)
-//                    println("Removing view from top because ${bounds.end} + ${margin} < ${outerBounds.start}")
-////                    println("Scrolling ${scrollAmount}")
-                    firstIndex += columns
-                } else {
-                    break
-                }
-            }
-        }
-
-        // Handle bottom falloff
-        for (index in children.length - 1 downTo 0) {
-            val child = children.get(index) as? org.w3c.dom.HTMLElement ?: continue
-            val bounds = child.getBoundingClientRect()
-            val style = window.getComputedStyle(child)
-            val margin = style.marginStart.removeSuffix("px").toDoubleOrNull() ?: 0.0
-            if (bounds.start - margin > (outerBounds.end + beyondEdge + extra) ) {
-                // We're scrolling up and this fell out the bottom
-                canRecycle.add(child)
-//                println("Removing view from bottom because ${bounds.start} - ${margin} > ${outerBounds.end}")
-                lastIndex -= columns
-            } else {
-                break
-            }
-        }
-
-//        println("Processing $scrollStart - $minIndex..$maxIndex cap, viewing $firstIndex..$lastIndex")
-
-        fun makeElement(index: Int): HTMLElement {
-            return if (reserved.isNotEmpty()) {
-                reserved.removeAt(reserved.lastIndex).also {
-                    if(columns == 1) {
-                        root.withoutAnimation {
-                            (it.asDynamic().__ROCK__property as Property<Int>).value = index
-                        }
-                    } else {
-                        root.withoutAnimation {
-                            (it.asDynamic().__ROCK__properties as Array<Property<Int>>).forEachIndexed { offset, p ->
-                                p.value = index + offset
-                            }
-                        }
-                    }
-                }
-            } else {
-                if(columns == 1) {
-                    with(newViews) {
-                        val p = Property(index)
-                        root.withoutAnimation {
-                            dataAndRenderer.renderAny(newViews, shared { dataCopy.await()[p.await().coerceIn(minIndex, maxIndex)] })
-                        }
-                        rootCreated!!.also {
-                            it.asDynamic().__ROCK__property = p
-                        }
-                    }
-                } else {
-                    with(newViews) {
-                        val properties = Array(columns) { offset -> Property(index + offset) }
-                        root.withoutAnimation {
-                            if(vertical) {
-                                row {
-                                    repeat(columns) { offset ->
-                                        val p = properties[offset]
-                                        beforeNextElementSetup {
-                                            style.flexGrow = "1"
-                                            style.flexShrink = "1"
-                                            style.flexBasis = "0"
-                                            this.calculationContext.reactiveScope {
-                                                style.visibility =
-                                                    if (p.await() in minIndexProperty.await()..maxIndexProperty.await()) "visible" else "hidden"
-                                            }
-                                        }
-                                        dataAndRenderer.renderAny(
-                                            newViews,
-                                            shared { dataCopy.await()[p.await().coerceIn(minIndex, maxIndex)] })
-                                    }
-                                }
-                            } else {
-                                col {
-                                    repeat(columns) { offset ->
-                                        val p = properties[offset]
-                                        beforeNextElementSetup {
-                                            style.flexGrow = "1"
-                                            style.flexShrink = "1"
-                                            style.flexBasis = "0"
-                                            this.calculationContext.reactiveScope {
-                                                style.visibility =
-                                                    if (p.await() in minIndexProperty.await()..maxIndexProperty.await()) "visible" else "hidden"
-                                            }
-                                        }
-                                        dataAndRenderer.renderAny(
-                                            newViews,
-                                            shared { dataCopy.await()[p.await().coerceIn(minIndex, maxIndex)] })
-                                    }
-                                }
-                            }
-                        }
-                        rootCreated!!.also {
-                            it.asDynamic().__ROCK__properties = properties
-                        }
-                    }
-                }
-            }
-        }
-
-
-        // Handle top needs content
-        val neededOnTop = (children.get(0) as? org.w3c.dom.HTMLElement)?.let { child ->
-            val bounds = child.getBoundingClientRect()
-            val style = window.getComputedStyle(child)
-            val margin = style.marginStart.removeSuffix("px").toDoubleOrNull() ?: 0.0
-////            println("bounds.start - margin - outerBounds.start: ${bounds.start} - $margin - ${outerBounds.start}")
-            (bounds.start - margin - (outerBounds.start - beyondEdge)).coerceAtLeast(0.0)
-        } ?: 0.0
-        // Handle bottom needs content
-        val neededOnBottom = (contentCol.native.lastElementChild as? org.w3c.dom.HTMLElement)?.let { child ->
-            val bounds = child.getBoundingClientRect()
-            val style = window.getComputedStyle(child)
-            val margin = style.marginEnd.removeSuffix("px").toDoubleOrNull() ?: 0.0
-////            println("outerBounds.end - bounds.end - margin: ${outerBounds.end} - ${bounds.end} - $margin")
-            ((outerBounds.end + beyondEdge) - bounds.end - margin).coerceAtLeast(0.0)
-        } ?: (outerBounds.size + beyondEdge * 2)
-
-        // Add new elements
-        for (r in canRecycle) contentCol.native.removeChild(r)
-        reserved.addAll(canRecycle)
-
-        // Append views at the bottom until the needed space is filled
-        val startHeight1 = contentCol.native.getBoundingClientRect().size
-        while (neededOnBottom > contentCol.native.getBoundingClientRect().size - startHeight1 && lastIndex + columns <= maxIndex) {
-            lastIndex += columns
-            val newElement = makeElement(lastIndex)
-            contentCol.native.appendChild(newElement)
-        }
-
-        // Insert views on top until the needed space is filled
-        val startHeight2 = contentCol.native.getBoundingClientRect().size
-        while (neededOnTop > contentCol.native.getBoundingClientRect().size - startHeight2 && firstIndex - columns >= minIndex) {
-            firstIndex -= columns
-            val newElement = makeElement(firstIndex)
-            contentCol.native.insertBefore(newElement, contentCol.native.firstChild)
-        }
-        scrollAmount -= contentCol.native.getBoundingClientRect().size - startHeight2
-
-        // Handle scroll edges; we do this by altering the container size.
-        // You can't just set scrollTop; it will have odd effects when pushing against the scroll edge
-////        println("Before edge processing: $scrollStart")
-        lastDefaultPos = if (firstIndex <= minIndex && lastIndex >= maxIndex) {
-            // cap both; go straight to native style
-////            println("cap both; go straight to native style")
-            sizingContainer.style.size = "max-content"
-            sizingContainer.style.position = "unset"
-            contentCol.native.style.start = "-${0}px"
-            contentCol.native.style.position = "unset"
-            val newDefaultPos = 0.0
-            scrollAmount -= newDefaultPos - lastDefaultPos
-            newDefaultPos
-        } else if (firstIndex <= minIndex) {
-            // cap top
-////            println("cap top")
-            sizingContainer.style.size = "${reservedScrollingSpace / 2}px"
-            sizingContainer.style.position = "relative"
-            contentCol.native.style.start = "-${0}px"
-            contentCol.native.style.position = "absolute"
-            val newDefaultPos = 0.0
-            scrollAmount -= newDefaultPos - lastDefaultPos
-            newDefaultPos
-        } else if (lastIndex >= maxIndex) {
-            // cap bottom
-////            println("cap bottom")
-            val h = contentCol.native.scrollSize
-            sizingContainer.style.size = "${reservedScrollingSpace / 2 + h}px"
-            sizingContainer.style.position = "relative"
-            contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
-            contentCol.native.style.position = "absolute"
-            val newDefaultPos = reservedScrollingSpace / 2
-            scrollAmount -= newDefaultPos - lastDefaultPos
-            newDefaultPos
-        } else {
-            // uncap
-////            println("uncap")
-            sizingContainer.style.size = "${reservedScrollingSpace}px"
-            sizingContainer.style.position = "relative"
-            contentCol.native.style.start = "${reservedScrollingSpace / 2 - 0}px"
-            contentCol.native.style.position = "absolute"
-            val newDefaultPos = reservedScrollingSpace / 2
-            scrollAmount -= newDefaultPos - lastDefaultPos
-            newDefaultPos
-        }
-////        println("After edge processing: $scrollStart")
-
-
-        // Adjust offset
-        if (scrollAmount != 0.0) {
-//            println("Scrolling ${scrollAmount} total from $beforeScroll to position ${beforeScroll - scrollAmount}")
-            scrollStart = beforeScroll - scrollAmount
-            updateFakeScroll()
-        }
-        suppress = false
-//                suppressNext = true
-
-        (0..<children.length).firstOrNull { index ->
-            val child = children.get(index) as? org.w3c.dom.HTMLElement ?: return@firstOrNull false
-            val bounds = child.getBoundingClientRect()
-            bounds.start >= outerBounds.start
-        }?.times(columns)?.plus(firstIndex)?.let {
-            if(it != firstVisible.value) firstVisible.value = it
-        }
-        (children.length-1 downTo 0).firstOrNull { index ->
-            val child = children.get(index) as? org.w3c.dom.HTMLElement ?: return@firstOrNull false
-            val bounds = child.getBoundingClientRect()
-            bounds.end <= outerBounds.end
-        }?.times(columns)?.plus(columns-1)?.plus(firstIndex)?.let {
-            if(it != lastVisible.value) lastVisible.value = it
+    fun relayoutDown(startingIndex: Int) {
+        var bottom = allSubviews[startingIndex].let { anchor -> anchor.startPosition + anchor.size }
+        for (index in (startingIndex + 1)..allSubviews.lastIndex) {
+            val element = allSubviews[index]
+            bottom = element.placeAfter(bottom)
         }
     }
+
+    fun relayoutUp(startingIndex: Int) {
+        var top = allSubviews[startingIndex].let { anchor -> anchor.startPosition }
+        for (index in (startingIndex - 1)downTo 0) {
+            val element = allSubviews[index]
+            top = element.placeBefore(top)
+        }
+    }
+}
+
+
+val reservedScrollingSpace = 10_000
+
+class ItemRenderer<T>(
+    val create: (T) -> HTMLElement,
+    val update: (HTMLElement, T) -> Unit
+) {
+    @Suppress("UNCHECKED_CAST")
+    fun createAny(t: Any?) = create(t as T)
+    @Suppress("UNCHECKED_CAST")
+    fun updateAny(element: HTMLElement, t: Any?) = update(element, t as T)
 }

@@ -56,18 +56,21 @@ actual fun ViewWriter.platformSpecific() {
 //    }
 
     col {
-        var controller: RecyclerController? = null
         button {
             text("Alter Data")
             var version = 2
             onClick {
                 val v = version++
-                if (v % 2 == 0) data.value = (0..50).map { "Item $it (v$v)" }.toList()
-                else data.value = (0..20).map { "Item $it (v$v)" }.toList()
+                when (v % 4) {
+                    0 -> data.value = (0..50).map { "Item $it (v$v)" }.toList()
+                    1 -> data.value = (0..20).map { "Item $it (v$v)" }.toList()
+                    2 -> data.value = listOf()
+                    3 -> data.value = (0..3).map { "Item $it (v$v)" }.toList()
+                }
             }
         }
         var rv: RecyclerView? = null
-        expanding - horizontalRecyclerView {
+        expanding - recyclerView {
             rv = this
             columns = 1
             children(data) { obs ->

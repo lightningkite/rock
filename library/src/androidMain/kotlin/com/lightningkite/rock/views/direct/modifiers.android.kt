@@ -1,14 +1,12 @@
 package com.lightningkite.rock.views.direct
 
-import android.graphics.Color
+import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
-import android.widget.ScrollView
 
-import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Align
@@ -47,13 +45,13 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
         try {
             val lp = (lparams as SimplifiedLinearLayout.LayoutParams)
             lp.weight = amount
-            if((this.parent as SimplifiedLinearLayout).orientation == SimplifiedLinearLayout.HORIZONTAL) {
+            if ((this.parent as SimplifiedLinearLayout).orientation == SimplifiedLinearLayout.HORIZONTAL) {
                 lp.width = 0
             } else {
                 lp.height = 0
             }
         } catch (ex: Throwable) {
-            throw RuntimeException("Weight is only available within a column or row, but the parent is a ${parent?.let {it::class.simpleName}}")
+            throw RuntimeException("Weight is only available within a column or row, but the parent is a ${parent?.let { it::class.simpleName }}")
         }
     }
     return ViewWrapper
@@ -84,12 +82,12 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
             println("Unknown layout params kind ${params::class.qualifiedName}; I am ${this::class.qualifiedName}")
         if (horizontal == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.orientation != SimplifiedLinearLayout.HORIZONTAL) {
             params.width = ViewGroup.LayoutParams.MATCH_PARENT
-        } else if(params.width == ViewGroup.LayoutParams.MATCH_PARENT) {
+        } else if (params.width == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.width = ViewGroup.LayoutParams.WRAP_CONTENT
         }
         if (vertical == Align.Stretch && (this.parent as? SimplifiedLinearLayout)?.orientation != SimplifiedLinearLayout.VERTICAL) {
             params.height = ViewGroup.LayoutParams.MATCH_PARENT
-        } else if(params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
+        } else if (params.height == ViewGroup.LayoutParams.MATCH_PARENT) {
             params.height = ViewGroup.LayoutParams.WRAP_CONTENT
         }
     }
@@ -126,14 +124,139 @@ actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
 //            )
 //        }
 //    } else {
-        beforeNextElementSetup {
-            constraints.minHeight?.let { minimumHeight = it.value.toInt() }
-            constraints.minWidth?.let { minimumWidth = it.value.toInt() }
-            constraints.width?.let { lparams.width = it.value.toInt() }
-            constraints.height?.let { lparams.height = it.value.toInt() }
-        }
-//    }
+    wrapNext(DesiredSizeView(this.context)) {
+        this.constraints = constraints
+    }
     return ViewWrapper
+}
+
+class DesiredSizeView(context: Context) : ViewGroup(context) {
+    var constraints: SizeConstraints = SizeConstraints()
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        getChildAt(0).layout(0, 0,  r - l, b - t)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val f = getChildAt(0)
+        fun preprocess(baseSpec: Int, min: Int?, max: Int?, set: Int?): Int {
+            var out = baseSpec
+            when (MeasureSpec.getMode(baseSpec)) {
+                MeasureSpec.UNSPECIFIED -> {
+                    max?.let {
+                        out = MeasureSpec.makeMeasureSpec(it, MeasureSpec.AT_MOST)
+                    }
+                    set?.let {
+                        out = MeasureSpec.makeMeasureSpec(it, MeasureSpec.AT_MOST)
+                    }
+                }
+
+                MeasureSpec.EXACTLY -> {
+                    val value = MeasureSpec.getSize(baseSpec)
+                    out = MeasureSpec.makeMeasureSpec(
+                        value.let {
+                            set?.let { limit ->
+                                it.coerceAtMost(limit)
+                            } ?: it
+                        }.let {
+                            max?.let { limit ->
+                                it.coerceAtMost(limit)
+                            } ?: it
+                        },
+                        MeasureSpec.EXACTLY
+                    )
+                }
+
+                MeasureSpec.AT_MOST -> {
+                    val value = MeasureSpec.getSize(baseSpec)
+                    out = MeasureSpec.makeMeasureSpec(
+                        value.let {
+                            set?.let { limit ->
+                                it.coerceAtMost(limit)
+                            } ?: it
+                        }.let {
+                            max?.let { limit ->
+                                it.coerceAtMost(limit)
+                            } ?: it
+                        },
+                        MeasureSpec.AT_MOST
+                    )
+                }
+            }
+            return out
+        }
+        f.measure(
+            preprocess(
+                widthMeasureSpec,
+                constraints.minWidth?.value?.toInt(),
+                constraints.maxWidth?.value?.toInt(),
+                constraints.width?.value?.toInt()
+            ),
+            preprocess(
+                heightMeasureSpec,
+                constraints.minHeight?.value?.toInt(),
+                constraints.maxHeight?.value?.toInt(),
+                constraints.height?.value?.toInt()
+            )
+        )
+        fun postprocess(originalSpec: Int, baseSpec: Int, min: Int?, max: Int?, set: Int?): Int {
+            val measuredSize = MeasureSpec.getSize(baseSpec)
+            val outerRulesSize = MeasureSpec.getSize(originalSpec)
+
+            var outMode = MeasureSpec.getMode(baseSpec)
+            var outSize = measuredSize
+
+            set?.let {
+                outSize = outSize.coerceAtLeast(it)
+            }
+
+            when(MeasureSpec.getMode(originalSpec)) {
+                MeasureSpec.EXACTLY -> {
+                    outMode = MeasureSpec.EXACTLY
+                    outSize = outSize.coerceAtMost(outerRulesSize)
+                }
+                MeasureSpec.AT_MOST -> {
+                    if(outMode == MeasureSpec.EXACTLY) {
+                        outSize = outSize.coerceAtMost(outerRulesSize)
+                    } else {
+                        outMode = MeasureSpec.AT_MOST
+                        outSize = outSize.coerceAtMost(outerRulesSize)
+                    }
+                }
+            }
+
+            min?.let {
+                outSize = outSize.coerceAtLeast(it)
+            }
+            max?.let {
+                outSize = outSize.coerceAtMost(it)
+                if(outMode == MeasureSpec.UNSPECIFIED) {
+                    outMode = MeasureSpec.AT_MOST
+                }
+            }
+            return MeasureSpec.makeMeasureSpec(outSize, outMode)
+        }
+        setMeasuredDimension(
+            postprocess(
+                widthMeasureSpec,
+                f.measuredWidth,
+                constraints.minWidth?.value?.toInt(),
+                constraints.maxWidth?.value?.toInt(),
+                constraints.width?.value?.toInt()
+            ),
+            postprocess(
+                heightMeasureSpec,
+                f.measuredHeight,
+                constraints.minHeight?.value?.toInt(),
+                constraints.maxHeight?.value?.toInt(),
+                constraints.height?.value?.toInt()
+            )
+        )
+    }
 }
 
 @ViewModifierDsl3
@@ -144,7 +267,7 @@ actual fun ViewWriter.hasPopover(
 ): ViewWrapper {
     beforeNextElementSetup {
         setOnClickListener {
-            navigator.dialog.navigate(object: RockScreen {
+            navigator.dialog.navigate(object : RockScreen {
                 override fun ViewWriter.render() {
                     stack {
                         centered - stack {
@@ -168,7 +291,7 @@ actual fun ViewWriter.textPopover(message: String): ViewWrapper {
 
 
 @ViewModifierDsl3
-actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend ()->Boolean): ViewWrapper {
+actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend () -> Boolean): ViewWrapper {
     beforeNextElementSetup {
         exists = true
         ::exists.invoke(condition)

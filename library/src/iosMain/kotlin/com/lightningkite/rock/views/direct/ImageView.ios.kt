@@ -21,6 +21,7 @@ actual typealias NImageView = UIImageView
 @ViewDsl
 actual inline fun ViewWriter.imageActual(crossinline setup: ImageView.() -> Unit): Unit = element(NImageView()) {
     handleTheme(this, viewDraws = true, viewLoads = true)
+    clipsToBounds = true
     this.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
     setup(ImageView(this))
 }
@@ -79,7 +80,6 @@ actual inline var ImageView.scaleType: ImageScaleType
         when (value) {
             ImageScaleType.Fit -> native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
             ImageScaleType.Crop -> {
-                native.clipsToBounds = true
                 native.contentMode = UIViewContentMode.UIViewContentModeScaleAspectFill
             }
 

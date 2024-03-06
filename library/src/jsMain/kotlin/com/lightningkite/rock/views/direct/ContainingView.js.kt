@@ -29,15 +29,15 @@ actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> U
     setup(ContainingView(this))
 }
 
-actual var ContainingView.spacing: Dimension
-    get() {
-        return Dimension(native.style.getPropertyValue("--spacing").takeUnless { it.isBlank() } ?: "0px")
-    }
-    set(value) {
-        native.style.setProperty("--spacing", value.value)
-        val cn = "spacingOf${value.value.replace(".", "_").filter { it.isLetterOrDigit() || it == '_' }}"
-        DynamicCSS.styleIfMissing(".$cn > *, .$cn > .hidingContainer > *", mapOf(
-            "--parentSpacing" to value.value
-        ))
-        native.className = native.className.split(' ').filter { !it.startsWith("spacingOf") }.plus(cn).joinToString(" ")
-    }
+//actual var ContainingView.spacing: Dimension
+//    get() {
+//        return Dimension(native.style.getPropertyValue("--spacing").takeUnless { it.isBlank() } ?: "0px")
+//    }
+//    set(value) {
+//        native.style.setProperty("--spacing", value.value)
+//        val cn = "spacingOf${value.value.replace(".", "_").filter { it.isLetterOrDigit() || it == '_' }}"
+//        DynamicCSS.styleIfMissing(".$cn > *, .$cn > .hidingContainer > *", mapOf(
+//            "--parentSpacing" to value.value
+//        ))
+//        native.className = native.className.split(' ').filter { !it.startsWith("spacingOf") }.plus(cn).joinToString(" ")
+//    }

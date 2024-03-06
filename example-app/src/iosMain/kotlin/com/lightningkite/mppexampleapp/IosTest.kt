@@ -3,6 +3,7 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.delay
 import com.lightningkite.rock.gc
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.CalculationContextStack
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.ViewWriter
@@ -134,5 +135,14 @@ fun ViewWriter.iosTest() {
                 gc()
             }
         }
+    }
+}
+
+fun ViewWriter.iosTest2() {
+    col {
+        spacing = 0.px
+        text("A")
+        text("B")
+        text("C")
     }
 }

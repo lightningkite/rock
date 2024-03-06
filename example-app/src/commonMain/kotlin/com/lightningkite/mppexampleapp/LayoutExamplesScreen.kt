@@ -80,14 +80,29 @@ object LayoutExamplesScreen : RockScreen {
                         text.value = !text.value
                     }
                 }
-                gravity(Align.Start, Align.Start) - sizeConstraints(maxWidth = 40.rem) - important - stack {
-                    text { ::content { if(text.await()) "maxWidth = 40.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "maxWidth = 20.rem" }}
+                run {
+                    val amount = 20
+                    gravity(Align.Start, Align.Start) - sizeConstraints(maxWidth = amount.rem) - important - stack {
+                        text { ::content { if(text.await()) "maxWidth = $amount.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "maxWidth = $amount.rem" }}
+                    }
+                    gravity(Align.Start, Align.Start) - sizeConstraints(width = amount.rem) - important - stack {
+                        text { ::content { if(text.await()) "width = $amount.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "width = $amount.rem" }}
+                    }
+                    gravity(Align.Start, Align.Start) - sizeConstraints(minWidth = amount.rem) - important - stack {
+                        text { ::content { if(text.await()) "minWidth = $amount.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "minWidth = $amount.rem" }}
+                    }
                 }
-                gravity(Align.Start, Align.Start) - sizeConstraints(width = 40.rem) - important - stack {
-                    text { ::content { if(text.await()) "width = 40.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "width = 20.rem" }}
-                }
-                gravity(Align.Start, Align.Start) - sizeConstraints(minWidth = 40.rem) - important - stack {
-                    text { ::content { if(text.await()) "minWidth = 40.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "minWidth = 20.rem" }}
+                run {
+                    val amount = 40
+                    gravity(Align.Start, Align.Start) - sizeConstraints(maxWidth = amount.rem) - important - stack {
+                        text { ::content { if(text.await()) "maxWidth = $amount.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "maxWidth = $amount.rem" }}
+                    }
+                    gravity(Align.Start, Align.Start) - sizeConstraints(width = amount.rem) - important - stack {
+                        text { ::content { if(text.await()) "width = $amount.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "width = $amount.rem" }}
+                    }
+                    gravity(Align.Start, Align.Start) - sizeConstraints(minWidth = amount.rem) - important - stack {
+                        text { ::content { if(text.await()) "minWidth = $amount.rem with a lot of additional content to demonstrate large sizes.  Try adjusting the screen width smaller." else "minWidth = $amount.rem" }}
+                    }
                 }
             }
 

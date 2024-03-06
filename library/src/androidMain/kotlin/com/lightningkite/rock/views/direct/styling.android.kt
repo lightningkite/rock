@@ -122,7 +122,7 @@ inline fun <T : NView> ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = mightTransition && !isRoot || viewForcePadding || parentIsSwap
+        val usePadding = (mightTransition && !isRoot || viewForcePadding || parentIsSwap)
 
         if (usePadding) {
             view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt())
@@ -178,6 +178,18 @@ inline fun <T : NView> ViewWriter.handleTheme(
             } else if (view.isClickable) {
                 view.elevation = 0f
                 view.background = theme.rippleDrawableOnly(parentSpacing, view.background)
+                backgroundRemove()
+            } else if (view is TransitionImageView) {
+                view.elevation = 0f
+                view.background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    val cr = when(val it = theme.cornerRadii) {
+                        is CornerRadii.Constant -> min(parentSpacing, it.value.value)
+                        is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
+                    }
+                    cornerRadii = floatArrayOf(cr, cr, cr, cr, cr, cr, cr, cr)
+                    colors = intArrayOf(theme.background.applyAlpha(0.01f).colorInt(), theme.background.applyAlpha(0.01f).colorInt())
+                }
                 backgroundRemove()
             } else {
                 view.elevation = 0f

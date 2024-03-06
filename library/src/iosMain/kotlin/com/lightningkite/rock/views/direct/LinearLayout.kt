@@ -29,12 +29,15 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         set(value) { extensionPadding = value }
     var gap: Double = 0.0
         set(value) {
+            println("Gap is set to $value")
             field = value
             debugDescriptionInfo2 = "(gap=$field)"
             setNeedsLayout()
             informParentOfSizeChange()
         }
-    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).also {
+        it.addListener { it.value?.let { gap = it.value } }
+    }
     override fun getSpacingOverrideProperty() = spacingOverride
 
 //    init { setUserInteractionEnabled(false) }

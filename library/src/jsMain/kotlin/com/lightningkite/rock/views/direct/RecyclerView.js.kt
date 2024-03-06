@@ -51,9 +51,6 @@ actual fun <T> RecyclerView.children(
     render: ViewWriter.(value: Readable<T>) -> Unit
 ): Unit {
     (native.asDynamic().__ROCK__controller as RecyclerController2).let {
-        reactiveScope { 
-            it.data = items.await().asIndexed()
-        }
         it.renderer = ItemRenderer<T>(
             create = { value ->
                 val prop = Property(value)
@@ -66,6 +63,9 @@ actual fun <T> RecyclerView.children(
                 (element.asDynamic().__ROCK_prop__ as Property<T>).value = value
             }
         )
+        reactiveScope {
+            it.data = items.await().asIndexed()
+        }
     }
 }
 
@@ -115,6 +115,59 @@ fun <T> List<T>.asIndexed(): Indexed<T> = object : Indexed<T> {
     override fun copy(): Indexed<T> = this@asIndexed.toList().asIndexed()
 }
 
+fun <T> Indexed<T>.columned(count: Int): Indexed<Indexed<T>> = object: Indexed<Indexed<T>> {
+    val original = this@columned
+    override val min: Int
+        get() = original.min / count
+    override val max: Int
+        get() = original.max / count
+    override fun get(index: Int): Indexed<T> {
+        val basis = index * count
+        return object: Indexed<T> {
+            override val max: Int
+                get() = (count - 1).coerceAtMost(original.max - basis)
+            override val min: Int
+                get() = (0).coerceAtLeast(original.min - basis)
+            override fun get(index: Int): T = original.get(index + basis)
+            override fun copy(): Indexed<T> = this
+        }
+    }
+    override fun copy(): Indexed<Indexed<T>> = original.copy().columned(count)
+}
+
+fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
+    create = { data ->
+        (document.createElement("div") as HTMLDivElement).apply {
+            classList.add("recyclerViewGridSub")
+            repeat(count) {
+                if(it in data.min..data.max) {
+                    addNView(this@columned.create(data[it]))
+                } else {
+                    addNView((document.createElement("div") as HTMLDivElement).apply {
+                        classList.add("placeholder")
+                    })
+                }
+            }
+        }
+    },
+    update = { element, data ->
+        repeat(count) {
+            val child = (element.children[it] as HTMLElement)
+            if(it in data.min..data.max) {
+                val sub = data[it]
+                if (child.classList.contains("placeholder")) {
+                    element.replaceChild(child, this.create(sub))
+                } else {
+                    this.update(child, sub)
+                }
+                child.style.visibility = "visible"
+            } else {
+                child.style.visibility = "hidden"
+            }
+        }
+    }
+)
+
 class RecyclerController2(
     val root: HTMLDivElement,
     val newViews: ViewWriter,
@@ -151,7 +204,7 @@ class RecyclerController2(
     val capView = (document.createElement("div") as HTMLDivElement).apply {
         style.size = "1px"
         style.start = "${reservedScrollingSpace}px"
-        style.backgroundColor = "red"
+        style.backgroundColor = "rbga(1, 1, 1, 0.01)"
     }
 
     init {
@@ -200,23 +253,48 @@ class RecyclerController2(
     
     var columns: Int = 1
         set(value) {
-            field = value
-            allSubviews.forEach {
-                it.element.shutdown()
+            if(value != field) {
+                field = value
+                if(columns == 1) {
+                    rendererDirect = renderer
+                    dataDirect = data
+                } else {
+                    rendererDirect = renderer.columned(columns)
+                    dataDirect = data.columned(columns)
+                }
             }
-            allSubviews.clear()
-            ready()
+        }
+    var data: Indexed<*> = Indexed.EMPTY
+        set(value) {
+            field = value
+            if(columns == 1) {
+                dataDirect = value
+            } else {
+                dataDirect = value.columned(columns)
+            }
         }
     var renderer: ItemRenderer<*> = ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
         set(value) {
+            field = value
+            data = Indexed.EMPTY
+            if(columns == 1) {
+                rendererDirect = value
+            } else {
+                rendererDirect = value.columned(columns)
+            }
+        }
+    var rendererDirect: ItemRenderer<*> = ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
+        set(value) {
+            dataDirect = Indexed.EMPTY
             field = value
             allSubviews.forEach {
                 it.element.shutdown()
                 contentHolder.removeChild(it.element)
             }
             allSubviews.clear()
+            populate()
         }
-    var data: Indexed<*> = Indexed.EMPTY
+    var dataDirect: Indexed<*> = Indexed.EMPTY
         set(value) {
             field = value
             if(allSubviews.isNotEmpty()) {
@@ -235,7 +313,7 @@ class RecyclerController2(
                     if (it.index in value.min..value.max) {
                         it.visible = true
                         it.element.withoutAnimation {
-                            renderer.updateAny(it.element, value[it.index])
+                            rendererDirect.updateAny(it.element, value[it.index])
                         }
                     } else {
                         it.visible = false
@@ -280,14 +358,14 @@ class RecyclerController2(
             populate()
             if (allSubviews.isNotEmpty()) {
                 var defaultShift = true
-                if (allSubviews.first().index <= data.min) {
+                if (allSubviews.first().index <= dataDirect.min) {
                     // shift and attach to top
                     if(allSubviews.first().startPosition > 100) {
                         shift(-allSubviews.first().startPosition)
                     }
                     defaultShift = false
                 }
-                if (allSubviews.last().index >= data.max) {
+                if (allSubviews.last().index >= dataDirect.max) {
                     capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
                     defaultShift = false
                 } else {
@@ -309,22 +387,22 @@ class RecyclerController2(
                 return@event Unit
             }
             if(allSubviews.isEmpty()) return@event Unit
-            val numElements = data.max - data.min + 1
+            val numElements = dataDirect.max - dataDirect.min + 1
             val partialStart = fakeScroll.scrollStart / fakeScrollInner.scrollHeight * numElements
-            val newStart = partialStart.toInt().coerceIn(data.min, data.max) // floor?
+            val newStart = partialStart.toInt().coerceIn(dataDirect.min, dataDirect.max) // floor?
             val startIndexPartial =
                 allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
             val currentStart = allSubviews[0].index
             val currentEnd = allSubviews.last().index
             var diff = (newStart - currentStart)
-            if(diff > data.max - currentEnd) {
-                diff = data.max - currentEnd
+            if(diff > dataDirect.max - currentEnd) {
+                diff = dataDirect.max - currentEnd
                 if(diff != 0) {
                     for(subview in allSubviews) {
                         val newIndex = subview.index + diff
                         subview.index = newIndex
                         subview.element.withoutAnimation {
-                            renderer.updateAny(subview.element, data[newIndex])
+                            rendererDirect.updateAny(subview.element, dataDirect[newIndex])
                         }
                     }
                 }
@@ -338,7 +416,7 @@ class RecyclerController2(
                         val newIndex = subview.index + diff
                         subview.index = newIndex
                         subview.element.withoutAnimation {
-                            renderer.updateAny(subview.element, data[newIndex])
+                            rendererDirect.updateAny(subview.element, dataDirect[newIndex])
                         }
                     }
                 }
@@ -351,21 +429,21 @@ class RecyclerController2(
     }
     fun jump(index: Int, align: Align) {
         if(allSubviews.isEmpty()) return
-        if(index !in data.min..data.max) return
+        if(index !in dataDirect.min..dataDirect.max) return
         val existingIndex = when(align) {
             Align.Start -> allSubviews.first().index
             Align.End -> allSubviews.last().index
             else -> (allSubviews.first().index + allSubviews.last().index) / 2
         }
         var target: Subview? = null
-        val shift = (index - existingIndex).coerceAtMost(data.max - allSubviews.last().index).coerceAtLeast(data.min - allSubviews.first().index)
+        val shift = (index - existingIndex).coerceAtMost(dataDirect.max - allSubviews.last().index).coerceAtLeast(dataDirect.min - allSubviews.first().index)
         allSubviews.forEach {
             it.index += shift
             if(it.index == index) target = it
-            if (it.index in data.min..data.max) {
+            if (it.index in dataDirect.min..dataDirect.max) {
                 it.visible = true
                 it.element.withoutAnimation {
-                    renderer.updateAny(it.element, data[it.index])
+                    rendererDirect.updateAny(it.element, dataDirect[it.index])
                 }
             } else {
                 it.visible = false
@@ -384,7 +462,7 @@ class RecyclerController2(
             allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
         val endIndexPartial = allSubviews.last()
             .let { it.index + (viewportOffset + viewportSize - it.startPosition) / it.size.toDouble() }
-        val numElements = data.max - data.min + 1
+        val numElements = dataDirect.max - dataDirect.min + 1
         val viewedRatio = ((endIndexPartial - startIndexPartial) / numElements).coerceAtLeast(0.01).coerceAtMost(2.0)
         suppressFakeScroll = true
         fakeScrollInner.style.size = "${100 / viewedRatio}%"
@@ -448,7 +526,7 @@ class RecyclerController2(
     }
 
     fun makeSubview(index: Int, atStart: Boolean): Subview {
-        val element = renderer.createAny(data[index])
+        val element = rendererDirect.createAny(dataDirect[index])
         return Subview(
             element = element,
             index = index,
@@ -456,9 +534,9 @@ class RecyclerController2(
     }
 
     fun makeFirst(): Subview? {
-        if(data.max < data.min) return null
+        if(dataDirect.max < dataDirect.min) return null
         viewportOffset = reservedScrollingSpace / 2
-        val element = makeSubview(data.min, false)
+        val element = makeSubview(dataDirect.min, false)
         element.measure()
         element.startPosition = reservedScrollingSpace / 2
         return element
@@ -468,11 +546,11 @@ class RecyclerController2(
         populateDown()
         populateUp()
         firstVisible.let {
-            val v = allSubviews.firstOrNull()?.index ?: -1
+            val v = allSubviews.firstOrNull()?.index?.times(columns) ?: -1
             if(v != it.value) it.value = v
         }
         lastVisible.let {
-            val v = allSubviews.lastOrNull()?.index ?: -1
+            val v = allSubviews.lastOrNull()?.index?.times(columns)?.plus(columns - 1) ?: -1
             if(v != it.value) it.value = v
         }
         updateFakeScroll()
@@ -483,14 +561,14 @@ class RecyclerController2(
         var bottom = anchor.startPosition + anchor.size
         while ((bottom < viewportSize + viewportOffset)) {
             val nextIndex = anchor.index + 1
-            if (nextIndex > data.max) break
+            if (nextIndex > dataDirect.max) break
             // Get the element to place
             val element: Subview = allSubviews.first().takeIf {
                 (it.startPosition + it.size < viewportOffset)
             }?.also {
                 it.index = nextIndex
                 it.element.withoutAnimation {
-                    renderer.updateAny(it.element, data[nextIndex])
+                    rendererDirect.updateAny(it.element, dataDirect[nextIndex])
                 }
                 allSubviews.removeFirst()
                 allSubviews.add(it)
@@ -506,14 +584,14 @@ class RecyclerController2(
         var top = anchor.startPosition
         while ((top > viewportOffset)) {
             val nextIndex = anchor.index - 1
-            if (nextIndex < data.min) break
+            if (nextIndex < dataDirect.min) break
             // Get the element to place
             val element: Subview = allSubviews.last().takeIf {
                 it.startPosition > viewportOffset + viewportSize
             }?.also {
                 it.index = nextIndex
                 it.element.withoutAnimation {
-                    renderer.updateAny(it.element, data[nextIndex])
+                    rendererDirect.updateAny(it.element, dataDirect[nextIndex])
                 }
                 allSubviews.removeLast()
                 allSubviews.add(0, it)

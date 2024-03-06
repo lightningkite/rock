@@ -17,7 +17,7 @@ object RecyclerViewScreen : RockScreen {
 
     override fun ViewWriter.render() {
         var expanded = Property(-1)
-        val items = Property((1..100).toList())
+        val items = Property((1..101).toList())
         var recyclerView: RecyclerView? = null
         col {
             row {
@@ -52,7 +52,7 @@ object RecyclerViewScreen : RockScreen {
             }
             recyclerView {
                 recyclerView = this
-                columns = 2
+//                columns = 2
                 children(items) {
                     themeFromLast { theme ->
                         if(it.await() == 50) theme.important() else if(it.await() % 7 == 0) theme.hover() else theme

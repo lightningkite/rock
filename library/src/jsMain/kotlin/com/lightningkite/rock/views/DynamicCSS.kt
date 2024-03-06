@@ -181,6 +181,21 @@ object DynamicCSS {
             "position" to "absolute",
             "height" to "100%",
         ))
+        style(".contentScroll-V > .recyclerViewGridSub",  mapOf(
+            "display" to "flex",
+            "flex-direction" to "row",
+            "gap" to "var(--spacing, 0)",
+        ))
+        style(".contentScroll-H > .recyclerViewGridSub",  mapOf(
+            "display" to "flex",
+            "flex-direction" to "column",
+            "gap" to "var(--spacing, 0)",
+        ))
+        style(".recyclerViewGridSub > *",  mapOf(
+            "flex-grow" to "1",
+            "flex-shrink" to "1",
+            "flex-basis" to "0",
+        ))
 
         style(
             ".spinner", mapOf(

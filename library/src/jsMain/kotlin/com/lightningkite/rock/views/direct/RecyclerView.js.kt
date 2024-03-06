@@ -208,13 +208,36 @@ class RecyclerController2(
     var data: Indexed<*> = ArrayList<Any?>().asIndexed()
         set(value) {
             field = value
-            allSubviews.forEach {
-                if (it.index in value.min..value.max) {
-                    it.visible = true
-                    it.property.value = value[it.index]
-                } else {
-                    it.visible = false
+            if(allSubviews.isNotEmpty()) {
+                // Shift into range
+                val outOfBoundsBottom = allSubviews.last().index > value.max
+                val outOfBoundsTop = allSubviews.first().index < value.min
+                val shift = if(outOfBoundsBottom && outOfBoundsTop) {
+                    value.min - allSubviews.first().index
+                } else if(outOfBoundsTop) {
+                    value.min - allSubviews.first().index
+                } else if (outOfBoundsBottom) {
+                    (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
+                } else 0
+                allSubviews.forEach {
+                    println("Shift ${it.index} by $shift")
+                    it.index += shift
+                    if (it.index in value.min..value.max) {
+                        it.visible = true
+                        it.property.value = value[it.index]
+                    } else {
+                        it.visible = false
+                    }
                 }
+                if(shift > 0) {
+                    // Force to top
+                    viewportOffset = allSubviews.first().startPosition
+                } else if(shift < 0) {
+                    // Force to bottom
+                    viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                }
+            } else {
+                populate()
             }
         }
     var spacing: Int = 0
@@ -246,21 +269,20 @@ class RecyclerController2(
             populate()
             if (allSubviews.isNotEmpty()) {
                 var defaultShift = true
-                if (allSubviews.first().index == data.min) {
+                if (allSubviews.first().index <= data.min) {
                     // shift and attach to top
                     if(allSubviews.first().startPosition > 100) {
                         shift(-allSubviews.first().startPosition)
                     }
                     defaultShift = false
                 }
-                if (allSubviews.last().index == data.max) {
+                if (allSubviews.last().index >= data.max) {
                     capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
-                    contentHolder.style.size =
-                        allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+//                    contentHolder.style.size = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
                     defaultShift = false
                 } else {
                     capView.style.start = reservedScrollingSpace.let { "${it}px" }
-                    contentHolder.style.size = reservedScrollingSpace.let { "${it}px" }
+//                    contentHolder.style.size = reservedScrollingSpace.let { "${it}px" }
                 }
                 if(defaultShift) {
                     if (viewportOffset > reservedScrollingSpace * 3 / 4) {
@@ -325,9 +347,8 @@ class RecyclerController2(
             allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
         val endIndexPartial = allSubviews.last()
             .let { it.index + (viewportOffset + viewportSize - it.startPosition) / it.size.toDouble() }
-        println("$startIndexPartial - $endIndexPartial")
         val numElements = data.max - data.min + 1
-        val viewedRatio = ((endIndexPartial - startIndexPartial) / numElements).coerceAtLeast(0.01).coerceAtMost(1.0)
+        val viewedRatio = ((endIndexPartial - startIndexPartial) / numElements).coerceAtLeast(0.01).coerceAtMost(2.0)
         suppressFakeScroll = true
         fakeScrollInner.style.size = "${100 / viewedRatio}%"
         fakeScroll.scrollStart = startIndexPartial / numElements * viewportSize / viewedRatio

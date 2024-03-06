@@ -159,11 +159,13 @@ object DynamicCSS {
 
         style(".contentScroll-V",  mapOf(
             "width" to "100%",
+            "height" to "100%",
             "position" to "relative",
             "overflow-y" to "scroll",
             "overflow-anchor" to "none",
         ))
         style(".contentScroll-H",  mapOf(
+            "width" to "100%",
             "height" to "100%",
             "position" to "relative",
             "overflow-x" to "scroll",

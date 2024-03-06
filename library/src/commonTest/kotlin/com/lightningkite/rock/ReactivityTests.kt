@@ -36,12 +36,41 @@ class ReactivityTests {
                 emissions.add(property.waitForNotNull.await())
             }
             repeat(10) {
-                property.value = it
                 property.value = null
+                property.value = it
             }
             cancel()
         }
         assertEquals((0..9).toList(), emissions)
+    }
+
+
+    @Test fun doubleAwait(){
+
+        val base = LateInitProperty<Int>()
+        val sub = shared{
+            base
+        }
+
+        var usableEmits = 0
+        val usable = shared{
+            println("A")
+            val t = sub.await().also { println("B") }.await()
+//            val t = base.await()
+            println("C")
+            usableEmits++
+            t
+        }
+
+        testContext {
+            reactiveScope {
+                println(usable.await())
+            }
+
+            base.value = 1
+            assertEquals(1, usableEmits)
+        }
+
     }
 
     @Test fun sharedShutdownTest() {
@@ -60,6 +89,18 @@ class ReactivityTests {
         removeListener()
         assertEquals(1, scopeCalled)
         assertEquals(1, onRemoveCalled)
+    }
+
+    @Test fun basics() {
+        val a = Property(1)
+        var bInvocations = 0
+        val b = shared { a.await().also { bInvocations++ } }
+        testContext {
+            reactiveScope {
+                b.await()
+                println("bInvocations: $bInvocations")
+            }
+        }
     }
 
     @Test fun sharedTest() {
@@ -173,8 +214,10 @@ fun testContext(action: CalculationContext.()->Unit): Cancellable {
 
         override fun notifyComplete(result: Result<Unit>) {
             result.onFailure { t ->
-                t.printStackTrace()
-                error = t
+                if(t !is CancelledException) {
+                    t.printStackTrace()
+                    error = t
+                }
             }
         }
     }) {

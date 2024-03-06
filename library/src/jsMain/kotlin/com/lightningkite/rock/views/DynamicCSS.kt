@@ -157,29 +157,39 @@ object DynamicCSS {
             )
         )
 
+        style(".contentScroll-V::-webkit-scrollbar", mapOf(
+            "display" to "none"
+        ))
+        style(".contentScroll-H::-webkit-scrollbar", mapOf(
+            "display" to "none"
+        ))
         style(".contentScroll-V",  mapOf(
             "width" to "100%",
             "height" to "100%",
             "position" to "relative",
             "overflow-y" to "scroll",
             "overflow-anchor" to "none",
+            "scrollbar-width" to "none",
         ))
         style(".contentScroll-H",  mapOf(
             "width" to "100%",
             "height" to "100%",
             "position" to "relative",
             "overflow-x" to "scroll",
-            "overflow-anchor" to "revert",
+            "overflow-anchor" to "none",
+            "scrollbar-width" to "none",
         ))
         style(".contentScroll-V > *",  mapOf(
             "position" to "absolute",
             "max-height" to "unset",
             "width" to "100%",
+            "overflow-anchor" to "revert",
         ))
         style(".contentScroll-H > *",  mapOf(
             "max-width" to "unset",
             "position" to "absolute",
             "height" to "100%",
+            "overflow-anchor" to "revert",
         ))
         style(".contentScroll-V > .recyclerViewGridSub",  mapOf(
             "display" to "flex",
@@ -849,19 +859,6 @@ object DynamicCSS {
 //        content
 //        barScroll
 //        barContent
-        style(".contentScroll::-webkit-scrollbar", mapOf(
-//            "display" to "none"
-        ))
-        style(".contentScroll", mapOf(
-            "scrollbar-width" to "none",
-            "overflow-anchor" to "none",
-            "padding" to "inherit",
-        ))
-        style(".contentScroll > *", mapOf(
-            "overflow-anchor" to "revert",
-            "max-width" to "unset",
-            "max-height" to "unset",
-        ))
         style(".viewPager", mapOf(
             "overflow-x" to "scroll",
             "scroll-snap-type" to "x mandatory",

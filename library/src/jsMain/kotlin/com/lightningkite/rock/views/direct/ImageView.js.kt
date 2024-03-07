@@ -65,8 +65,7 @@ fun ImageView.setSrc(url: String) {
     }
 
     if (native.children.length > 0) {
-        val exists = native.children[0] as HTMLImageElement
-        exists.src = url
+        (native.children[0] as? HTMLImageElement)?.let { it.src == url }
         return
     }
 

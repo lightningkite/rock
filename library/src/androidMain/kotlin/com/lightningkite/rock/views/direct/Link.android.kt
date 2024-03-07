@@ -1,11 +1,13 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.RockActivity
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.navigation.PlatformNavigator
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
 import com.lightningkite.rock.views.navigator
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
@@ -14,16 +16,11 @@ import timber.log.Timber
 actual typealias NLink = LinkFrameLayout
 
 actual var Link.to: RockScreen
-    get() {
-        val rockScreen: RockScreen
-        runBlocking {
-            rockScreen = PlatformNavigator.currentScreen.await()!!
-        }
-        return rockScreen
-    }
+    get() = TODO()
     set(value) {
         native.setOnClickListener {
             native.navigator.navigate(value)
+            calculationContext.launchManualCancel { native.onNavigate() }
         }
     }
 actual var Link.newTab: Boolean
@@ -33,6 +30,9 @@ actual var Link.newTab: Boolean
     set(value) {
         Timber.d("New Tab called with value $value")
     }
+actual fun Link.onNavigate(action: suspend () -> Unit): Unit {
+    native.onNavigate = action
+}
 
 @ViewDsl
 actual inline fun ViewWriter.linkActual(crossinline setup: Link.() -> Unit) {

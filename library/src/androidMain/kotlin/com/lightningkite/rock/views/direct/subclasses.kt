@@ -10,6 +10,7 @@ import com.lightningkite.rock.views.animationsEnabled
 
 class LinkFrameLayout(context: Context): SlightlyModifiedFrameLayout(context) {
     lateinit var navigator: RockNavigator
+    var onNavigate: suspend ()->Unit = {}
 }
 
 class RockLayoutTransition: LayoutTransition() {

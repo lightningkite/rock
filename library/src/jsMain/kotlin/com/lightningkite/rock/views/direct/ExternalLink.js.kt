@@ -1,7 +1,9 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
 import org.w3c.dom.HTMLAnchorElement
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -24,3 +26,8 @@ actual inline var ExternalLink.newTab: Boolean
     set(value) {
         native.target = if (value) "_blank" else "_self"
     }
+actual fun ExternalLink.onNavigate(action: suspend () -> Unit): Unit {
+    native.onclick = {
+        calculationContext.launchManualCancel(action)
+    }
+}

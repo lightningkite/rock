@@ -63,6 +63,13 @@ fun ImageView.setSrc(url: String) {
         }
         return
     }
+
+    if (native.children.length > 0) {
+        val exists = native.children[0] as HTMLImageElement
+        exists.src = url
+        return
+    }
+
     val newElement = document.createElement("img") as HTMLImageElement
     newElement.style.opacity = "0"
     val now = clockMillis()

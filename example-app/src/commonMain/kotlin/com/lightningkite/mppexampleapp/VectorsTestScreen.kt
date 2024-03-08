@@ -150,6 +150,42 @@ object VectorsTestScreen : RockScreen {
                     )
                 }
             }
+            row  {
+                image {
+                    source = ImageVector(
+                        4.rem,
+                        4.rem,
+                        viewBoxWidth = 100,
+                        viewBoxHeight = 100,
+                        paths = listOf(
+                            ImageVector.Path(
+                                fillColor = LinearGradient(listOf(
+                                    GradientStop(0f, Color.blue),
+                                    GradientStop(1f, Color.red),
+                                ), Angle.eighthTurn, false),
+                                path = "M 0,0 L 0,100 L 100,100 L 100,0 Z"
+                            ),
+                        )
+                    )
+                }
+                image {
+                    source = ImageVector(
+                        4.rem,
+                        4.rem,
+                        viewBoxWidth = 100,
+                        viewBoxHeight = 100,
+                        paths = listOf(
+                            ImageVector.Path(
+                                fillColor = LinearGradient(listOf(
+                                    GradientStop(0f, Color.blue),
+                                    GradientStop(1f, Color.red),
+                                ), Angle.eighthTurn + Angle.halfTurn, false),
+                                path = "M 0,0 L 0,100 L 100,100 L 100,0 Z"
+                            ),
+                        )
+                    )
+                }
+            }
         }
     }
 }

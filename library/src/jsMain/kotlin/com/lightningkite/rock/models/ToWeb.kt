@@ -1,6 +1,7 @@
 package com.lightningkite.rock.models
 
 import com.lightningkite.rock.dom.HTMLElement
+import com.lightningkite.rock.encodeURIComponent
 import kotlinx.browser.document
 import kotlinx.dom.appendElement
 import kotlinx.dom.createElement
@@ -13,18 +14,44 @@ import kotlin.contracts.contract
 
 
 fun ImageVector.toWeb(): String {
-    return buildString {
-        append("data:image/svg+xml;utf8,<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+    return "data:image/svg+xml;utf8," + encodeURIComponent(buildString {
+        append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
         append("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${width.value}\" height=\"${height.value}\" viewBox=\"$viewBoxMinX $viewBoxMinY $viewBoxWidth $viewBoxHeight\">")
-        paths.forEach { path ->
+        append("<defs>")
+        paths.forEachIndexed { index: Int, path: ImageVector.Path ->
+            when(val p = path.fillColor) {
+                is LinearGradient -> {
+                    append("<linearGradient id=\"fill$index\" gradientTransform=\"rotate(${p.angle.degrees}, 0.5, 0.5)\">")
+                    for(stop in p.stops) {
+                        append("<stop stop-color=\"${stop.color.toAlphalessWeb()}\" stop-opacity=\"${stop.color.alpha}\" offset=\"${stop.ratio.times(100).toInt()}%\"/>")
+                    }
+                    append("</linearGradient>")
+                }
+                is RadialGradient -> {
+                    append("<radialGradient id=\"fill$index\">")
+                    for(stop in p.stops) {
+                        append("<stop stop-color=\"${stop.color.toAlphalessWeb()}\" stop-opacity=\"${stop.color.alpha}\" offset=\"${stop.ratio.times(100).toInt()}%\"/>")
+                    }
+                    append("</radialGradient>")
+                }
+                else -> {}
+            }
+        }
+        append("</defs>")
+        paths.forEachIndexed { index, path ->
             append(
                 "<path d=\"${path.path}\" stroke=\"${path.strokeColor?.toWeb() ?: Color.transparent.toWeb()}\" stroke-width=\"${path.strokeWidth ?: 0}\" fill=\"${
-                    (path.fillColor ?: Color.transparent).closestColor().toWeb()
+                    when(val f = path.fillColor) {
+                        is LinearGradient -> "url(#fill$index)"
+                        is RadialGradient -> "url(#fill$index)"
+                        is Color -> f.toWeb()
+                        null -> Color.transparent.toWeb()
+                    }
                 }\"/>"
             )
         }
         append("</svg>")
-    }
+    })
 }
 
 fun HTMLElement.renderSvgIcon(svg: Icon) {

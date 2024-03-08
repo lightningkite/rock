@@ -142,6 +142,7 @@ class ViewWriter(
 
     private var beforeNextElementSetupList = ArrayList<NView.() -> Unit>()
     private var afterNextElementSetupList = ArrayList<NView.() -> Unit>()
+    private var afterNextElementPopList = ArrayList<()->Unit>()
 
     //    private val wrapperToDoList = ArrayList<NView.() -> Unit>()
     private var popCount = 0
@@ -162,7 +163,11 @@ class ViewWriter(
             popCount = 0
             beforeCopy.forEach { it(element) }
             setup(element)
-            afterCopy.forEach { it(element) }
+            afterNextElementPopList.add {
+                CalculationContextStack.useIn(element.calculationContext) {
+                    afterCopy.forEach { it(element) }
+                }
+            }
             popCount = oldPop
         }
         popCount++
@@ -190,6 +195,7 @@ class ViewWriter(
             while (toPop > 0) {
                 val item = stack.removeLast()
                 toPop--
+                afterNextElementPopList.removeLast().invoke()
             }
 //            wrapperToDoList.clear()
         }

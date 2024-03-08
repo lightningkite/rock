@@ -14,8 +14,6 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.util.*
-import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -23,6 +21,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 
 val client: HttpClient
@@ -72,8 +71,7 @@ actual suspend fun fetch(
                                 ) ?: "application/octet-stream"
                             contentType(ContentType.parse(type))
                             setBody(
-                                AndroidAppContext.applicationCtx.contentResolver.openInputStream(body.content.uri)!!
-                                    .toByteReadChannel()
+                                body.content.uri.path?.let { File(it).readBytes() }
                             )
                         }
 

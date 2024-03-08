@@ -56,18 +56,23 @@ fun ImageView.setSrc(url: String) {
             val children = (0..<native.children.length).mapNotNull { native.children[it] }
             children.forEach {
                 (it as? HTMLElement)?.style?.opacity = "0"
-                window.setTimeout({
-                    native.removeChild(it)
-                }, 150)
             }
+            window.setTimeout({
+                children.forEach {
+                    native.removeChild(it)
+                }
+            }, 150)
         }
         return
     }
+
     val newElement = document.createElement("img") as HTMLImageElement
     newElement.style.opacity = "0"
     val now = clockMillis()
-    newElement.onload = {
+    newElement.onload = label@{
         val children = (0..<native.children.length).mapNotNull { native.children[it] }
+        val myIndex = children.indexOf(newElement)
+        if(myIndex == -1) return@label Unit
         if((clockMillis() - now).also { println("Image load for $url took $it ms") } < 32 && children.isEmpty()) {
             // disable animations and get it done; no reason to show the user an animation
             newElement.withoutAnimation {
@@ -75,17 +80,13 @@ fun ImageView.setSrc(url: String) {
             }
         } else {
             newElement.style.opacity = "1"
-            var found = false
-            children.forEach {
-                if(it === newElement)
-                    found = true
-                else if(found) {
-                    (it as? HTMLElement)?.style?.opacity = "0"
-                    window.setTimeout({
-                        native.removeChild(it)
-                    }, 150)
-                }
-            }
+        }
+        for(index in 0..<myIndex) {
+            val it = children[index]
+            (it as? HTMLElement)?.style?.opacity = "0"
+            window.setTimeout({
+                native.removeChild(it)
+            }, 150)
         }
     }
     newElement.src = url

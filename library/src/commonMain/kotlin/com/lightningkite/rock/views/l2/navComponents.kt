@@ -43,10 +43,10 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>,
                     }
                     row {
                         spacing = 0.px
-                        space(1.0)
-                        col {
+                        space()
+                        expanding - col {
                             spacing = 0.px
-                            navGroupColumnInner(shared { it.children() })
+                            navGroupColumnInner(shared { it.children() }, onNavigate)
                         }
                     }
                 }

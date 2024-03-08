@@ -29,7 +29,6 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         set(value) { extensionPadding = value }
     var gap: Double = 0.0
         set(value) {
-            println("Gap is set to $value")
             field = value
             debugDescriptionInfo2 = "(gap=$field)"
             setNeedsLayout()

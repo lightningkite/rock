@@ -973,7 +973,7 @@ object DynamicCSS {
 
     private fun Paint.toCss() = when (this) {
         is Color -> this.toWeb()
-        is LinearGradient -> "linear-gradient(${angle.turns}turn, ${joinGradientStops(stops)})"
+        is LinearGradient -> "linear-gradient(${angle.plus(Angle.quarterTurn).turns}turn, ${joinGradientStops(stops)})"
         is RadialGradient -> "radial-gradient(circle at center, ${joinGradientStops(stops)})"
     }
 

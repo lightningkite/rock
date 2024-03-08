@@ -2,7 +2,10 @@ package com.lightningkite.rock.views.Path
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.ImageVector
+import com.lightningkite.rock.models.LinearGradient
+import com.lightningkite.rock.models.RadialGradient
 import com.lightningkite.rock.views.direct.colorInt
 import kotlin.math.*
 
@@ -25,6 +28,40 @@ val pathLetters = charArrayOf(
 )
 val spaceOrComma = Regex("[ ,]+")
 
+fun Paint.match(rock: com.lightningkite.rock.models.Paint, parentOffsetX: Float, parentWidth: Float, parentOffsetY: Float, parentHeight: Float) {
+    when (val it = rock) {
+        is Color -> this.color = it.colorInt()
+        is LinearGradient -> {
+            val smallest = min(parentWidth, parentHeight) / 2
+            val x0 = parentOffsetX + parentWidth / 2 - it.angle.cos() * smallest
+            val x1 = parentOffsetX + parentWidth / 2 + it.angle.cos() * smallest
+            val y0 = parentOffsetY + parentWidth / 2 - it.angle.sin() * smallest
+            val y1 = parentOffsetY + parentWidth / 2 + it.angle.sin() * smallest
+            this.shader = android.graphics.LinearGradient(
+                x0,
+                y0,
+                x1,
+                y1,
+                it.stops.map { it.color.colorInt() }.toIntArray(),
+                it.stops.map { it.ratio }.toFloatArray(),
+                Shader.TileMode.CLAMP
+            )
+        }
+
+        is RadialGradient -> {
+            val smallest = min(parentWidth, parentHeight) / 2
+            this.shader = android.graphics.RadialGradient(
+                parentOffsetX + parentWidth / 2,
+                parentOffsetY + parentHeight / 2,
+                smallest,
+                it.stops.map { it.color.colorInt() }.toIntArray(),
+                it.stops.map { it.ratio }.toFloatArray(),
+                Shader.TileMode.CLAMP
+            )
+        }
+    }
+}
+
 class PathDrawable(val vector: ImageVector) : Drawable() {
     val drawingResources = DrawingResources()
 
@@ -43,15 +80,31 @@ class PathDrawable(val vector: ImageVector) : Drawable() {
         vector.paths.map {
             PathInfo(
                 path = Path().apply { render(drawingResources, it.path, translateX, translateY, scaleX, scaleY) },
-                outline = it.strokeColor?.let { color -> Paint().apply {
-                    this.color = color.colorInt()
-                    style = Paint.Style.STROKE
-                    strokeWidth = it.strokeWidth?.times(scaleX)?.toFloat() ?: 0f
-                }},
-                fill = it.fillColor?.let { color -> Paint().apply {
-                    this.color = color.colorInt()
-                    style = Paint.Style.FILL
-                }},
+                outline = it.strokeColor?.let { color ->
+                    Paint().apply {
+                        match(
+                            color,
+                            translateX,
+                            vector.width.value,
+                            translateY,
+                            vector.height.value,
+                        )
+                        style = Paint.Style.STROKE
+                        strokeWidth = it.strokeWidth?.times(scaleX)?.toFloat() ?: 0f
+                    }
+                },
+                fill = it.fillColor?.let { color ->
+                    Paint().apply {
+                        match(
+                            color,
+                            translateX,
+                            vector.width.value,
+                            translateY,
+                            vector.height.value,
+                        )
+                        style = Paint.Style.FILL
+                    }
+                },
             )
         }
     }
@@ -348,11 +401,13 @@ fun DrawingResources.drawArc(
     val delta = (p1xSquared / radiusXSquared + p1ySquared / radiusYSquared)
     val deltaSqrt: Float = sqrt(delta)
     // limited precision
-    val transformedRadiusX = if(delta < 1.001f) radiusX else radiusX * deltaSqrt
-    val transformedRadiusY = if(delta < 1.001f) radiusY else radiusY * deltaSqrt
-    val numerator = (transformedRadiusX * transformedRadiusX) * (transformedRadiusY * transformedRadiusY) - (transformedRadiusX * transformedRadiusX) * (p1y * p1y) - (transformedRadiusY * transformedRadiusY) * (p1x * p1x)
-    val denom = (transformedRadiusX * transformedRadiusX) * (p1y * p1y) + (transformedRadiusY * transformedRadiusY) * (p1x * p1x)
-    val lhs = if(denom == 0f) 0f else (if(largeArcFlag == sweepFlag) -1 else 1) * sqrt(max(numerator, 0f) / denom)
+    val transformedRadiusX = if (delta < 1.001f) radiusX else radiusX * deltaSqrt
+    val transformedRadiusY = if (delta < 1.001f) radiusY else radiusY * deltaSqrt
+    val numerator =
+        (transformedRadiusX * transformedRadiusX) * (transformedRadiusY * transformedRadiusY) - (transformedRadiusX * transformedRadiusX) * (p1y * p1y) - (transformedRadiusY * transformedRadiusY) * (p1x * p1x)
+    val denom =
+        (transformedRadiusX * transformedRadiusX) * (p1y * p1y) + (transformedRadiusY * transformedRadiusY) * (p1x * p1x)
+    val lhs = if (denom == 0f) 0f else (if (largeArcFlag == sweepFlag) -1 else 1) * sqrt(max(numerator, 0f) / denom)
 
     val cxp = lhs * transformedRadiusX * p1y / transformedRadiusY
     val cyp = -lhs * transformedRadiusY * p1x / transformedRadiusX
@@ -360,11 +415,16 @@ fun DrawingResources.drawArc(
     val cy = sinRotation * cxp + cosRotation * cyp + (lastY + y) / 2
 
     val startAngle: Float = angle(1f, 0f, (p1x - cxp) / transformedRadiusX, (p1y - cyp) / transformedRadiusY)
-    var deltaAngle: Float = angle((p1x - cxp) / transformedRadiusX, (p1y - cyp) / transformedRadiusY, (-p1x - cxp) / transformedRadiusX, (-p1y - cyp) / transformedRadiusY)
-    if(sweepFlag) {
-        if(deltaAngle < 0f) deltaAngle += 360f
+    var deltaAngle: Float = angle(
+        (p1x - cxp) / transformedRadiusX,
+        (p1y - cyp) / transformedRadiusY,
+        (-p1x - cxp) / transformedRadiusX,
+        (-p1y - cyp) / transformedRadiusY
+    )
+    if (sweepFlag) {
+        if (deltaAngle < 0f) deltaAngle += 360f
     } else {
-        if(deltaAngle > 0f) deltaAngle -= 360f
+        if (deltaAngle > 0f) deltaAngle -= 360f
     }
 
     // draw

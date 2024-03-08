@@ -123,19 +123,36 @@ object DynamicCSS {
             )
         )
 
-        style(
-            "input.sameThemeText, textarea.sameThemeText", mapOf(
-                "border-bottom-style" to "solid",
-                "border-bottom-width" to "1px",
-                "border-radius" to "0",
-            )
-        )
-
-        style(
-            "input.sameThemeText:focus, textarea.sameThemeText:focus", mapOf(
-                "border-radius" to "0",
-            )
-        )
+//        style(
+//            "input.sameThemeText, textarea.sameThemeText", mapOf(
+//                "border-bottom-style" to "solid",
+//                "border-bottom-width" to "1px",
+//                "border-radius" to "0",
+//            )
+//        )
+//
+//        style(
+//            "input.sameThemeText:focus, textarea.sameThemeText:focus", mapOf(
+//                "border-radius" to "0",
+//            )
+//        )
+//
+//        style(
+//            "input:not(.mightTransition).editable.editable, textarea:not(.mightTransition).editable.editable, select:not(.mightTransition).editable.editable", mapOf(
+//                "border-bottom-color" to "currentColor",
+//                "border-bottom-width" to "1px",
+//                "border-bottom-style" to "solid",
+//            )
+//        )
+//
+//        style(
+//            "input:not(.mightTransition).editable.editable:focus, textarea:not(.mightTransition).editable.editable:focus, select:not(.mightTransition).editable.editable:focus", mapOf(
+//                "border-bottom-color" to "currentColor",
+//                "border-bottom-width" to "2px",
+//                "border-bottom-style" to "solid",
+//                "outline" to "none",
+//            )
+//        )
 
         style(
             "input:focus textarea:focus", mapOf(
@@ -603,23 +620,6 @@ object DynamicCSS {
                 "display" to "flex",
                 "flex-direction" to "column",
                 "align-items" to "stretch",
-            )
-        )
-
-        style(
-            "input:not(.mightTransition).editable.editable, textarea:not(.mightTransition).editable.editable, select:not(.mightTransition).editable.editable", mapOf(
-                "border-bottom-color" to "currentColor",
-                "border-bottom-width" to "1px",
-                "border-bottom-style" to "solid",
-            )
-        )
-
-        style(
-            "input:not(.mightTransition).editable.editable:focus, textarea:not(.mightTransition).editable.editable:focus, select:not(.mightTransition).editable.editable:focus", mapOf(
-                "border-bottom-color" to "currentColor",
-                "border-bottom-width" to "2px",
-                "border-bottom-style" to "solid",
-                "outline" to "none",
             )
         )
 

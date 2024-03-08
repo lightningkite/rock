@@ -66,7 +66,6 @@ fun ViewWriter.handleTheme(
         val borders = !viewMarginless
 
         if (usePadding) {
-            println("Awaiting spacingOverride")
             view.extensionPadding = (view.spacingOverride?.await() ?: theme.spacing).value
         } else {
             view.extensionPadding = 0.0

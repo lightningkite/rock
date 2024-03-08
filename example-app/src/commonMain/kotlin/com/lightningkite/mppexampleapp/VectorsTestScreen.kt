@@ -167,6 +167,11 @@ object VectorsTestScreen : RockScreen {
                                 ), Angle.zero, false),
                                 path = "M 0,0 L 0,100 L 100,100 L 100,0 Z"
                             ),
+                            ImageVector.Path(
+                                strokeColor = Color.black,
+                                strokeWidth = 5.0,
+                                path = "M0,0L100,100"
+                            ),
                         )
                     )
                 }
@@ -184,6 +189,11 @@ object VectorsTestScreen : RockScreen {
                                 ), Angle.eighthTurn, false),
                                 path = "M 0,0 L 0,100 L 100,100 L 100,0 Z"
                             ),
+                            ImageVector.Path(
+                                strokeColor = Color.black,
+                                strokeWidth = 5.0,
+                                path = "M0,0L100,100"
+                            ),
                         )
                     )
                 }
@@ -200,6 +210,11 @@ object VectorsTestScreen : RockScreen {
                                     GradientStop(1f, Color.red),
                                 ), Angle.eighthTurn + Angle.halfTurn, false),
                                 path = "M 0,0 L 0,100 L 100,100 L 100,0 Z"
+                            ),
+                            ImageVector.Path(
+                                strokeColor = Color.black,
+                                strokeWidth = 5.0,
+                                path = "M0,0L100,100"
                             ),
                         )
                     )

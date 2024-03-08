@@ -1071,7 +1071,7 @@ object DynamicCSS {
             when (val it = theme.background) {
                 is Color -> mapOf("background-color" to it.toCss())
                 is LinearGradient -> mapOf(
-                    "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
+                    "background-image" to "linear-gradient(${it.angle.plus(Angle.quarterTurn).turns}turn, ${joinGradientStops(it.stops)})",
                     "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
                 )
 
@@ -1133,7 +1133,7 @@ object DynamicCSS {
             ) + when (val it = theme.background.applyAlpha(0.5f)) {
                 is Color -> mapOf("background-color" to it.toCss())
                 is LinearGradient -> mapOf(
-                    "background-image" to "linear-gradient(${it.angle.turns}turn, ${joinGradientStops(it.stops)})",
+                    "background-image" to "linear-gradient(${it.angle.plus(Angle.quarterTurn).turns}turn, ${joinGradientStops(it.stops)})",
                     "background-attachment" to (if (it.screenStatic) "fixed" else "unset"),
                 )
 

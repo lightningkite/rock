@@ -1,10 +1,19 @@
 package com.lightningkite.rock.views
 
 import com.lightningkite.rock.models.*
+import com.lightningkite.rock.objc.toObjcId
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.CoreGraphics.CGContextRef
+import platform.CoreGraphics.CGPointMake
+import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
+import platform.Foundation.NSNumber
+import platform.Foundation.numberWithFloat
+import platform.QuartzCore.CAGradientLayer
+import platform.QuartzCore.kCAGradientLayerAxial
+import platform.QuartzCore.kCAGradientLayerRadial
 import platform.UIKit.UIColor
 import platform.UIKit.UIImageView
 import platform.UIKit.UIView
@@ -108,6 +117,7 @@ fun ViewWriter.handleTheme(
                         is CornerRadii.Constant -> min(parentSpacing, it.value.value)
                         is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
                     }
+                    view.layer.sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
                     view.layer.apply {
                         backgroundColor = null
                         borderWidth = 0.0
@@ -119,6 +129,7 @@ fun ViewWriter.handleTheme(
                         shadowRadius = 0.0
                     }
                 } else {
+                    view.layer.sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
                     view.layer.apply {
                         backgroundColor = null
                         borderWidth = 0.0
@@ -151,6 +162,7 @@ private fun applyThemeBackground(
     when (val b = theme.background) {
         is Color -> {
             view.layer.apply {
+                sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
                 backgroundColor = b.toUiColor().CGColor
                 if (borders) {
                     borderWidth = theme.outlineWidth.value
@@ -166,32 +178,83 @@ private fun applyThemeBackground(
 
         is LinearGradient -> {
             view.layer.apply {
-                backgroundColor = b.closestColor().toUiColor().CGColor
-                if (borders) {
-                    borderWidth = theme.outlineWidth.value
-                    borderColor = theme.outline.closestColor().toUiColor().CGColor
-                    cornerRadius = cr
-                    shadowColor = UIColor.grayColor.CGColor
-                    shadowOpacity = 1f
-                    shadowOffset = CGSizeMake(0.0, theme.elevation.value)
-                    shadowRadius = theme.elevation.value
-                }
+                backgroundColor = null
+                borderWidth = 0.0
+                borderColor = null
+                cornerRadius = 0.0
+                shadowColor = null
+                shadowOpacity = 0f
+                shadowOffset = CGSizeMake(0.0, 0.0)
+                shadowRadius = 0.0
+                sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
+                addSublayer(CAGradientLayerResizing().apply {
+                    this.type = kCAGradientLayerAxial
+                    this.locations = b.stops.map {
+                        NSNumber.numberWithFloat(it.ratio)
+                    }
+                    this.colors = b.stops.map { it.color.toUiColor().CGColor!!.toObjcId() }
+                    this.startPoint = CGPointMake(-b.angle.cos() * .5 + .5, -b.angle.sin() * .5 + .5)
+                    this.endPoint = CGPointMake(b.angle.cos() * .5 + .5, b.angle.sin() * .5 + .5)
+                    this.needsDisplayOnBoundsChange = true
+
+                    if (borders) {
+                        borderWidth = theme.outlineWidth.value
+                        borderColor = theme.outline.closestColor().toUiColor().CGColor
+                        cornerRadius = cr
+                        shadowColor = UIColor.grayColor.CGColor
+                        shadowOpacity = 1f
+                        shadowOffset = CGSizeMake(0.0, theme.elevation.value)
+                        shadowRadius = theme.elevation.value
+                    }
+                })
             }
         }
 
         is RadialGradient -> {
             view.layer.apply {
-                backgroundColor = b.closestColor().toUiColor().CGColor
-                if (borders) {
-                    borderWidth = theme.outlineWidth.value
-                    borderColor = theme.outline.closestColor().toUiColor().CGColor
-                    cornerRadius = cr
-                    shadowColor = UIColor.grayColor.CGColor
-                    shadowOpacity = 1f
-                    shadowOffset = CGSizeMake(0.0, theme.elevation.value)
-                    shadowRadius = theme.elevation.value
-                }
+                backgroundColor = null
+                borderWidth = 0.0
+                borderColor = null
+                cornerRadius = 0.0
+                shadowColor = null
+                shadowOpacity = 0f
+                shadowOffset = CGSizeMake(0.0, 0.0)
+                shadowRadius = 0.0
+                sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
+                addSublayer(CAGradientLayerResizing().apply {
+                    this.type = kCAGradientLayerRadial
+                    this.locations = b.stops.map {
+                        NSNumber.numberWithFloat(it.ratio)
+                    }
+                    this.colors = b.stops.map { it.color.toUiColor().CGColor!!.toObjcId() }
+                    this.startPoint = CGPointMake(0.5, 0.5)
+                    this.endPoint = CGPointMake(0.0, 0.0)
+                    this.needsDisplayOnBoundsChange = true
+                    if(borders) {
+                        borderWidth = theme.outlineWidth.value
+                        borderColor = theme.outline.closestColor().toUiColor().CGColor
+                        cornerRadius = cr
+                        shadowColor = UIColor.grayColor.CGColor
+                        shadowOpacity = 1f
+                        shadowOffset = CGSizeMake(0.0, theme.elevation.value)
+                        shadowRadius = theme.elevation.value
+                    }
+                })
             }
         }
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+class CAGradientLayerResizing: CAGradientLayer() {
+    init {
+        needsDisplayOnBoundsChange = true
+        frame = CGRectMake(0.0, 0.0, 10.0, 10.0)
+    }
+
+    @OptIn(ExperimentalForeignApi::class)
+    override fun drawInContext(ctx: CGContextRef?) {
+        superlayer?.bounds?.let { frame = it }
+        super.drawInContext(ctx)
     }
 }

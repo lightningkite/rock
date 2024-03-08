@@ -87,6 +87,7 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
             ::exists { appNav.existsProperty.await() }
         } in bar
         expanding - stack {
+            spacing = 0.px
             navigatorView(navigator)
             row {
                 ignoreInteraction = true

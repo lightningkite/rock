@@ -33,7 +33,6 @@ actual inline var Link.to: RockScreen
             it.preventDefault()
             navigator.navigate(value)
             (native.asDynamic().__ROCK__onNavigate as? suspend ()->Unit)?.let {
-                println("launchingmanucan")
                 calculationContext.launchManualCancel(it)
             }
         }

@@ -8,6 +8,8 @@ import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.handleTheme
 import platform.CoreGraphics.CGFloat
 import platform.UIKit.UIView
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
+import kotlinx.cinterop.ExperimentalForeignApi
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NContainingView = UIView
@@ -35,17 +37,3 @@ actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> U
     }
     setup(ContainingView(this))
 }
-
-actual var ContainingView.spacing: Dimension
-    get() = when(native) {
-        is LinearLayout -> native.spacingOverride.value ?: 0.px
-        is FrameLayout -> native.spacingOverride.value ?: 0.px
-        else -> 0.px
-    }
-    set(value) {
-        when(native) {
-            is LinearLayout -> native.spacingOverride.value = value
-            is FrameLayout -> native.spacingOverride.value = value
-            else -> {}
-        }
-    }

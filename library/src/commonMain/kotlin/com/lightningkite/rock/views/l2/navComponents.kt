@@ -7,13 +7,13 @@ import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 
 
-fun ViewWriter.navGroupColumn(elements: Readable<List<NavElement>>, setup: ContainingView.()->Unit = {}) {
+fun ViewWriter.navGroupColumn(elements: Readable<List<NavElement>>, onNavigate: suspend ()->Unit = {}, setup: ContainingView.()->Unit = {}) {
     col {
-        navGroupColumnInner(elements)
+        navGroupColumnInner(elements, onNavigate)
         setup()
     }
 }
-private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>) {
+private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>, onNavigate: suspend ()->Unit = {}) {
     forEach(readable) {
         fun ViewWriter.display(navElement: NavElement) {
             row {
@@ -24,17 +24,24 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>)
         }
         when (it) {
             is NavAction -> button {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 display(it)
                 onClick { it.onSelect() }
             }
 
             is NavExternal -> externalLink {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 ::to { it.to() }
                 display(it)
+                this.onNavigate(onNavigate)
             }
 
             is NavGroup -> {
                 col {
+                    exists = false
+                    ::exists {it.hidden?.invoke() != true}
                     spacing = 0.px
                     padded - row {
                         centered - navElementIconAndCountHorizontal(it)
@@ -42,22 +49,29 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>)
                     }
                     row {
                         spacing = 0.px
-                        space(1.0)
-                        col {
+                        space()
+                        expanding - col {
                             spacing = 0.px
-                            navGroupColumnInner(shared { it.children() })
+                            navGroupColumnInner(shared { it.children() }, onNavigate)
                         }
                     }
                 }
             }
 
             is NavCustom -> {
-                it.long(this)
+                stack {
+                    exists = false
+                    ::exists { it.hidden?.invoke() != true }
+                    it.long(this@navGroupColumnInner)
+                }
             }
 
             is NavLink -> link {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 ::to { it.destination() }
                 display(it)
+                this.onNavigate(onNavigate)
             } in maybeThemeFromLast { existing ->
                 if (navigator.currentScreen.await()
                         ?.let { navigator.routes.render(it) } == navigator.routes.render(it.destination())
@@ -80,12 +94,16 @@ private fun ViewWriter.navGroupActionsInner(readable: Readable<List<NavElement>>
     forEach(readable) {
         when (it) {
             is NavAction -> button {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
 //                text { ::content { it.title() } }
                 navElementIconAndCount(it)
                 onClick { it.onSelect() }
             }
 
             is NavExternal -> externalLink {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 ::to { it.to() }
 //                text { ::content { it.title() } }
                 navElementIconAndCount(it)
@@ -93,15 +111,23 @@ private fun ViewWriter.navGroupActionsInner(readable: Readable<List<NavElement>>
 
             is NavGroup -> {
                 row {
+                    exists = false
+                    ::exists {it.hidden?.invoke() != true}
                     navGroupActionsInner(shared { it.children() })
                 }
             }
 
             is NavCustom -> {
-                it.square(this)
+                stack {
+                    exists = false
+                    ::exists { it.hidden?.invoke() != true }
+                    it.square(this@navGroupActionsInner)
+                }
             }
 
             is NavLink -> link {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 ::to { it.destination() }
 //                text { ::content { it.title() } }
                 navElementIconAndCount(it)
@@ -127,26 +153,38 @@ private fun ViewWriter.navGroupTopInner(readable: Readable<List<NavElement>>) {
     forEach(readable) {
         when (it) {
             is NavAction -> button {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 text { ::content { it.title() } }
                 onClick { it.onSelect() }
             }
 
             is NavExternal -> externalLink {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 ::to { it.to() }
                 text { ::content { it.title() } }
             }
 
             is NavCustom -> {
-                it.square(this)
+                stack {
+                    exists = false
+                    ::exists { it.hidden?.invoke() != true }
+                    it.square(this@navGroupTopInner)
+                }
             }
 
             is NavGroup -> button {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 text { ::content { it.title() } }
             } in hasPopover {
                 card - navGroupColumn(shared { it.children() })
             }
 
             is NavLink -> link {
+                exists = false
+                ::exists {it.hidden?.invoke() != true}
                 ::to { it.destination() }
                 text { ::content { it.title() } }
             }
@@ -196,34 +234,45 @@ fun ViewWriter.navGroupTabs(readable: Readable<List<NavElement>>, setup: Contain
         spacing = 0.px
         setup()
         fun ViewWriter.display(navElement: NavElement) {
-            compact - col {
-                centered - navElementIconAndCount(navElement)
-                subtext { ::content { navElement.title() } } in gravity(Align.Center, Align.Center)
-            }
+                compact - col {
+                    centered - navElementIconAndCount(navElement)
+                    subtext { ::content { navElement.title() } } in gravity(Align.Center, Align.Center)
+                }
         }
         forEach(readable) {
             when (it) {
                 is NavAction -> button {
+                    exists = false
+                    ::exists {it.hidden?.invoke() != true}
                     display(it)
                     onClick { it.onSelect() }
                 }
 
                 is NavExternal -> externalLink {
+                    exists = false
+                    ::exists {it.hidden?.invoke() != true}
                     ::to { it.to() }
                     display(it)
                 }
 
                 is NavGroup -> button {
+                    exists = false
+                    ::exists {it.hidden?.invoke() != true}
                     display(it)
                     onClick { }  // TODO: select dialog
                 }
 
                 is NavCustom -> {
+                    exists = false
+                    ::exists {it.hidden?.invoke() != true}
                     it.tall(this)
                 }
 
                 is NavLink -> {
+
                     link {
+                        exists = false
+                        ::exists {it.hidden?.invoke() != true}
                         display(it)
                         ::to { it.destination() }
                     } in themeFromLast { existing ->

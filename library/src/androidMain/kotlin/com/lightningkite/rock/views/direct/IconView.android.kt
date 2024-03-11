@@ -25,6 +25,9 @@ import androidx.appcompat.widget.AppCompatImageView
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual class NIconView(context: Context) : AppCompatImageView(context) {
+    init {
+        scaleType = ScaleType.CENTER_INSIDE
+    }
     var icon: Icon? = null
         set(value) {
             field = value

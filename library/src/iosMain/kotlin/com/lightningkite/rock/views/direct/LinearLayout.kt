@@ -34,7 +34,9 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             setNeedsLayout()
             informParentOfSizeChange()
         }
-    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).also {
+        it.addListener { it.value?.let { gap = it.value } }
+    }
     override fun getSpacingOverrideProperty() = spacingOverride
 
 //    init { setUserInteractionEnabled(false) }

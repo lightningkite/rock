@@ -2,7 +2,10 @@ package com.lightningkite.rock.views.Path
 
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import com.lightningkite.rock.models.Color
 import com.lightningkite.rock.models.ImageVector
+import com.lightningkite.rock.models.LinearGradient
+import com.lightningkite.rock.models.RadialGradient
 import com.lightningkite.rock.views.direct.colorInt
 import kotlin.math.*
 
@@ -25,6 +28,40 @@ val pathLetters = charArrayOf(
 )
 val spaceOrComma = Regex("[ ,]+")
 
+fun Paint.match(rock: com.lightningkite.rock.models.Paint, parentOffsetX: Float, parentWidth: Float, parentOffsetY: Float, parentHeight: Float) {
+    when (val it = rock) {
+        is Color -> this.color = it.colorInt()
+        is LinearGradient -> {
+            val smallest = min(parentWidth, parentHeight) / 2
+            val x0 = parentOffsetX + parentWidth / 2 - it.angle.cos() * smallest
+            val x1 = parentOffsetX + parentWidth / 2 + it.angle.cos() * smallest
+            val y0 = parentOffsetY + parentWidth / 2 - it.angle.sin() * smallest
+            val y1 = parentOffsetY + parentWidth / 2 + it.angle.sin() * smallest
+            this.shader = android.graphics.LinearGradient(
+                x0,
+                y0,
+                x1,
+                y1,
+                it.stops.map { it.color.colorInt() }.toIntArray(),
+                it.stops.map { it.ratio }.toFloatArray(),
+                Shader.TileMode.CLAMP
+            )
+        }
+
+        is RadialGradient -> {
+            val smallest = min(parentWidth, parentHeight) / 2
+            this.shader = android.graphics.RadialGradient(
+                parentOffsetX + parentWidth / 2,
+                parentOffsetY + parentHeight / 2,
+                smallest,
+                it.stops.map { it.color.colorInt() }.toIntArray(),
+                it.stops.map { it.ratio }.toFloatArray(),
+                Shader.TileMode.CLAMP
+            )
+        }
+    }
+}
+
 class PathDrawable(val vector: ImageVector) : Drawable() {
     val drawingResources = DrawingResources()
 
@@ -43,15 +80,31 @@ class PathDrawable(val vector: ImageVector) : Drawable() {
         vector.paths.map {
             PathInfo(
                 path = Path().apply { render(drawingResources, it.path, translateX, translateY, scaleX, scaleY) },
-                outline = it.strokeColor?.let { color -> Paint().apply {
-                    this.color = color.colorInt()
-                    style = Paint.Style.STROKE
-                    strokeWidth = it.strokeWidth?.times(scaleX)?.toFloat() ?: 0f
-                }},
-                fill = it.fillColor?.let { color -> Paint().apply {
-                    this.color = color.colorInt()
-                    style = Paint.Style.FILL
-                }},
+                outline = it.strokeColor?.let { color ->
+                    Paint().apply {
+                        match(
+                            color,
+                            translateX,
+                            vector.width.value,
+                            translateY,
+                            vector.height.value,
+                        )
+                        style = Paint.Style.STROKE
+                        strokeWidth = it.strokeWidth?.times(scaleX)?.toFloat() ?: 0f
+                    }
+                },
+                fill = it.fillColor?.let { color ->
+                    Paint().apply {
+                        match(
+                            color,
+                            translateX,
+                            vector.width.value,
+                            translateY,
+                            vector.height.value,
+                        )
+                        style = Paint.Style.FILL
+                    }
+                },
             )
         }
     }
@@ -281,8 +334,8 @@ private fun Path.render(
                         previousC2Y = referenceY
                         drawingResources.drawArc(
                             path = this,
-                            lastX = lastX,
-                            lastY = lastY,
+                            lastX = lastX.posX(),
+                            lastY = lastY.posY(),
                             radiusX = radiusX.sizeX(),
                             radiusY = radiusY.sizeY(),
                             x = destX.posX(),
@@ -320,69 +373,74 @@ fun DrawingResources.drawArc(
     path: Path, lastX: Float, lastY: Float, x: Float, y: Float, radiusX: Float, radiusY: Float, theta: Float,
     largeArcFlag: Boolean, sweepFlag: Boolean
 ) {
+    println("x: $x, y: $y, radiusX: $radiusX, radiusY: $radiusY, theta: $theta, largeArcFlag: $largeArcFlag, sweepFlag: $sweepFlag")
     // Log.d("drawArc", "from (" + lastX + "," + lastY + ") to (" + x + ","+ y + ") r=(" + rx + "," + ry +
     // ") theta=" + theta + " flags="+ largeArc + "," + sweepArc);
 
     // http://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
-    var rx = radiusX
-    var ry = radiusY
-    if (rx == 0f || ry == 0f) {
+    if (radiusX == 0f || radiusY == 0f) {
         path.lineTo(x, y)
         return
     }
     if (x == lastX && y == lastY) {
         return  // nothing to draw
     }
-    rx = Math.abs(rx)
-    ry = Math.abs(ry)
     val thrad = theta * Math.PI.toFloat() / 180
-    val st: Float = sin(thrad)
-    val ct: Float = cos(thrad)
+
+    val sinRotation: Float = sin(thrad)
+    val cosRotation: Float = cos(thrad)
     val xc = (lastX - x) / 2
     val yc = (lastY - y) / 2
-    val x1t = ct * xc + st * yc
-    val y1t = -st * xc + ct * yc
-    val x1ts = x1t * x1t
-    val y1ts = y1t * y1t
-    var rxs = rx * rx
-    var rys = ry * ry
-    val lambda = (x1ts / rxs + y1ts / rys) * 1.001f // add 0.1% to be sure that no out of range occurs due to
+    val p1x = cosRotation * xc + sinRotation * yc
+    val p1y = -sinRotation * xc + cosRotation * yc
+
+    val p1xSquared = p1x * p1x
+    val p1ySquared = p1y * p1y
+    var radiusXSquared = radiusX * radiusX
+    var radiusYSquared = radiusY * radiusY
+    val delta = (p1xSquared / radiusXSquared + p1ySquared / radiusYSquared)
+    val deltaSqrt: Float = sqrt(delta)
     // limited precision
-    if (lambda > 1) {
-        val lambdasr: Float = sqrt(lambda)
-        rx *= lambdasr
-        ry *= lambdasr
-        rxs = rx * rx
-        rys = ry * ry
-    }
-    val R: Float = (sqrt((rxs * rys - rxs * y1ts - rys * x1ts) / (rxs * y1ts + rys * x1ts))
-            * if (largeArcFlag == sweepFlag) -1 else 1)
-    val cxt = R * rx * y1t / ry
-    val cyt = -R * ry * x1t / rx
-    val cx = ct * cxt - st * cyt + (lastX + x) / 2
-    val cy = st * cxt + ct * cyt + (lastY + y) / 2
-    val th1: Float = angle(1f, 0f, (x1t - cxt) / rx, (y1t - cyt) / ry)
-    var dth: Float = angle((x1t - cxt) / rx, (y1t - cyt) / ry, (-x1t - cxt) / rx, (-y1t - cyt) / ry)
-    if (!sweepFlag && dth > 0) {
-        dth -= 360f
-    } else if (sweepFlag && dth < 0) {
-        dth += 360f
+    val transformedRadiusX = if (delta < 1.001f) radiusX else radiusX * deltaSqrt
+    val transformedRadiusY = if (delta < 1.001f) radiusY else radiusY * deltaSqrt
+    val numerator =
+        (transformedRadiusX * transformedRadiusX) * (transformedRadiusY * transformedRadiusY) - (transformedRadiusX * transformedRadiusX) * (p1y * p1y) - (transformedRadiusY * transformedRadiusY) * (p1x * p1x)
+    val denom =
+        (transformedRadiusX * transformedRadiusX) * (p1y * p1y) + (transformedRadiusY * transformedRadiusY) * (p1x * p1x)
+    val lhs = if (denom == 0f) 0f else (if (largeArcFlag == sweepFlag) -1 else 1) * sqrt(max(numerator, 0f) / denom)
+
+    val cxp = lhs * transformedRadiusX * p1y / transformedRadiusY
+    val cyp = -lhs * transformedRadiusY * p1x / transformedRadiusX
+    val cx = cosRotation * cxp - sinRotation * cyp + (lastX + x) / 2
+    val cy = sinRotation * cxp + cosRotation * cyp + (lastY + y) / 2
+
+    val startAngle: Float = angle(1f, 0f, (p1x - cxp) / transformedRadiusX, (p1y - cyp) / transformedRadiusY)
+    var deltaAngle: Float = angle(
+        (p1x - cxp) / transformedRadiusX,
+        (p1y - cyp) / transformedRadiusY,
+        (-p1x - cxp) / transformedRadiusX,
+        (-p1y - cyp) / transformedRadiusY
+    )
+    if (sweepFlag) {
+        if (deltaAngle < 0f) deltaAngle += 360f
+    } else {
+        if (deltaAngle > 0f) deltaAngle -= 360f
     }
 
     // draw
     if (theta % 360 == 0f) {
         // no rotate and translate need
-        arcRectf.set(cx - rx, cy - ry, cx + rx, cy + ry)
-        path.arcTo(arcRectf, th1, dth)
+        arcRectf.set(cx - transformedRadiusX, cy - transformedRadiusY, cx + transformedRadiusX, cy + transformedRadiusY)
+        path.arcTo(arcRectf, startAngle, deltaAngle)
     } else {
         // this is the hard and slow part :-)
-        arcRectf.set(-rx, -ry, rx, ry)
+        arcRectf.set(-transformedRadiusX, -transformedRadiusY, transformedRadiusX, transformedRadiusY)
         arcMatrix.reset()
         arcMatrix.postRotate(theta)
         arcMatrix.postTranslate(cx, cy)
         arcMatrix.invert(arcMatrix2)
         path.transform(arcMatrix2)
-        path.arcTo(arcRectf, th1, dth)
+        path.arcTo(arcRectf, startAngle, deltaAngle)
         path.transform(arcMatrix)
     }
 }

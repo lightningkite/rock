@@ -166,15 +166,17 @@ sealed interface NavElement {
     val title: suspend () -> String
     val icon: suspend () -> Icon
     val count: (suspend ()->Int?)?
+    val hidden: (suspend () -> Boolean)?
 }
 
 data class NavGroup(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val children: suspend () -> List<NavElement>,
 ) : NavElement{
-    constructor(title: String, icon: Icon, children: List<NavElement> = listOf()) : this({ title }, { icon }, null, { children })
+    constructor(title: String, icon: Icon, children: List<NavElement> = listOf()) : this({ title }, { icon }, null, {false}, { children })
 }
 
 @Deprecated("Use NavLink", ReplaceWith("NavLink"))
@@ -184,17 +186,18 @@ data class NavLink(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val destination: suspend () -> RockScreen,
 ) : NavElement {
-    constructor(title: String, icon: Icon, destination: RockScreen) : this({ title }, { icon }, null, { destination })
+    constructor(title: String, icon: Icon, destination: RockScreen) : this({ title }, { icon }, null, { false }, { destination })
 }
-
 @Deprecated("Use NavExternal", ReplaceWith("NavExternal"))
 typealias ExternalNav = NavExternal
 data class NavExternal(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val to: suspend () -> String,
 ) : NavElement
 
@@ -202,6 +205,7 @@ data class NavAction(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val onSelect: suspend () -> Unit,
 ) : NavElement
 
@@ -209,6 +213,7 @@ data class NavCustom(
     override val title: suspend () -> String = { "" },
     override val icon: suspend () -> Icon = { Icon.moreHoriz },
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val square: ViewWriter.()->Unit,
     val long: ViewWriter.()->Unit = square,
     val tall: ViewWriter.()->Unit = square,

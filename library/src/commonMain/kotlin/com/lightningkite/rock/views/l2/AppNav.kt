@@ -50,25 +50,28 @@ fun ViewWriter.appNav(routes: Routes, setup: AppNav.() -> Unit) {
         swapView {
             swapping(
                 current = { appNavFactory.await() },
-                views = { it(this, setup)  }
+                views = { it(this, setup) }
             )
         }
     }
 }
+
+private val ViewWriter.compactBar get() = themeFromLast { (it.bar() ?: it).let { it.copy(spacing = it.spacing / 2) } }
 
 fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
     val appNav = AppNav.ByProperty()
     val showMenu = Property(false)
     col {
         spacing = 0.px
-        row {
+        compactBar - row {
             setup(appNav)
             toggleButton {
-                checked bind showMenu; image {
-                val currentTheme = currentTheme
-                ::source { Icon.menu.toImageSource(currentTheme().foreground) }
-                description = "Open navigation menu"
-            }
+                checked bind showMenu
+                image {
+                    val currentTheme = currentTheme
+                    ::source { Icon.menu.toImageSource(currentTheme().foreground) }
+                    description = "Open navigation menu"
+                }
             }
             button {
                 image {
@@ -85,18 +88,24 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
             ) in weight(1f)
             navGroupActions(appNav.actionsProperty)
             ::exists { appNav.existsProperty.await() }
-        } in bar
+        }
         expanding - stack {
+            spacing = 0.px
             navigatorView(navigator)
             row {
+                spacing = 0.px
+                ignoreInteraction = true
+                bar
                 onlyWhen(false) { showMenu.await() && appNav.existsProperty.await() }
-                scrolls - bar - navGroupColumn(appNav.navItemsProperty) {
+                scrolls - navGroupColumn(appNav.navItemsProperty, { showMenu set false }) {
                     spacing = 0.px
                 }
-                weight(2f) - space()
+                weight(2f) - space {
+                    ignoreInteraction = true
+                }
             }
         }
-    } 
+    }
 }
 
 
@@ -105,7 +114,7 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
     // Nav 2 top, horizontal
     col {
         spacing = 0.px
-        row {
+        compactBar - row {
             setup(appNav)
             button {
                 image {
@@ -125,9 +134,9 @@ fun ViewWriter.appNavTop(setup: AppNav.() -> Unit) {
             space()
             centered - navGroupActions(appNav.actionsProperty)
             ::exists { appNav.existsProperty.await() }
-        } in bar 
-        navigatorView(navigator) in weight(1f) 
-    } 
+        }
+        navigatorView(navigator) in weight(1f)
+    }
 }
 
 fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
@@ -135,9 +144,9 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
     col {
         spacing = 0.px
 // Nav 3 top and bottom (top)
-        row {
+        compactBar - row {
             setup(appNav)
-            compact - button {
+            button {
                 image {
                     val currentTheme = currentTheme
                     ::source { Icon.arrowBack.toImageSource(currentTheme().foreground) }
@@ -150,15 +159,15 @@ fun ViewWriter.appNavBottomTabs(setup: AppNav.() -> Unit) {
                 Align.Center,
                 Align.Center
             ) in weight(1f)
-            compact - navGroupActions(appNav.actionsProperty)
+            navGroupActions(appNav.actionsProperty)
             ::exists { appNav.existsProperty.await() }
-        } in bar 
-        navigatorView(navigator) in weight(1f) 
+        }
+        navigatorView(navigator) in weight(1f)
         //Nav 3 - top and bottom (bottom/tabs)
         navGroupTabs(appNav.navItemsProperty) {
             ::exists { appNav.existsProperty.await() && !SoftInputOpen.await() }
         }
-    } 
+    }
 }
 
 fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
@@ -166,7 +175,7 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
     col {
         spacing = 0.px
 // Nav 4 left and top - add dropdown for user info
-        row {
+        compactBar - row {
             setup(appNav)
             button {
                 image {
@@ -185,14 +194,14 @@ fun ViewWriter.appNavTopAndLeft(setup: AppNav.() -> Unit) {
             navGroupActions(appNav.actionsProperty)
 
             ::exists { appNav.existsProperty.await() }
-        } in bar 
+        }
         row {
             spacing = 0.px
             nav - scrolls - navGroupColumn(appNav.navItemsProperty) {
                 spacing = 0.px
                 ::exists { appNav.navItemsProperty.await().size > 1 && appNav.existsProperty.await() }
             }
-            navigatorView(navigator) in weight(1f) 
+            navigatorView(navigator) in weight(1f)
         } in weight(1f)
-    } 
+    }
 }

@@ -25,6 +25,7 @@ actual inline var Link.to: RockScreen
 actual inline var Link.newTab: Boolean
     get() = TODO()
     set(value) { }
+actual fun Link.onNavigate(action: suspend () -> Unit): Unit {}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NExternalLink = HTMLElement
 @ViewDsl actual inline fun ViewWriter.externalLinkActual(crossinline setup: ExternalLink.() -> Unit): Unit = todo("externalLink")
@@ -34,6 +35,7 @@ actual inline var ExternalLink.to: String
 actual inline var ExternalLink.newTab: Boolean
     get() = TODO()
     set(value) { }
+actual fun ExternalLink.onNavigate(action: suspend () -> Unit): Unit {}
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") actual typealias NImageView = HTMLElement
 @ViewDsl actual inline fun ViewWriter.imageActual(crossinline setup: ImageView.() -> Unit): Unit = todo("image")

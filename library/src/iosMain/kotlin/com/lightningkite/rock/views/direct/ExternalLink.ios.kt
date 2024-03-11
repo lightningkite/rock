@@ -1,7 +1,10 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.rock.views.calculationContext
+import platform.UIKit.UIControlEventTouchUpInside
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NExternalLink = NativeLink
@@ -23,3 +26,6 @@ actual inline var ExternalLink.newTab: Boolean
     set(value) {
         native.newTab = value
     }
+actual fun ExternalLink.onNavigate(action: suspend () -> Unit): Unit {
+    native.onNavigate = action
+}

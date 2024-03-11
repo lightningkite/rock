@@ -2,6 +2,8 @@
 
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.launchGlobal
+import com.lightningkite.rock.launchManualCancel
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.navigation.RockNavigator
@@ -50,6 +52,7 @@ class NativeLink: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     var onNavigator: RockNavigator? = null
     var toUrl: String? = null
     var newTab: Boolean = false
+    var onNavigate: suspend ()->Unit = {}
 
     init {
         addTarget(this, sel_registerName("clicked"), UIControlEventTouchUpInside)
@@ -58,6 +61,7 @@ class NativeLink: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     @ObjCAction fun clicked() {
         toScreen?.let { onNavigator?.navigate(it) }
         toUrl?.let { UIApplication.sharedApplication.openURL(NSURL(string = it)) }
+        calculationContext.launchManualCancel(onNavigate)
     }
 
 }

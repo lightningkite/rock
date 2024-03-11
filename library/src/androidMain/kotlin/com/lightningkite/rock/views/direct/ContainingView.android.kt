@@ -20,7 +20,7 @@ actual typealias NContainingView = ViewGroup
 
 @ViewDsl
 actual inline fun ViewWriter.stackActual(crossinline setup: ContainingView.() -> Unit) = viewElement(
-    factory = ::FrameLayout,
+    factory = ::SlightlyModifiedFrameLayout,
     wrapper = ::ContainingView
 ) {
     handleTheme(native, viewDraws = false)
@@ -90,9 +90,3 @@ open class SlightlyModifiedLinearLayout(context: Context) : SimplifiedLinearLayo
         return null
     }
 }
-
-actual var ContainingView.spacing: Dimension
-    get() = (native as HasSpacingMultiplier).spacingOverride.value ?: 0.px
-    set(value) {
-        (native as HasSpacingMultiplier).spacingOverride.value = value
-    }

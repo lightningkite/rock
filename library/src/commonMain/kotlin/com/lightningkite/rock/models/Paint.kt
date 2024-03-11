@@ -11,6 +11,9 @@ sealed interface Paint {
 data class GradientStop(val ratio: Float, val color: Color)
 data class LinearGradient(
     val stops: List<GradientStop>,
+    /**
+     * Zero is left to right, angle added is clockwise
+     */
     val angle: Angle = Angle.zero,
     val screenStatic: Boolean = false,
 ) : Paint {

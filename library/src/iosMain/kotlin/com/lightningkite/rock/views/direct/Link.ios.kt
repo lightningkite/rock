@@ -26,3 +26,6 @@ actual inline var Link.newTab: Boolean
     set(value) {
         native.newTab = value
     }
+actual fun Link.onNavigate(action: suspend () -> Unit): Unit {
+    native.onNavigate = action
+}

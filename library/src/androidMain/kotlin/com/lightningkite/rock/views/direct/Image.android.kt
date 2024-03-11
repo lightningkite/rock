@@ -23,11 +23,16 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.FrameLayout
 import androidx.annotation.Nullable
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.children
+import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.views.animationsEnabled
 import android.widget.ImageView as AImageView
 
-actual typealias NImageView = AImageView
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NImageView = TransitionImageView
 
 actual var ImageView.source: ImageSource?
     get() = TODO()
@@ -35,54 +40,63 @@ actual var ImageView.source: ImageSource?
         native.tag = value
         when (value) {
             null -> {
-                native.setImageDrawable(null)
+                native.transition(null)
             }
             is ImageRaw -> {
                 val imageData = value.data
-                try {
-                    native.setImageDrawable(
-                        BitmapDrawable(
-                            native.resources,
-                            BitmapFactory.decodeByteArray(
-                                /* data = */ imageData,
-                                /* offset = */ 0,
-                                /* length = */ imageData.size
+                native.transition {
+                    try {
+                        setImageDrawable(
+                            BitmapDrawable(
+                                native.resources,
+                                BitmapFactory.decodeByteArray(
+                                    /* data = */ imageData,
+                                    /* offset = */ 0,
+                                    /* length = */ imageData.size
+                                )
                             )
                         )
-                    )
-                } catch (ex: Exception) {
-                    native.setImageResource(R.drawable.baseline_broken_image_24)
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        setImageResource(R.drawable.baseline_broken_image_24)
+                    }
                 }
-                val bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
-                BitmapDrawable(native.resources, bitmap)
             }
 
             is ImageRemote -> {
-                native.setImageDrawable(null)
-
                 LoadRemoteImageScope.bitmapFromUrl(value.url, onBitmapLoaded = { bitmap ->
                     Handler(Looper.getMainLooper()).post {
                         Timber.d("REMOTE IMAGE SET DRAWABLE")
-                        native.setImageDrawable(BitmapDrawable(native.resources, bitmap))
+                        native.transition {
+                            setImageDrawable(BitmapDrawable(native.resources, bitmap))
+                        }
                     }
                 }) {
                     Handler(Looper.getMainLooper()).post {
-                        native.setImageResource(R.drawable.baseline_broken_image_24)
+                        native.transition {
+                            it.printStackTrace()
+                            setImageResource(R.drawable.baseline_broken_image_24)
+                        }
                     }
                 }
             }
 
             is ImageResource -> {
-                Timber.d("HITHER AND THITHER IMAGE RESOURCE ${value.resource}")
-                native.setImageResource(value.resource)
+                native.transition {
+                    setImageResource(value.resource)
+                }
             }
 
             is ImageVector -> {
-                native.setImageDrawable(PathDrawable(value))
+                native.transition {
+                    setImageDrawable(PathDrawable(value))
+                }
             }
 
             is ImageLocal -> {
-                native.setImageURI(value.file.uri)
+                native.transition {
+                    setImageURI(value.file.uri)
+                }
             }
 
             else -> {
@@ -123,7 +137,8 @@ actual var ImageView.description: String?
 
 @ViewDsl
 actual inline fun ViewWriter.imageActual(crossinline setup: ImageView.() -> Unit) {
-    return viewElement(factory = ::AImageView, wrapper = ::ImageView) {
+    return viewElement(factory = ::TransitionImageView, wrapper = ::ImageView) {
+        native.clipToOutline = true
         handleTheme(native, viewDraws = true, viewLoads = true)
         setup(this)
     }
@@ -133,13 +148,36 @@ actual inline fun ViewWriter.imageActual(crossinline setup: ImageView.() -> Unit
 @ViewDsl
 actual inline fun ViewWriter.zoomableImageActual(crossinline setup: ImageView.() -> Unit) {
     return viewElement(::ZoomClass, wrapper = ::ImageView){
+        native.clipToOutline = true
         handleTheme(native, viewDraws = true)
         setup(this)
     }
 }
 
+open class TransitionImageView(context: Context): FrameLayout(context), HasSpacingMultiplier {
+    override val spacingOverride: Property<Dimension?> = Property(0.px)
+    var scaleType: AImageView.ScaleType = AImageView.ScaleType.CENTER_INSIDE
+        set(value) {
+            field = value
+            children.filterIsInstance<AImageView>().forEach { it.scaleType = value }
+        }
+    open fun transition(setter: (AImageView.()->Unit)?) {
+        if(!animationsEnabled) removeAllViews()
+        children.forEach { it.animate().alpha(0f).setDuration(150L).withEndAction { removeView(it) }.start() }
+        if(setter != null) {
+            addView(AImageView(context).apply(setter).also {
+                it.scaleType = this@TransitionImageView.scaleType
+                if(animationsEnabled) {
+                    it.alpha = 0f
+                    it.animate().alpha(1f).setDuration(150L).start()
+                }
+            })
+        }
+    }
+}
 
-class ZoomClass : AppCompatImageView, View.OnTouchListener,
+
+class ZoomClass : TransitionImageView, View.OnTouchListener,
     GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
     //shared constructing
     private var mContext: Context? = null
@@ -164,7 +202,8 @@ class ZoomClass : AppCompatImageView, View.OnTouchListener,
 
     constructor(context: Context) : super(context) {}
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context!!, attrs, defStyleAttr)
+    val identity = Matrix()
+    val imageView: AImageView? get() = children.filterIsInstance<AImageView>().lastOrNull()
 
     private fun resetZoom(){
         mSaveScale = 1f
@@ -181,17 +220,12 @@ class ZoomClass : AppCompatImageView, View.OnTouchListener,
 
         mMatrix = Matrix()
         mMatrixValues = FloatArray(9)
-        imageMatrix = mMatrix
+        imageView?.imageMatrix = mMatrix
     }
 
-    override fun setImageDrawable(drawable: Drawable?) {
+    override fun transition(setter: (android.widget.ImageView.() -> Unit)?) {
         resetZoom()
-        super.setImageDrawable(drawable)
-    }
-
-    override fun setImageResource(resId: Int) {
-        resetZoom()
-        super.setImageResource(resId)
+        super.transition(setter)
     }
 
     init{
@@ -200,8 +234,8 @@ class ZoomClass : AppCompatImageView, View.OnTouchListener,
         mScaleDetector = ScaleGestureDetector(context, ScaleListener())
         mMatrix = Matrix()
         mMatrixValues = FloatArray(9)
-        imageMatrix = mMatrix
-        scaleType = ScaleType.MATRIX
+        imageView?.imageMatrix = mMatrix
+        scaleType = AImageView.ScaleType.MATRIX
         mGestureDetector = GestureDetector(context, this)
         setOnTouchListener(this)
     }
@@ -236,10 +270,10 @@ class ZoomClass : AppCompatImageView, View.OnTouchListener,
         }
     }
 
-    private  fun fitToScreen() {
+    private fun fitToScreen() {
         mSaveScale = 1f
         val scale: Float
-        val drawable = drawable
+        val drawable = imageView?.drawable
         if (drawable == null || drawable.intrinsicWidth == 0 || drawable.intrinsicHeight == 0) return
         val imageWidth = drawable.intrinsicWidth
         val imageHeight = drawable.intrinsicHeight
@@ -249,16 +283,14 @@ class ZoomClass : AppCompatImageView, View.OnTouchListener,
         mMatrix!!.setScale(scale, scale)
 
         // Center the image
-        var redundantYSpace = (viewHeight.toFloat()
-                - scale * imageHeight.toFloat())
-        var redundantXSpace = (viewWidth.toFloat()
-                - scale * imageWidth.toFloat())
-        redundantYSpace /= 2.toFloat()
-        redundantXSpace /= 2.toFloat()
+        var redundantYSpace: Float = (viewHeight.toFloat() - scale * imageHeight.toFloat())
+        var redundantXSpace: Float = (viewWidth.toFloat() - scale * imageWidth.toFloat())
+        redundantYSpace /= 2f
+        redundantXSpace /= 2f
         mMatrix!!.postTranslate(redundantXSpace, redundantYSpace)
         origWidth = viewWidth - 2 * redundantXSpace
         origHeight = viewHeight - 2 * redundantYSpace
-        imageMatrix = mMatrix
+        imageView?.imageMatrix = mMatrix
     }
 
     fun fixTranslation() {
@@ -330,7 +362,7 @@ class ZoomClass : AppCompatImageView, View.OnTouchListener,
             }
             MotionEvent.ACTION_POINTER_UP -> mode = NONE
         }
-        imageMatrix = mMatrix
+        imageView?.imageMatrix = mMatrix
         return false
     }
 

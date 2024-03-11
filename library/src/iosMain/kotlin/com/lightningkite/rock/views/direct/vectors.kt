@@ -5,11 +5,13 @@ import com.lightningkite.rock.models.ImageVector
 import com.lightningkite.rock.models.LinearGradient
 import com.lightningkite.rock.models.RadialGradient
 import com.lightningkite.rock.models.px
+import com.lightningkite.rock.objc.toObjcId
 import com.lightningkite.rock.views.toUiColor
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.CoreGraphics.*
 import platform.Foundation.NSNumber
+import platform.Foundation.numberWithFloat
 import platform.QuartzCore.*
 import platform.UIKit.*
 import kotlin.math.*
@@ -36,20 +38,22 @@ val spaceOrComma = Regex("[ ,]+")
 @OptIn(ExperimentalForeignApi::class) inline fun CGMutablePathRef.addLine(x: CGFloat, y: CGFloat) = CGPathAddLineToPoint(this, null, x, y)
 @OptIn(ExperimentalForeignApi::class) inline fun CGMutablePathRef.addQuadCurve(cx: CGFloat, cy: CGFloat, x: CGFloat, y: CGFloat) = CGPathAddQuadCurveToPoint(this, null, cx, cy, x, y)
 @OptIn(ExperimentalForeignApi::class) inline fun CGMutablePathRef.addCurve(c1x: CGFloat, c1y: CGFloat, c2x: CGFloat, c2y: CGFloat, x: CGFloat, y: CGFloat) = CGPathAddCurveToPoint(this, null, c1x, c1y, c2x, c2y, x, y)
-@OptIn(ExperimentalForeignApi::class) inline fun CGMutablePathRef.arcTo(x: CGFloat, y: CGFloat, radius: CGFloat, startAngle: CGFloat, endAngle: CGFloat, clockwise: Boolean) = CGPathAddArc(this, null, x, y, radius, startAngle, endAngle, clockwise)
-@OptIn(ExperimentalForeignApi::class) inline fun CGMutablePathRef.arcTo(x: CGFloat, y: CGFloat, radiusX: CGFloat, radiusY: CGFloat, rotation: CGFloat, largeArcFlag: Boolean, sweepFlag: Boolean) {
-    val start = CGPathGetCurrentPoint(this).useContents { this.x to this.y }
+@OptIn(ExperimentalForeignApi::class) fun CGMutablePathRef.arcTo(lastX: CGFloat, lastY: CGFloat, x: CGFloat, y: CGFloat, radiusX: CGFloat, radiusY: CGFloat, rotation: CGFloat, largeArcFlag: Boolean, sweepFlag: Boolean) {
+    println("x: $x, y: $y, radiusX: $radiusX, radiusY: $radiusY, theta: $rotation, largeArcFlag: $largeArcFlag, sweepFlag: $sweepFlag")
     if (radiusX == 0.0 || radiusY == 0.0) {
         addLine(x, y)
         return
     }
+
+
     val rotationRadians = (rotation * PI/180).rem(PI * 2)
     val cosRotation = cos(rotationRadians)
     val sinRotation = sin(rotationRadians)
 
     // Calculate arc center
-    val p1x = cosRotation * (start.first - x) / 2 + sinRotation * (start.second - y) / 2
-    val p1y = -sinRotation * (start.first - x) / 2 + cosRotation * (start.second - y) / 2
+    val p1x = cosRotation * (lastX - x) / 2 + sinRotation * (lastY - y) / 2
+    val p1y = -sinRotation * (lastX - x) / 2 + cosRotation * (lastY - y) / 2
+
     val delta = (p1x * p1x) / (radiusX * radiusX) + (p1y * p1y) / (radiusY * radiusY)
     val transformedRadiusX = if(delta <= 1.0) radiusX else radiusX * sqrt(delta)
     val transformedRadiusY = if(delta <= 1.0) radiusY else radiusY * sqrt(delta)
@@ -58,31 +62,21 @@ val spaceOrComma = Regex("[ ,]+")
     val lhs = if(denom == 0.0) 0.0 else (if(largeArcFlag == sweepFlag) -1 else 1) * sqrt(max(numerator, 0.0) / denom)
     val cxp = lhs * transformedRadiusX * p1y / transformedRadiusY
     val cyp = lhs * -transformedRadiusY * p1x / transformedRadiusX
-    val cx = cosRotation * cxp - sinRotation * cyp + (start.first + x) / 2
-    val cy = sinRotation * cxp + cosRotation * cyp + (start.second + y) / 2
-
+    val cx = cosRotation * cxp - sinRotation * cyp + (lastX + x) / 2
+    val cy = sinRotation * cxp + cosRotation * cyp + (lastY + y) / 2
 
     // Transform ellipse into unit circle and calculate angles
     var transform = CGAffineTransformMakeScale(1/transformedRadiusX, 1/transformedRadiusY)
     transform = CGAffineTransformRotate(transform, -rotationRadians)
     transform = CGAffineTransformTranslate(transform, -cx, -cy)
-//    val transformedStart = start.applying(transform)
-    val transformedStartX = transform.useContents { start.first * a + start.second * b + tx }
-    val transformedStartY = transform.useContents { start.first * c + start.second * d + ty }
-//    val transformedEnd = end.applying(transform)
-    val transformedEndX = transform.useContents { x * a + y * b + tx }
-    val transformedEndY = transform.useContents { x * c + y * d + ty }
-    val startAngle = atan2(transformedStartY, transformedStartX)
-    val endAngle = atan2(transformedEndY, transformedEndX)
-    var deltaAngle = endAngle - startAngle
-    if (sweepFlag) {
-        if (deltaAngle < 0) {
-            deltaAngle += 2 * PI
-        }
+
+
+    val startAngle = angle(1.0, 0.0, (p1x - cxp) / transformedRadiusX, (p1y - cyp) / transformedRadiusY)
+    var deltaAngle = angle((p1x - cxp) / transformedRadiusX, (p1y - cyp) / transformedRadiusY, (-p1x - cxp) / transformedRadiusX, (-p1y - cyp) / transformedRadiusY)
+    if(sweepFlag) {
+        if(deltaAngle < 0f) deltaAngle += PI * 2
     } else {
-        if (deltaAngle > 0) {
-            deltaAngle -= 2 * PI
-        }
+        if(deltaAngle > 0f) deltaAngle -= PI * 2
     }
 
     // Draw
@@ -96,6 +90,9 @@ val spaceOrComma = Regex("[ ,]+")
         delta = deltaAngle,
         matrix = reversedTransform
     )
+}
+fun angle(x1: CGFloat, y1: CGFloat, x2: CGFloat, y2: CGFloat): CGFloat {
+    return (atan2(x1, y1) - atan2(x2, y2)) % (PI * 2)
 }
 @OptIn(ExperimentalForeignApi::class) inline fun CGMutablePathRef.close() = CGPathCloseSubpath(this)
 
@@ -261,6 +258,8 @@ private fun CGMutablePathRef.render(pathData: String, translateX: CGFloat = 0.0,
                         this.addCurve(x = destX.posX(), y = destY.posY(), c1x = c1x.posX(), c1y = c1y.posY(), c2x = control2X.posX(), c2y = control2Y.posY())
                     }
                     'a' -> {
+                        val lastX = referenceX
+                        val lastY = referenceY
                         val radiusX = arguments.unshift()
                         val radiusY = arguments.unshift()
                         val xAxisRotation = arguments.unshift()
@@ -272,7 +271,7 @@ private fun CGMutablePathRef.render(pathData: String, translateX: CGFloat = 0.0,
                         previousC2X = referenceX
                         referenceY = destY
                         previousC2Y = referenceY
-                        this.arcTo(radiusX = radiusX.sizeX(), radiusY = radiusY.sizeY(), x = destX.posX(), y = destY.posY(), rotation = xAxisRotation, largeArcFlag = largeArcFlag > 0.5, sweepFlag = sweepFlag > 0.5)
+                        this.arcTo(lastX = lastX.posX(), lastY = lastY.posY(), radiusX = radiusX.sizeX(), radiusY = radiusY.sizeY(), x = destX.posX(), y = destY.posY(), rotation = xAxisRotation, largeArcFlag = largeArcFlag > 0.5, sweepFlag = sweepFlag > 0.5)
                     }
                     else -> throw IllegalStateException("Non-legal command ${instruction}")
                 }
@@ -307,7 +306,7 @@ fun ImageVector.caLayer(): CALayer {
         val p = CGPathCreateMutable()!!
         p.render(path.path, translateX, translateY, scaleX, scaleY)
         layer.addSublayer(when(val f = path.fillColor) {
-            is LinearGradient -> CAGradientLayer().apply {
+            is LinearGradient -> CAGradientLayer.layer().apply {
                 frame = layer.bounds
                 this.mask = CAShapeLayer().apply {
                     frame = layer.bounds
@@ -315,14 +314,13 @@ fun ImageVector.caLayer(): CALayer {
                 }
                 this.type = kCAGradientLayerAxial
                 this.locations = f.stops.map {
-                    @Suppress("CAST_NEVER_SUCCEEDS")
-                    it.ratio as NSNumber
+                    NSNumber.numberWithFloat(it.ratio)
                 }
-                this.colors = listOf(f.stops.map { it.color.toUiColor().CGColor })
-                this.startPoint = CGPointMake(-(f.angle.cos() * .5 + .5), -(f.angle.sin() * .5 + .5))
+                this.colors = f.stops.map { it.color.toUiColor().CGColor!!.toObjcId() }
+                this.startPoint = CGPointMake(-f.angle.cos() * .5 + .5, -f.angle.sin() * .5 + .5)
                 this.endPoint = CGPointMake(f.angle.cos() * .5 + .5, f.angle.sin() * .5 + .5)
             }
-            is RadialGradient -> CAGradientLayer().apply {
+            is RadialGradient -> CAGradientLayer.layer().apply {
                 frame = layer.bounds
                 this.mask = CAShapeLayer().apply {
                     frame = layer.bounds
@@ -330,10 +328,9 @@ fun ImageVector.caLayer(): CALayer {
                 }
                 this.type = kCAGradientLayerRadial
                 this.locations = f.stops.map {
-                    @Suppress("CAST_NEVER_SUCCEEDS")
-                    it.ratio as NSNumber
+                    NSNumber.numberWithFloat(it.ratio)
                 }
-                this.colors = listOf(f.stops.map { it.color.toUiColor().CGColor })
+                this.colors = f.stops.map { it.color.toUiColor().CGColor!!.toObjcId() }
                 this.startPoint = CGPointMake(0.5, 0.5)
                 this.endPoint = CGPointMake(0.0, 0.0)
             }

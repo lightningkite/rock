@@ -122,7 +122,7 @@ inline fun <T : NView> ViewWriter.handleTheme(
         }
         val mightTransition = transition != ViewWriter.TransitionNextView.No
         val useBackground = shouldTransition
-        val usePadding = mightTransition && !isRoot || viewForcePadding || parentIsSwap
+        val usePadding = (mightTransition && !isRoot || viewForcePadding || parentIsSwap)
 
         if (usePadding) {
             view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt())
@@ -178,6 +178,18 @@ inline fun <T : NView> ViewWriter.handleTheme(
             } else if (view.isClickable) {
                 view.elevation = 0f
                 view.background = theme.rippleDrawableOnly(parentSpacing, view.background)
+                backgroundRemove()
+            } else if (view is TransitionImageView) {
+                view.elevation = 0f
+                view.background = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    val cr = when(val it = theme.cornerRadii) {
+                        is CornerRadii.Constant -> min(parentSpacing, it.value.value)
+                        is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
+                    }
+                    cornerRadii = floatArrayOf(cr, cr, cr, cr, cr, cr, cr, cr)
+                    colors = intArrayOf(theme.background.applyAlpha(0.01f).colorInt(), theme.background.applyAlpha(0.01f).colorInt())
+                }
                 backgroundRemove()
             } else {
                 view.elevation = 0f
@@ -252,13 +264,13 @@ fun Theme.backgroundDrawable(
             is LinearGradient -> {
                 colors = background.stops.map { it.color.toInt() }.toIntArray()
                 orientation = when ((background.angle angleTo Angle.zero).turns.times(8).roundToInt()) {
-                    -3 -> GradientDrawable.Orientation.BL_TR
-                    -2 -> GradientDrawable.Orientation.BOTTOM_TOP
-                    -1 -> GradientDrawable.Orientation.BR_TL
+                    -3 -> GradientDrawable.Orientation.TR_BL
+                    -2 -> GradientDrawable.Orientation.TOP_BOTTOM
+                    -1 -> GradientDrawable.Orientation.TL_BR
                     0 -> GradientDrawable.Orientation.LEFT_RIGHT
-                    1 -> GradientDrawable.Orientation.TL_BR
-                    2 -> GradientDrawable.Orientation.TOP_BOTTOM
-                    3 -> GradientDrawable.Orientation.TR_BL
+                    1 -> GradientDrawable.Orientation.BL_TR
+                    2 -> GradientDrawable.Orientation.BOTTOM_TOP
+                    3 -> GradientDrawable.Orientation.BR_TL
                     else -> GradientDrawable.Orientation.LEFT_RIGHT
                 }
                 gradientType = GradientDrawable.LINEAR_GRADIENT

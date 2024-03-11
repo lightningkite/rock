@@ -555,7 +555,7 @@ class RecyclerController2(
 
     private fun emergencyEdges() {
         if (allSubviews.isNotEmpty()) {
-            if (allSubviews.first().let { it.index <= dataDirect.min && it.startPosition > viewportOffset + spacing }) {
+            if (allSubviews.first().let { it.index <= dataDirect.min && it.startPosition >= viewportOffset + spacing }) {
                 // shift and attach to top
                 if ((allSubviews.first().startPosition - spacing).absoluteValue > 2) {
                     offsetWholeSystem(-allSubviews.first().startPosition + spacing)
@@ -689,7 +689,7 @@ class RecyclerController2(
     fun ready() {
         lock("ready") {
             populate()
-            emergencyEdges()
+            forceCenteringHandler()
         }
     }
 

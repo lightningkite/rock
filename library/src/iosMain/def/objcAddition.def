@@ -4,6 +4,9 @@ package = com.lightningkite.rock.objc
 #import <objc/runtime.h>
 #import <UIKit/UIView.h>
 #import <UIKit/UIColor.h>
+#import <CoreGraphics/CGColor.h>
+#import <QuartzCore/CALayer.h>
+#import <QuartzCore/CAGradientLayer.h>
 #import <Foundation/NSArray.h>
 #import <Foundation/NSURLSession.h>
 #import <Foundation/NSURL.h>
@@ -19,6 +22,9 @@ void setAssociatedObjectWithKey(id object, NSValue* key, id value) {
 }
 CGRect cgRectValue(NSValue* key) {
   return key.CGRectValue;
+}
+id cgColorRefasIdType(CGColorRef color) {
+    return (__bridge id) color;
 }
 
 @protocol KeyValueObserver

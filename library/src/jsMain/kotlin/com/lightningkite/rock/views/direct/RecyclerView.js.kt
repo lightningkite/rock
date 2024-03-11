@@ -156,7 +156,7 @@ fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
             if(it in data.min..data.max) {
                 val sub = data[it]
                 if (child.classList.contains("placeholder")) {
-                    element.replaceChild(child, this.create(sub))
+                    element.replaceChild(this.create(sub), child)
                 } else {
                     this.update(child, sub)
                 }

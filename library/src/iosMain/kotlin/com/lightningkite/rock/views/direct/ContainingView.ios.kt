@@ -24,7 +24,6 @@ actual inline fun ViewWriter.stackActual(crossinline setup: ContainingView.() ->
 actual inline fun ViewWriter.colActual(crossinline setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = false
     handleTheme(this, viewDraws = false) {
-        println("Gap updating: ${spacingOverride.value}")
         gap = (spacingOverride.value ?: it.spacing).value
     }
     setup(ContainingView(this))
@@ -34,7 +33,6 @@ actual inline fun ViewWriter.colActual(crossinline setup: ContainingView.() -> U
 actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> Unit): Unit = element(LinearLayout()) {
     horizontal = true
     handleTheme(this, viewDraws = false) {
-        println("Gap updating: ${spacingOverride.value}")
         gap = (spacingOverride.value ?: it.spacing).value
     }
     setup(ContainingView(this))

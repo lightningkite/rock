@@ -5,6 +5,7 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.CalculationContext
+import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 
@@ -49,7 +50,9 @@ actual inline fun NView.withoutAnimation(action: () -> Unit) {
         action()
     } finally {
         offsetHeight  // force layout calculation
-        classList.remove("notransition")
+        window.setTimeout({
+            classList.remove("notransition")
+        }, 100)
         animationsEnabled = true
     }
 }

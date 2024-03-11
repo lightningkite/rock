@@ -67,7 +67,7 @@ import platform.objc.sel_registerName
 actual fun ViewWriter.hasPopover(
     requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
-    setup: ViewWriter.() -> Unit
+    setup: ViewWriter.(popoverContext: PopoverContext) -> Unit
 ): ViewWrapper {
     beforeNextElementSetup {
         val actionHolder = object : NSObject() {
@@ -77,7 +77,11 @@ actual fun ViewWriter.hasPopover(
                     override fun ViewWriter.render() {
                         stack {
                             centered - stack {
-                                setup()
+                                setup(object: PopoverContext {
+                                    override fun close() {
+                                        navigator.dialog.dismiss()
+                                    }
+                                })
                             }
                         }
                     }

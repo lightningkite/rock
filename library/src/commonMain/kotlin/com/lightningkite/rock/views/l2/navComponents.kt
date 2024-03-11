@@ -144,7 +144,7 @@ private fun ViewWriter.navGroupTopInner(readable: Readable<List<NavElement>>) {
 
             is NavGroup -> button {
                 text { ::content { it.title() } }
-            } in hasPopover {
+            } in hasPopover { _ ->
                 card - navGroupColumn(shared { it.children() })
             }
 

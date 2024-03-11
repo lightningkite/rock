@@ -462,6 +462,7 @@ object DynamicCSS {
             ".switch", mapOf(
                 "position" to "relative",
                 "overflow" to "visible",
+                "padding" to "0 !important",
                 "height" to "1.5rem",
                 "width" to "3rem",
                 "cursor" to "pointer",

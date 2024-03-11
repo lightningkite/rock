@@ -19,9 +19,17 @@ object ControlsScreen : RockScreen {
         col {
 
             h1 { content = "Controls" } in padded in hasPopover {
-                text {
-                    content = "Pop over!"
-                } in card
+                card - col {
+                    text {
+                        content = "Pop over!"
+                    }
+                    button {
+                        text("Dismiss")
+                        onClick {
+                            it.close()
+                        }
+                    }
+                }
             }
             card - col {
                 h2 { content = "Buttons" }

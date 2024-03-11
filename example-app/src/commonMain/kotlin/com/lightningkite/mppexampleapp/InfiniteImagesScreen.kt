@@ -45,16 +45,14 @@ object InfiniteImagesScreen : RockScreen {
     }
 
     override fun ViewWriter.render() {
-        col {
-            expanding - recyclerView {
-                columns = 4
-                children(Constant(ReturnIndexList)) {
-                    stack {
-                        sizeConstraints(height = 16.rem) - image {
-                            scaleType = ImageScaleType.Crop
-                            ::source { ImageRemote("https://picsum.photos/seed/${it.await()}/200/200") }
+        recyclerView {
+            columns = 4
+            children(Constant(ReturnIndexList)) {
+                stack {
+                    sizeConstraints(height = 16.rem) - image {
+                        scaleType = ImageScaleType.Crop
+                        ::source { ImageRemote("https://picsum.photos/seed/${it.await()}/200/200") }
 //                            source = Resources.imagesSolera
-                        }
                     }
                 }
             }

@@ -372,7 +372,7 @@ class RecyclerController2(
                 updateFakeScroll()
             }
         }
-    var spacing: Int = 0
+    var spacing: Int = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
         set(value) {
             if (value != field) {
                 field = value
@@ -688,7 +688,6 @@ class RecyclerController2(
 
     fun ready() {
         lock("ready") {
-            spacing = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
             populate()
             emergencyEdges()
         }

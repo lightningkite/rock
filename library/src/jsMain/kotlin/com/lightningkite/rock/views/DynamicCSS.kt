@@ -29,6 +29,9 @@ object DynamicCSS {
 
     init {
         // basis rules
+        style(":root", mapOf(
+            "--usePadding" to "0",
+        ))
         style("*", mapOf(
             "box-sizing" to "border-box",
             "line-height" to "unset",
@@ -156,56 +159,6 @@ object DynamicCSS {
                 "flex-shrink" to "1",
             )
         )
-
-        style(".contentScroll-V::-webkit-scrollbar", mapOf(
-            "display" to "none"
-        ))
-        style(".contentScroll-H::-webkit-scrollbar", mapOf(
-            "display" to "none"
-        ))
-        style(".contentScroll-V",  mapOf(
-            "width" to "100%",
-            "height" to "100%",
-            "position" to "relative",
-            "overflow-y" to "scroll",
-            "overflow-anchor" to "none",
-            "scrollbar-width" to "none",
-        ))
-        style(".contentScroll-H",  mapOf(
-            "width" to "100%",
-            "height" to "100%",
-            "position" to "relative",
-            "overflow-x" to "scroll",
-            "overflow-anchor" to "none",
-            "scrollbar-width" to "none",
-        ))
-        style(".contentScroll-V > *",  mapOf(
-            "position" to "absolute",
-            "max-height" to "unset",
-            "width" to "100%",
-            "overflow-anchor" to "revert",
-        ))
-        style(".contentScroll-H > *",  mapOf(
-            "max-width" to "unset",
-            "position" to "absolute",
-            "height" to "100%",
-            "overflow-anchor" to "revert",
-        ))
-        style(".contentScroll-V > .recyclerViewGridSub",  mapOf(
-            "display" to "flex",
-            "flex-direction" to "row",
-            "gap" to "var(--spacing, 0)",
-        ))
-        style(".contentScroll-H > .recyclerViewGridSub",  mapOf(
-            "display" to "flex",
-            "flex-direction" to "column",
-            "gap" to "var(--spacing, 0)",
-        ))
-        style(".recyclerViewGridSub > *",  mapOf(
-            "flex-grow" to "1",
-            "flex-shrink" to "1",
-            "flex-basis" to "0",
-        ))
 
         style(
             ".spinner", mapOf(
@@ -857,6 +810,60 @@ object DynamicCSS {
             "position" to "relative",
             "padding" to "0 !important"
         ))
+
+        style(".contentScroll-V::-webkit-scrollbar", mapOf(
+            "display" to "none"
+        ))
+        style(".contentScroll-H::-webkit-scrollbar", mapOf(
+            "display" to "none"
+        ))
+        style(".contentScroll-V",  mapOf(
+            "width" to "100%",
+            "height" to "100%",
+            "position" to "relative",
+            "overflow-y" to "scroll",
+            "overflow-anchor" to "none",
+            "scrollbar-width" to "none",
+        ))
+        style(".contentScroll-H",  mapOf(
+            "width" to "100%",
+            "height" to "100%",
+            "position" to "relative",
+            "overflow-x" to "scroll",
+            "overflow-anchor" to "none",
+            "scrollbar-width" to "none",
+        ))
+        style(".contentScroll-V > *",  mapOf(
+            "position" to "absolute",
+            "max-height" to "unset",
+            "width" to "calc(100% - var(--spacing, 0px) * var(--usePadding, 0) * 2)",
+            "margin-left" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
+            "margin-right" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
+            "overflow-anchor" to "revert",
+        ))
+        style(".contentScroll-H > *",  mapOf(
+            "max-width" to "unset",
+            "position" to "absolute",
+            "height" to "calc(100% - var(--spacing, 0px) * var(--usePadding, 0) * 2)",
+            "margin-top" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
+            "margin-bottom" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
+            "overflow-anchor" to "revert",
+        ))
+        style(".contentScroll-V > .recyclerViewGridSub",  mapOf(
+            "display" to "flex",
+            "flex-direction" to "row",
+            "gap" to "var(--spacing, 0)",
+        ))
+        style(".contentScroll-H > .recyclerViewGridSub",  mapOf(
+            "display" to "flex",
+            "flex-direction" to "column",
+            "gap" to "var(--spacing, 0)",
+        ))
+        style(".recyclerViewGridSub > *",  mapOf(
+            "flex-grow" to "1",
+            "flex-shrink" to "1",
+            "flex-basis" to "0",
+        ))
 //        contentScroll
 //        content
 //        barScroll
@@ -1074,6 +1081,7 @@ object DynamicCSS {
         style(
             sel(".mightTransition:not(.isRoot):not(.swapImage)", ".forcePadding:not(.cancelForcePadding):not(.swapImage)"), mapOf(
                 "padding" to "var(--spacing, 0px)",
+                "--usePadding" to "1",
             )
         )
         style(

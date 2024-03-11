@@ -854,23 +854,32 @@ object DynamicCSS {
         )
 //        recyclerView
         style(".recyclerView", mapOf(
-            "position" to "relative"
+            "position" to "relative",
+            "padding" to "0 !important"
         ))
 //        contentScroll
 //        content
 //        barScroll
 //        barContent
-        style(".viewPager", mapOf(
-            "overflow-x" to "scroll",
-            "scroll-snap-type" to "x mandatory",
-            "display" to "flex",
-            "flex-direction" to "row",
-        ))
+//        style(".viewPager", mapOf(
+//            "scroll-snap-type" to "x mandatory",
+//            "scroll-behavior" to "smooth"
+//        ))
         style(".viewPager > *", mapOf(
-            "width" to "100%",
-            "height" to "100%",
+            "width" to "var(--pager-width, 0rem)",
+            "height" to "var(--pager-height, 0rem)",
             "scroll-snap-align" to "center",
         ))
+        style(".touchscreenOnly", mapOf(
+            "visibility" to "gone"
+        ))
+        rule("""
+            @media (pointer: coarse) and (hover: none) {
+                .touchscreenOnly {
+                    visibility: visible
+                }
+            }
+        """.trimIndent())
     }
 
     fun rule(rule: String, index: Int = 0): Int {

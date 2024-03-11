@@ -7,3 +7,4 @@ enum class Platform {
 }
 expect val Platform.Companion.current: Platform
 expect val Platform.Companion.probablyAppleUser: Boolean
+expect val Platform.Companion.usesTouchscreen: Boolean

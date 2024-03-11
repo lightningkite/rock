@@ -3,11 +3,16 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.KeyboardCase
+import com.lightningkite.rock.printStackTrace2
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.*
+import org.w3c.dom.events.KeyboardEvent
+import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NRecyclerView = HTMLDivElement
@@ -74,7 +79,7 @@ actual fun RecyclerView.scrollToIndex(
     align: Align?,
     animate: Boolean
 ) {
-    (native.asDynamic().__ROCK__controller as RecyclerController2).jump(index, align ?: Align.Center)
+    (native.asDynamic().__ROCK__controller as RecyclerController2).jump(index, align ?: Align.Center, animate)
 }
 
 actual val RecyclerView.firstVisibleIndex: Readable<Int>
@@ -87,19 +92,23 @@ interface Indexed<out T> {
     val min: Int
     val max: Int
     operator fun get(index: Int): T
+
     companion object {
-        val EMPTY = object: Indexed<Nothing> {
+        val EMPTY = object : Indexed<Nothing> {
             override val max: Int
                 get() = -1
             override val min: Int
                 get() = 0
+
             override fun get(index: Int): Nothing {
                 throw IndexOutOfBoundsException()
             }
+
             override fun copy(): Indexed<Nothing> = this
         }
     }
-    fun copy(): Indexed<T> 
+
+    fun copy(): Indexed<T>
 }
 
 fun <T> List<T>.asIndexed(): Indexed<T> = object : Indexed<T> {
@@ -115,23 +124,26 @@ fun <T> List<T>.asIndexed(): Indexed<T> = object : Indexed<T> {
     override fun copy(): Indexed<T> = this@asIndexed.toList().asIndexed()
 }
 
-fun <T> Indexed<T>.columned(count: Int): Indexed<Indexed<T>> = object: Indexed<Indexed<T>> {
+fun <T> Indexed<T>.columned(count: Int): Indexed<Indexed<T>> = object : Indexed<Indexed<T>> {
     val original = this@columned
     override val min: Int
         get() = original.min / count
     override val max: Int
         get() = original.max / count
+
     override fun get(index: Int): Indexed<T> {
         val basis = index * count
-        return object: Indexed<T> {
+        return object : Indexed<T> {
             override val max: Int
                 get() = (count - 1).coerceAtMost(original.max - basis)
             override val min: Int
                 get() = (0).coerceAtLeast(original.min - basis)
+
             override fun get(index: Int): T = original.get(index + basis)
             override fun copy(): Indexed<T> = this
         }
     }
+
     override fun copy(): Indexed<Indexed<T>> = original.copy().columned(count)
 }
 
@@ -140,7 +152,7 @@ fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
         (document.createElement("div") as HTMLDivElement).apply {
             classList.add("recyclerViewGridSub")
             repeat(count) {
-                if(it in data.min..data.max) {
+                if (it in data.min..data.max) {
                     addNView(this@columned.create(data[it]))
                 } else {
                     addNView((document.createElement("div") as HTMLDivElement).apply {
@@ -153,7 +165,7 @@ fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
     update = { element, data ->
         repeat(count) {
             val child = (element.children[it] as HTMLElement)
-            if(it in data.min..data.max) {
+            if (it in data.min..data.max) {
                 val sub = data[it]
                 if (child.classList.contains("placeholder")) {
                     element.replaceChild(this.create(sub), child)
@@ -171,18 +183,37 @@ fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
 class RecyclerController2(
     val root: HTMLDivElement,
     val newViews: ViewWriter,
-    val vertical: Boolean = true
-)  {
+    val vertical: Boolean = true,
+) {
+    val me = Random.nextInt()
     val firstVisible = Property(0)
+    val centerVisible = Property(0)
     val lastVisible = Property(0)
 
     val contentHolder = (document.createElement("div") as HTMLDivElement).apply {
         classList.add("contentScroll-${if (vertical) "V" else "H"}")
+
+        tabIndex = -1
+        this.addEventListener("keydown", { ev ->
+            ev as KeyboardEvent
+            if(forceCentering) {
+                when (ev.key) {
+                    KeyCodes.left -> {
+                        scrollBy(ScrollToOptions(-(clientWidth.toDouble() - this@RecyclerController2.spacing),  behavior = ScrollBehavior.SMOOTH))
+                        ev.preventDefault()
+                    }
+                    KeyCodes.right -> {
+                        scrollBy(ScrollToOptions((clientWidth.toDouble() - this@RecyclerController2.spacing),  behavior = ScrollBehavior.SMOOTH))
+                        ev.preventDefault()
+                    }
+                }
+            }
+        })
     }
     val fakeScroll = (document.createElement("div") as HTMLDivElement).apply {
         classList.add("barScroll")
         style.position = "absolute"
-        if(vertical) {
+        if (vertical) {
             style.width = "1rem"
             style.right = "0px"
             style.top = "0px"
@@ -198,6 +229,11 @@ class RecyclerController2(
     }
     val fakeScrollInner = (document.createElement("div") as HTMLDivElement).apply {
         style.size = "${reservedScrollingSpace}px"
+        if(vertical) {
+            style.width = "1px"
+        } else {
+            style.height = "1px"
+        }
         style.maxWidth = "unset"
         style.maxHeight = "unset"
     }.also { fakeScroll.addNView(it) }
@@ -250,12 +286,12 @@ class RecyclerController2(
         set(value) {
             if (vertical) top = value else left = value
         }
-    
+
     var columns: Int = 1
         set(value) {
-            if(value != field) {
+            if (value != field) {
                 field = value
-                if(columns == 1) {
+                if (columns == 1) {
                     rendererDirect = renderer
                     dataDirect = data
                 } else {
@@ -267,7 +303,7 @@ class RecyclerController2(
     var data: Indexed<*> = Indexed.EMPTY
         set(value) {
             field = value
-            if(columns == 1) {
+            if (columns == 1) {
                 dataDirect = value
             } else {
                 dataDirect = value.columned(columns)
@@ -277,13 +313,14 @@ class RecyclerController2(
         set(value) {
             field = value
             data = Indexed.EMPTY
-            if(columns == 1) {
+            if (columns == 1) {
                 rendererDirect = value
             } else {
                 rendererDirect = value.columned(columns)
             }
         }
-    var rendererDirect: ItemRenderer<*> = ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
+    var rendererDirect: ItemRenderer<*> =
+        ItemRenderer<Int>({ document.createElement("div") as HTMLDivElement }, { _, _ -> })
         set(value) {
             dataDirect = Indexed.EMPTY
             field = value
@@ -297,37 +334,42 @@ class RecyclerController2(
     var dataDirect: Indexed<*> = Indexed.EMPTY
         set(value) {
             field = value
-            if(allSubviews.isNotEmpty()) {
-                // Shift into range
-                val outOfBoundsBottom = allSubviews.last().index > value.max
-                val outOfBoundsTop = allSubviews.first().index < value.min
-                val shift = if(outOfBoundsBottom && outOfBoundsTop) {
-                    value.min - allSubviews.first().index
-                } else if(outOfBoundsTop) {
-                    value.min - allSubviews.first().index
-                } else if (outOfBoundsBottom) {
-                    (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
-                } else 0
-                allSubviews.forEach {
-                    it.index += shift
-                    if (it.index in value.min..value.max) {
-                        it.visible = true
-                        it.element.withoutAnimation {
-                            rendererDirect.updateAny(it.element, value[it.index])
+            lock("dataSet") {
+                if (allSubviews.isNotEmpty()) {
+                    // Shift into range
+                    val outOfBoundsBottom = allSubviews.last().index > value.max
+                    val outOfBoundsTop = allSubviews.first().index < value.min
+                    val shift = if (outOfBoundsBottom && outOfBoundsTop) {
+                        value.min - allSubviews.first().index
+                    } else if (outOfBoundsTop) {
+                        value.min - allSubviews.first().index
+                    } else if (outOfBoundsBottom) {
+                        (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
+                    } else 0
+                    allSubviews.forEach {
+                        it.index += shift
+                        if (it.index in value.min..value.max) {
+                            it.visible = true
+                            it.element.withoutAnimation {
+                                rendererDirect.updateAny(it.element, value[it.index])
+                            }
+                        } else {
+                            it.visible = false
                         }
-                    } else {
-                        it.visible = false
                     }
+                    if (shift > 0) {
+                        // Force to top
+                        viewportOffset = allSubviews.first().startPosition
+                    } else if (shift < 0) {
+                        // Force to bottom
+                        viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                    }
+                } else {
+                    populate()
                 }
-                if(shift > 0) {
-                    // Force to top
-                    viewportOffset = allSubviews.first().startPosition
-                } else if(shift < 0) {
-                    // Force to bottom
-                    viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
-                }
-            } else {
-                populate()
+                emergencyEdges()
+                updateVisibleIndexes()
+                updateFakeScroll()
             }
         }
     var spacing: Int = 0
@@ -345,119 +387,293 @@ class RecyclerController2(
             field = value
             relayout()
         }
-    var viewportOffset: Int = 0
+    private var _viewportOffsetField: Int = 0
+    var viewportOffset: Int
+        get() = _viewportOffsetField
         set(value) {
-            field = value
+            _viewportOffsetField = value
+            suppressTrueScroll = true
             contentHolder.scrollStart = value.toDouble()
         }
+    var suppressTrueScroll = true
     var suppressFakeScroll = true
 
+    private var lastForceCenteringDismiss: Int = -1
+    private val forceCenteringHandler = { ->
+        if (allSubviews.isNotEmpty()) {
+            if (allSubviews.first().index <= dataDirect.min) {
+                // shift and attach to top
+                if ((allSubviews.first().startPosition - spacing).absoluteValue > 2) {
+                    offsetWholeSystem(-allSubviews.first().startPosition + spacing)
+                }
+            } else  {
+                if (viewportOffset > reservedScrollingSpace * 7 / 8) {
+                    offsetWholeSystem(3 * reservedScrollingSpace / -8)
+                } else if (viewportOffset < reservedScrollingSpace / 8) {
+                    offsetWholeSystem(3 * reservedScrollingSpace / 8)
+                }
+            }
+            if (allSubviews.last().index >= dataDirect.max) {
+                capView.style.start = allSubviews.last().let { it.startPosition + it.size + spacing }.let { "${it}px" }
+            } else {
+                capView.style.start = reservedScrollingSpace.let { "${it}px" }
+            }
+        }
+        if (forceCentering) {
+            val scrollCenter = viewportOffset + viewportSize / 2
+            allSubviews.map { it.startPosition + it.size / 2 - scrollCenter }.minBy { it.absoluteValue }.let {
+                if (it.absoluteValue > 10) {
+                    if (vertical) {
+                        contentHolder.scrollBy(
+                            ScrollToOptions(
+                                top = it.toDouble(),
+                                behavior = ScrollBehavior.SMOOTH
+                            )
+                        )
+                    } else {
+                        contentHolder.scrollBy(
+                            ScrollToOptions(
+                                left = it.toDouble(),
+                                behavior = ScrollBehavior.SMOOTH
+                            )
+                        )
+                    }
+                }
+            }
+        }
+        Unit
+    }
+    var forceCentering = false
+    var suppressFakeScrollEnd = false
+    var suppressTrueScrollEnd = false
+
     init {
-        contentHolder.onscroll = { ev ->
-            viewportOffset = contentHolder.scrollStart.toInt()
-            populate()
-            if (allSubviews.isNotEmpty()) {
-                var defaultShift = true
-                if (allSubviews.first().index <= dataDirect.min) {
-                    // shift and attach to top
-                    if(allSubviews.first().startPosition > 100) {
-                        shift(-allSubviews.first().startPosition)
-                    }
-                    defaultShift = false
-                }
-                if (allSubviews.last().index >= dataDirect.max) {
-                    capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
-                    defaultShift = false
-                } else {
-                    capView.style.start = reservedScrollingSpace.let { "${it}px" }
-                }
-                if(defaultShift) {
-                    if (viewportOffset > reservedScrollingSpace * 3 / 4) {
-                        shift(reservedScrollingSpace / -4)
-                    } else if (viewportOffset < reservedScrollingSpace / 4) {
-                        shift(reservedScrollingSpace / 4)
-                    }
-                }
+        contentHolder.onscroll = event@{ ev ->
+            if (suppressTrueScroll) {
+                suppressTrueScroll = false
+                suppressTrueScrollEnd = true
+                return@event Unit
+            }
+            suppressTrueScrollEnd = false
+            lock("onscroll") {
+                window.clearTimeout(lastForceCenteringDismiss)
+                lastForceCenteringDismiss = window.setTimeout(forceCenteringHandler, 1000)
+
+                _viewportOffsetField = contentHolder.scrollStart.toInt()
+                populate()
+                emergencyEdges()
+                updateVisibleIndexes()
             }
             Unit
         }
         fakeScroll.onscroll = event@{ ev ->
-            if(suppressFakeScroll) {
+            if (suppressFakeScroll) {
                 suppressFakeScroll = false
+                suppressFakeScrollEnd = true
                 return@event Unit
             }
-            if(allSubviews.isEmpty()) return@event Unit
-            val numElements = dataDirect.max - dataDirect.min + 1
-            val partialStart = fakeScroll.scrollStart / fakeScrollInner.scrollHeight * numElements
-            val newStart = partialStart.toInt().coerceIn(dataDirect.min, dataDirect.max) // floor?
-            val startIndexPartial =
-                allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
-            val currentStart = allSubviews[0].index
-            val currentEnd = allSubviews.last().index
-            var diff = (newStart - currentStart)
-            if(diff > dataDirect.max - currentEnd) {
-                diff = dataDirect.max - currentEnd
-                if(diff != 0) {
-                    for(subview in allSubviews) {
-                        val newIndex = subview.index + diff
-                        subview.index = newIndex
-                        subview.element.withoutAnimation {
-                            rendererDirect.updateAny(subview.element, dataDirect[newIndex])
+            suppressFakeScrollEnd = false
+            lock("fakescroll") {
+                window.clearTimeout(lastForceCenteringDismiss)
+                lastForceCenteringDismiss = window.setTimeout(forceCenteringHandler, 1000)
+                if (allSubviews.isEmpty()) return@event Unit
+                val numElements = dataDirect.max - dataDirect.min + 1
+                val partialStart = fakeScroll.scrollStart / fakeScrollInner.scrollSize * numElements
+                val newStart = partialStart.toInt().coerceIn(dataDirect.min, dataDirect.max) // floor?
+                val startIndexPartial =
+                    allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
+                val currentStart = allSubviews[0].index
+                val currentEnd = allSubviews.last().index
+                var diff = (newStart - currentStart)
+                if (diff > dataDirect.max - currentEnd) {
+                    diff = dataDirect.max - currentEnd
+                    if (diff != 0) {
+                        for (subview in allSubviews) {
+                            val newIndex = subview.index + diff
+                            subview.index = newIndex
+                            subview.element.withoutAnimation {
+                                rendererDirect.updateAny(subview.element, dataDirect[newIndex])
+                            }
                         }
                     }
-                }
-                viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
-                capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
-                contentHolder.style.size =
-                    allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
-            } else {
-                if(diff != 0) {
-                    for(subview in allSubviews) {
-                        val newIndex = subview.index + diff
-                        subview.index = newIndex
-                        subview.element.withoutAnimation {
-                            rendererDirect.updateAny(subview.element, dataDirect[newIndex])
+                    viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                    capView.style.start = allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+                    contentHolder.style.size =
+                        allSubviews.last().let { it.startPosition + it.size }.let { "${it}px" }
+                } else {
+                    if (diff != 0) {
+                        for (subview in allSubviews) {
+                            val newIndex = subview.index + diff
+                            subview.index = newIndex
+                            subview.element.withoutAnimation {
+                                rendererDirect.updateAny(subview.element, dataDirect[newIndex])
+                            }
                         }
                     }
+                    val firstHiddenRatio = (partialStart % 1.0)
+                    viewportOffset += ((firstHiddenRatio - startIndexPartial % 1.0) * allSubviews[0].size).toInt()
                 }
-                val firstHiddenRatio = (partialStart % 1.0)
-                viewportOffset += ((firstHiddenRatio - startIndexPartial % 1.0) * allSubviews[0].size).toInt()
+                updateVisibleIndexes()
             }
             Unit
         }
+        contentHolder.addEventListener("scrollend", event@{
+            if (suppressTrueScrollEnd) {
+                suppressTrueScrollEnd = false
+                return@event Unit
+            }
+            window.clearTimeout(lastForceCenteringDismiss)
+            forceCenteringHandler()
+        })
+        fakeScroll.addEventListener("scrollend", event@{
+            if (suppressFakeScrollEnd) {
+                suppressFakeScrollEnd = false
+                return@event Unit
+            }
+            window.clearTimeout(lastForceCenteringDismiss)
+            forceCenteringHandler()
+        })
         window.setTimeout({ ready() }, 1)
     }
-    fun jump(index: Int, align: Align) {
-        if(allSubviews.isEmpty()) return
-        if(index !in dataDirect.min..dataDirect.max) return
-        val existingIndex = when(align) {
-            Align.Start -> allSubviews.first().index
-            Align.End -> allSubviews.last().index
-            else -> (allSubviews.first().index + allSubviews.last().index) / 2
+
+    private var lockState: String? = null
+    private inline fun lock(key: String, action: ()->Unit) {
+        if(lockState != null) {
+            println("Cannot get lock for $key, already held by $lockState!!!")
+            return
         }
-        var target: Subview? = null
-        val shift = (index - existingIndex).coerceAtMost(dataDirect.max - allSubviews.last().index).coerceAtLeast(dataDirect.min - allSubviews.first().index)
-        allSubviews.forEach {
-            it.index += shift
-            if(it.index == index) target = it
-            if (it.index in dataDirect.min..dataDirect.max) {
-                it.visible = true
-                it.element.withoutAnimation {
-                    rendererDirect.updateAny(it.element, dataDirect[it.index])
+        lockState = key
+        val r = try {
+            action()
+        } catch(e:Exception) {
+            e.printStackTrace2()
+        }finally {
+            lockState = null
+        }
+        return r
+    }
+
+    private fun emergencyEdges() {
+        if (allSubviews.isNotEmpty()) {
+            if (allSubviews.first().let { it.index <= dataDirect.min && it.startPosition > viewportOffset + spacing }) {
+                // shift and attach to top
+                if ((allSubviews.first().startPosition - spacing).absoluteValue > 2) {
+                    offsetWholeSystem(-allSubviews.first().startPosition + spacing)
                 }
+            } else  {
+                if (viewportOffset > reservedScrollingSpace) {
+                    offsetWholeSystem(reservedScrollingSpace / -2)
+                } else if (viewportOffset < 0) {
+                    offsetWholeSystem(reservedScrollingSpace / 2)
+                }
+            }
+            if (allSubviews.last().let { it.index >= dataDirect.max && it.startPosition + it.size + spacing < viewportOffset + viewportSize } ) {
+                capView.style.start = allSubviews.last().let { it.startPosition + it.size + spacing }.let { "${it}px" }
             } else {
-                it.visible = false
+                capView.style.start = reservedScrollingSpace.let { "${it}px" }
             }
         }
-        when(align) {
-            Align.Start -> viewportOffset = allSubviews.first().startPosition
-            Align.End -> viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
-            else -> target?.let { viewportOffset = it.startPosition + it.size / 2 - viewportSize / 2 }
+    }
+
+    private fun scrollTo(pos: Double, animate: Boolean) {
+        if(vertical) {
+            contentHolder.scrollTo(ScrollToOptions(
+                top = pos,
+                behavior = if(animate) ScrollBehavior.SMOOTH else ScrollBehavior.INSTANT
+            ))
+        } else {
+            contentHolder.scrollTo(ScrollToOptions(
+                left = pos,
+                behavior = if(animate) ScrollBehavior.SMOOTH else ScrollBehavior.INSTANT
+            ))
+        }
+    }
+
+    fun jump(index: Int, align: Align, animate: Boolean) {
+        if (allSubviews.isEmpty()) return
+        lock("jump $index $align") {
+            allSubviews.find { it.index == index }?.let {
+                when(align) {
+                    Align.Start -> scrollTo(it.startPosition.toDouble(), animate)
+                    Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), animate)
+                    else -> scrollTo((it.startPosition + it.size / 2 - viewportSize / 2).toDouble(), animate)
+                }
+                return
+            }
+            if(animate) {
+                if (index !in dataDirect.min..dataDirect.max) return
+                fun move() {
+                    val existingTop = allSubviews.first().index
+                    val existingBottom = allSubviews.last().index
+                    val shift = if (index < existingTop)
+                        (index - existingTop)
+                    else if (index > existingBottom)
+                        (index - existingBottom)
+                    else 0
+                    allSubviews.forEach {
+                        it.index += shift
+                        if (it.index in dataDirect.min..dataDirect.max) {
+                            it.visible = true
+                            it.element.withoutAnimation {
+                                rendererDirect.updateAny(it.element, dataDirect[it.index])
+                            }
+                        } else {
+                            it.visible = false
+                        }
+                    }
+                }
+                move()
+                populate()
+                emergencyEdges()
+                updateVisibleIndexes()
+                forceCenteringHandler()
+                move()
+                allSubviews.find { it.index == index }?.let {
+                    when(align) {
+                        Align.Start -> scrollTo(it.startPosition.toDouble(), true)
+                        Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), true)
+                        else -> scrollTo((it.startPosition + it.size / 2 - viewportSize / 2).toDouble(), true)
+                    }
+                } ?: println("Wha?!")
+            } else {
+                if (index !in dataDirect.min..dataDirect.max) return
+                val existingIndex = when (align) {
+                    Align.Start -> allSubviews.first().index
+                    Align.End -> allSubviews.last().index
+                    else -> (allSubviews.first().index + allSubviews.last().index) / 2
+                }
+                var target: Subview? = null
+                val shift = (index - existingIndex)
+                    .coerceAtMost(dataDirect.max - allSubviews.last().index)
+                    .coerceAtLeast(dataDirect.min - allSubviews.first().index)
+                allSubviews.forEach {
+                    it.index += shift
+                    if (it.index == index) target = it
+                    if (it.index in dataDirect.min..dataDirect.max) {
+                        it.visible = true
+                        it.element.withoutAnimation {
+                            rendererDirect.updateAny(it.element, dataDirect[it.index])
+                        }
+                    } else {
+                        it.visible = false
+                    }
+                }
+                viewportOffset = when (align) {
+                    Align.Start -> allSubviews.first().startPosition - spacing
+                    Align.End -> allSubviews.last().let { it.startPosition + it.size } - viewportSize - spacing
+                    else -> target?.let { it.startPosition + it.size / 2 - viewportSize / 2 }
+                        ?: (allSubviews.first().startPosition - spacing)
+                }
+                populate()
+                emergencyEdges()
+                updateVisibleIndexes()
+                forceCenteringHandler()
+            }
         }
     }
 
     private fun updateFakeScroll() {
-        if(allSubviews.isEmpty()) return
+        if (allSubviews.isEmpty()) return
         val startIndexPartial =
             allSubviews.first().let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
         val endIndexPartial = allSubviews.last()
@@ -467,11 +683,15 @@ class RecyclerController2(
         suppressFakeScroll = true
         fakeScrollInner.style.size = "${100 / viewedRatio}%"
         fakeScroll.scrollStart = startIndexPartial / numElements * viewportSize / viewedRatio
+        updateVisibleIndexes()
     }
 
     fun ready() {
-        spacing = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
-        populate()
+        lock("ready") {
+            spacing = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
+            populate()
+            emergencyEdges()
+        }
     }
 
     inner class Subview(
@@ -512,13 +732,14 @@ class RecyclerController2(
             startPosition = top - size - spacing
             return top - size - spacing
         }
+
         fun placeAfter(bottom: Int): Int {
             startPosition = bottom + spacing
             return bottom + size + spacing
         }
     }
 
-    fun shift(by: Int) {
+    fun offsetWholeSystem(by: Int) {
         viewportOffset += by
         for (view in allSubviews) {
             view.startPosition += by
@@ -530,30 +751,40 @@ class RecyclerController2(
         return Subview(
             element = element,
             index = index,
-        ).also { if(atStart)allSubviews.add(0, it) else allSubviews.add(it); contentHolder.addNView(it.element) }
+        ).also { if (atStart) allSubviews.add(0, it) else allSubviews.add(it); contentHolder.addNView(it.element) }
     }
 
     fun makeFirst(): Subview? {
-        if(dataDirect.max < dataDirect.min) return null
+        if (dataDirect.max < dataDirect.min) return null
         viewportOffset = reservedScrollingSpace / 2
         val element = makeSubview(dataDirect.min, false)
         element.measure()
-        element.startPosition = reservedScrollingSpace / 2
+        element.startPosition = reservedScrollingSpace / 2 + spacing
         return element
     }
 
     fun populate() {
         populateDown()
         populateUp()
+        updateFakeScroll()
+    }
+
+    fun updateVisibleIndexes() {
         firstVisible.let {
             val v = allSubviews.firstOrNull()?.index?.times(columns) ?: -1
-            if(v != it.value) it.value = v
+            if (v != it.value) it.value = v
+        }
+        centerVisible.let {
+            val center = viewportOffset + viewportSize / 2
+            allSubviews.find { center in it.startPosition..it.startPosition.plus(it.size) }?.index?.times(columns)
+                ?.plus(columns / 2)?.let { v ->
+                if (v != it.value) it.value = v
+            }
         }
         lastVisible.let {
             val v = allSubviews.lastOrNull()?.index?.times(columns)?.plus(columns - 1) ?: -1
-            if(v != it.value) it.value = v
+            if (v != it.value) it.value = v
         }
-        updateFakeScroll()
     }
 
     fun populateDown() {
@@ -627,7 +858,7 @@ class RecyclerController2(
 
     fun relayoutUp(startingIndex: Int) {
         var top = allSubviews[startingIndex].let { anchor -> anchor.startPosition }
-        for (index in (startingIndex - 1)downTo 0) {
+        for (index in (startingIndex - 1) downTo 0) {
             val element = allSubviews[index]
             top = element.placeBefore(top)
         }
@@ -635,7 +866,7 @@ class RecyclerController2(
 }
 
 
-val reservedScrollingSpace = 10_000
+val reservedScrollingSpace = 100_000
 
 class ItemRenderer<T>(
     val create: (T) -> HTMLElement,
@@ -643,6 +874,7 @@ class ItemRenderer<T>(
 ) {
     @Suppress("UNCHECKED_CAST")
     fun createAny(t: Any?) = create(t as T)
+
     @Suppress("UNCHECKED_CAST")
     fun updateAny(element: HTMLElement, t: Any?) = update(element, t as T)
 }

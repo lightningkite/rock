@@ -42,8 +42,7 @@ object DocSearchScreen : RockScreen {
                             ImageElementScreen,
                             IconsScreen,
                             ViewModifiersScreen,
-                            LayoutScreen,
-                            ThemeScreen
+                            LayoutScreen
                         ).mapNotNull {
                             val q = query.await()
                             if(q.isBlank()) return@mapNotNull it to it.covers

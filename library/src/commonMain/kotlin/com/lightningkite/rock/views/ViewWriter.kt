@@ -165,7 +165,7 @@ class ViewWriter(
             setup(element)
             afterNextElementPopList.add {
                 CalculationContextStack.useIn(element.calculationContext) {
-                    afterCopy.forEach { it(element) }
+                    afterCopy.asReversed().forEach { it(element) }
                 }
             }
             popCount = oldPop
@@ -190,7 +190,7 @@ class ViewWriter(
             stackUse(this) {
                 beforeCopy.forEach { it(this) }
                 setup()
-                afterCopy.forEach { it(this) }
+                afterCopy.asReversed().forEach { it(this) }
             }
             while (toPop > 0) {
                 val item = stack.removeLast()

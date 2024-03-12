@@ -36,7 +36,6 @@ object DynamicCSS {
             "box-sizing" to "border-box",
             "line-height" to "unset",
             "overflow-x" to "visible",
-            "--parentSpacing" to "var(--spacing)",
         ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
@@ -399,6 +398,7 @@ object DynamicCSS {
                 "animation" to "spin 2s infinite linear !important",
             )
         )
+        style("button", mapOf("position" to "relative"))
         style(
             "button.loading > *", mapOf(
                 "opacity" to "0.15",
@@ -1082,6 +1082,11 @@ object DynamicCSS {
             sel(".mightTransition:not(.isRoot):not(.swapImage)", ".forcePadding:not(.cancelForcePadding):not(.swapImage)"), mapOf(
                 "padding" to "var(--spacing, 0px)",
                 "--usePadding" to "1",
+            )
+        )
+        style(
+            sel(".mightTransition:not(.isRoot):not(.swapImage) > *", ".forcePadding:not(.cancelForcePadding):not(.swapImage) > *"), mapOf(
+                "--parentSpacing" to theme.spacing.value,
             )
         )
         style(

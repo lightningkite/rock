@@ -5,11 +5,13 @@ import com.lightningkite.rock.models.ImageVector
 import com.lightningkite.rock.models.LinearGradient
 import com.lightningkite.rock.models.RadialGradient
 import com.lightningkite.rock.models.px
+import com.lightningkite.rock.objc.toObjcId
 import com.lightningkite.rock.views.toUiColor
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import platform.CoreGraphics.*
 import platform.Foundation.NSNumber
+import platform.Foundation.numberWithFloat
 import platform.QuartzCore.*
 import platform.UIKit.*
 import kotlin.math.*
@@ -304,7 +306,7 @@ fun ImageVector.caLayer(): CALayer {
         val p = CGPathCreateMutable()!!
         p.render(path.path, translateX, translateY, scaleX, scaleY)
         layer.addSublayer(when(val f = path.fillColor) {
-            is LinearGradient -> CAGradientLayer().apply {
+            is LinearGradient -> CAGradientLayer.layer().apply {
                 frame = layer.bounds
                 this.mask = CAShapeLayer().apply {
                     frame = layer.bounds
@@ -312,14 +314,13 @@ fun ImageVector.caLayer(): CALayer {
                 }
                 this.type = kCAGradientLayerAxial
                 this.locations = f.stops.map {
-                    @Suppress("CAST_NEVER_SUCCEEDS")
-                    it.ratio as NSNumber
+                    NSNumber.numberWithFloat(it.ratio)
                 }
-                this.colors = listOf(f.stops.map { it.color.toUiColor().CGColor })
-                this.startPoint = CGPointMake(-(f.angle.cos() * .5 + .5), -(f.angle.sin() * .5 + .5))
+                this.colors = f.stops.map { it.color.toUiColor().CGColor!!.toObjcId() }
+                this.startPoint = CGPointMake(-f.angle.cos() * .5 + .5, -f.angle.sin() * .5 + .5)
                 this.endPoint = CGPointMake(f.angle.cos() * .5 + .5, f.angle.sin() * .5 + .5)
             }
-            is RadialGradient -> CAGradientLayer().apply {
+            is RadialGradient -> CAGradientLayer.layer().apply {
                 frame = layer.bounds
                 this.mask = CAShapeLayer().apply {
                     frame = layer.bounds
@@ -327,10 +328,9 @@ fun ImageVector.caLayer(): CALayer {
                 }
                 this.type = kCAGradientLayerRadial
                 this.locations = f.stops.map {
-                    @Suppress("CAST_NEVER_SUCCEEDS")
-                    it.ratio as NSNumber
+                    NSNumber.numberWithFloat(it.ratio)
                 }
-                this.colors = listOf(f.stops.map { it.color.toUiColor().CGColor })
+                this.colors = f.stops.map { it.color.toUiColor().CGColor!!.toObjcId() }
                 this.startPoint = CGPointMake(0.5, 0.5)
                 this.endPoint = CGPointMake(0.0, 0.0)
             }

@@ -9,7 +9,10 @@ import com.lightningkite.rock.views.ViewModifierDsl3
 import com.lightningkite.rock.views.ViewWriter
 
 @ViewModifierDsl3
-expect fun ViewWriter.hasPopover(requireClick: Boolean = false, preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewWriter.()->Unit): ViewWrapper
+expect fun ViewWriter.hasPopover(requireClick: Boolean = false, preferredDirection: PopoverPreferredDirection = PopoverPreferredDirection.belowRight, setup: ViewWriter.(popoverContext: PopoverContext)->Unit): ViewWrapper
+interface PopoverContext {
+    fun close()
+}
 @ViewModifierDsl3
 expect fun ViewWriter.textPopover(message: String): ViewWrapper
 @ViewModifierDsl3

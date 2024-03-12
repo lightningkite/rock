@@ -5,6 +5,7 @@ import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.CalculationContext
+import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 
@@ -49,7 +50,9 @@ actual inline fun NView.withoutAnimation(action: () -> Unit) {
         action()
     } finally {
         offsetHeight  // force layout calculation
-        classList.remove("notransition")
+        window.setTimeout({
+            classList.remove("notransition")
+        }, 100)
         animationsEnabled = true
     }
 }
@@ -76,7 +79,7 @@ actual var NView.spacing: Dimension
     set(value) {
         style.setProperty("--spacing", value.value)
         val cn = "spacingOf${value.value.replace(".", "_").filter { it.isLetterOrDigit() || it == '_' }}"
-        DynamicCSS.styleIfMissing(".$cn > *, .$cn > .hidingContainer > *", mapOf(
+        DynamicCSS.styleIfMissing(".$cn.$cn.$cn.$cn.$cn > *, .$cn.$cn.$cn.$cn.$cn > .hidingContainer > *", mapOf(
             "--parentSpacing" to value.value
         ))
         className = className.split(' ').filter { !it.startsWith("spacingOf") }.plus(cn).joinToString(" ")

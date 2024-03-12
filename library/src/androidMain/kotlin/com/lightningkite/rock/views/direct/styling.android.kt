@@ -264,13 +264,13 @@ fun Theme.backgroundDrawable(
             is LinearGradient -> {
                 colors = background.stops.map { it.color.toInt() }.toIntArray()
                 orientation = when ((background.angle angleTo Angle.zero).turns.times(8).roundToInt()) {
-                    -3 -> GradientDrawable.Orientation.BL_TR
-                    -2 -> GradientDrawable.Orientation.BOTTOM_TOP
-                    -1 -> GradientDrawable.Orientation.BR_TL
+                    -3 -> GradientDrawable.Orientation.TR_BL
+                    -2 -> GradientDrawable.Orientation.TOP_BOTTOM
+                    -1 -> GradientDrawable.Orientation.TL_BR
                     0 -> GradientDrawable.Orientation.LEFT_RIGHT
-                    1 -> GradientDrawable.Orientation.TL_BR
-                    2 -> GradientDrawable.Orientation.TOP_BOTTOM
-                    3 -> GradientDrawable.Orientation.TR_BL
+                    1 -> GradientDrawable.Orientation.BL_TR
+                    2 -> GradientDrawable.Orientation.BOTTOM_TOP
+                    3 -> GradientDrawable.Orientation.BR_TL
                     else -> GradientDrawable.Orientation.LEFT_RIGHT
                 }
                 gradientType = GradientDrawable.LINEAR_GRADIENT

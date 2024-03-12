@@ -57,4 +57,7 @@ var ViewWriter.navigator by viewWriterAddonLateInit<RockNavigator>()
 @ViewModifierDsl3 val ViewWriter.danger: ViewWrapper get() = themeFromLast { it.danger() }
 @ViewModifierDsl3 val ViewWriter.affirmative: ViewWrapper get() = themeFromLast { it.affirmative() }
 @ViewModifierDsl3 val ViewWriter.compact: ViewWrapper get() = tweakTheme { it.copy(spacing = it.spacing / 2) }
+@ViewModifierDsl3 val ViewWriter.bold: ViewWrapper get() = tweakTheme { it.copy(title = it.title.copy(bold = true), body = it.body.copy(bold = true)) }
+@ViewModifierDsl3 val ViewWriter.italic: ViewWrapper get() = tweakTheme { it.copy(title = it.title.copy(italic = true), body = it.body.copy(italic = true)) }
+@ViewModifierDsl3 val ViewWriter.allCaps: ViewWrapper get() = tweakTheme { it.copy(title = it.title.copy(allCaps = true), body = it.body.copy(allCaps = true)) }
 @ViewModifierDsl3 fun ViewWriter.withSpacing(multiplier: Double): ViewWrapper = tweakTheme { it.copy(spacing = it.spacing * multiplier) }

@@ -19,14 +19,27 @@ object ControlsScreen : RockScreen {
         col {
 
             h1 { content = "Controls" } in padded in hasPopover {
-                text {
-                    content = "Pop over!"
-                } in card
+                card - col {
+                    text {
+                        content = "Pop over!"
+                    }
+                    button {
+                        text("Dismiss")
+                        onClick {
+                            it.close()
+                        }
+                    }
+                }
             }
             card - col {
                 h2 { content = "Buttons" }
                 row {
                     expanding - space {}
+                    centered - important - compact - compact - button {
+                        icon {
+                             source = Icon.star
+                        }
+                    }
                     button { onClick { delay(1000L) }; text { content = "Sample" }; ::enabled { booleanContent.await() } }
                     card - button { onClick { delay(1000L) }; text { content = "Card" }; ::enabled { booleanContent.await() } }
                     important - button { onClick { delay(1000L) }; text { content = "Important" }; ::enabled { booleanContent.await() } }
@@ -232,13 +245,27 @@ object ControlsScreen : RockScreen {
             col {
                 h2 { content = "Images" }
                 row {
-                    repeat(5) {
-                        image { source = ImageRemote("https://picsum.photos/seed/${it}/200/300") } in sizedBox(
+                    image { source = ImageRemote("https://picsum.photos/seed/0/200/300") } in sizedBox(
+                        SizeConstraints(
+                            width = 5.rem
+                        )
+                    )
+                    stack {
+                        image { source = ImageRemote("https://picsum.photos/seed/1/200/300") } in sizedBox(
                             SizeConstraints(
                                 width = 5.rem
                             )
                         )
                     }
+                    padded - stack {
+                        spacing = 0.px
+                        image { source = ImageRemote("https://picsum.photos/seed/2/200/300") } in sizedBox(
+                            SizeConstraints(
+                                width = 5.rem
+                            )
+                        )
+                    }
+
                 } in scrollsHorizontally
             } in card
         } in scrolls

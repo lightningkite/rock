@@ -18,7 +18,7 @@ data class FontAndStyle(
     val bold: Boolean = false,
     val italic: Boolean = false,
     val allCaps: Boolean = false,
-    val lineSpacingMultiplier: Double = 1.2,
+    val lineSpacingMultiplier: Double = 1.4,
     val additionalLetterSpacing: Dimension = 0.px,
 )
 
@@ -39,6 +39,7 @@ data class Icon(
         val delete = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"))
         val arrowBack = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"))
         val chevronRight = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"))
+        val chevronLeft = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z"))
         val logout = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"))
         val login = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"))
         val moreHoriz = Icon(2.rem, 2.rem, 0, -960, 960, 960, listOf("M240-400q-33 0-56.5-23.5T160-480q0-33 23.5-56.5T240-560q33 0 56.5 23.5T320-480q0 33-23.5 56.5T240-400Zm240 0q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm240 0q-33 0-56.5-23.5T640-480q0-33 23.5-56.5T720-560q33 0 56.5 23.5T800-480q0 33-23.5 56.5T720-400Z"))
@@ -166,15 +167,17 @@ sealed interface NavElement {
     val title: suspend () -> String
     val icon: suspend () -> Icon
     val count: (suspend ()->Int?)?
+    val hidden: (suspend () -> Boolean)?
 }
 
 data class NavGroup(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val children: suspend () -> List<NavElement>,
 ) : NavElement{
-    constructor(title: String, icon: Icon, children: List<NavElement> = listOf()) : this({ title }, { icon }, null, { children })
+    constructor(title: String, icon: Icon, children: List<NavElement> = listOf()) : this({ title }, { icon }, null, {false}, { children })
 }
 
 @Deprecated("Use NavLink", ReplaceWith("NavLink"))
@@ -184,17 +187,18 @@ data class NavLink(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val destination: suspend () -> RockScreen,
 ) : NavElement {
-    constructor(title: String, icon: Icon, destination: RockScreen) : this({ title }, { icon }, null, { destination })
+    constructor(title: String, icon: Icon, destination: RockScreen) : this({ title }, { icon }, null, { false }, { destination })
 }
-
 @Deprecated("Use NavExternal", ReplaceWith("NavExternal"))
 typealias ExternalNav = NavExternal
 data class NavExternal(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val to: suspend () -> String,
 ) : NavElement
 
@@ -202,6 +206,7 @@ data class NavAction(
     override val title: suspend () -> String,
     override val icon: suspend () -> Icon,
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val onSelect: suspend () -> Unit,
 ) : NavElement
 
@@ -209,6 +214,7 @@ data class NavCustom(
     override val title: suspend () -> String = { "" },
     override val icon: suspend () -> Icon = { Icon.moreHoriz },
     override val count: (suspend () -> Int?)? = null,
+    override val hidden: (suspend () -> Boolean)? = { false },
     val square: ViewWriter.()->Unit,
     val long: ViewWriter.()->Unit = square,
     val tall: ViewWriter.()->Unit = square,
@@ -226,14 +232,14 @@ enum class ImageScaleType { Fit, Crop, Stretch, NoScale }
 expect class DimensionRaw
 @JvmInline
 value class Dimension(val value: DimensionRaw): Comparable<Dimension> {
-    override fun compareTo(other: Dimension): Int = this.compareToImpl(other)
+    override fun compareTo(other: Dimension): Int = this.px.compareTo(other.px)
 }
 expect val Int.px: Dimension
 expect val Int.rem: Dimension
 expect val Int.dp: Dimension
 expect val Double.rem: Dimension
 expect val Double.dp: Dimension
-expect fun Dimension.compareToImpl(other: Dimension): Int
+expect val Dimension.px: Double
 expect inline operator fun Dimension.plus(other: Dimension): Dimension
 expect inline operator fun Dimension.minus(other: Dimension): Dimension
 expect inline operator fun Dimension.times(other: Float): Dimension

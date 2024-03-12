@@ -41,4 +41,4 @@ actual class ImageResource(val resource: Int) : ImageSource()
 actual sealed class VideoSource actual constructor()
 actual class VideoResource(val resource: Int) : VideoSource()
 
-actual fun Dimension.compareToImpl(other: Dimension): Int = value.compareTo(other.value)
+actual val Dimension.px: Double get() = value.toDouble()

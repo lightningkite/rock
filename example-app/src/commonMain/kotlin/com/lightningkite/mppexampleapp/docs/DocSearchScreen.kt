@@ -35,12 +35,15 @@ object DocSearchScreen : RockScreen {
                 expanding - recyclerView {
                     children(shared {
                         listOf(
+                            TextElementScreen,
                             DataScreen,
                             NavigationScreen,
                             VideoElementScreen,
                             ViewPagerElementScreen,
                             ImageElementScreen,
-                            IconsScreen
+                            IconsScreen,
+                            ViewModifiersScreen,
+                            LayoutScreen
                         ).mapNotNull {
                             val q = query.await()
                             if(q.isBlank()) return@mapNotNull it to it.covers

@@ -7,8 +7,6 @@ actual typealias DimensionRaw = Double
 actual val Int.px: Dimension
     get() = Dimension(this.toDouble() / UIScreen.mainScreen.scale)
 
-val Dimension.px: Double  get() = this.value * UIScreen.mainScreen.scale
-
 actual val Int.rem: Dimension
     get() = Dimension(this.toDouble() * UIFont.systemFontSize)
 
@@ -25,6 +23,7 @@ actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimensi
 actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimension(this.value.minus(other.value))
 actual inline operator fun Dimension.times(other: Float): Dimension = Dimension(this.value.times(other))
 actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(this.value.div(other))
+actual val Dimension.px: Double get() = value * UIScreen.mainScreen.scale
 
 actual data class Font(val get: (size: CGFloat, weight: UIFontWeight, italic: Boolean)->UIFont)
 fun fontFromFamilyInfo(

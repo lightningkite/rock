@@ -31,9 +31,8 @@ object DataScreen: DocScreen {
     override fun ViewWriter.render() {
         article {
             h1("Data")
-            text("Rock is roughly based on Solid.js, which uses smaller blocks to contain actions that should run when dependencies change.")
+            text("Rock is roughly based on Solid.js, which uses smaller blocks to contain actions that should run when dependencies change.\nHowever, to begin using that, we have to first look at Property.")
 
-            text("However, to begin using that, we have to first look at Property.")
             code - text("val counter = Property<Int>(0)")
             val counter = Property<Int>(0)
 

@@ -16,10 +16,10 @@ object ViewPagerElementScreen: DocScreen {
             text("This is frequently used for browsing photos or advertising features.")
             text("V2")
             val currentPage = Property(0)
-            val items = Constant((1..3).toList())
+            val items = Constant((1..30).toList())
             example("""
                 val currentPage = Property(0)
-                val items = Constant((1..3).toList())
+                val items = Constant((1..30).toList())
                 
                 card - viewPager {
                     // Bind the current index of the ViewPager to `currentPage`
@@ -56,9 +56,9 @@ object ViewPagerElementScreen: DocScreen {
                         }
                     }
                     important - button {
-                        text("Scroll to two (the last one)")
+                        text("Scroll to twenty nine (the last one)")
                         onClick {
-                            currentPage.value = 2
+                            currentPage.value = 29
                         }
                     }
                 }
@@ -72,9 +72,9 @@ object ViewPagerElementScreen: DocScreen {
                         }
                     }
                     important - button {
-                        text("Scroll to index two (the last one)")
+                        text("Scroll to index twenty nine (the last one)")
                         onClick {
-                            currentPage.value = 2
+                            currentPage.value = 29
                         }
                     }
                 }

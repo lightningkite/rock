@@ -8,6 +8,10 @@ import com.lightningkite.rock.views.*
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.*
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.MouseEvent
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -16,26 +20,27 @@ import kotlin.time.Duration.Companion.milliseconds
 actual fun ViewWriter.hasPopover(
     requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
-    setup: ViewWriter.() -> Unit
+    setup: ViewWriter.(popoverContext: PopoverContext) -> Unit
 ): ViewWrapper {
     beforeNextElementSetup {
+        val theme = currentTheme
         val pos = this
-        var existingElement:  HTMLElement? = null
-        var hoverOriginal = false
-        var hoverPopup = false
-        fun maybeRemoveElement() {
-            if(!hoverOriginal && !hoverPopup) {
-                existingElement?.let { it.parentElement?.removeChild(it) }
-                existingElement = null
-            }
-        }
+        val sourceElement = this
+        var existingElement: HTMLElement? = null
+        var existingDismisser: HTMLElement? = null
+        val maxDist = 64
+        var stayOpen = false
+        var close = {}
         fun makeElement() {
-            if(existingElement != null) return
+            if (existingElement != null) return
             with(targeting(document.body!!)) {
+                stayOpen = false
                 element<HTMLDivElement>("div") {
                     existingElement = this
                     style.position = "absolute"
                     style.zIndex = "999"
+//                    style.transform = "scale(0,0)"
+                    style.opacity = "0"
                     style.height = "max-content"
                     fun reposition() {
                         val r = pos.getBoundingClientRect()
@@ -76,25 +81,83 @@ actual fun ViewWriter.hasPopover(
                     }
                     reposition()
                     this.onmouseenter = {
-                        hoverPopup = true
                         makeElement()
                     }
-                    this.onmouseleave = {
-                        hoverPopup = false
-                        maybeRemoveElement()
+                    val currentElement = this
+                    val mouseMove = { it: Event ->
+                        it as MouseEvent
+                        if (!stayOpen) {
+                            val clientRect = sourceElement.getBoundingClientRect()
+                            val popUpRect = currentElement.getBoundingClientRect()
+                            if (min(
+                                    maxOf(
+                                        it.x - popUpRect.right,
+                                        popUpRect.left - it.x,
+                                        it.y - popUpRect.bottom,
+                                        popUpRect.top - it.y,
+                                    ), maxOf(
+                                        it.x - clientRect.right,
+                                        clientRect.left - it.x,
+                                        it.y - clientRect.bottom,
+                                        clientRect.top - it.y,
+                                    )
+                                ) > maxDist
+                            ) close()
+                        }
                     }
+                    close = {
+                        window.removeEventListener("mousemove", mouseMove)
+                        existingElement?.style?.opacity = "0"
+//                        existingElement?.style?.transform = "scale(0,0)"
+                        existingDismisser?.style?.opacity = "0"
+                        window.setTimeout({
+                            existingElement?.let { it.parentElement?.removeChild(it) }
+                            existingElement = null
+                            existingDismisser?.let { it.parentElement?.removeChild(it) }
+                            existingDismisser = null
+                        }, 150)
+                        close = {}
+                    }
+                    window.setTimeout({
+                        style.opacity = "1"
+//                        style.transform = "none"
+                    }, 16)
+                    window.addEventListener("mousemove", mouseMove)
                     window.addEventListener("scroll", { reposition() }, true)
-                    setup()
+                    setup(object : PopoverContext {
+                        override fun close() {
+                            close()
+                        }
+                    })
                 }
             }
         }
-        this.onmouseenter = {
-            hoverOriginal = true
+        this.addEventListener("click", {
             makeElement()
-        }
-        this.onmouseleave = {
-            hoverOriginal = false
-            maybeRemoveElement()
+            stayOpen = true
+            val dismisser = document.createElement("div") as HTMLDivElement
+            dismisser.style.position = "absolute"
+            dismisser.style.left = "0"
+            dismisser.style.right = "0"
+            dismisser.style.bottom = "0"
+            dismisser.style.top = "0"
+            dismisser.style.opacity = "0"
+            dismisser.onclick = {
+                close()
+            }
+            window.setTimeout({
+                dismisser.style.opacity = "1"
+            }, 16)
+            dismisser.calculationContext.reactiveScope {
+                dismisser.style.backgroundColor = theme().background.closestColor().withAlpha(0.5f).toWeb()
+            }
+            existingDismisser = dismisser
+            document.body!!.insertBefore(dismisser, existingElement)
+        })
+        if(requireClick) {
+            this.onmouseenter = {
+                makeElement()
+            }
         }
     }
     return ViewWrapper

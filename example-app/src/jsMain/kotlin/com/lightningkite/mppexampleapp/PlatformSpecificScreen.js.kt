@@ -1,8 +1,7 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.rock.dom.CSSStyleDeclaration
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.dp
+import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
@@ -55,51 +54,63 @@ actual fun ViewWriter.platformSpecific() {
 //        }
 //    }
 
+//    col {
+//        button {
+//            text("Alter Data")
+//            var version = 2
+//            onClick {
+//                val v = version++
+//                when (v % 4) {
+//                    0 -> data.value = (0..50).map { "Item $it (v$v)" }.toList()
+//                    1 -> data.value = (0..20).map { "Item $it (v$v)" }.toList()
+//                    2 -> data.value = listOf()
+//                    3 -> data.value = (0..3).map { "Item $it (v$v)" }.toList()
+//                }
+//            }
+//        }
+//        var rv: RecyclerView? = null
+//        expanding - recyclerView {
+//            rv = this
+//            columns = 1
+//            children(data) { obs ->
+//                card - sizeConstraints(minWidth = 100.dp, minHeight = 100.dp) - stack {
+//                    text {
+//                        ::content { obs.await() }
+//                    }
+//                }
+//            }
+//        }
+//        row {
+//            button {
+//                text("Jump S")
+//                onClick {
+//                    rv!!.scrollToIndex(100, Align.Start)
+//                }
+//            }
+//            button {
+//                text("Jump C")
+//                onClick {
+//                    rv!!.scrollToIndex(100, Align.Center)
+//                }
+//            }
+//            button {
+//                text("Jump E")
+//                onClick {
+//                    rv!!.scrollToIndex(100, Align.End)
+//                }
+//            }
+//        }
+//    }
+
     col {
-        button {
-            text("Alter Data")
-            var version = 2
-            onClick {
-                val v = version++
-                when (v % 4) {
-                    0 -> data.value = (0..50).map { "Item $it (v$v)" }.toList()
-                    1 -> data.value = (0..20).map { "Item $it (v$v)" }.toList()
-                    2 -> data.value = listOf()
-                    3 -> data.value = (0..3).map { "Item $it (v$v)" }.toList()
-                }
-            }
+        important - compact - compact - button {
+            icon { source = Icon.add }
         }
-        var rv: RecyclerView? = null
-        expanding - recyclerView {
-            rv = this
-            columns = 1
-            children(data) { obs ->
-                card - sizeConstraints(minWidth = 100.dp, minHeight = 100.dp) - stack {
-                    text {
-                        ::content { obs.await() }
-                    }
-                }
-            }
+        important - compact - button {
+            icon { source = Icon.add }
         }
-        row {
-            button {
-                text("Jump S")
-                onClick {
-                    rv!!.scrollToIndex(100, Align.Start)
-                }
-            }
-            button {
-                text("Jump C")
-                onClick {
-                    rv!!.scrollToIndex(100, Align.Center)
-                }
-            }
-            button {
-                text("Jump E")
-                onClick {
-                    rv!!.scrollToIndex(100, Align.End)
-                }
-            }
+        important - button {
+            icon { source = Icon.add }
         }
     }
 }

@@ -10,7 +10,7 @@ interface DocScreen: RockScreen {
     val covers: List<String>
 }
 
-val ViewWriter.code: ViewWrapper get() = tweakTheme {
+val ViewWriter.code: ViewWrapper get() = themeFromLast {
     it.copy(body = FontAndStyle(font = systemDefaultFixedWidthFont))
 }
 
@@ -18,7 +18,7 @@ fun ViewWriter.example(
     codeText: String,
     action: ViewWriter.()->Unit
 ) {
-    card - row {
+    row {
         expanding - scrollsHorizontally - code - text(codeText)
         separator()
         expanding - action()

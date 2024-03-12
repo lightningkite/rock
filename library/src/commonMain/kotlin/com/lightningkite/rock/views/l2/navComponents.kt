@@ -178,7 +178,7 @@ private fun ViewWriter.navGroupTopInner(readable: Readable<List<NavElement>>) {
                 exists = false
                 ::exists {it.hidden?.invoke() != true}
                 text { ::content { it.title() } }
-            } in hasPopover {
+            } in hasPopover { _ ->
                 card - navGroupColumn(shared { it.children() })
             }
 

@@ -263,7 +263,7 @@ class DesiredSizeView(context: Context) : ViewGroup(context) {
 actual fun ViewWriter.hasPopover(
     requireClick: Boolean,
     preferredDirection: PopoverPreferredDirection,
-    setup: ViewWriter.() -> Unit,
+    setup: ViewWriter.(popoverContext: PopoverContext) -> Unit,
 ): ViewWrapper {
     beforeNextElementSetup {
         setOnClickListener {
@@ -271,7 +271,11 @@ actual fun ViewWriter.hasPopover(
                 override fun ViewWriter.render() {
                     stack {
                         centered - stack {
-                            setup()
+                            setup(object: PopoverContext {
+                                override fun close() {
+                                    navigator.dialog.dismiss()
+                                }
+                            })
                         }
                     }
                 }

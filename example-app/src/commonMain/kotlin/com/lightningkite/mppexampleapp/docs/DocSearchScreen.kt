@@ -35,6 +35,7 @@ object DocSearchScreen : RockScreen {
                 expanding - recyclerView {
                     children(shared {
                         listOf(
+                            TextElementScreen,
                             DataScreen,
                             NavigationScreen,
                             VideoElementScreen,

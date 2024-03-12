@@ -242,6 +242,15 @@ class RecyclerController2(
         style.start = "${reservedScrollingSpace}px"
         style.backgroundColor = "rbga(1, 1, 1, 0.01)"
     }
+    var capViewAtBottom: Boolean = false
+        set(value) {
+            field = value
+            if (value) {
+                capView.style.start = allSubviews.last().let { it.startPosition + it.size + spacing }.let { "${it}px" }
+            } else {
+                capView.style.start = reservedScrollingSpace.let { "${it}px" }
+            }
+        }
 
     init {
         root.addNView(contentHolder)
@@ -413,11 +422,7 @@ class RecyclerController2(
                     offsetWholeSystem(3 * reservedScrollingSpace / 8)
                 }
             }
-            if (allSubviews.last().index >= dataDirect.max) {
-                capView.style.start = allSubviews.last().let { it.startPosition + it.size + spacing }.let { "${it}px" }
-            } else {
-                capView.style.start = reservedScrollingSpace.let { "${it}px" }
-            }
+            capViewAtBottom = allSubviews.last().index >= dataDirect.max
         }
         if (forceCentering) {
             val scrollCenter = viewportOffset + viewportSize / 2
@@ -567,11 +572,7 @@ class RecyclerController2(
                     offsetWholeSystem(reservedScrollingSpace / 2)
                 }
             }
-            if (allSubviews.last().let { it.index >= dataDirect.max && it.startPosition + it.size + spacing < viewportOffset + viewportSize } ) {
-                capView.style.start = allSubviews.last().let { it.startPosition + it.size + spacing }.let { "${it}px" }
-            } else {
-                capView.style.start = reservedScrollingSpace.let { "${it}px" }
-            }
+            capViewAtBottom = allSubviews.last().index >= dataDirect.max
         }
     }
 
@@ -697,8 +698,6 @@ class RecyclerController2(
         val element: HTMLElement,
         var index: Int,
     ) {
-//        val column: Int get() = index % columns
-//        val row: Int get() = index / columns
 
         var startPosition: Int = 0
             set(value) {
@@ -739,10 +738,11 @@ class RecyclerController2(
     }
 
     fun offsetWholeSystem(by: Int) {
-        viewportOffset += by
         for (view in allSubviews) {
             view.startPosition += by
         }
+        capViewAtBottom = capViewAtBottom
+        viewportOffset += by
     }
 
     fun makeSubview(index: Int, atStart: Boolean): Subview {

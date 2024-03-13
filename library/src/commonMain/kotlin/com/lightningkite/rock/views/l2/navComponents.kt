@@ -62,7 +62,7 @@ private fun ViewWriter.navGroupColumnInner(readable: Readable<List<NavElement>>,
                 stack {
                     exists = false
                     ::exists { it.hidden?.invoke() != true }
-                    it.long(this@navGroupColumnInner)
+                    it.long(this@forEach)
                 }
             }
 
@@ -121,7 +121,7 @@ private fun ViewWriter.navGroupActionsInner(readable: Readable<List<NavElement>>
                 stack {
                     exists = false
                     ::exists { it.hidden?.invoke() != true }
-                    it.square(this@navGroupActionsInner)
+                    it.square(this@forEach)
                 }
             }
 
@@ -170,7 +170,7 @@ private fun ViewWriter.navGroupTopInner(readable: Readable<List<NavElement>>) {
                 stack {
                     exists = false
                     ::exists { it.hidden?.invoke() != true }
-                    it.square(this@navGroupTopInner)
+                    it.square(this@forEach)
                 }
             }
 

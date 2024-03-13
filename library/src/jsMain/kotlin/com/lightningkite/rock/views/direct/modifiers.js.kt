@@ -154,7 +154,7 @@ actual fun ViewWriter.hasPopover(
             existingDismisser = dismisser
             document.body!!.insertBefore(dismisser, existingElement)
         })
-        if(requireClick) {
+        if(!requireClick) {
             this.onmouseenter = {
                 makeElement()
             }

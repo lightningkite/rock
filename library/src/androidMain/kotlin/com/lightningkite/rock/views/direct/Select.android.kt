@@ -100,25 +100,20 @@ actual fun <T> Select.bind(
 @ViewDsl
 actual inline fun ViewWriter.selectActual(crossinline setup: Select.() -> Unit) {
     return viewElement(factory = ::NSelect, wrapper = ::Select, setup = {
-        handleThemeControl(native, viewLoads = true, customDrawable = {
-            // LayerDrawable has poor interfaces for dynamically adding layers, so we have to do this to be able to
-            // safely call setDrawable(1, ...) later
-            if (numberOfLayers < 2) {
-                addLayer(null)
+        val platformBackgroundDrawable = ResourcesCompat.getDrawable(native.resources,
+            androidx.appcompat.R.drawable.abc_spinner_mtrl_am_alpha,
+            null)!!
+        handleThemeControl(native, viewLoads = true,
+            platformDrawable = platformBackgroundDrawable,
+            applyThemeToPlatformDrawable = {
+                colorFilter = PorterDuffColorFilter(it.foreground.closestColor().toInt(), PorterDuff.Mode.SRC_IN)
+            },
+            background = {
+                native.setPopupBackgroundDrawable(it.backgroundDrawable(8.dp.value, true))
+            }) {
+                native.viewWriter = newViews()
+                setup(this)
             }
-
-            val dropdown = ResourcesCompat.getDrawable(native.resources, R.drawable.baseline_arrow_drop_down_24, null)
-            dropdown?.colorFilter = PorterDuffColorFilter(it.foreground.closestColor().toInt(), PorterDuff.Mode.SRC_IN)
-
-            setDrawable(1, dropdown)
-            setLayerGravity(1, Gravity.END or Gravity.CENTER_VERTICAL)
-            setLayerInsetEnd(1, it.spacing.value.toInt())
-        },background = {
-            native.setPopupBackgroundDrawable(it.backgroundDrawable(8.dp.value, true))
-        }) {
-            native.viewWriter = newViews()
-            setup(this)
-        }
     })
 }
 

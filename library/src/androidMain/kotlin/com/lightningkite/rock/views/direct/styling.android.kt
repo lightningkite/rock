@@ -4,6 +4,7 @@ package com.lightningkite.rock.views.direct
 
 import android.animation.ValueAnimator
 import android.content.res.ColorStateList
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.*
 import android.view.View
@@ -17,6 +18,7 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import android.widget.TextView as AndroidTextView
@@ -94,7 +96,8 @@ inline fun <T : NView> ViewWriter.handleTheme(
     view: T,
     viewDraws: Boolean = true,
     viewLoads: Boolean = false,
-    noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
+    platformDrawable: Drawable? = null,
+    noinline applyThemeToPlatformDrawable: Drawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _ -> },
@@ -124,20 +127,12 @@ inline fun <T : NView> ViewWriter.handleTheme(
         val useBackground = shouldTransition
         val usePadding = (mightTransition && !isRoot || viewForcePadding || parentIsSwap)
 
-        if (usePadding) {
-            view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt())
-        } else {
-            view.setPaddingAll(0)
-        }
-
         val parentSpacing = ((view.parent as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value
 
         if (viewLoads && view.androidCalculationContext.loading.await()) {
 
-            val backgroundDrawable = theme.backgroundDrawable(
-                parentSpacing, view.isClickable, view.background,
-                customDrawable = customDrawable
-            )
+            val backgroundDrawable = theme.backgroundDrawable(parentSpacing, view.isClickable, view.background,
+                platformDrawable)
             val animation = ValueAnimator.ofFloat(0f, 1f)
 
             animation.setDuration(1000)
@@ -168,16 +163,14 @@ inline fun <T : NView> ViewWriter.handleTheme(
             animator?.cancel()
             animator = null
             if (useBackground) {
-                val backgroundDrawable = theme.backgroundDrawable(
-                    parentSpacing, view.isClickable, view.background,
-                    customDrawable = customDrawable
-                )
+                val backgroundDrawable = theme.backgroundDrawable(parentSpacing, view.isClickable, view.background,
+                    platformDrawable)
                 view.background = backgroundDrawable
                 view.elevation = if (parentSpacing > 0f) theme.elevation.value else 0f
                 background(theme)
             } else if (view.isClickable) {
                 view.elevation = 0f
-                view.background = theme.rippleDrawableOnly(parentSpacing, view.background)
+                view.background = theme.rippleDrawableOnly(parentSpacing, view.background, platformDrawable)
                 backgroundRemove()
             } else if (view is TransitionImageView) {
                 view.elevation = 0f
@@ -197,6 +190,31 @@ inline fun <T : NView> ViewWriter.handleTheme(
                 backgroundRemove()
             }
         }
+
+        val platformDrawableSuggestedPadding = Rect()
+        platformDrawable?.getPadding(platformDrawableSuggestedPadding)
+        val rockThemePadding =
+            if (usePadding) ((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt()
+            else 0
+
+        val paddingLeft = max(rockThemePadding, platformDrawableSuggestedPadding.left)
+        val paddingRight = max(rockThemePadding, platformDrawableSuggestedPadding.right)
+        val paddingTop = max(rockThemePadding, platformDrawableSuggestedPadding.top)
+        val paddingBottom = max(rockThemePadding, platformDrawableSuggestedPadding.bottom)
+
+        view.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
+
+        platformDrawable?.let {
+            val layeredBackground = view.background as LayerDrawable
+            // Potentially unclear: whenever platformDrawable is not null, it is the second of two layers in the background
+            assert(layeredBackground.numberOfLayers == 2)
+            layeredBackground.setLayerInsetStart(1, paddingLeft - platformDrawableSuggestedPadding.left)
+            layeredBackground.setLayerInsetEnd(1, paddingRight - platformDrawableSuggestedPadding.right)
+            layeredBackground.setLayerInsetTop(1, paddingTop - platformDrawableSuggestedPadding.top)
+            layeredBackground.setLayerInsetBottom(1, paddingBottom - platformDrawableSuggestedPadding.bottom)
+        }
+
+        platformDrawable?.let { it.applyThemeToPlatformDrawable(theme) }
         foreground(theme, view)
     }
 }
@@ -204,11 +222,15 @@ inline fun <T : NView> ViewWriter.handleTheme(
 fun Theme.rippleDrawableOnly(
     parentSpacing: Float,
     existingBackground: Drawable? = null,
+    platformDrawable: Drawable? = null,
 ): LayerDrawable {
     val rippleColor = ColorStateList.valueOf(hover().background.colorInt())
     val preparing = (existingBackground as? RippleDrawable)?.apply {
         setColor(rippleColor)
-    } ?: RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
+    } ?: RippleDrawable(rippleColor, null, null).apply {
+        addLayer(null)
+        platformDrawable?.let(::addLayer)
+    }
     preparing.setDrawable(0, GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
         val cr = when(val it = this@rippleDrawableOnly.cornerRadii) {
@@ -225,7 +247,7 @@ fun Theme.backgroundDrawable(
     parentSpacing: Float,
     clickable: Boolean = false,
     existingBackground: Drawable? = null,
-    customDrawable: LayerDrawable.(Theme) -> Unit = {},
+    platformDrawable: Drawable? = null,
 ): LayerDrawable {
     val formDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -290,17 +312,21 @@ fun Theme.backgroundDrawable(
         // Problem: if the color is set mid-animation, then it is not applied until the next animation
         (existingBackground as? RippleDrawable)?.apply {
             setColor(rippleColor)
-        } ?: RippleDrawable(rippleColor, null, null).apply { addLayer(null) }
+        } ?: RippleDrawable(rippleColor, null, null).apply {
+            addLayer(null)
+            platformDrawable?.let(::addLayer)
+        }
     } else {
-        LayerDrawable(arrayOfNulls(1))
-    }.apply { setDrawable(0, formDrawable); customDrawable(this@backgroundDrawable) }
+        LayerDrawable(arrayOfNulls(1)).apply { platformDrawable?.let(::addLayer) }
+    }.apply { setDrawable(0, formDrawable) }
 }
 
 inline fun <T : View> ViewWriter.handleThemeControl(
     view: T,
     viewLoads: Boolean = false,
     noinline checked: suspend () -> Boolean = { false },
-    noinline customDrawable: LayerDrawable.(Theme) -> Unit = {},
+    platformDrawable: Drawable? = null,
+    noinline applyThemeToPlatformDrawable: Drawable.(Theme) -> Unit = {},
     crossinline background: (Theme) -> Unit = {},
     crossinline backgroundRemove: () -> Unit = {},
     crossinline foreground: (Theme, T) -> Unit = { _, _ -> },
@@ -330,7 +356,8 @@ inline fun <T : View> ViewWriter.handleThemeControl(
                 }
             }
         }
-        handleTheme(view, false, viewLoads, customDrawable, background, backgroundRemove, foreground)
+        handleTheme(view, false, viewLoads, platformDrawable, applyThemeToPlatformDrawable, background,
+            backgroundRemove, foreground)
         setup()
     }
 }

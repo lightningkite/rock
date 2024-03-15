@@ -1,9 +1,12 @@
 package com.lightningkite.rock.views.direct
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.text.InputType
 import android.view.KeyEvent
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doAfterTextChanged
 import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.models.KeyboardCase
@@ -138,7 +141,18 @@ actual var TextField.range: ClosedRange<Double>?
 @ViewDsl
 actual inline fun ViewWriter.textFieldActual(crossinline setup: TextField.() -> Unit) {
     return viewElement(factory = ::EditText, wrapper = ::TextField) {
-        handleTheme<TextView>(native, foreground = applyTextColorFromTheme, viewLoads = true)
+        val platformBackgroundDrawable = ResourcesCompat.getDrawable(native.resources,
+            androidx.appcompat.R.drawable.abc_edit_text_material,
+            null)!!
+        handleTheme<TextView>(
+            native,
+            platformDrawable = platformBackgroundDrawable,
+            applyThemeToPlatformDrawable = {
+                colorFilter = PorterDuffColorFilter(it.foreground.closestColor().toInt(), PorterDuff.Mode.SRC_IN)
+            },
+            foreground = applyTextColorFromTheme,
+            viewLoads = true
+        )
         setup(this)
     }
 }

@@ -689,6 +689,7 @@ class RecyclerController2(
 
     fun ready() {
         lock("ready") {
+            spacing = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
             populate()
             forceCenteringHandler()
         }

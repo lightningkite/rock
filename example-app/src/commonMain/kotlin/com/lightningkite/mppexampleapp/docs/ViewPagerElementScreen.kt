@@ -15,7 +15,7 @@ object ViewPagerElementScreen: DocScreen {
             text("You can use a view pager to create an element that scrolls horizontally displaying pages.")
             text("This is frequently used for browsing photos or advertising features.")
             text("V2")
-            val currentPage = Property(0)
+            val currentPage = Property(9)
             val items = Constant((1..30).toList())
             example("""
                 val currentPage = Property(0)

@@ -1,6 +1,8 @@
 package com.lightningkite.rock.views.direct
 
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.widget.TextView
@@ -45,7 +47,7 @@ actual fun <T> Select.bind(
                 return convertView
             } else {
                 with(native.viewWriter) {
-                    padded - text {
+                    text {
                         content = render(list[position])
                     }
                 }
@@ -98,8 +100,10 @@ actual fun <T> Select.bind(
 }
 
 @ViewDsl
-actual inline fun ViewWriter.selectActual(crossinline setup: Select.() -> Unit) {
+actual fun ViewWriter.selectActual(setup: Select.() -> Unit) {
     return viewElement(factory = ::NSelect, wrapper = ::Select, setup = {
+        native.viewWriter = newViews()
+        setup(this)
         handleThemeControl(native, viewLoads = true, customDrawable = {
             // LayerDrawable has poor interfaces for dynamically adding layers, so we have to do this to be able to
             // safely call setDrawable(1, ...) later
@@ -113,7 +117,7 @@ actual inline fun ViewWriter.selectActual(crossinline setup: Select.() -> Unit) 
             setDrawable(1, dropdown)
             setLayerGravity(1, Gravity.END or Gravity.CENTER_VERTICAL)
             setLayerInsetEnd(1, it.spacing.value.toInt())
-        },background = {
+        }, foreground = { theme, nselect -> nselect.setPaddingAll(0) }, background = {
             native.setPopupBackgroundDrawable(it.backgroundDrawable(8.dp.value, true))
         }) {
             native.viewWriter = newViews()
@@ -121,34 +125,3 @@ actual inline fun ViewWriter.selectActual(crossinline setup: Select.() -> Unit) 
         }
     })
 }
-
-
-data class SpinnerTextStyle(
-    val textColor: Int,
-    val textSize: Float,
-    val paddingLeft: Int,
-    val paddingTop: Int,
-    val paddingRight: Int,
-    val paddingBottom: Int,
-    val typeface: Typeface?,
-    val letterSpacing: Float?,
-    val lineSpacingMultiplier: Float?,
-    val gravity: Int,
-) {
-    fun apply(to: TextView) {
-        to.gravity = gravity
-        to.setTextColor(textColor)
-        to.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-        to.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
-        letterSpacing?.let { to.letterSpacing = it }
-        lineSpacingMultiplier?.let { to.setLineSpacing(0f, it) }
-        typeface?.let { to.typeface = it }
-    }
-}
-
-var Spinner.spinnerTextStyle: SpinnerTextStyle?
-    get() = spinnerTextStyleMap[this]
-    set(value) {
-        spinnerTextStyleMap[this] = value
-    }
-private val spinnerTextStyleMap = WeakHashMap<Spinner, SpinnerTextStyle>()

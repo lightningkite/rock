@@ -46,7 +46,9 @@ actual inline fun NView.withoutAnimation(action: () -> Unit) {
     }
     try {
         animationsEnabled = false
+        clientWidth
         classList.add("notransition")
+        clientWidth
         action()
     } finally {
         offsetHeight  // force layout calculation

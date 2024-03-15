@@ -165,7 +165,7 @@ object DynamicCSS {
         style(
             ".toggle-button", mapOf(
                 "display" to "flex",
-                "align-items" to "center",
+                "align-items" to "stretch",
             )
         )
 
@@ -788,7 +788,7 @@ object DynamicCSS {
         )
 
         style(
-            ".notransition *", mapOf(
+            ".notransition, .notransition *", mapOf(
                 "transition" to "none !important"
             )
         )
@@ -835,17 +835,17 @@ object DynamicCSS {
         style(".contentScroll-V > *",  mapOf(
             "position" to "absolute",
             "max-height" to "unset",
-            "width" to "calc(100% - var(--spacing, 0px) * var(--usePadding, 0) * 2)",
-            "margin-left" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
-            "margin-right" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
+            "width" to "calc(100% - var(--parentSpacing, 0px) * var(--usePadding, 0) * 2)",
+            "margin-left" to "calc(var(--parentSpacing, 0px) * var(--usePadding, 0))",
+            "margin-right" to "calc(var(--parentSpacing, 0px) * var(--usePadding, 0))",
             "overflow-anchor" to "revert",
         ))
         style(".contentScroll-H > *",  mapOf(
             "max-width" to "unset",
             "position" to "absolute",
-            "height" to "calc(100% - var(--spacing, 0px) * var(--usePadding, 0) * 2)",
-            "margin-top" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
-            "margin-bottom" to "calc(var(--spacing, 0px) * var(--usePadding, 0))",
+            "height" to "calc(100% - var(--parentSpacing, 0px) * var(--usePadding, 0) * 2)",
+            "margin-top" to "calc(var(--parentSpacing, 0px) * var(--usePadding, 0))",
+            "margin-bottom" to "calc(var(--parentSpacing, 0px) * var(--usePadding, 0))",
             "overflow-anchor" to "revert",
         ))
         style(".contentScroll-V > .recyclerViewGridSub",  mapOf(

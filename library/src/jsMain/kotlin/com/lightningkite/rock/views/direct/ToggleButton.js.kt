@@ -24,7 +24,7 @@ actual inline fun ViewWriter.toggleButtonActual(crossinline setup: ToggleButton.
         this.style.display = "none"
     }
     themedElementClickable<HTMLSpanElement>("span") {
-        classList.add("checkResponsive")
+        classList.add("checkResponsive", "rock-stack")
         tabIndex = 0
         setup(ToggleButton(this))
         addEventListener("keydown", { ev ->

@@ -25,7 +25,7 @@ actual inline fun ViewWriter.radioToggleButtonActual(crossinline setup: RadioTog
             this.style.display = "none"
         }
         themedElementClickable<HTMLSpanElement>("span") {
-            classList.add("checkResponsive")
+            classList.add("checkResponsive", "rock-stack")
             tabIndex = 0
             setup(RadioToggleButton(this))
             addEventListener("keydown", { ev ->

@@ -3,6 +3,7 @@ package com.lightningkite.mppexampleapp
 import com.lightningkite.rock.*
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.models.rem
 import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.*
@@ -52,6 +53,7 @@ object RecyclerViewScreen : RockScreen {
             }
             recyclerView {
                 recyclerView = this
+                spacing = 0.5.rem
 //                columns = 2
                 children(items) {
                     themeFromLast { theme ->

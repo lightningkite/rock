@@ -51,4 +51,4 @@ expect val ViewWriter.padded: ViewWrapper
 val ViewWriter.withDefaultPadding: ViewWrapper get() = padded
 
 @ViewModifierDsl3
-expect fun ViewWriter.onlyWhen(default: Boolean = true, condition: suspend ()->Boolean): ViewWrapper
+expect fun ViewWriter.onlyWhen(default: Boolean = false, condition: suspend ()->Boolean): ViewWrapper

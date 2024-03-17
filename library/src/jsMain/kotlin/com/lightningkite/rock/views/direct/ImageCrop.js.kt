@@ -11,6 +11,7 @@ import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.get
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
 import org.w3c.dom.url.URL
 import org.w3c.files.Blob
@@ -18,6 +19,7 @@ import org.w3c.files.FileReader
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.experimental.and
 import kotlin.js.Promise
 import kotlin.math.*
 
@@ -44,6 +46,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         native.width = 320
         native.height = 320
 
+        native.addEventListener("mousemove", ::handleMouseMove)
         native.addEventListener("pointerdown", ::handleTouchStart)
         native.addEventListener("pointerup", ::handleTouchEnd)
         native.addEventListener("pointercancel", ::handleTouchCancel)
@@ -80,6 +83,12 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         dWidth: Double = cropWidth,
         dHeight: Double = cropHeight
     ) {
+        strokeStyle = "white"
+        lineWidth = 2.0
+        beginPath()
+        rect(cropX, cropY, cropWidth, cropHeight)
+        stroke()
+
         for (i in 0..3) {
             val offsetX = (i / 2) * dWidth
             val offsetY = (i % 2) * dHeight
@@ -91,6 +100,21 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             arc(dx + offsetX, dy + offsetY, THUMB_RADIUS, 0.0, 2 * PI)
             fill()
             stroke()
+        }
+    }
+
+    private fun handleMouseMove(event: Event) {
+        event as MouseEvent
+
+        event.preventDefault()
+        event.stopPropagation()
+
+        val pointerDown = (event.buttons and 1).toInt() == 1
+
+        if (withinThumbTouchTarget(event.offsetX, event.offsetY) >= 0) {
+            native.style.cursor = if (pointerDown) "grabbing" else "grab"
+        } else {
+            native.style.cursor = "default"
         }
     }
 
@@ -117,11 +141,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         context.draw()
     }
 
-    private val touchHandlers = mutableMapOf<Int, Int>()
-
-    private fun handleTouchStart(event: Event) {
-        event as PointerEvent
-
+    private fun withinThumbTouchTarget(x: Double, y: Double): Int {
         for (i in 0..3) {
             val offsetX = (i / 2) * cropWidth
             val offsetY = (i % 2) * cropHeight
@@ -129,17 +149,29 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             val thumbX = cropX + offsetX
             val thumbY = cropY + offsetY
 
-            val distance = sqrt((event.offsetX - thumbX).pow(2) + (event.offsetY - thumbY).pow(2))
+            val distance = sqrt((x - thumbX).pow(2) + (y - thumbY).pow(2))
             if (distance <= THUMB_RADIUS) {
-                touchHandlers[event.pointerId] = i
-                break
+                return i
             }
+        }
+        return -1
+    }
+
+    private val touchHandlers = mutableMapOf<Int, Int>()
+
+    private fun handleTouchStart(event: Event) {
+        event as PointerEvent
+
+        val thumbIndex = withinThumbTouchTarget(event.offsetX, event.offsetY)
+        if (thumbIndex >= 0) {
+            touchHandlers[event.pointerId] = thumbIndex
         }
     }
 
     private fun handleTouchEnd(event: Event) {
         event as PointerEvent
         touchHandlers.remove(event.pointerId)
+        native.style.cursor = "grab"
     }
 
     private fun handleTouchCancel(event: Event) {
@@ -159,8 +191,8 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
 
         val scale = native.width / bitmap.width.toDouble()
 
-        val resultWidth = (cropWidth / scale).toInt()
-        val resultHeight = (cropHeight / scale).toInt()
+        val resultWidth = (cropWidth.absoluteValue / scale).toInt()
+        val resultHeight = (cropHeight.absoluteValue / scale).toInt()
 
         val cropCanvas = OffscreenCanvas(resultWidth, resultHeight)
         val cropContext = cropCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D

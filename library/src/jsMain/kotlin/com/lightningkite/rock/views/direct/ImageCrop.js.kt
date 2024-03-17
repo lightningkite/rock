@@ -2,12 +2,23 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.await
 import com.lightningkite.rock.models.ImageLocal
+import com.lightningkite.rock.models.ImageRaw
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.clear
 import kotlinx.browser.window
+import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Uint8Array
+import org.khronos.webgl.get
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.pointerevents.PointerEvent
+import org.w3c.dom.url.URL
+import org.w3c.files.Blob
+import org.w3c.files.FileReader
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+import kotlin.js.Promise
 import kotlin.math.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -128,7 +139,9 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
 
     private fun handleTouchEnd(event: Event) {
         event as PointerEvent
-        touchHandlers.remove(event.pointerId)
+        touchHandlers.remove(event.pointerId)?.let {
+            launch { crop() }
+        }
     }
 
     private fun handleTouchCancel(event: Event) {
@@ -142,6 +155,64 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             handleThumbMove(it, event.offsetX, event.offsetY)
         }
     }
+
+    actual suspend fun crop(): ImageRaw? {
+        val bitmap = bitmap ?: return null
+
+        val scale = native.width / bitmap.width.toDouble()
+
+        val resultWidth = (cropWidth / scale).toInt()
+        val resultHeight = (cropHeight / scale).toInt()
+
+        val cropCanvas = OffscreenCanvas(resultWidth, resultHeight)
+        val cropContext = cropCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D
+
+        cropContext.drawImage(
+            bitmap,
+            sx = cropX / scale,
+            sy = cropY / scale,
+            sw = cropWidth / scale,
+            sh = cropHeight / scale,
+            dx = 0.0,
+            dy = 0.0,
+            dw = resultWidth.toDouble(),
+            dh = resultHeight.toDouble()
+        )
+
+        val result = cropCanvas.convertToBlob().await()
+        val blobUrl = URL.Companion.createObjectURL(result)
+        println("Check cropped photo at $blobUrl")
+
+        val arrayBuffer = FileReader().readAsArrayBufferSync(result)
+        val jsArray = Uint8Array(arrayBuffer)
+        val byteArray = ByteArray(jsArray.length)
+        for (i in 0..<jsArray.length) {
+            byteArray[i] = jsArray[i]
+        }
+        return ImageRaw(byteArray)
+    }
+}
+
+external class OffscreenCanvas(width: Int, height: Int) {
+    var width: Int
+    var height: Int
+    fun getContext(contextType: String, vararg arguments: Any): Any?
+    fun convertToBlob(): Promise<Blob>
+}
+
+external class OffscreenCanvasRenderingContext2D {
+    fun drawImage(image: CanvasImageSource, sx: Double, sy: Double, sw: Double, sh: Double, dx: Double, dy: Double, dw: Double, dh: Double)
+}
+
+suspend fun FileReader.readAsArrayBufferSync(blob: Blob): ArrayBuffer = suspendCoroutine { continuation ->
+    onload = {
+        continuation.resume(result as ArrayBuffer)
+    }
+    onerror = {
+        continuation.resumeWithException(Exception())
+    }
+
+    readAsArrayBuffer(blob)
 }
 
 @ViewDsl

@@ -139,9 +139,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
 
     private fun handleTouchEnd(event: Event) {
         event as PointerEvent
-        touchHandlers.remove(event.pointerId)?.let {
-            launch { crop() }
-        }
+        touchHandlers.remove(event.pointerId)
     }
 
     private fun handleTouchCancel(event: Event) {

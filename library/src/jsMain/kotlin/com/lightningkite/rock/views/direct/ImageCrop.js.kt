@@ -42,9 +42,8 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
     private var bitmap: ImageBitmap? = null
 
     init {
-        // TODO: How to determine the dimens of the HTML element? When set by CSS, this is different from the properties below
-        native.width = 320
-        native.height = 320
+        native.width = native.offsetWidth
+        native.height = native.offsetHeight
 
         native.addEventListener("mousemove", ::handleMouseMove)
         native.addEventListener("pointerdown", ::handleTouchStart)
@@ -58,20 +57,27 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
     private var cropY: Double = 40.0
     private var cropWidth: Double = 150.0
     private var cropHeight: Double = 80.0
+    private var fitHorizontal = true    // If false, fit image vertically
 
     private fun CanvasRenderingContext2D.draw() {
         clear()
 
         bitmap?.let {
-            val imageMinDimen = min(it.width, it.height).toDouble()
-            val imageMaxDimen = max(it.width, it.height).toDouble()
-            val imageAspectRatio = imageMinDimen / imageMaxDimen
+            val imageAspectRatio: Double = it.width.toDouble() / it.height
+            val canvasAspectRatio: Double = native.width.toDouble() / native.height
+            fitHorizontal = imageAspectRatio > canvasAspectRatio
 
-            // TODO: Proper fitting of image to canvas
-            val width = native.width
-            val height = imageAspectRatio * width
+            val width: Double
+            val height: Double
+            if (fitHorizontal) {
+                width = native.width.toDouble()
+                height = width / imageAspectRatio
+            } else {
+                height = native.height.toDouble()
+                width = height * imageAspectRatio
+            }
 
-            drawImage(it, 0.0, 0.0, width.toDouble(), height.toDouble())
+            drawImage(it, 0.0, 0.0, width, height)
         }
 
         drawThumbs()
@@ -188,8 +194,11 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
 
     actual suspend fun crop(): ImageRaw? {
         val bitmap = bitmap ?: return null
-
-        val scale = native.width / bitmap.width.toDouble()
+        val scale: Double = if (fitHorizontal) {
+            native.width.toDouble() / bitmap.width
+        } else {
+            native.height.toDouble() / bitmap.height
+        }
 
         val resultWidth = (cropWidth.absoluteValue / scale).toInt()
         val resultHeight = (cropHeight.absoluteValue / scale).toInt()

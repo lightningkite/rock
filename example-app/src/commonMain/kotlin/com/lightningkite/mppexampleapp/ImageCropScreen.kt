@@ -20,7 +20,7 @@ object ImageCropScreen : RockScreen {
         val croppedImage = Property<ImageRaw?>(null)
         val imageCrop: ImageCrop
 
-        col {
+        scrolls - col {
             h1("Image Crop")
             button {
                 text("Upload Image")

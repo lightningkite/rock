@@ -13,6 +13,7 @@ data class Theme(
     val outline: Paint = Color.black,
     val outlineWidth: Dimension = 0.px,
     val background: Paint = Color.white,
+    val card: (Theme.() -> Theme) = { this },
     val hover: (Theme.() -> Theme) = {
         copy(
             background = this.background.closestColor().highlight(0.2f),
@@ -88,6 +89,9 @@ data class Theme(
 ) {
     val icon: Paint get() = iconOverride ?: foreground
 
+    private var cardCache: Theme? = null
+    @JsName("cardDirect")
+    fun card() = cardCache ?: card(this).also { cardCache = it }
     private var dialogCache: Theme? = null
     @JsName("dialogDirect")
     fun dialog() = dialogCache ?: dialog(this).also { dialogCache = it }

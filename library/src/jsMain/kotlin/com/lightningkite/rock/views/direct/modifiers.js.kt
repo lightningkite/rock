@@ -31,9 +31,12 @@ actual fun ViewWriter.hasPopover(
         val maxDist = 64
         var stayOpen = false
         var close = {}
+        val writerTargetingBody = targeting(document.body!!)
+        val newViews = newViews()
         fun makeElement() {
             if (existingElement != null) return
-            with(targeting(document.body!!)) {
+            with(writerTargetingBody) {
+                lastTheme = rootTheme
                 stayOpen = false
                 element<HTMLDivElement>("div") {
                     existingElement = this
@@ -42,6 +45,9 @@ actual fun ViewWriter.hasPopover(
 //                    style.transform = "scale(0,0)"
                     style.opacity = "0"
                     style.height = "max-content"
+                    calculationContext.reactiveScope {
+                        style.setProperty("--parentSpacing", theme().spacing.value)
+                    }
                     fun reposition() {
                         val r = pos.getBoundingClientRect()
                         style.removeProperty("top")
@@ -135,24 +141,24 @@ actual fun ViewWriter.hasPopover(
         this.addEventListener("click", {
             makeElement()
             stayOpen = true
-            val dismisser = document.createElement("div") as HTMLDivElement
-            dismisser.style.position = "absolute"
-            dismisser.style.left = "0"
-            dismisser.style.right = "0"
-            dismisser.style.bottom = "0"
-            dismisser.style.top = "0"
-            dismisser.style.opacity = "0"
-            dismisser.onclick = {
-                close()
+            with(newViews)  {
+                dismissBackground {
+                    native.style.position = "absolute"
+                    native.style.left = "0"
+                    native.style.right = "0"
+                    native.style.bottom = "0"
+                    native.style.top = "0"
+                    native.style.opacity = "0"
+                    native.style.setProperty("backdrop-filter", "blur(0px)")
+                    window.setTimeout({
+                        native.style.opacity = "1"
+                        native.style.removeProperty("backdrop-filter")
+                    }, 16)
+                    onClick { close() }
+                    existingDismisser = native
+                }
             }
-            window.setTimeout({
-                dismisser.style.opacity = "1"
-            }, 16)
-            dismisser.calculationContext.reactiveScope {
-                dismisser.style.backgroundColor = theme().background.closestColor().withAlpha(0.5f).toWeb()
-            }
-            existingDismisser = dismisser
-            document.body!!.insertBefore(dismisser, existingElement)
+            document.body!!.insertBefore(newViews.rootCreated!!, existingElement)
         })
         if(!requireClick) {
             this.onmouseenter = {

@@ -32,6 +32,7 @@ fun ViewWriter.navSideBar(navElements: suspend () -> List<NavElement>) {
 
 fun ViewWriter.appBase(routes: Routes, mainLayout: ContainingView.() -> Unit) {
     stack {
+        rootTheme = lastTheme
         val navigator = PlatformNavigator
         PlatformNavigator.routes = routes
         this@appBase.navigator = navigator

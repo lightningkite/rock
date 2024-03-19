@@ -73,7 +73,7 @@ fun ImageView.setSrc(url: String) {
         val children = (0..<native.children.length).mapNotNull { native.children[it] }
         val myIndex = children.indexOf(newElement)
         if(myIndex == -1) return@label Unit
-        if((clockMillis() - now).also { println("Image load for $url took $it ms") } < 32) {
+        if((clockMillis() - now) < 32) {
             // disable animations and get it done; no reason to show the user an animation
             newElement.withoutAnimation {
                 newElement.style.opacity = "1"

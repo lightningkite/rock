@@ -48,14 +48,49 @@ object InfiniteImagesScreen : RockScreen {
         recyclerView {
             columns = 4
             children(Constant(ReturnIndexList)) {
-                stack {
+                button {
                     sizeConstraints(height = 16.rem) - image {
                         scaleType = ImageScaleType.Crop
-                        ::source { ImageRemote("https://picsum.photos/seed/${it.await()}/200/200") }
+                        ::source { ImageRemote("https://picsum.photos/seed/${it.await()}/100/100") }
 //                            source = Resources.imagesSolera
+                    }
+                    onClick {
+                        navigator.dialog.navigate(ImageViewPager(it.await()))
                     }
                 }
             }
         }
+    }
+}
+
+class ImageViewPager(val initialIndex: Int) : RockScreen {
+    val currentPage = Property(initialIndex)
+
+    override fun ViewWriter.render() {
+        stack {
+            viewPager {
+                children(Constant(InfiniteImagesScreen.ReturnIndexList)) { currImage ->
+                    stack {
+                        spacing = 0.25.rem
+                        image {
+                            reactiveScope {
+                                val index = currImage.await()
+                                source = ImageRemote("https://picsum.photos/seed/${index}/100/100")
+                                delay(1)
+                                source = ImageRemote("https://picsum.photos/seed/${index}/1000/1000")
+                            }
+                            scaleType = ImageScaleType.Fit
+                        }
+                    }
+                }
+                index bind currentPage
+            }
+            gravity(Align.End, Align.Start) - button {
+                icon { source = Icon.close }
+                onClick {
+                    navigator.dismiss()
+                }
+            }
+        } in themeFromLast { it.copy(background = Color.black, foreground = Color.white) }
     }
 }

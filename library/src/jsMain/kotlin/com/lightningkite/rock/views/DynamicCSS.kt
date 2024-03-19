@@ -775,7 +775,7 @@ object DynamicCSS {
                 "transition-duration" to "0.15s",
                 "transition-timing-function" to "linear",
                 "transition-delay" to "0s",
-                "transition-property" to "color, background-image, background-color, outline-color, box-shadow, border-radius, opacity",
+                "transition-property" to "color, background-image, background-color, outline-color, box-shadow, border-radius, opacity, backdrop-filter",
             )
         )
 

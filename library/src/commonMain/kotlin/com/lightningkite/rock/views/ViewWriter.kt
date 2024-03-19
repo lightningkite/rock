@@ -79,6 +79,7 @@ class ViewWriter(
             }
         }
 
+    var rootTheme: suspend () -> Theme = { MaterialLikeTheme() }
     var lastTheme: suspend () -> Theme = { MaterialLikeTheme() }
     var currentTheme: suspend () -> Theme = { MaterialLikeTheme() }
     inline fun <T> withThemeGetter(crossinline calculate: suspend (suspend () -> Theme) -> Theme, action: () -> T): T {

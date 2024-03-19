@@ -36,6 +36,24 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             }
         }
 
+    actual var aspectRatio: Pair<Int, Int>? = null
+        set(value) {
+            field = value
+
+            value?.let {
+                // For any aspect ratio, there are two options that preserve one of the current dimensions
+                val widthOfFirstOption = cropHeight * (value.first / value.second)
+                val heightOfSecondOption = cropWidth * (value.second / value.first)
+
+                // Pick the one that results in making a dimension smaller
+                if (widthOfFirstOption < cropWidth) {
+                    cropWidth = widthOfFirstOption
+                } else {
+                    cropHeight = heightOfSecondOption
+                }
+            }
+        }
+
     private val context = (native.getContext("2d") as CanvasRenderingContext2D).apply {
         imageSmoothingQuality = ImageSmoothingQuality.HIGH
     }
@@ -128,20 +146,29 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         val directX = thumbIndex / 2 == 0
         val directY = thumbIndex % 2 == 0
 
-        val deltaX = x - cropX
-        if (directX) {
-            cropWidth -= deltaX
-            cropX += deltaX
-        } else {
-            cropWidth = deltaX
+        val cornerX = cropX + if (!directX) cropWidth else 0.0
+        val cornerY = cropY + if (!directY) cropHeight else 0.0
+
+        var deltaWidth = (x - cornerX) * if (directX) -1 else 1
+        var deltaHeight = (y - cornerY) * if (directY) -1 else 1
+
+        aspectRatio?.let { aspectRatio ->
+            if (deltaWidth > deltaHeight) {
+                deltaHeight = deltaWidth * (aspectRatio.second / aspectRatio.first)
+            } else {
+                deltaWidth = deltaHeight * (aspectRatio.first / aspectRatio.second)
+            }
         }
 
-        val deltaY = y - cropY
+        cropWidth += deltaWidth
+        cropHeight += deltaHeight
+
+        if (directX) {
+            cropX -= deltaWidth
+        }
+
         if (directY) {
-            cropHeight -= deltaY
-            cropY += deltaY
-        } else {
-            cropHeight = deltaY
+            cropY -= deltaHeight
         }
 
         context.draw()

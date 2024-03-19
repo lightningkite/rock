@@ -13,6 +13,7 @@ expect class NImageCrop : NView
 expect class ImageCrop(native: NImageCrop) : RView<NImageCrop> {
     override val native: NImageCrop
     var source: ImageLocal?
+    var aspectRatio: Pair<Int, Int>?
     suspend fun crop(): ImageRaw?
 }
 

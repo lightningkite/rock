@@ -31,6 +31,7 @@ object ImageCropScreen : RockScreen {
                 }
             }
             centered - sizeConstraints(width = 20.rem, height = 20.rem) - imageCrop {
+                aspectRatio = 1 to 1
                 imageCrop = this
                 reactiveScope {
                     val imageSource = ImageLocal(image.awaitNotNull())

@@ -26,5 +26,4 @@ actual class ImageCrop actual constructor(native: NImageCrop) : RView<NImageCrop
 
 @ViewDsl
 actual fun ViewWriter.imageCropActual(setup: ImageCrop.() -> Unit) {
-    TODO("Not yet implemented")
 }

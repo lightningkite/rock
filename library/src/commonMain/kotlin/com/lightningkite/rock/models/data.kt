@@ -96,36 +96,6 @@ data class SizeConstraints(
     val height: Dimension? = null,
 )
 
-data class Insets(
-    val left: Dimension? = null,
-    val top: Dimension? = null,
-    val right: Dimension? = null,
-    val bottom: Dimension? = null
-) {
-    constructor(all: Dimension) : this(all, all, all, all)
-
-    companion object {
-        fun zero() = Insets(0.px)
-
-        val none = zero()
-
-        fun symmetric(horizontal: Dimension = 0.px, vertical: Dimension = 0.px) =
-            Insets(horizontal, vertical, horizontal, vertical)
-    }
-}
-
-data class TextStyle(
-    val color: Color = Color.black,
-    val disabledColor: Color = Color.gray,
-    val size: Double = 14.0,
-    val font: Font = systemDefaultFont,
-    val bold: Boolean = false,
-    val italic: Boolean = false,
-    val allCaps: Boolean = false,
-    val lineSpacingMultiplier: Double = 1.0,
-    val letterSpacing: Dimension = 0.px,
-)
-
 enum class Align {
     Start, Center, End, Stretch
 }

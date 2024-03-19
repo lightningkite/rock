@@ -83,7 +83,6 @@ fun ImageView.setSrc(url: String) {
         }
         for(index in 0..<myIndex) {
             val it = children[index]
-            (it as? HTMLElement)?.style?.opacity = "0"
             window.setTimeout({
                 native.removeChild(it)
             }, 150)

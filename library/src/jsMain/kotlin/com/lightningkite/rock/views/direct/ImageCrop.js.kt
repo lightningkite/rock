@@ -76,6 +76,8 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
     private var cropWidth: Double = 150.0
     private var cropHeight: Double = 80.0
     private var fitHorizontal = true    // If false, fit image vertically
+    private var imageWidth: Double = 0.0
+    private var imageHeight: Double = 0.0
 
     private fun CanvasRenderingContext2D.draw() {
         clear()
@@ -85,17 +87,15 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             val canvasAspectRatio: Double = native.width.toDouble() / native.height
             fitHorizontal = imageAspectRatio > canvasAspectRatio
 
-            val width: Double
-            val height: Double
             if (fitHorizontal) {
-                width = native.width.toDouble()
-                height = width / imageAspectRatio
+                imageWidth = native.width.toDouble()
+                imageHeight = imageWidth / imageAspectRatio
             } else {
-                height = native.height.toDouble()
-                width = height * imageAspectRatio
+                imageHeight = native.height.toDouble()
+                imageWidth = imageHeight * imageAspectRatio
             }
 
-            drawImage(it, 0.0, 0.0, width, height)
+            drawImage(it, 0.0, 0.0, imageWidth, imageHeight)
         }
 
         drawThumbs()
@@ -135,7 +135,8 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
 
         val pointerDown = (event.buttons and 1).toInt() == 1
 
-        if (withinThumbTouchTarget(event.offsetX, event.offsetY) >= 0) {
+        if (withinThumbTouchTarget(event.offsetX, event.offsetY) >= 0 ||
+            withinCropRegion(event.offsetX, event.offsetY)) {
             native.style.cursor = if (pointerDown) "grabbing" else "grab"
         } else {
             native.style.cursor = "default"
@@ -160,15 +161,27 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             }
         }
 
-        cropWidth += deltaWidth
-        cropHeight += deltaHeight
+        val newCropWidth = cropWidth + deltaWidth
+        val newCropHeight = cropHeight + deltaHeight
+        val newCropX = if (directX) cropX - deltaWidth else cropX
+        val newCropY = if (directY) cropY - deltaHeight else cropY
 
-        if (directX) {
-            cropX -= deltaWidth
-        }
+        // Check that the current corner and diagonal corner are in bounds before accepting a new crop region
+        val cornerInBounds = withinImage(
+            if (directX) newCropX else newCropX + newCropWidth,
+            if (directY) newCropY else newCropY + newCropHeight,
+        )
 
-        if (directY) {
-            cropY -= deltaHeight
+        val diagonalInBounds = withinImage(
+            if (!directX) newCropX else newCropX + newCropWidth,
+            if (!directY) newCropY else newCropY + newCropHeight,
+        )
+
+        if (cornerInBounds && diagonalInBounds) {
+            cropWidth = newCropWidth
+            cropHeight = newCropHeight
+            cropX = newCropX
+            cropY = newCropY
         }
 
         context.draw()
@@ -189,6 +202,13 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         }
         return -1
     }
+
+    private fun withinImage(x: Double, y: Double): Boolean =
+        x in 0.0..imageWidth && y in 0.0..imageHeight
+
+    private fun rangeBetween(a: Double, b: Double) = min(a, b) .. max(a, b)
+    private fun withinCropRegion(x: Double, y: Double): Boolean =
+        x in rangeBetween(cropX, cropX + cropWidth) && y in rangeBetween(cropY, cropY + cropHeight)
 
     private val touchHandlers = mutableMapOf<Int, Int>()
 

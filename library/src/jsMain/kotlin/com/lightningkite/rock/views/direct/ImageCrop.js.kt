@@ -2,24 +2,19 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.await
 import com.lightningkite.rock.models.ImageLocal
-import com.lightningkite.rock.models.ImageRaw
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.clear
 import kotlinx.browser.window
 import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.Uint8Array
-import org.khronos.webgl.get
 import org.w3c.dom.*
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.MouseEvent
 import org.w3c.dom.pointerevents.PointerEvent
-import org.w3c.dom.url.URL
 import org.w3c.files.Blob
 import org.w3c.files.FileReader
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.experimental.and
 import kotlin.js.Promise
 import kotlin.math.*
 
@@ -60,14 +55,17 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
     private var bitmap: ImageBitmap? = null
 
     init {
-        native.width = native.offsetWidth
-        native.height = native.offsetHeight
+        native.style.setProperty("touch-action", "none")
 
         native.addEventListener("mousemove", ::handleMouseMove)
         native.addEventListener("pointerdown", ::handleTouchStart)
         native.addEventListener("pointerup", ::handleTouchEndOrCancel)
         native.addEventListener("pointercancel", ::handleTouchEndOrCancel)
         native.addEventListener("pointermove", ::handleTouchMove)
+
+        ResizeObserver(::sizeCanvas).observe(native)
+
+        sizeCanvas()
     }
 
     data class Rect(val x: Double, val y: Double, val width: Double, val height: Double) {
@@ -150,6 +148,11 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             fill()
             stroke()
         }
+    }
+
+    private fun sizeCanvas(a: Array<ResizeObserverEntry>? = null, b: ResizeObserver? = null) {
+        native.width = native.offsetWidth
+        native.height = native.offsetHeight
     }
 
     private fun handleMouseMove(event: Event) {
@@ -259,7 +262,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         }
     }
 
-    actual suspend fun crop(): ImageRaw? {
+    actual suspend fun crop(): Blob? {
         val bitmap = bitmap ?: return null
         val scale: Double = if (fitHorizontal) {
             native.width.toDouble() / bitmap.width
@@ -285,17 +288,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             dh = resultHeight.toDouble()
         )
 
-        val result = cropCanvas.convertToBlob().await()
-        val blobUrl = URL.Companion.createObjectURL(result)
-        println("Check cropped photo at $blobUrl")
-
-        val arrayBuffer = FileReader().readAsArrayBufferSync(result)
-        val jsArray = Uint8Array(arrayBuffer)
-        val byteArray = ByteArray(jsArray.length)
-        for (i in 0..<jsArray.length) {
-            byteArray[i] = jsArray[i]
-        }
-        return ImageRaw(byteArray)
+        return cropCanvas.convertToBlob().await()
     }
 }
 

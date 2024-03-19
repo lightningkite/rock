@@ -41,7 +41,7 @@ object ImageCropScreen : RockScreen {
             button {
                 text("Crop")
                 onClick {
-                    croppedImage.value = imageCrop.crop()
+                    //croppedImage.value = imageCrop.crop()
                 }
             }
             centered - sizeConstraints(width = 20.rem, height = 20.rem) - image {

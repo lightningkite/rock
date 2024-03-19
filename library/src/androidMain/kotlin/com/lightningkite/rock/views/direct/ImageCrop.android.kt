@@ -1,6 +1,7 @@
 package com.lightningkite.rock.views.direct
 
 import android.view.View
+import com.lightningkite.rock.Blob
 import com.lightningkite.rock.models.ImageLocal
 import com.lightningkite.rock.models.ImageRaw
 import com.lightningkite.rock.views.RView
@@ -19,7 +20,7 @@ actual class ImageCrop actual constructor(native: NImageCrop) : RView<NImageCrop
         get() = TODO("Not yet implemented")
         set(value) {}
 
-    actual suspend fun crop(): ImageRaw? {
+    actual suspend fun crop(): Blob? {
         TODO("Not yet implemented")
     }
 }

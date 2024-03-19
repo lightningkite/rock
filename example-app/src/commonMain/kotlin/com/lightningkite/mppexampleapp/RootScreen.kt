@@ -66,6 +66,7 @@ object RootScreen : RockScreen {
                 linkScreen(ReactivityScreen)
                 linkScreen(DialogSamplesScreen)
                 linkScreen(ExternalServicesScreen)
+                linkScreen(ImageCropScreen)
                 linkScreen(FullExampleScreen())
                 linkScreen(RecyclerViewScreen)
                 linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })

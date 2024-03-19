@@ -41,7 +41,8 @@ actual inline fun ViewWriter.linkActual(crossinline setup: Link.() -> Unit) {
         // OnClickListener may not be set until after handleTheme() is called, so we must manually set isClickable for
         // the RippleDrawable to be added to the background
         native.isClickable = true
-        handleTheme(native, viewDraws = false)
-        setup(this)
+        handleThemeControl(native) {
+            setup(this)
+        }
     }
 }

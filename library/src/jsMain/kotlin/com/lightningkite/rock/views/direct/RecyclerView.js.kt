@@ -3,7 +3,6 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.dom.HTMLElement
 import com.lightningkite.rock.dom.CSSStyleDeclaration
 import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.KeyboardCase
 import com.lightningkite.rock.printStackTrace2
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
@@ -260,6 +259,7 @@ class RecyclerController2(
             val newSize = root.clientSize
             if (viewportSize != newSize) {
                 viewportSize = newSize
+                enqueuedJump?.let { jump(it, Align.Center, false) }
             }
         }.observe(root)
     }
@@ -380,6 +380,9 @@ class RecyclerController2(
                 updateVisibleIndexes()
                 updateFakeScroll()
             }
+            enqueuedJump?.let {
+                jump(it, Align.Center, false)
+            }
         }
     var spacing: Int = window.getComputedStyle(root).columnGap.removeSuffix("px").toDouble().toInt()
         set(value) {
@@ -469,6 +472,7 @@ class RecyclerController2(
                 emergencyEdges()
                 updateVisibleIndexes()
             }
+            enqueuedJump = null
             Unit
         }
         fakeScroll.onscroll = event@{ ev ->
@@ -590,19 +594,26 @@ class RecyclerController2(
         }
     }
 
+    var enqueuedJump: Int? = null
+        set(value) {
+            field = value
+        }
     fun jump(index: Int, align: Align, animate: Boolean) {
+        enqueuedJump = index
         if (allSubviews.isEmpty()) return
+        if (index !in dataDirect.min..dataDirect.max) return
+        if(viewportSize < 1) return
+        enqueuedJump = null
         lock("jump $index $align") {
-            allSubviews.find { it.index == index }?.let {
-                when(align) {
-                    Align.Start -> scrollTo(it.startPosition.toDouble(), animate)
-                    Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), animate)
-                    else -> scrollTo((it.startPosition + it.size / 2 - viewportSize / 2).toDouble(), animate)
-                }
-                return
-            }
             if(animate) {
-                if (index !in dataDirect.min..dataDirect.max) return
+                allSubviews.find { it.index == index }?.let {
+                    when(align) {
+                        Align.Start -> scrollTo(it.startPosition.toDouble(), animate)
+                        Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), animate)
+                        else -> scrollTo((it.startPosition + it.size / 2 - viewportSize / 2).toDouble(), animate)
+                    }
+                    return
+                }
                 fun move() {
                     val existingTop = allSubviews.first().index
                     val existingBottom = allSubviews.last().index
@@ -637,7 +648,6 @@ class RecyclerController2(
                     }
                 } ?: println("Wha?!")
             } else {
-                if (index !in dataDirect.min..dataDirect.max) return
                 val existingIndex = when (align) {
                     Align.Start -> allSubviews.first().index
                     Align.End -> allSubviews.last().index
@@ -665,6 +675,7 @@ class RecyclerController2(
                     else -> target?.let { it.startPosition + it.size / 2 - viewportSize / 2 }
                         ?: (allSubviews.first().startPosition - spacing)
                 }
+                println("Hopped to ${viewportOffset}, where the target starts at ${target?.startPosition} size ${target?.size} and the viewport size is $viewportSize")
                 populate()
                 emergencyEdges()
                 updateVisibleIndexes()

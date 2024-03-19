@@ -103,6 +103,7 @@ actual fun <T> Select.bind(
 actual fun ViewWriter.selectActual(setup: Select.() -> Unit) {
     return viewElement(factory = ::NSelect, wrapper = ::Select, setup = {
         native.viewWriter = newViews()
+        native.minimumHeight = 0
         setup(this)
         handleThemeControl(native, viewLoads = true, customDrawable = {
             // LayerDrawable has poor interfaces for dynamically adding layers, so we have to do this to be able to

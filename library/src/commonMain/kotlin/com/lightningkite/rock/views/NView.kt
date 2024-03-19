@@ -3,6 +3,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Angle
 import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.Rect
 import com.lightningkite.rock.reactive.CalculationContext
 
 
@@ -27,5 +28,6 @@ expect fun NView.removeNView(child: NView)
 expect fun NView.listNViews(): List<NView>
 expect fun NView.scrollIntoView(horizontal: Align?, vertical: Align?, animate: Boolean = true)
 expect fun NView.consumeInputEvents()
+//expect fun NView.getFrameRelativeToParent(): Rect
 
 expect inline fun NView.withoutAnimation(action: ()->Unit)

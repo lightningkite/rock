@@ -18,7 +18,7 @@ object ViewPagerElementScreen: DocScreen {
             val currentPage = Property(9)
             val items = Constant((1..30).toList())
             example("""
-                val currentPage = Property(0)
+                val currentPage = Property(9)
                 val items = Constant((1..30).toList())
                 
                 card - viewPager {

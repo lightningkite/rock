@@ -46,5 +46,9 @@ actual fun ExternalLink.onNavigate(action: suspend () -> Unit): Unit {
 
 @ViewDsl
 actual inline fun ViewWriter.externalLinkActual(crossinline setup: ExternalLink.() -> Unit) {
-    viewElement(factory = ::LinkFrameLayout, wrapper = ::ExternalLink, setup = setup)
+    viewElement(factory = ::LinkFrameLayout, wrapper = ::ExternalLink) {
+        handleThemeControl(native) {
+            setup(this)
+        }
+    }
 }

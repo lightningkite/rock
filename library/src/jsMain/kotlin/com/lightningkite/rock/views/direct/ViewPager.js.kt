@@ -1,19 +1,15 @@
 package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.Icon
-import com.lightningkite.rock.models.px
 import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
 import com.lightningkite.rock.views.*
-import kotlinx.browser.window
 import kotlinx.dom.addClass
 import org.w3c.dom.*
 import kotlin.math.roundToInt
-import kotlin.random.Random
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
 actual typealias NViewPager = HTMLDivElement

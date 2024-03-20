@@ -272,6 +272,7 @@ class RecyclerController2(
             if (viewportSize != newSize) {
                 viewportSize = newSize
                 enqueuedJump?.let { jump(it, Align.Center, false) }
+                forceCenteringHandler()
             }
         }.observe(root)
     }

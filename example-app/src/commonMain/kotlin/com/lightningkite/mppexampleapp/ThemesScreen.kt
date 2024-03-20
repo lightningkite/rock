@@ -21,7 +21,19 @@ object ThemesScreen : RockScreen {
                     space {} in weight(1f)
                     text { content = "Sample" } in padded
                     text { content = "Card" } in card
-                    text { content = "Important" } in important
+                    text { content = "Important" } in hasPopover {
+                        card - col {
+                            text {
+                                content = "Pop over!"
+                            }
+                            button {
+                                text("Dismiss")
+                                onClick {
+                                    it.close()
+                                }
+                            }
+                        }
+                    } in important
                     text { content = "Critical" } in critical
                     space {} in weight(1f)
                 } in scrollsHorizontally

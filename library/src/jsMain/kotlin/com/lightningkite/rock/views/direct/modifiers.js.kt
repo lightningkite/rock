@@ -36,6 +36,7 @@ actual fun ViewWriter.hasPopover(
         fun makeElement() {
             if (existingElement != null) return
             with(writerTargetingBody) {
+                currentTheme = rootTheme
                 lastTheme = rootTheme
                 stayOpen = false
                 element<HTMLDivElement>("div") {
@@ -142,6 +143,8 @@ actual fun ViewWriter.hasPopover(
             makeElement()
             stayOpen = true
             with(newViews)  {
+                currentTheme = rootTheme
+                lastTheme = rootTheme
                 dismissBackground {
                     native.style.position = "absolute"
                     native.style.left = "0"

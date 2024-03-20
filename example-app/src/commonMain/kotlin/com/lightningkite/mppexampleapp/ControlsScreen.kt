@@ -18,19 +18,7 @@ object ControlsScreen : RockScreen {
         val booleanContent = Property(true)
         col {
 
-            h1 { content = "Controls" } in padded in hasPopover {
-                card - col {
-                    text {
-                        content = "Pop over!"
-                    }
-                    button {
-                        text("Dismiss")
-                        onClick {
-                            it.close()
-                        }
-                    }
-                }
-            }
+            h1 { content = "Controls" }
             card - col {
                 h2 { content = "Buttons" }
                 row {

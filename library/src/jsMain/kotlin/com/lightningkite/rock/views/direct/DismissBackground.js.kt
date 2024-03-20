@@ -2,9 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.contains
 import com.lightningkite.rock.launchManualCancel
-import com.lightningkite.rock.views.ViewDsl
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.calculationContext
+import com.lightningkite.rock.views.*
 import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
@@ -15,16 +13,13 @@ actual typealias NDismissBackground = HTMLElement
 @ViewDsl
 actual inline fun ViewWriter.dismissBackgroundActual(crossinline setup: DismissBackground.() -> Unit): Unit {
     stack {
-        themedElement<HTMLSpanElement>(
-            name = "span",
-            setup = {
-                classList.add("dismissBackground")
-            }
-        ) 
+        native.classList.add("dismissBackground")
+        native.onclick = { navigator.dismiss() }
         setup(DismissBackground(native))
+        native.listNViews().forEach { it.onclick = { ev -> ev.stopImmediatePropagation() } }
     }
 }
 
 actual fun DismissBackground.onClick(action: suspend () -> Unit): Unit {
-    (native.children[0] as HTMLElement).onclick = { native.calculationContext.launchManualCancel(action) }
+    native.onclick = { native.calculationContext.launchManualCancel(action) }
 }

@@ -33,8 +33,7 @@ fun ViewWriter.confirmDanger(
     navigator.dialog.navigate(object : RockScreen {
         override val title: Readable<String> = Constant(title)
         override fun ViewWriter.render() {
-            stack {
-                ignoreInteraction = true
+            dismissBackground {
                 centered - card - col {
                     h2(title)
                     text(body)
@@ -65,8 +64,7 @@ fun ViewWriter.alert(
     navigator.dialog.navigate(object : RockScreen {
         override val title: Readable<String> = Constant(title)
         override fun ViewWriter.render() {
-            stack {
-                ignoreInteraction = true
+            dismissBackground {
                 centered - card - col {
 //                    ignoreInteraction = false
                     h2(title)

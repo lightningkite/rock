@@ -36,12 +36,7 @@ fun ViewWriter.appBase(routes: Routes, mainLayout: ContainingView.() -> Unit) {
         val navigator = PlatformNavigator
         PlatformNavigator.routes = routes
         this@appBase.navigator = navigator
-        mainLayout() 
-        dismissBackground {
-            val nav = navigator.dialog
-            ::exists { nav.currentScreen.await() != null }
-            onClick { nav.dismiss() }
-            navigatorViewDialog() in tweakTheme { it.dialog() }
-        } 
+        mainLayout()
+        navigatorViewDialog() in tweakTheme { it.dialog() }
     } 
 }

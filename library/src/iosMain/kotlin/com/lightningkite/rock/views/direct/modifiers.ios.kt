@@ -119,7 +119,6 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
 actual val ViewWriter.scrolls: ViewWrapper
     get() {
         wrapNext(ScrollLayout()) {
-            handleTheme(this, viewDraws = false)
             horizontal = false
         }
         return ViewWrapper
@@ -129,7 +128,6 @@ actual val ViewWriter.scrolls: ViewWrapper
 actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         wrapNext(ScrollLayout()) {
-            handleTheme(this, viewDraws = false)
             horizontal = true
         }
         return ViewWrapper

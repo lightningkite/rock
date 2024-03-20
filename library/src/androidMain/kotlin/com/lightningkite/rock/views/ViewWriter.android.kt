@@ -120,8 +120,8 @@ actual var NView.ignoreInteraction: Boolean
     }
 
 private fun NView.assertLayoutTransitionReady() {
-    val animateHost = (parent as? ViewGroup)
-    if (animateHost?.layoutTransition == null) animateHost?.layoutTransition = RockLayoutTransition()
+//    val animateHost = (parent as? ViewGroup)
+//    if (animateHost?.layoutTransition == null) animateHost?.layoutTransition = RockLayoutTransition()
 }
 
 actual var NView.exists: Boolean

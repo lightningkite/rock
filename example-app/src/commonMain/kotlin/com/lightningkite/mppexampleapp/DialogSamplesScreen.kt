@@ -32,7 +32,7 @@ object DialogSamplesScreen : RockScreen {
 
 @Routable("sample/dialog/1") object DialogSampleScreen1: RockScreen {
     override fun ViewWriter.render() {
-        stack {
+        dismissBackground {
             centered - card - col {
                 h2 { content = "Sample Dialog" }
                 text { content = "This is a sample dialog." }

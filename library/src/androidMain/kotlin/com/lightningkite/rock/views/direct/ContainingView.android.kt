@@ -33,7 +33,6 @@ actual inline fun ViewWriter.colActual(crossinline setup: ContainingView.() -> U
         val l = native as SlightlyModifiedLinearLayout
         l.orientation = SimplifiedLinearLayout.VERTICAL
         l.gravity = Gravity.CENTER_HORIZONTAL
-        l.setLayoutTransition(LayoutTransition())
         handleTheme(l, viewDraws = false) { t, v ->
             v.gap = (v.spacingOverride.value ?: t.spacing).value.toInt()
         }
@@ -47,7 +46,6 @@ actual inline fun ViewWriter.rowActual(crossinline setup: ContainingView.() -> U
         val l = native as SlightlyModifiedLinearLayout
         l.orientation = SimplifiedLinearLayout.HORIZONTAL
         l.gravity = Gravity.CENTER_VERTICAL
-        l.setLayoutTransition(LayoutTransition())
         handleTheme(l, viewDraws = false) { t, v ->
             v.gap = (v.spacingOverride.value ?: t.spacing).value.toInt()
         }

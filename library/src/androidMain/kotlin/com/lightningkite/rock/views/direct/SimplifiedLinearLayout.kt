@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 
 
-
+typealias SimplifiedLinearLayoutLayoutParams = SimplifiedLinearLayout.LayoutParams
 /**
  * A drastically simplified variant of LinearLayout.
  */

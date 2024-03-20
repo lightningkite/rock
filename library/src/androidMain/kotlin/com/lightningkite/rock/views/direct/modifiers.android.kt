@@ -43,7 +43,7 @@ actual val ViewWriter.padded: ViewWrapper
 actual fun ViewWriter.weight(amount: Float): ViewWrapper {
     beforeNextElementSetup {
         try {
-            val lp = (lparams as SimplifiedLinearLayout.LayoutParams)
+            val lp = (lparams as SimplifiedLinearLayoutLayoutParams)
             lp.weight = amount
             if ((this.parent as SimplifiedLinearLayout).orientation == SimplifiedLinearLayout.HORIZONTAL) {
                 lp.width = 0
@@ -74,7 +74,7 @@ actual fun ViewWriter.gravity(horizontal: Align, vertical: Align): ViewWrapper {
             Align.End -> Gravity.BOTTOM
             else -> Gravity.CENTER_VERTICAL
         }
-        if (params is SimplifiedLinearLayout.LayoutParams)
+        if (params is SimplifiedLinearLayoutLayoutParams)
             params.gravity = horizontalGravity or verticalGravity
         else if (params is FrameLayout.LayoutParams)
             params.gravity = horizontalGravity or verticalGravity
@@ -99,7 +99,6 @@ actual val ViewWriter.scrolls: ViewWrapper
     get() {
         wrapNext(NestedScrollView(this.context)) {
             isFillViewport = true
-            handleTheme(this, viewDraws = false)
         }
         return ViewWrapper
     }
@@ -109,7 +108,6 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
     get() {
         wrapNext(HorizontalScrollView(this.context)) {
             isFillViewport = true
-            handleTheme(this, viewDraws = false)
         }
         return ViewWrapper
     }
@@ -117,16 +115,17 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
 //    if(constraints.maxHeight != null || constraints.maxWidth != null) {
-//        wrapNext(FrameLayout(this.context)) {
-//            layoutParams = ViewGroup.LayoutParams(
-//                /* width = */ constraints.width?.value?.toInt() ?: ViewGroup.LayoutParams.WRAP_CONTENT,
-//                /* height = */ constraints.height?.value?.toInt() ?: ViewGroup.LayoutParams.WRAP_CONTENT
-//            )
+//        wrapNext(DesiredSizeView(this.context)) {
+//            this.constraints = constraints
 //        }
 //    } else {
-    wrapNext(DesiredSizeView(this.context)) {
-        this.constraints = constraints
-    }
+        beforeNextElementSetup {
+            constraints.width?.let { this.lparams.width = it.value.toInt() }
+            constraints.height?.let { this.lparams.height = it.value.toInt() }
+            constraints.minWidth?.let { this.minimumWidth = it.value.toInt() }
+            constraints.minHeight?.let { this.minimumHeight = it.value.toInt() }
+        }
+//    }
     return ViewWrapper
 }
 

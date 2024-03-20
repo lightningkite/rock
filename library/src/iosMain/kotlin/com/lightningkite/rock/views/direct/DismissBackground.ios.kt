@@ -16,7 +16,14 @@ actual inline fun ViewWriter.dismissBackgroundActual(crossinline setup: DismissB
     handleTheme(this) {
         backgroundColor = it.background.closestColor().copy(alpha = 0.5f).toUiColor()
     }
-    setup(DismissBackground(this))
+    val d = DismissBackground(this)
+    d.onClick {
+        navigator.dismiss()
+    }
+    setup(d)
+    listNViews().forEach {
+        it.userInteractionEnabled = true
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)

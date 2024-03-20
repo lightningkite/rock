@@ -15,8 +15,6 @@ actual typealias NButton = SlightlyModifiedFrameLayout
 actual inline fun ViewWriter.buttonActual(crossinline setup: Button.() -> Unit) {
     viewElement(factory = ::SlightlyModifiedFrameLayout, wrapper = ::ContainingView) {
         val frame = native as SlightlyModifiedFrameLayout
-        native.minimumWidth = 2.rem.value.toInt()
-        native.minimumHeight = 2.rem.value.toInt()
         native.isClickable = true
         val l = native.androidCalculationContext.loading
         handleThemeControl(frame) {

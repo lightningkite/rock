@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.ColorDrawable
 import android.view.View
 import android.view.ViewGroup
+import com.lightningkite.rock.models.px
 
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -12,8 +13,8 @@ import com.lightningkite.rock.views.lparams
 
 @ViewDsl
 actual inline fun ViewWriter.separatorActual(crossinline setup: Separator.() -> Unit): Unit {
-    val c = currentView
-    if(c !is SimplifiedLinearLayout) throw IllegalStateException("Separators can only be used inside rows or columns")
+    val c = stack.asReversed().asSequence().filterIsInstance<SimplifiedLinearLayout>().firstOrNull()
+        ?: throw IllegalStateException("Separators can only be used inside rows or columns")
     viewElement(factory = { NSeparator(it, c.orientation == SimplifiedLinearLayout.HORIZONTAL) }, wrapper = ::Separator) {
         handleTheme(native) { it, v ->
             v.background = ColorDrawable(it.foreground.closestColor().colorInt())
@@ -24,6 +25,12 @@ actual inline fun ViewWriter.separatorActual(crossinline setup: Separator.() -> 
                 v.lparams.run {
                     width = if(it.orientation == SimplifiedLinearLayout.HORIZONTAL) size else ViewGroup.LayoutParams.MATCH_PARENT
                     height = if(it.orientation == SimplifiedLinearLayout.HORIZONTAL) ViewGroup.LayoutParams.MATCH_PARENT else size
+                }
+            } ?: (v.parent as? DesiredSizeView)?.let {
+                if(c.orientation == SimplifiedLinearLayout.HORIZONTAL) {
+                    it.constraints = it.constraints.copy(width = size.px)
+                } else {
+                    it.constraints = it.constraints.copy(height = size.px)
                 }
             }
         }
@@ -41,13 +48,6 @@ actual class NSeparator(context: Context, val containerHorizontal: Boolean) : Vi
         }
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val thicknessMode = MeasureSpec.getMode(if(!containerHorizontal) widthMeasureSpec else heightMeasureSpec)
-        var newThickness = if(!containerHorizontal) measuredWidth else measuredHeight
-        if (thicknessMode == MeasureSpec.AT_MOST || thicknessMode == MeasureSpec.UNSPECIFIED) {
-            if (thickness > 0 && newThickness != thickness) {
-                newThickness = thickness
-            }
-            setMeasuredDimension(if(!containerHorizontal) newThickness else measuredWidth, if(!containerHorizontal) measuredHeight else newThickness)
-        }
+        setMeasuredDimension(if(containerHorizontal) thickness else measuredWidth, if(!containerHorizontal) measuredHeight else thickness)
     }
 }

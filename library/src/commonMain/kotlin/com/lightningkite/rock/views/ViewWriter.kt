@@ -34,7 +34,7 @@ class ViewWriter(
         it.currentTheme = currentTheme
         it.lastTheme = lastTheme
         it.isRoot = isRoot
-        it.transitionNextView = transitionNextView
+        it.transitionNextView = TransitionNextView.No
         it.includePaddingAtStackEmpty = includePaddingAtStackEmpty
         it.changedThemes = changedThemes
     }
@@ -48,7 +48,7 @@ class ViewWriter(
         it.currentTheme = currentTheme
         it.lastTheme = lastTheme
         it.isRoot = isRoot
-        it.transitionNextView = transitionNextView
+        it.transitionNextView = TransitionNextView.No
         it.includePaddingAtStackEmpty = includePaddingAtStackEmpty
         it.changedThemes = changedThemes
     }
@@ -62,7 +62,7 @@ class ViewWriter(
         it.currentTheme = currentTheme
         it.lastTheme = lastTheme
         it.isRoot = isRoot
-        it.transitionNextView = transitionNextView
+        it.transitionNextView = TransitionNextView.No
         it.includePaddingAtStackEmpty = includePaddingAtStackEmpty
         it.changedThemes = changedThemes
     }

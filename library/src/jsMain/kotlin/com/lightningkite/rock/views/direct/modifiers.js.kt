@@ -143,6 +143,8 @@ actual fun ViewWriter.hasPopover(
             makeElement()
             stayOpen = true
             with(newViews)  {
+                currentTheme = rootTheme
+                lastTheme = rootTheme
                 dismissBackground {
                     native.style.position = "absolute"
                     native.style.left = "0"

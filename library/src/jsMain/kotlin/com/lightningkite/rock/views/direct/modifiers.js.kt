@@ -36,6 +36,7 @@ actual fun ViewWriter.hasPopover(
         fun makeElement() {
             if (existingElement != null) return
             with(writerTargetingBody) {
+                currentTheme = rootTheme
                 lastTheme = rootTheme
                 stayOpen = false
                 element<HTMLDivElement>("div") {

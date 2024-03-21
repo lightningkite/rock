@@ -32,7 +32,6 @@ fun ViewWriter.navigatorViewDialog() {
         this@swapViewDialog.swapping(
             current = { n.dialog.currentScreen.await() },
             views = { screen ->
-                println("swapping to $screen")
                 this.navigator = n.dialog
                 if (screen != null)
                     with(screen) { render() }

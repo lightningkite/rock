@@ -31,15 +31,12 @@ actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter
     native.withoutAnimation {
         createNewView(native.extensionViewWriter!!.also { it.includePaddingAtStackEmpty = true })
     }
-    println("Clearing children...")
     native.clearNViews()
     native.extensionViewWriter!!.rootCreated?.let {
-        println("Adding new view...")
         native.addNView(it)
         native.hidden = false
         native.informParentOfSizeChange()
     } ?: run {
-        println("Hiding...")
         native.hidden = true
         native.informParentOfSizeChange()
     }

@@ -46,6 +46,7 @@ object RootScreen : RockScreen {
                     }
                 } in card
 
+                linkScreen(PerformanceTestScreen)
                 linkScreen(InfiniteImagesScreen)
                 linkScreen(PlatformSpecificScreen)
                 linkScreen(VideoElementScreen)

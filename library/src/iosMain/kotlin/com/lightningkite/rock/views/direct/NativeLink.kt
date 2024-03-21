@@ -64,4 +64,8 @@ class NativeLink: UIButton(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         calculationContext.launchManualCancel(onNavigate)
     }
 
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return frameLayoutHitTest(point, withEvent)
+    }
+
 }

@@ -43,7 +43,8 @@ fun ViewWriter.handleTheme(
     this.isRoot = false
     val changedThemes = changedThemes
     this.changedThemes = false
-    val parentIsSwap = includePaddingAtStackEmpty && stack.size == 1
+    val parentIsSwap = includePaddingAtStackEmpty
+    includePaddingAtStackEmpty = false
 
     var firstTime = true
     inline fun animateAfterFirst(crossinline action: () -> Unit) {

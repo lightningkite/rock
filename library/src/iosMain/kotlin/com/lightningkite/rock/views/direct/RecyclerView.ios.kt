@@ -225,9 +225,8 @@ class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesP
         return layoutAttributes
     }
 
-
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
-        return super.hitTest(point, withEvent).takeUnless { it == this }
+        return frameLayoutHitTest(point, withEvent)
     }
 }
 

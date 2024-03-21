@@ -43,6 +43,9 @@ class FrameLayoutButton: UIButton(CGRectZero.readValue()), UIViewWithSizeOverrid
         super.willRemoveSubview(subview)
     }
 
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return frameLayoutHitTest(point, withEvent)
+    }
 //    init {
 //        addTarget(this, sel_registerName("test"), UIControlEventTouchUpInside)
 //    }

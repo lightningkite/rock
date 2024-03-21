@@ -48,8 +48,9 @@ actual class NVideo: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProt
         super.willRemoveSubview(subview)
     }
 
+
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
-        return super.hitTest(point, withEvent).takeUnless { it == this }
+        return frameLayoutHitTest(point, withEvent)
     }
 
     val controller = AVPlayerViewController()

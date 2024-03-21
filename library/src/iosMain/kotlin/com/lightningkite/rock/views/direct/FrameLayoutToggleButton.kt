@@ -68,4 +68,8 @@ class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()), UIViewWithSizeO
             on = value
         }
     }
+
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return frameLayoutHitTest(point, withEvent)
+    }
 }

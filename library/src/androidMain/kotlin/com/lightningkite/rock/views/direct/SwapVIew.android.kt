@@ -40,6 +40,7 @@ actual fun SwapView.swap(
     native.viewWriter.rootCreated = null
     animationsEnabled = false
     try {
+        native.viewWriter.includePaddingAtStackEmpty = true
         native.viewWriter.createNewView()
     } finally {
         animationsEnabled = true

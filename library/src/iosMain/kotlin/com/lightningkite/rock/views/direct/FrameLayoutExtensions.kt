@@ -5,9 +5,12 @@ import com.lightningkite.rock.views.*
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import platform.CoreGraphics.CGPoint
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
 import platform.CoreGraphics.CGSizeMake
+import platform.UIKit.UICoordinateSpaceProtocol
+import platform.UIKit.UIEvent
 import platform.UIKit.UIView
 import kotlin.math.max
 
@@ -52,6 +55,34 @@ fun UIView.frameLayoutLayoutSubviews(sizeCache: MutableMap<Size, List<Size>>) {
 }
 
 @OptIn(ExperimentalForeignApi::class)
+fun UIView.frameLayoutHitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+    if(hidden) return null
+    if (bounds.useContents {
+            val rect = this
+            point.useContents {
+                val point = this
+                point.x >= rect.origin.x &&
+                        point.y >= rect.origin.y &&
+                        point.x <= rect.origin.x + rect.size.width &&
+                        point.y <= rect.origin.y + rect.size.height
+            }
+        }) {
+        subviews.asReversed().forEach {
+            it as UIView
+            if(it.hidden) return@forEach
+            it.hitTest(
+                it.convertPoint(point = point, fromCoordinateSpace = this as UICoordinateSpaceProtocol),
+                withEvent
+            )
+                ?.let { return it }
+        }
+        return this
+    } else {
+        return null
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class)
 fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>, sizeCache: MutableMap<Size, List<Size>>): CValue<CGSize> {
     val size = size.local
     val measuredSize = Size()
@@ -67,34 +98,38 @@ fun UIView.frameLayoutSizeThatFits(size: CValue<CGSize>, sizeCache: MutableMap<S
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun UIView.frameLayoutCalcSizes(size: Size, sizeCache: MutableMap<Size, List<Size>>): List<Size> = sizeCache.getOrPut(size) {
-    val padding = extensionPadding ?: 0.0
+private fun UIView.frameLayoutCalcSizes(size: Size, sizeCache: MutableMap<Size, List<Size>>): List<Size> =
+    sizeCache.getOrPut(size) {
+        val padding = extensionPadding ?: 0.0
 //        let size = padding.shrinkSize(size)
 //    val remaining = size.copy()
-    val remaining = size.copy(width = size.width - 2 * padding, height = size.height - 2 * padding)
+        val remaining = size.copy(width = size.width - 2 * padding, height = size.height - 2 * padding)
 
-    return subviews.map {
-        it as UIView
-        if(it.hidden) return@map Size(0.0, 0.0)
+        return subviews.map {
+            it as UIView
+            if (it.hidden) return@map Size(0.0, 0.0)
 //        val required = it.sizeThatFits2(remaining.objc, it.extensionSizeConstraints).local
 //         TODO: This line is more accurate
-        val required = it.sizeThatFits2(remaining.copy(width = remaining.width, height = remaining.height).objc, it.extensionSizeConstraints).local
-        it.extensionSizeConstraints?.let {
-            it.maxWidth?.let { required.width = required.width.coerceAtMost(it.value) }
-            it.maxHeight?.let { required.height = required.height.coerceAtMost(it.value) }
-            it.minWidth?.let { required.width = required.width.coerceAtLeast(it.value) }
-            it.minHeight?.let { required.height = required.height.coerceAtLeast(it.value) }
-            it.width?.let { required.width = it.value.coerceAtMost(remaining.width) }
-            it.height?.let { required.height = it.value.coerceAtMost(remaining.height) }
-        }
-        required.width = required.width.coerceAtLeast(0.0)//.coerceAtMost(size.width - 2 * m)
-        required.height = required.height.coerceAtLeast(0.0)//.coerceAtMost(size.height - 2 * m)
+            val required = it.sizeThatFits2(
+                remaining.copy(width = remaining.width, height = remaining.height).objc,
+                it.extensionSizeConstraints
+            ).local
+            it.extensionSizeConstraints?.let {
+                it.maxWidth?.let { required.width = required.width.coerceAtMost(it.value) }
+                it.maxHeight?.let { required.height = required.height.coerceAtMost(it.value) }
+                it.minWidth?.let { required.width = required.width.coerceAtLeast(it.value) }
+                it.minHeight?.let { required.height = required.height.coerceAtLeast(it.value) }
+                it.width?.let { required.width = it.value.coerceAtMost(remaining.width) }
+                it.height?.let { required.height = it.value.coerceAtMost(remaining.height) }
+            }
+            required.width = required.width.coerceAtLeast(0.0)//.coerceAtMost(size.width - 2 * m)
+            required.height = required.height.coerceAtLeast(0.0)//.coerceAtMost(size.height - 2 * m)
 
-        remaining.width = remaining.width.coerceAtLeast(required.width)
-        remaining.height = remaining.height.coerceAtLeast(required.height)
-        required
+            remaining.width = remaining.width.coerceAtLeast(required.width)
+            remaining.height = remaining.height.coerceAtLeast(required.height)
+            required
+        }
     }
-}
 
 fun UIView.frameLayoutSubviewDidChangeSizing(child: UIView?, sizeCache: MutableMap<Size, List<Size>>) {
     val it = child ?: return

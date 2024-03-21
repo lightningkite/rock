@@ -80,11 +80,13 @@ actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 1, LinearLayoutManager.VERTICAL, false)
-//        val spacing = SpacingItemDecoration(0)
-//        native.addItemDecoration(spacing)
-//        handleTheme(native, viewDraws = false) { theme, view ->
-//            spacing.spacing = theme.spacing.value.toInt()
-//        }
+        val spacing = SpacingItemDecoration(0)
+        native.addItemDecoration(spacing)
+        handleTheme(native, viewDraws = false)
+        val theme = currentTheme
+        reactiveScope {
+            spacing.spacing = native.spacingOverride?.await()?.value?.toInt() ?: theme().spacing.value.toInt()
+        }
         setup()
     }
 }
@@ -94,11 +96,13 @@ actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: Rec
     viewElement(factory = ::NRecyclerView, wrapper = ::RecyclerView) {
         native.viewWriter = newViews()
         native.layoutManager = GridLayoutManager(context, 1, LinearLayoutManager.HORIZONTAL, false)
-//        val spacing = SpacingItemDecoration(0)
-//        native.addItemDecoration(spacing)
-//        handleTheme(native, viewDraws = false) { theme, view ->
-//            spacing.spacing = theme.spacing.value.toInt()
-//        }
+        val spacing = SpacingItemDecoration(0)
+        native.addItemDecoration(spacing)
+        handleTheme(native, viewDraws = false)
+        val theme = currentTheme
+        reactiveScope {
+            spacing.spacing = native.spacingOverride?.await()?.value?.toInt() ?: theme().spacing.value.toInt()
+        }
         setup()
     }
 }

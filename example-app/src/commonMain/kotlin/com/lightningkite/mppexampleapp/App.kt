@@ -13,7 +13,7 @@ val appTheme = Property<Theme>(
         secondary = Color.blue,
         title = FontAndStyle(font = Resources.fontsMontserrat),
         body = FontAndStyle(font = Resources.fontsMontserrat),
-        spacing = 1.5.rem,
+        spacing = 1.rem,
     )
 )
 

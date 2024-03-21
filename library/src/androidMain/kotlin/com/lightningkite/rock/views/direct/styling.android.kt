@@ -108,7 +108,8 @@ inline fun <T : NView> ViewWriter.handleTheme(
     val changedThemes = changedThemes
     this.changedThemes = false
     var animator: ValueAnimator? = null
-    val parentIsSwap = includePaddingAtStackEmpty && stack.size == 1
+    val parentIsSwap = includePaddingAtStackEmpty
+    includePaddingAtStackEmpty = false
 
     view.calculationContext.reactiveScope {
         val theme = currentTheme()
@@ -125,7 +126,9 @@ inline fun <T : NView> ViewWriter.handleTheme(
         val usePadding = (mightTransition && !isRoot || viewForcePadding || parentIsSwap)
 
         if (usePadding) {
-            view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt())
+            view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt().also {
+                if(parentIsSwap) println("Using padding of $it on a $view")
+            })
         } else {
             view.setPaddingAll(0)
         }

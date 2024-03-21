@@ -75,4 +75,8 @@ class FrameLayoutInputButton: UIButton(CGRectZero.readValue()), UIResponderWithO
     init {
         setUserInteractionEnabled(true)
     }
+
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
+        return frameLayoutHitTest(point, withEvent)
+    }
 }

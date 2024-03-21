@@ -27,12 +27,17 @@ actual inline fun ViewWriter.swapViewDialogActual(crossinline setup: SwapView.()
 }
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
+    native.extensionViewWriter!!.rootCreated = null
     native.withoutAnimation {
-        createNewView(native.extensionViewWriter!!)
+        createNewView(native.extensionViewWriter!!.also { it.includePaddingAtStackEmpty = true })
     }
     native.clearNViews()
     native.extensionViewWriter!!.rootCreated?.let {
         native.addNView(it)
+        native.hidden = false
+        native.informParentOfSizeChange()
+    } ?: run {
+        native.hidden = true
+        native.informParentOfSizeChange()
     }
-    native.hidden = native.subviews.all { (it as UIView).hidden }
 }

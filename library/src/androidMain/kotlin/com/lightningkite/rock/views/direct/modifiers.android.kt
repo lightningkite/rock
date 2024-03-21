@@ -10,6 +10,7 @@ import android.widget.HorizontalScrollView
 import androidx.core.widget.NestedScrollView
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.PopoverPreferredDirection
 import com.lightningkite.rock.models.SizeConstraints
 import com.lightningkite.rock.navigation.RockScreen
@@ -114,18 +115,18 @@ actual val ViewWriter.scrollsHorizontally: ViewWrapper
 
 @ViewModifierDsl3
 actual fun ViewWriter.sizedBox(constraints: SizeConstraints): ViewWrapper {
-//    if(constraints.maxHeight != null || constraints.maxWidth != null) {
-//        wrapNext(DesiredSizeView(this.context)) {
-//            this.constraints = constraints
-//        }
-//    } else {
+    if(constraints.maxHeight != null || constraints.maxWidth != null || constraints.width != null || constraints.height != null) {
+        wrapNext(DesiredSizeView(this.context)) {
+            this.constraints = constraints
+        }
+    } else {
         beforeNextElementSetup {
-            constraints.width?.let { this.lparams.width = it.value.toInt() }
-            constraints.height?.let { this.lparams.height = it.value.toInt() }
+            constraints.width?.let { it: Dimension -> this.lparams.width = it.value.toInt() }
+            constraints.height?.let { it: Dimension -> this.lparams.height = it.value.toInt() }
             constraints.minWidth?.let { this.minimumWidth = it.value.toInt() }
             constraints.minHeight?.let { this.minimumHeight = it.value.toInt() }
         }
-//    }
+    }
     return ViewWrapper
 }
 

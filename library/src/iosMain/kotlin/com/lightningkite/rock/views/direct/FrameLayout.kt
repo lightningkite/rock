@@ -43,6 +43,6 @@ class FrameLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtoc
     }
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
-        return super.hitTest(point, withEvent).takeUnless { it == this }
+        return frameLayoutHitTest(point, withEvent)
     }
 }

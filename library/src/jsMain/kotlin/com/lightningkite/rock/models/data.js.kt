@@ -13,6 +13,7 @@ private val measuringDiv = (document.createElement("div") as HTMLDivElement).app
     style.padding = "none"
     style.margin = "none"
     style.boxSizing = "content-box"
+    style.maxHeight = "unset"
     document.body!!.appendChild(this)
 }
 actual val Dimension.px: Double get() = value.cssCalc().toDouble()

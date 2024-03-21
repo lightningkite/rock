@@ -164,7 +164,7 @@ class WebSocketWrapper(val native: org.w3c.dom.WebSocket) : WebSocket {
     }
 
     override fun onMessage(action: (String) -> Unit) {
-        native.addEventListener("message", { it as MessageEvent; (it.data as? String)?.let { action(it) } })
+        native.addEventListener("message", { it as MessageEvent; (it.data as? JsString)?.toString()?.let { action(it) } })
     }
 
     override fun onBinaryMessage(action: (Blob) -> Unit) {

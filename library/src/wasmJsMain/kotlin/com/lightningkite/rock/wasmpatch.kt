@@ -19,7 +19,8 @@ class JsAnyNativeDelegate<T: JsAny, V: Any>(val key: String): ReadWriteProperty<
 }
 class JsAnyDelegate<T: JsAny, V: JsAny>(val key: String): ReadWriteProperty<T, V?> {
     override fun getValue(thisRef: T, property: KProperty<*>): V? {
-        return thisRef.get(key).unsafeCast()
+        println("thisRef: $thisRef")
+        return thisRef.get(key)?.also { println("it $it") }?.unsafeCast()
     }
 
     override fun setValue(thisRef: T, property: KProperty<*>, value: V?) {
@@ -39,8 +40,8 @@ public fun <T : JsAny> jsArrayOf(vararg elements: T): JsArray<T> {
 fun jsObj(): JsAny {
     js("return ({})")
 }
-private fun jsAny_get(self: JsAny, key: String): JsAny = js("self[key]")
-operator fun JsAny.get(key: String): JsAny = jsAny_get(this, key)
+private fun jsAny_get(self: JsAny, key: String): JsAny? = js("self[key]")
+operator fun JsAny.get(key: String): JsAny? = jsAny_get(this, key)
 private fun jsAny_set(self: JsAny, key: String, value: JsAny?): Unit {
     js("self[key] = value")
 }

@@ -15,7 +15,6 @@ actual class NSwapView(override val js: HTMLDivElement): NView2<HTMLDivElement>(
     lateinit var viewWriter: ViewWriter
 }
 
-var HTMLElement.__ROCK_ViewWriter__ by JsAnyNativeDelegate<HTMLElement, ViewWriter>("__ROCK_ViewWriter__")
 var HTMLElement.__ROCK__removing by JsAnyDelegate<HTMLElement, JsBoolean>("__ROCK__removing")
 
 @ViewDsl
@@ -35,7 +34,7 @@ actual inline fun ViewWriter.swapViewDialogActual(crossinline setup: SwapView.()
 }
 
 actual fun SwapView.swap(transition: ScreenTransition, createNewView: ViewWriter.() -> Unit): Unit {
-    val vw = native.js.__ROCK_ViewWriter__ as ViewWriter
+    val vw = native.viewWriter
     val keyframeName = DynamicCSS.transition(transition)
     val previousLast = native.js.lastElementChild
     native.js.children.let { (0 until it.length).map { i -> it.get(i) } }.filterIsInstance<HTMLElement>()

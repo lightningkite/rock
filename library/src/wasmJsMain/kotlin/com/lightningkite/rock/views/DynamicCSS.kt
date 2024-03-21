@@ -3,7 +3,6 @@ package com.lightningkite.rock.views
 import org.w3c.dom.HTMLElement
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.PlatformNavigator
-import com.lightningkite.rock.views.direct.reservedScrollingSpace
 import kotlinx.browser.document
 import kotlinx.browser.window
 import org.w3c.dom.HTMLLinkElement

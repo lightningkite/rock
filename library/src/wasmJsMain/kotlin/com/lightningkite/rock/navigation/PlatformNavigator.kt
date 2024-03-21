@@ -58,7 +58,7 @@ actual object PlatformNavigator : RockNavigator {
     init {
         window.addEventListener("popstate", { event ->
             event as PopStateEvent
-            val index = event.state as Int?
+            val index = (event.state as? JsNumber)?.toInt()
             when {
                 index == null -> RockNavigator.Direction.Neutral
                 index > currentIndex -> direction = RockNavigator.Direction.Forward

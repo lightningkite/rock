@@ -3,6 +3,7 @@ import com.lightningkite.rock.RockPluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import java.util.*
 
 plugins {
@@ -48,6 +49,29 @@ kotlin {
                     enabled.set(true)
                 }
             }
+        }
+    }
+    wasmJs {
+        binaries.executable()
+        browser {
+            commonWebpackConfig {
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    // Uncomment and configure this if you want to open a browser different from the system default
+                    // open = mapOf(
+                    //     "app" to mapOf(
+                    //         "name" to "google chrome"
+                    //     )
+                    // )
+
+                    static = (static ?: mutableListOf()).apply {
+                        // Serve sources to debug inside browser
+                        add(project.rootDir.path)
+                    }
+                }
+            }
+
+            // Uncomment the next line to apply Binaryen and get optimized wasm binaries
+//             applyBinaryen()
         }
     }
 

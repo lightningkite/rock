@@ -54,15 +54,18 @@ kotlin {
     js(IR) {
         browser()
     }
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         applyDefaultHierarchyTemplate()
 
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
-                api("org.jetbrains.kotlinx:kotlinx-serialization-properties:1.6.2")
-                api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+                api("org.jetbrains.kotlinx:kotlinx-serialization-properties:1.6.3")
+                api("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
             }
         }
         val commonTest by getting {
@@ -97,6 +100,10 @@ kotlin {
         }
         val jsMain by getting {
             dependsOn(commonHtmlMain)
+        }
+
+        val wasmJsMain by getting {
+//            dependsOn(commonHtmlMain)
         }
     }
 

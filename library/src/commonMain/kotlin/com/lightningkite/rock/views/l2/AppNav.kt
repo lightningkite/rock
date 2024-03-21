@@ -94,7 +94,6 @@ fun ViewWriter.appNavHamburger(setup: AppNav.() -> Unit) {
             navigatorView(navigator)
             row {
                 spacing = 0.px
-                ignoreInteraction = true
                 bar
                 onlyWhen(false) { showMenu.await() && appNav.existsProperty.await() }
                 scrolls - navGroupColumn(appNav.navItemsProperty, { showMenu set false }) {

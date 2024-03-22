@@ -2,6 +2,7 @@
 
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.PerformanceInfo
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.SizeConstraints
@@ -11,7 +12,6 @@ import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
 import platform.CoreGraphics.*
-import platform.QuartzCore.CATextLayer
 import platform.UIKit.*
 import kotlin.math.max
 
@@ -21,12 +21,13 @@ import kotlin.math.max
 //class LayoutParams()
 
 @OptIn(ExperimentalForeignApi::class)
-class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
-    private val sizeCache = HashMap<Pair<Size, Boolean>, List<Size>>()
+class LinearLayout : UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
     var horizontal: Boolean = true
     var padding: Double
         get() = extensionPadding ?: 0.0
-        set(value) { extensionPadding = value }
+        set(value) {
+            extensionPadding = value
+        }
     var gap: Double = 0.0
         set(value) {
             field = value
@@ -37,11 +38,12 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
     val spacingOverride: Property<Dimension?> = Property<Dimension?>(null).also {
         it.addListener { it.value?.let { gap = it.value } }
     }
+
     override fun getSpacingOverrideProperty() = spacingOverride
 
 //    init { setUserInteractionEnabled(false) }
 
-//    val debugLayer = CATextLayer().apply {
+    //    val debugLayer = CATextLayer().apply {
 //        layer.addSublayer(this)
 //        frame = CGRectMake(0.0, 0.0, 200.0, 20.0)
 //        fontSize = 8.0
@@ -49,36 +51,32 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 //    }
     var debugDescriptionInfo: String = ""
     var debugDescriptionInfo2: String = ""
-    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
+    override fun debugDescription(): String? =
+        "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
 
     override fun subviewDidChangeSizing(view: UIView?) {
         val it = view ?: return
-//        if(it.hidden) return
-//        it.extensionSizeConstraints?.takeIf { it.primary != null && it.secondary != null }?.let {
-//            return
-//        }
-//        val m = it.extensionMargin ?: 0.0
-//        if(it.extensionWeight != null && it.extensionWeight!! > 0.0 && it.secondaryAlign.let { it == null || it == Align.Stretch }) {
-//            return
-//        }
-        sizeCache.clear()
+        val index = subviews.indexOf(view)
+        if (index != -1) childSizeCache[index].clear()
+        lastLaidOutSize = null
         informParentOfSizeChange()
     }
 
     data class Size(var primary: Double = 0.0, var secondary: Double = 0.0) {
     }
-    val Size.objc get() = CGSizeMake(if(horizontal) primary else secondary, if(horizontal) secondary else primary)
-    val CGSize.local get() = Size(if(horizontal) width else height, if(horizontal) height else width)
-    val CValue<CGSize>.local get() = useContents { local }
-    val SizeConstraints.primaryMax get() = if(horizontal) maxWidth else maxHeight
-    val SizeConstraints.secondaryMax get() = if(horizontal) maxHeight else maxWidth
-    val SizeConstraints.primaryMin get() = if(horizontal) minWidth else minHeight
-    val SizeConstraints.secondaryMin get() = if(horizontal) minHeight else minWidth
-    val SizeConstraints.primary get() = if(horizontal) width else height
-    val SizeConstraints.secondary get() = if(horizontal) height else width
-    val UIView.secondaryAlign get() = if(horizontal) extensionVerticalAlign else extensionHorizontalAlign
 
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
+    val Size.objc get() = CGSizeMake(if (horizontal) primary else secondary, if (horizontal) secondary else primary)
+    val CGSize.local get() = Size(if (horizontal) width else height, if (horizontal) height else width)
+    val CValue<CGSize>.local get() = useContents { local }
+    val SizeConstraints.primaryMax get() = if (horizontal) maxWidth else maxHeight
+    val SizeConstraints.secondaryMax get() = if (horizontal) maxHeight else maxWidth
+    val SizeConstraints.primaryMin get() = if (horizontal) minWidth else minHeight
+    val SizeConstraints.secondaryMin get() = if (horizontal) minHeight else minWidth
+    val SizeConstraints.primary get() = if (horizontal) width else height
+    val SizeConstraints.secondary get() = if (horizontal) height else width
+    val UIView.secondaryAlign get() = if (horizontal) extensionVerticalAlign else extensionHorizontalAlign
+
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = PerformanceInfo.linearMeasure {
         val sizeLocal = size.local
         val measuredSize = Size()
 
@@ -87,8 +85,8 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         var first = true
         subviews.zip(sizes) { view, size ->
             view as UIView
-            if(view.hidden) return@zip
-            if(first) {
+            if (view.hidden) return@zip
+            if (first) {
                 first = false
             } else {
                 measuredSize.primary += gap
@@ -97,23 +95,29 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
             measuredSize.secondary = max(measuredSize.secondary, size.secondary + padding * 2)
         }
         measuredSize.primary += padding
-
-        debugDescriptionInfo = size.useContents { "${width.toInt()} x ${height.toInt()}" } + " -> " + measuredSize.objc.useContents { "${width.toInt()} x ${height.toInt()} from ${sizes.joinToString { it.primary.toInt().toString() }}" }
-        return measuredSize.objc
+        measuredSize.objc
     }
 
     override fun didAddSubview(subview: UIView) {
         super.didAddSubview(subview)
-        sizeCache.clear()
+        val index = subviews.indexOf(subview).also { if (it == -1) throw Exception() }
+        childSizeCache.add(index, HashMap())
+        lastLaidOutSize = null
     }
 
     override fun willRemoveSubview(subview: UIView) {
         // Fixes a really cursed crash where "this" is null
-        this?.sizeCache?.clear()
+        if (this != null) {
+            lastLaidOutSize = null
+            val index = subviews.indexOf(subview).also { if (it == -1) throw Exception() }
+            childSizeCache.removeAt(index)
+        }
         super.willRemoveSubview(subview)
     }
 
-    fun calcSizes(size: Size, includeWeighted: Boolean): List<Size> = sizeCache.getOrPut(size to includeWeighted) {
+    val childSizeCache = ArrayList<HashMap<Size, Size>>()
+
+    fun calcSizes(size: Size, includeWeighted: Boolean): Array<Size> = PerformanceInfo.linearCalcSizes {
 //        let size = padding.shrinkSize(size)
         val remaining = size.copy()
         remaining.primary -= padding * 2
@@ -126,11 +130,11 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
         var first = true
         subviews.forEachIndexed { index, it ->
             it as UIView
-            if(it.hidden) {
+            if (it.hidden) {
                 out[index] = Size(0.0, 0.0)
                 return@forEachIndexed
             }
-            if(first) {
+            if (first) {
                 first = false
             } else {
                 remaining.primary -= gap
@@ -139,7 +143,13 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
                 totalWeight += it
                 return@forEachIndexed
             }
-            val required = it.sizeThatFits2(Size(remaining.primary, remaining.secondary).objc, it.extensionSizeConstraints).local
+            val measureInput = Size(remaining.primary, remaining.secondary)
+            val required = childSizeCache[index].getOrPut(measureInput) {
+                it.sizeThatFits2(
+                    measureInput.objc,
+                    it.extensionSizeConstraints
+                ).local
+            }
             it.extensionSizeConstraints?.let {
                 it.primaryMax?.let { required.primary = required.primary.coerceAtMost(it.value) }
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
@@ -156,10 +166,12 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
 
         subviews.forEachIndexed { index, it ->
             it as UIView
-            if(out[index] != null) return@forEachIndexed
+            if (out[index] != null) return@forEachIndexed
+            if (it.isHidden()) return@forEachIndexed
             val w = it.extensionWeight!!.toDouble()
             val available = ((w / totalWeight) * remaining.primary).coerceAtLeast(0.0)
-            val required = it.sizeThatFits2(Size(available, remaining.secondary).objc, it.extensionSizeConstraints).local
+            val required =
+                it.sizeThatFits2(Size(available, remaining.secondary).objc, it.extensionSizeConstraints).local
 //            val required = it.sizeThatFits2(Size(1000.0, remaining.secondary - m * 2).objc, it.extensionSizeConstraints).local
             it.extensionSizeConstraints?.let {
                 it.secondaryMax?.let { required.secondary = required.secondary.coerceAtMost(it.value) }
@@ -167,53 +179,58 @@ class LinearLayout: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProto
                 it.secondary?.let { required.secondary = it.value }
             }
 //            required.primary = if(includeWeighted) available else 0.0
-            required.primary = if(includeWeighted) available else required.primary
+            required.primary = if (includeWeighted) available else required.primary
             required.secondary = required.secondary.coerceAtLeast(0.0)
             out[index] = required
         }
-
-        return out.map { it!! }
+        @Suppress("UNCHECKED_CAST")
+        out as Array<Size>
     }
 
-    override fun layoutSubviews() {
+    var lastLaidOutSize: Size? = null
+    override fun layoutSubviews() = PerformanceInfo.linearLayout {
         val mySize = bounds.useContents { size.local }
+        if (lastLaidOutSize == mySize) return@linearLayout
+
+        lastLaidOutSize = mySize
         var primary = padding
         val sizes = calcSizes(frame.useContents { size.local }, true)
         var first = true
         subviews.zip(sizes) { view, size ->
             view as UIView
-            if(view.hidden) return@zip
-            if(first) {
+            if (view.hidden) return@zip
+            if (first) {
                 first = false
             } else {
                 primary += gap
             }
             val ps = primary
             val a = view.secondaryAlign ?: Align.Stretch
-            val offset = when(a) {
+            val offset = when (a) {
                 Align.Start -> padding
                 Align.Stretch -> padding
                 Align.End -> mySize.secondary - padding - size.secondary
                 Align.Center -> (mySize.secondary - size.secondary) / 2
             }
-            val secondarySize = if(a == Align.Stretch) mySize.secondary - padding * 2 else size.secondary
+            val secondarySize = if (a == Align.Stretch) mySize.secondary - padding * 2 else size.secondary
             val oldSize = view.bounds.useContents { this.size.width to this.size.height }
-            val widthSize = if(horizontal) size.primary else secondarySize
-            val heightSize = if(horizontal) secondarySize else size.primary
+            val widthSize = if (horizontal) size.primary else secondarySize
+            val heightSize = if (horizontal) secondarySize else size.primary
             view.setFrame(
                 CGRectMake(
-                    if(horizontal) ps else offset,
-                    if(horizontal) offset else ps,
+                    if (horizontal) ps else offset,
+                    if (horizontal) offset else ps,
                     widthSize,
                     heightSize,
                 )
             )
-            if(oldSize.first != widthSize || oldSize.second != heightSize) {
+            if (oldSize.first != widthSize || oldSize.second != heightSize) {
                 view.layoutSubviews()
             }
             primary += size.primary
         }
         primary += padding
+
     }
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {

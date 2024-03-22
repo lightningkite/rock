@@ -14,6 +14,7 @@ object PerformanceTestScreen : RockScreen {
     override fun ViewWriter.render() {
         col {
             h1 { content = "Performance Test" }
+            text("This screen is hammering the UI by adding and removing thousands of views every 100 milliseconds.")
             val items = Property((0..5000).toList())
             reactiveScope {
                 var i = 0

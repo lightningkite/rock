@@ -46,7 +46,6 @@ object RootScreen : RockScreen {
                     }
                 } in card
 
-                linkScreen(PerformanceTestScreen)
                 linkScreen(InfiniteImagesScreen)
                 linkScreen(PlatformSpecificScreen)
                 linkScreen(VideoElementScreen)
@@ -70,6 +69,7 @@ object RootScreen : RockScreen {
                 linkScreen(ImageCropScreen)
                 linkScreen(FullExampleScreen())
                 linkScreen(RecyclerViewScreen)
+                linkScreen(PerformanceTestScreen)
                 linkScreen(ArgumentsExampleScreen("test-id").also { it.toAdd.value = "Preset" })
 
                 button {

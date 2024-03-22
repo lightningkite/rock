@@ -5,6 +5,7 @@ package com.lightningkite.rock.views
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.FontAndStyle
 import com.lightningkite.rock.models.SizeConstraints
+import com.lightningkite.rock.reactive.Property
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.*
 import platform.UIKit.UIView
@@ -79,6 +80,9 @@ var UIView.extensionForcePadding: Boolean? by UIViewMarginless
 
 private val UIViewWriter = ExtensionProperty<UIView, ViewWriter>()
 var UIView.extensionViewWriter: ViewWriter? by UIViewWriter
+
+private val UIViewProp = ExtensionProperty<UIView, Property<*>>()
+var UIView.extensionProp: Property<*>? by UIViewProp
 
 private val NSObjectStrongRefHolder = ExtensionProperty<NSObject, NSObject>()
 var NSObject.extensionStrongRef: NSObject? by NSObjectStrongRefHolder

@@ -34,20 +34,18 @@ actual class NVideo: UIView(CGRectZero.readValue()), UIViewWithSizeOverridesProt
         get() = extensionPadding ?: 0.0
         set(value) { extensionPadding = value }
 
-    private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
-    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, sizeCache)
+    private val childSizeCache: ArrayList<HashMap<Size, Size>> = ArrayList()
+    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, childSizeCache)
+    override fun layoutSubviews() = frameLayoutLayoutSubviews(childSizeCache)
+    override fun subviewDidChangeSizing(view: UIView?) = frameLayoutSubviewDidChangeSizing(view, childSizeCache)
     override fun didAddSubview(subview: UIView) {
         super.didAddSubview(subview)
-        sizeCache.clear()
+        frameLayoutDidAddSubview(subview, childSizeCache)
     }
     override fun willRemoveSubview(subview: UIView) {
-        // Fixes a really cursed crash where "this" is null
-        this?.sizeCache?.clear()
+        if(this != null) frameLayoutWillRemoveSubview(subview, childSizeCache)
         super.willRemoveSubview(subview)
     }
-
 
     override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
         return frameLayoutHitTest(point, withEvent)

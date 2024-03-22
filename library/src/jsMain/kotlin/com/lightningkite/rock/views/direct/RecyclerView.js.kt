@@ -189,6 +189,7 @@ class RecyclerController2(
     val firstVisible = Property(0)
     val centerVisible = Property(0)
     val lastVisible = Property(0)
+    val beyondEdgeRendering = 10
 
     val contentHolder = (document.createElement("div") as HTMLDivElement).apply {
         classList.add("contentScroll-${if (vertical) "V" else "H"}")
@@ -830,10 +831,7 @@ class RecyclerController2(
     fun populateDown() {
         var anchor = allSubviews.lastOrNull() ?: makeFirst() ?: return
         var bottom = anchor.startPosition + anchor.size
-        if (printing) println("populateDown")
-        while ((bottom < viewportSize + viewportOffset).also {
-                if (printing) println("$bottom < $viewportSize + $viewportOffset")
-            }) {
+        while ((bottom < viewportSize + viewportOffset + beyondEdgeRendering)) {
             val nextIndex = anchor.index + 1
             if (nextIndex > dataDirect.max) break
             // Get the element to place
@@ -856,10 +854,7 @@ class RecyclerController2(
     fun populateUp() {
         var anchor = allSubviews.firstOrNull() ?: makeFirst() ?: return
         var top = anchor.startPosition
-        if (printing) println("populateUp")
-        while ((top > viewportOffset).also {
-                if (printing) println("$top > $viewportOffset")
-            }) {
+        while ((top > viewportOffset - beyondEdgeRendering)) {
             val nextIndex = anchor.index - 1
             if (nextIndex < dataDirect.min) break
             // Get the element to place

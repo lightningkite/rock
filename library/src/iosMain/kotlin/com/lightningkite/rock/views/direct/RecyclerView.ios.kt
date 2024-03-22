@@ -1,60 +1,31 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.afterTimeout
 import com.lightningkite.rock.models.Align
+import com.lightningkite.rock.models.Dimension
+import com.lightningkite.rock.models.px
 import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
+import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
+import com.lightningkite.rock.printStackTrace2
 import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
-import kotlinx.cinterop.BetaInteropApi
-import kotlinx.cinterop.CValue
-import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.ExportObjCClass
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import platform.CoreGraphics.*
-import platform.Foundation.NSCoder
-import platform.Foundation.NSIndexPath
-import platform.QuartzCore.CATextLayer
 import platform.UIKit.*
-import platform.darwin.NSInteger
-import platform.darwin.NSObject
-import platform.objc.object_getClass
-import kotlin.experimental.ExperimentalObjCName
-import kotlin.math.max
-
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-actual typealias NRecyclerView = UICollectionView
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalForeignApi::class)
 @ViewDsl
 actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.() -> Unit): Unit = element(
-    UICollectionView(
-        CGRectMake(
-            0.0,
-            0.0,
-            0.0,
-            0.0
-        ), run {
-            val size = NSCollectionLayoutSize.sizeWithWidthDimension(
-                width = NSCollectionLayoutDimension.fractionalWidthDimension(1.0),
-                heightDimension = NSCollectionLayoutDimension.estimatedDimension(1000.0),
-            )
-            UICollectionViewCompositionalLayout(
-                NSCollectionLayoutSection.sectionWithGroup(
-                    NSCollectionLayoutGroup.horizontalGroupWithLayoutSize(
-                        layoutSize = size,
-                        subitem = NSCollectionLayoutItem.itemWithLayoutSize(
-                            layoutSize = size
-                        ),
-                        count = 1,
-                    )
-                )
-            )
-        })
+    NRecyclerView(true, newViews())
 ) {
     calculationContext.onRemove {
         extensionStrongRef = null
     }
     backgroundColor = UIColor.clearColor
-    handleTheme(this, viewDraws = false)
+    handleTheme(this, viewDraws = false) {
+        spacing = spacingOverride?.value ?: it.spacing
+    }
     extensionViewWriter = newViews()
     setup(RecyclerView(this))
 }
@@ -62,320 +33,782 @@ actual inline fun ViewWriter.recyclerViewActual(crossinline setup: RecyclerView.
 @OptIn(ExperimentalForeignApi::class)
 @ViewDsl
 actual inline fun ViewWriter.horizontalRecyclerViewActual(crossinline setup: RecyclerView.() -> Unit): Unit = element(
-    UICollectionView(
-        CGRectMake(
-            0.0,
-            0.0,
-            0.0,
-            0.0
-        ), run {
-            val size = NSCollectionLayoutSize.sizeWithWidthDimension(
-                width = NSCollectionLayoutDimension.estimatedDimension(500.0),
-                heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension(1.0),
-            )
-            UICollectionViewCompositionalLayout(
-                NSCollectionLayoutSection.sectionWithGroup(
-                    NSCollectionLayoutGroup.verticalGroupWithLayoutSize(
-                        layoutSize = size,
-                        subitem = NSCollectionLayoutItem.itemWithLayoutSize(
-                            layoutSize = size
-                        ),
-                        count = 1,
-                    )
-                )
-            ).apply {
-                configuration = configuration.apply {
-                    scrollDirection =
-                        UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal
-                }
-            }
-        })
+    NRecyclerView(false, newViews())
 ) {
+    calculationContext.onRemove {
+        extensionStrongRef = null
+    }
     backgroundColor = UIColor.clearColor
-    handleTheme(this, viewDraws = false)
+    handleTheme(this, viewDraws = false) {
+        spacing = spacingOverride?.value ?: it.spacing
+    }
     extensionViewWriter = newViews()
     setup(RecyclerView(this))
-}
-
-actual var RecyclerView.columns: Int
-    get() = 1  // TODO
-    set(value) {
-        val existingConfig = (native.collectionViewLayout as? UICollectionViewCompositionalLayout)?.configuration
-        if(existingConfig?.scrollDirection == UICollectionViewScrollDirection.UICollectionViewScrollDirectionHorizontal) {
-            val size = NSCollectionLayoutSize.sizeWithWidthDimension(
-                width = NSCollectionLayoutDimension.estimatedDimension(500.0),
-                heightDimension = NSCollectionLayoutDimension.fractionalHeightDimension(1.0),
-            )
-            native.collectionViewLayout = UICollectionViewCompositionalLayout(
-                NSCollectionLayoutSection.sectionWithGroup(
-                    NSCollectionLayoutGroup.verticalGroupWithLayoutSize(
-                        layoutSize = size,
-                        subitem = NSCollectionLayoutItem.itemWithLayoutSize(
-                            layoutSize = size
-                        ),
-                        count = value.toLong(),
-                    )
-                )
-            ).apply {
-                existingConfig?.let { configuration = it }
-            }
-        } else {
-            val size = NSCollectionLayoutSize.sizeWithWidthDimension(
-                width = NSCollectionLayoutDimension.fractionalWidthDimension(1.0),
-                heightDimension = NSCollectionLayoutDimension.estimatedDimension(1000.0),
-            )
-            native.collectionViewLayout = UICollectionViewCompositionalLayout(
-                NSCollectionLayoutSection.sectionWithGroup(
-                    NSCollectionLayoutGroup.horizontalGroupWithLayoutSize(
-                        layoutSize = size,
-                        subitem = NSCollectionLayoutItem.itemWithLayoutSize(
-                            layoutSize = size
-                        ),
-                        count = value.toLong(),
-                    )
-                )
-            ).apply {
-                existingConfig?.let { configuration = it }
-            }
-        }
-    }
-
-@OptIn(ExperimentalObjCName::class, BetaInteropApi::class, ExperimentalForeignApi::class)
-@ExportObjCClass
-class ObsUICollectionViewCell<T>: UICollectionViewCell, UIViewWithSizeOverridesProtocol {
-    constructor():this(CGRectMake(0.0, 0.0, 0.0, 0.0))
-
-    @OverrideInit
-    constructor(frame: CValue<CGRect>):super(frame = frame)
-
-    @OverrideInit
-    constructor(coder: NSCoder):super(coder = coder)
-
-    init {
-
-    }
-
-    var debugDescriptionInfo: String = ""
-    var debugDescriptionInfo2: String = ""
-    override fun debugDescription(): String? = "${super.debugDescription()} $debugDescriptionInfo $debugDescriptionInfo2"
-
-//    var lockWidth = false
-//    var lockHeight = false
-
-    val data = LateInitProperty<T>()
-    var ready = false
-    var suppressRemeasure = false
-    private val sizeCache: MutableMap<Size, List<Size>> = HashMap()
-    override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> = frameLayoutSizeThatFits(size, sizeCache)
-    override fun layoutSubviews() = frameLayoutLayoutSubviews(sizeCache)
-    override fun subviewDidChangeSizing(view: UIView?) {
-        if(suppressRemeasure) return
-        frameLayoutSubviewDidChangeSizing(view, sizeCache)
-        // Remeasure self
-        if(lastInputHeight != -1.0) {
-            val size = sizeThatFits(CGSizeMake(lastInputWidth, lastInputHeight))
-            if(size.useContents { width } != lastWidth || size.useContents { height } != lastHeight) {
-                lastWidth = size.useContents { width }
-                lastHeight = size.useContents { height }
-                generateSequence(this as UIView) { it.superview }.filterIsInstance<UICollectionView>().firstOrNull()?.collectionViewLayout?.invalidateLayout()
-            }
-        }
-    }
-    var padding: Double
-        get() = extensionPadding ?: 0.0
-        set(value) { extensionPadding = value }
-
-    fun setNeedsNewMeasure() {
-        lastWidth = -1.0
-        lastInputWidth = -1.0
-        lastHeight = -1.0
-        lastInputHeight = -1.0
-    }
-
-    var lastInputWidth = -1.0
-    var lastWidth = -1.0
-    var lastInputHeight = -1.0
-    var lastHeight = -1.0
-
-    override fun preferredLayoutAttributesFittingAttributes(layoutAttributes: UICollectionViewLayoutAttributes): UICollectionViewLayoutAttributes {
-        var before = layoutAttributes.size.useContents { "${width.toInt()} x ${height.toInt()}" }
-        var widthMeasured = lastWidth
-        var heightMeasured = lastHeight
-        if(lastInputWidth != layoutAttributes.size.useContents { width } || lastInputHeight != layoutAttributes.size.useContents { height }) {
-            val size = sizeThatFits(layoutAttributes.size)
-            widthMeasured = size.useContents { width }
-            heightMeasured = size.useContents { height }
-//            println("Remeasured to $widthMeasured x $heightMeasured")
-            lastWidth = widthMeasured
-            lastHeight = heightMeasured
-            lastInputWidth = layoutAttributes.size.useContents { width }
-            lastInputHeight = layoutAttributes.size.useContents { height }
-        } else {
-//            println("Reusing $widthMeasured x $heightMeasured")
-        }
-        if(layoutAttributes.frame.useContents { size.width } != widthMeasured || layoutAttributes.frame.useContents { size.height } != heightMeasured) {
-            layoutAttributes.frame = CGRectMake(
-                layoutAttributes.frame.useContents { origin.x },
-                layoutAttributes.frame.useContents { origin.y },
-                widthMeasured,
-                heightMeasured,
-            )
-        }
-        debugDescriptionInfo = before + " -> " + layoutAttributes.size.useContents { "${width.toInt()} x ${height.toInt()} " }
-        return layoutAttributes
-    }
-
-    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? {
-        return frameLayoutHitTest(point, withEvent)
-    }
-}
-
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-fun <T> UICollectionView.children(
-    items: Readable<List<T>>,
-    render: ViewWriter.(value: Readable<T>) -> Unit
-) {
-    val altCellRef = HashSet<UICollectionViewCell>()
-    calculationContext.onRemove {
-        altCellRef.forEach { it.shutdown() }
-        altCellRef.clear()
-    }
-    val placeholders = 5
-    val source = GeneralCollectionDelegate(altCellRef, render, placeholders, extensionViewWriter!!)
-    calculationContext.reactiveScope(onLoad = {
-        source.loading = true
-        reloadData()
-    }) {
-        source.list = items.await()
-        source.loading = false
-        reloadData()
-    }
-    setDataSource(source)
-    setDelegate(source)
-    extensionStrongRef = source
-}
-
-@Suppress("DIFFERENT_NAMES_FOR_THE_SAME_PARAMETER_IN_SUPERTYPES", "RETURN_TYPE_MISMATCH_ON_INHERITANCE", "MANY_INTERFACES_MEMBER_NOT_IMPLEMENTED")
-class GeneralCollectionDelegate<T>(
-    private val altCellRef: HashSet<UICollectionViewCell>,
-    private val render: ViewWriter.(value: Readable<T>) -> Unit,
-    private val placeholders: Int,
-    private val viewWriter: ViewWriter,
-) : NSObject(), UICollectionViewDelegateProtocol, UICollectionViewDataSourceProtocol {
-    var list: List<T> = listOf()
-    var loading: Boolean = false
-    val registered = HashSet<String>()
-
-    @OptIn(BetaInteropApi::class)
-    @Suppress("CONFLICTING_OVERLOADS", "RETURN_TYPE_MISMATCH_ON_OVERRIDE", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-    override fun collectionView(collectionView: UICollectionView, cellForItemAtIndexPath: NSIndexPath): UICollectionViewCell {
-        if (registered.add("main")) {
-            collectionView.registerClass(object_getClass(ObsUICollectionViewCell<T>())!!, "main")
-        }
-        @Suppress("UNCHECKED_CAST") val cell = collectionView.dequeueReusableCellWithReuseIdentifier("main", cellForItemAtIndexPath) as ObsUICollectionViewCell<T>
-        if(altCellRef.add(cell)) collectionView.calculationContext.onRemove { cell.shutdown() }
-//                ?: run {
-//                val vw = native.extensionViewWriter ?: throw IllegalStateException("No view writer attached")
-//                vw!!.element(ObsUICollectionViewCell<T>()) {
-//                    render(vw, data)
-//                }
-//                vw.rootCreated as? ObsUICollectionViewCell<T> ?: throw IllegalStateException("No view created")
-//            }
-        collectionView.withoutAnimation {
-            if(loading) {
-                cell.suppressRemeasure = true
-                cell.data.unset()
-                cell.setNeedsNewMeasure()
-                cell.suppressRemeasure = false
-            } else {
-                list.getOrNull(cellForItemAtIndexPath.row.toInt())?.let {
-                    cell.suppressRemeasure = true
-                    cell.data.value = it
-                    cell.setNeedsNewMeasure()
-                    cell.suppressRemeasure = false
-                }
-            }
-            if(!cell.ready) {
-                val vw = viewWriter
-                cell.suppressRemeasure = true
-                render(vw.targeting(cell), cell.data)
-                cell.suppressRemeasure = false
-                cell.ready = true
-            }
-        }
-        return cell
-    }
-
-    @OptIn(ExperimentalForeignApi::class)
-    override fun scrollViewDidScroll(scrollView: UIScrollView) {
-        val native = scrollView as UICollectionView
-        native.bounds.useContents {
-            val outerBounds = this
-            (native.indexPathsForVisibleItems as List<NSIndexPath>).filter {
-                native.cellForItemAtIndexPath(it)?.frame?.useContents {
-                    this.origin.x >= outerBounds.origin.x &&
-                    this.origin.y >= outerBounds.origin.y &&
-                    this.origin.x + this.size.width <= outerBounds.origin.x + outerBounds.size.width &&
-                    this.origin.y + this.size.height <= outerBounds.origin.y + outerBounds.size.height
-                } == true
-            }.rangeOfOrNull { it.row.toInt() }?.let {
-                it.start.let { if(firstVisibleIndex.value != it) firstVisibleIndex.value = it }
-                it.endInclusive.let { if(lastVisibleIndex.value != it) lastVisibleIndex.value = it }
-            }
-        }
-        native.indexPathForItemAtPoint(native.frame.useContents { CGPointMake(size.width / 2, size.height / 2) })?.row?.toInt()?.let {
-            if(centerIndex.value != it) centerIndex.value = it
-        }
-    }
-
-    override fun collectionView(collectionView: UICollectionView, numberOfItemsInSection: NSInteger): NSInteger = if(loading) placeholders.toLong() else list.size.toLong()
-
-    val firstVisibleIndex = Property(0)
-    val centerIndex = Property(0)
-    val lastVisibleIndex = Property(0)
-}
-
-inline fun <S, T: Comparable<T>> Iterable<S>.rangeOfOrNull(calculate: (S)->T): ClosedRange<T>? {
-    var min: T? = null
-    var max: T? = null
-    for(item in this) {
-        val value = calculate(item)
-        if(min == null || value < min) min = value
-        if(max == null || value > max) max = value
-    }
-    if(min == null || max == null) return null
-    else return min..max
 }
 
 actual fun <T> RecyclerView.children(
     items: Readable<List<T>>,
     render: ViewWriter.(value: Readable<T>) -> Unit
-) = native.children(items, render)
+): Unit {
+    native.renderer = ItemRenderer<T>(
+        create = { parent, value ->
+            val prop = Property(value)
+            render(native.newViews, prop)
+            native.newViews.rootCreated!!.also {
+                it.extensionProp = prop
+            }
+        },
+        update = { parent, element, value ->
+            @Suppress("UNCHECKED_CAST")
+            (element.extensionProp as Property<T>).value = value
+        }
+    )
+    calculationContext.reactiveScope {
+        native.data = items.await().asIndexed()
+    }
+}
+
+actual var RecyclerView.columns: Int
+    get() = native.columns
+    set(value) { native.columns = value }
 
 actual fun RecyclerView.scrollToIndex(
     index: Int,
     align: Align?,
     animate: Boolean
 ) {
-    if(index in 0..<native.numberOfItemsInSection(0L)) {
-        native.scrollToItemAtIndexPath(
-            NSIndexPath.indexPathForRow(index.toLong(), 0L),
-            when (align) {
-                Align.Start -> UICollectionViewScrollPositionLeft or UICollectionViewScrollPositionTop
-                Align.Center -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
-                Align.End -> UICollectionViewScrollPositionRight or UICollectionViewScrollPositionBottom
-                else -> UICollectionViewScrollPositionCenteredVertically or UICollectionViewScrollPositionCenteredHorizontally
-            },
-            animate
-        )
-    }
+    native.jump(index, align ?: Align.Center, animate)
 }
 
 actual val RecyclerView.firstVisibleIndex: Readable<Int>
-    get() = (native.delegate as? GeneralCollectionDelegate<*>)?.firstVisibleIndex ?: Constant(0)
+    get() = native.firstVisible
 
 actual val RecyclerView.lastVisibleIndex: Readable<Int>
-    get() = (native.delegate as? GeneralCollectionDelegate<*>)?.lastVisibleIndex ?: Constant(0)
+    get() = native.lastVisible
 
-val RecyclerView.centerIndex: Readable<Int>
-    get() = (native.delegate as? GeneralCollectionDelegate<*>)?.centerIndex ?: Constant(0)
+interface Indexed<out T> {
+    val min: Int
+    val max: Int
+    operator fun get(index: Int): T
+
+    companion object {
+        val EMPTY = object : Indexed<Nothing> {
+            override val max: Int
+                get() = -1
+            override val min: Int
+                get() = 0
+
+            override fun get(index: Int): Nothing {
+                throw IndexOutOfBoundsException()
+            }
+
+            override fun copy(): Indexed<Nothing> = this
+        }
+    }
+
+    fun copy(): Indexed<T>
+}
+
+fun <T> List<T>.asIndexed(): Indexed<T> = object : Indexed<T> {
+    override val min: Int
+        get() = 0
+    override val max: Int
+        get() = this@asIndexed.size - 1
+
+    override fun get(index: Int): T {
+        return this@asIndexed.get(index)
+    }
+
+    override fun copy(): Indexed<T> = this@asIndexed.toList().asIndexed()
+}
+
+class ItemRenderer<T>(
+    val create: (NRecyclerView, T) -> UIView,
+    val update: (NRecyclerView, UIView, T) -> Unit
+) {
+    @Suppress("UNCHECKED_CAST")
+    fun createAny(r: NRecyclerView, t: Any?) = create(r, t as T)
+
+    @Suppress("UNCHECKED_CAST")
+    fun updateAny(r: NRecyclerView, element: UIView, t: Any?) = update(r, element, t as T)
+}
+
+
+fun <T> Indexed<T>.columned(count: Int): Indexed<Indexed<T>> = object : Indexed<Indexed<T>> {
+    val original = this@columned
+    override val min: Int
+        get() = original.min / count
+    override val max: Int
+        get() = original.max / count
+
+    override fun get(index: Int): Indexed<T> {
+        val basis = index * count
+        return object : Indexed<T> {
+            override val max: Int
+                get() = (count - 1).coerceAtMost(original.max - basis)
+            override val min: Int
+                get() = (0).coerceAtLeast(original.min - basis)
+
+            override fun get(index: Int): T = original.get(index + basis)
+            override fun copy(): Indexed<T> = this
+        }
+    }
+
+    override fun copy(): Indexed<Indexed<T>> = original.copy().columned(count)
+}
+
+fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
+    create = { parent, data ->
+        LinearLayout().apply {
+            this.spacing = parent.spacing
+            horizontal = true
+            repeat(count) {
+                if (it in data.min..data.max) {
+                    insertSubview(this@columned.create(parent, data[it]).apply { extensionWeight = 1f }, 0L)
+                } else {
+                    insertSubview(NSpace().apply { extensionWeight = 1f }, 0L)
+                }
+            }
+        }
+    },
+    update = { parent, element, data ->
+        repeat(count) { index ->
+            val child = element.subviews[index] as UIView
+            if (index in data.min..data.max) {
+                val sub = data[index]
+                if (child is NSpace) {
+                    child.removeFromSuperview()
+                    element.insertSubview(this.create(parent, sub), index.toLong())
+                } else {
+                    this.update(parent, child, sub)
+                }
+                child.alpha = 1.0
+            } else {
+                child.alpha = 0.0
+            }
+        }
+    }
+)
+
+private val reservedScrollingSpace: CGFloat = 50000.0
+@OptIn(ExperimentalForeignApi::class)
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWriter): UIScrollView(CGRectMake(0.0, 0.0, 0.0, 0.0)), UIScrollViewDelegateProtocol,
+    UIViewWithSizeOverridesProtocol, UIViewWithSpacingRulesProtocol {
+    val firstVisible = Property(0)
+    val centerVisible = Property(0)
+    val lastVisible = Property(0)
+
+    val allSubviews: ArrayList<Subview> = ArrayList()
+
+    var viewportSize: CGFloat = 0.0
+        set(value) {
+            field = value
+            relayout()
+        }
+    private var _viewportOffsetField: CGFloat = 0.0
+    var viewportOffset: CGFloat
+        get() = _viewportOffsetField
+        set(value) {
+            _viewportOffsetField = value
+            suppressTrueScroll = true
+            setContentOffset(CGPointMake(if(vertical) 0.0 else value, if(vertical) value else 0.0))
+        }
+    var suppressTrueScroll = true
+    var suppressFakeScroll = true
+    val beyondEdgeRendering = 10.0
+
+    private var lastForceCenteringDismiss: Int = -1
+
+    var forceCentering = false
+    var elementsMatchSize: Boolean = false
+        set(value) {
+            field = value
+            allSubviews.forEach { it.measure() }
+            relayout()
+        }
+    var suppressFakeScrollEnd = false
+    var suppressTrueScrollEnd = false
+    var printing = false
+
+    var capViewAtBottom: Boolean = false
+        set(value) {
+            field = value
+            if (value) {
+                val s = allSubviews.last().let { it.startPosition + it.size + spacingRaw }
+                setContentSize(if(vertical) CGSizeMake(0.0, s) else CGSizeMake(s,  0.0))
+            } else {
+                val s = reservedScrollingSpace
+                setContentSize(if(vertical) CGSizeMake(0.0, s) else CGSizeMake(s,  0.0))
+            }
+        }
+
+    private fun CValue<CGRect>.withSize(value: CGFloat): CValue<CGRect> = useContents { CGRectMake(origin.x, origin.y, if(vertical) size.width else value, if(vertical) value else size.height) }
+    private fun CValue<CGRect>.withStart(value: CGFloat): CValue<CGRect> = useContents { CGRectMake(if(vertical) origin.x else value, if(vertical) value else origin.y, size.width, size.height) }
+    private fun CValue<CGRect>.size() = useContents { if(vertical) size.height else size.width }
+    private fun CValue<CGRect>.start() = useContents { if(vertical) origin.y else origin.x }
+
+    val spacingOverride: Property<Dimension?> = Property<Dimension?>(null)
+    override fun getSpacingOverrideProperty() = spacingOverride
+    var spacing: Dimension = 0.px
+        set(value) {
+            if (value != field) {
+                field = value
+                relayout()
+            }
+        }
+    val spacingRaw: CGFloat get() = spacing.value
+
+    override fun subviewDidChangeSizing(view: UIView?) {
+        allSubviews.find { it.element === view }?.let {
+            it.needsLayout = true
+            afterTimeout(16) {
+                if(it.needsLayout) setNeedsLayout()
+            }
+        }
+    }
+
+    inner class Subview(
+        val element: UIView,
+        var index: Int,
+    ) {
+
+        var needsLayout: Boolean = true
+        var startPosition: CGFloat = 0.0
+            set(value) {
+                field = value
+                element.setFrame(element.frame.withStart(value))
+            }
+        var size: CGFloat = -1.0
+            get() {
+                if(needsLayout) measure()
+                return field
+            }
+
+        fun measure() {
+            needsLayout = false
+            if(elementsMatchSize) {
+                if(vertical) {
+                    size = this@NRecyclerView.bounds.useContents { size.height }
+                    element.setFrame(CGRectMake(0.0, startPosition, this@NRecyclerView.bounds.useContents { size.width }, size))
+                    element.layoutSubviews()
+                } else {
+                    size = this@NRecyclerView.bounds.useContents { size.width }
+                    element.setFrame(CGRectMake(startPosition, 0.0, size, this@NRecyclerView.bounds.useContents { size.height }))
+                    element.layoutSubviews()
+                }
+            } else {
+                if(vertical) {
+                    size = element.sizeThatFits(CGSizeMake(this@NRecyclerView.bounds.useContents { size.width }, 10000.0)).useContents { height }
+                    element.setFrame(CGRectMake(0.0, startPosition, this@NRecyclerView.bounds.useContents { size.width }, size))
+                    element.layoutSubviews()
+                } else {
+                    size = element.sizeThatFits(CGSizeMake(10000.0, this@NRecyclerView.bounds.useContents { size.height })).useContents { width }
+                    element.setFrame(CGRectMake(startPosition, 0.0, size, this@NRecyclerView.bounds.useContents { size.height }))
+                    element.layoutSubviews()
+                }
+            }
+        }
+
+        var visible: Boolean
+            get() = element.exists
+            set(value) {
+                element.exists = value
+            }
+
+        fun placeBefore(top: CGFloat): CGFloat {
+            startPosition = top - size - spacingRaw
+            return top - size - spacingRaw
+        }
+
+        fun placeAfter(bottom: CGFloat): CGFloat {
+            startPosition = bottom + spacingRaw
+            return bottom + size + spacingRaw
+        }
+    }
+
+    var columns: Int = 1
+        set(value) {
+            if (value != field) {
+                field = value
+                if (columns == 1) {
+                    rendererDirect = renderer
+                    dataDirect = data
+                } else {
+                    rendererDirect = renderer.columned(columns)
+                    dataDirect = data.columned(columns)
+                }
+            }
+        }
+    var data: Indexed<*> = Indexed.EMPTY
+        set(value) {
+            field = value
+            if (columns == 1) {
+                dataDirect = value
+            } else {
+                dataDirect = value.columned(columns)
+            }
+        }
+    var renderer: ItemRenderer<*> = ItemRenderer<Int>({ _, _ -> UIView() }, { _, _, _ -> })
+        set(value) {
+            field = value
+            data = Indexed.EMPTY
+            if (columns == 1) {
+                rendererDirect = value
+            } else {
+                rendererDirect = value.columned(columns)
+            }
+        }
+    var rendererDirect: ItemRenderer<*> =
+        ItemRenderer<Int>({ _, _ -> UIView() }, { _, _, _ -> })
+        set(value) {
+            dataDirect = Indexed.EMPTY
+            field = value
+            if (ready) {
+                allSubviews.forEach {
+                    it.element.shutdown()
+                    it.element.removeFromSuperview()
+                }
+                allSubviews.clear()
+                populate()
+            }
+        }
+    var dataDirect: Indexed<*> = Indexed.EMPTY
+        set(value) {
+            field = value
+            if (ready) {
+                lock("dataSet") {
+                    if (allSubviews.isNotEmpty()) {
+                        // Shift into range
+                        val outOfBoundsBottom = allSubviews.last().index > value.max
+                        val outOfBoundsTop = allSubviews.first().index < value.min
+                        val shift = if (outOfBoundsBottom && outOfBoundsTop) {
+                            value.min - allSubviews.first().index
+                        } else if (outOfBoundsTop) {
+                            value.min - allSubviews.first().index
+                        } else if (outOfBoundsBottom) {
+                            (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
+                        } else 0
+                        allSubviews.forEach {
+                            it.index += shift
+                            if (it.index in value.min..value.max) {
+                                it.visible = true
+                                it.element.withoutAnimation {
+                                    rendererDirect.updateAny(this, it.element, value[it.index])
+                                }
+                            } else {
+                                it.visible = false
+                            }
+                        }
+                        if (shift > 0) {
+                            // Force to top
+                            viewportOffset = allSubviews.first().startPosition
+                        } else if (shift < 0) {
+                            // Force to bottom
+                            viewportOffset = allSubviews.last().let { it.startPosition + it.size } - viewportSize
+                        }
+                    } else {
+                        populate()
+                    }
+                    emergencyEdges()
+                    updateVisibleIndexes()
+                    updateFakeScroll()
+                }
+                enqueuedJump?.let {
+                    jump(it, Align.Center, false)
+                }
+            }
+        }
+
+    private fun forceCenteringHandler() {
+        if (allSubviews.isNotEmpty()) {
+            if (allSubviews.first().index <= dataDirect.min) {
+                // shift and attach to top
+                if ((allSubviews.first().startPosition - spacingRaw).absoluteValue > 2) {
+                    offsetWholeSystem(-allSubviews.first().startPosition + spacingRaw)
+                }
+            } else {
+                if (viewportOffset > reservedScrollingSpace * 7 / 8) {
+                    offsetWholeSystem(3 * reservedScrollingSpace / -8)
+                } else if (viewportOffset < reservedScrollingSpace / 8) {
+                    offsetWholeSystem(3 * reservedScrollingSpace / 8)
+                }
+            }
+            capViewAtBottom = allSubviews.last().index >= dataDirect.max
+        }
+        Unit
+    }
+
+    private var lockState: String? = null
+    private inline fun lock(key: String, action: () -> Unit) {
+        if (lockState != null) {
+            println("Cannot get lock for $key, already held by $lockState!!!")
+            return
+        }
+        lockState = key
+        val r = try {
+            action()
+        } catch (e: Exception) {
+            e.printStackTrace2()
+        } finally {
+            lockState = null
+        }
+        return r
+    }
+
+    private fun emergencyEdges() {
+        if (allSubviews.isNotEmpty()) {
+            if (allSubviews.first()
+                    .let { it.index <= dataDirect.min && it.startPosition >= viewportOffset + spacingRaw }
+            ) {
+                // shift and attach to top
+                if ((allSubviews.first().startPosition - spacingRaw).absoluteValue > 2) {
+                    offsetWholeSystem(-allSubviews.first().startPosition + spacingRaw)
+                }
+            } else {
+                if (viewportOffset > reservedScrollingSpace) {
+                    offsetWholeSystem(reservedScrollingSpace / -2)
+                } else if (viewportOffset < 0) {
+                    offsetWholeSystem(reservedScrollingSpace / 2)
+                }
+            }
+            capViewAtBottom = allSubviews.last().index >= dataDirect.max
+        }
+    }
+
+    private fun scrollTo(pos: Double, animate: Boolean) {
+        println("scrollTo: $pos")
+        if (vertical) {
+            setContentOffset(CGPointMake(
+                0.0,
+                pos,
+            ), animated = animate)
+        } else {
+            setContentOffset(CGPointMake(
+                pos,
+                0.0,
+            ), animated = animate)
+        }
+    }
+
+    var enqueuedJump: Int? = null
+        set(value) {
+            field = value
+        }
+
+    fun jump(index: Int, align: Align, animate: Boolean) {
+        enqueuedJump = index
+        if (allSubviews.isEmpty()) return
+        if (index !in dataDirect.min..dataDirect.max) return
+        if (viewportSize < 1) return
+        enqueuedJump = null
+        lock("jump $index $align") {
+            if (animate) {
+                allSubviews.find { it.index == index }?.let {
+                    when (align) {
+                        Align.Start -> scrollTo(it.startPosition.toDouble(), animate)
+                        Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), animate)
+                        else -> scrollTo((it.startPosition + it.size / 2 - viewportSize / 2).toDouble(), animate)
+                    }
+                    return
+                }
+                fun move() {
+                    val existingTop = allSubviews.first().index
+                    val existingBottom = allSubviews.last().index
+                    val shift = if (index < existingTop)
+                        (index - existingTop)
+                    else if (index > existingBottom)
+                        (index - existingBottom)
+                    else 0
+                    allSubviews.forEach {
+                        it.index += shift
+                        if (it.index in dataDirect.min..dataDirect.max) {
+                            it.visible = true
+                            it.element.withoutAnimation {
+                                rendererDirect.updateAny(this, it.element, dataDirect[it.index])
+                            }
+                        } else {
+                            it.visible = false
+                        }
+                    }
+                }
+                move()
+                populate()
+                emergencyEdges()
+                updateVisibleIndexes()
+                forceCenteringHandler()
+                move()
+                allSubviews.find { it.index == index }?.let {
+                    when (align) {
+                        Align.Start -> scrollTo(it.startPosition.toDouble(), true)
+                        Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), true)
+                        else -> scrollTo((it.startPosition + it.size / 2 - viewportSize / 2).toDouble(), true)
+                    }
+                } ?: println("Wha?!")
+            } else {
+                val existingIndex = when (align) {
+                    Align.Start -> allSubviews.first().index
+                    Align.End -> allSubviews.last().index
+                    else -> (allSubviews.first().index + allSubviews.last().index) / 2
+                }
+                var target: Subview? = null
+                val shift = (index - existingIndex)
+                    .coerceAtMost(dataDirect.max - allSubviews.last().index)
+                    .coerceAtLeast(dataDirect.min - allSubviews.first().index)
+                allSubviews.forEach {
+                    it.index += shift
+                    if (it.index == index) target = it
+                    if (it.index in dataDirect.min..dataDirect.max) {
+                        it.visible = true
+                        it.element.withoutAnimation {
+                            rendererDirect.updateAny(this, it.element, dataDirect[it.index])
+                        }
+                    } else {
+                        it.visible = false
+                    }
+                }
+                viewportOffset = when (align) {
+                    Align.Start -> allSubviews.first().startPosition - spacingRaw
+                    Align.End -> allSubviews.last().let { it.startPosition + it.size } - viewportSize - spacingRaw
+                    else -> target?.let { it.startPosition + it.size / 2 - viewportSize / 2 }
+                        ?: (allSubviews.first().startPosition - spacingRaw)
+                }
+                println("Hopped to ${viewportOffset}, where the target starts at ${target?.startPosition} size ${target?.size} and the viewport size is $viewportSize")
+                populate()
+                emergencyEdges()
+                updateVisibleIndexes()
+                forceCenteringHandler()
+            }
+        }
+    }
+
+    private fun updateFakeScroll() {
+        if (allSubviews.isEmpty()) return
+        val startIndexPartial = (allSubviews.firstOrNull { it.startPosition + it.size > viewportOffset } ?: return)
+            .let { it.index + ((viewportOffset - it.startPosition) / it.size.toDouble()) }
+        val endIndexPartial = (allSubviews.lastOrNull { it.startPosition < viewportOffset + viewportSize } ?: return)
+            .let { it.index + 1 + (viewportOffset + viewportSize - it.startPosition - it.size) / it.size.toDouble() }
+        val numElements = dataDirect.max - dataDirect.min + 1
+        val startRatio = (startIndexPartial + dataDirect.min) / (dataDirect.max - dataDirect.min).coerceAtLeast(1)
+        val endRatio = (endIndexPartial + dataDirect.min) / (dataDirect.max - dataDirect.min).coerceAtLeast(1)
+        val sw = bounds.useContents { size.width }
+        val sh = bounds.useContents { size.height }
+        if(vertical) {
+            fakeScrollIndicator.setFrame(CGRectMake(
+                bounds.useContents { size.width - 4.0 },
+                startRatio * sh + viewportOffset,
+                4.0,
+                (endRatio - startRatio) * sh
+            ))
+        } else {
+            fakeScrollIndicator.setFrame(CGRectMake(
+                startRatio * sw + viewportOffset,
+                bounds.useContents { size.height - 4.0 },
+                (endRatio - startRatio) * sw,
+                4.0,
+            ))
+        }
+//        fakeScrollInner.style.size = "${100 * numElements}%"
+//        fakeScroll.scrollStart = (startIndexPartial + endIndexPartial - 1) / 2 * viewportSize
+        updateVisibleIndexes()
+    }
+
+    var ready = false
+
+    fun offsetWholeSystem(by: CGFloat) {
+        for (view in allSubviews) {
+            view.startPosition += by
+        }
+        viewportOffset += by
+    }
+
+    fun makeSubview(index: Int, atStart: Boolean): Subview {
+        val element = rendererDirect.createAny(this, dataDirect[index])
+        return Subview(
+            element = element,
+            index = index,
+        ).also { if (atStart) allSubviews.add(0, it) else allSubviews.add(it); insertSubview(it.element, 0L) }
+    }
+
+    fun makeFirst(): Subview? {
+        if (dataDirect.max < dataDirect.min) return null
+        viewportOffset = reservedScrollingSpace / 2
+        val element = makeSubview(dataDirect.min, false)
+        element.measure()
+        element.startPosition = reservedScrollingSpace / 2 + spacingRaw
+        return element
+    }
+
+    fun populate() {
+        populateDown()
+        populateUp()
+        updateFakeScroll()
+    }
+
+    fun updateVisibleIndexes() {
+        firstVisible.let {
+            val v = allSubviews.firstOrNull()?.index?.times(columns) ?: -1
+            if (v != it.value) it.value = v
+        }
+        centerVisible.let {
+            val center = viewportOffset + viewportSize / 2
+            allSubviews.find { center in it.startPosition..it.startPosition.plus(it.size) }?.index?.times(columns)
+                ?.plus(columns / 2)?.let { v ->
+                    if (v != it.value) it.value = v
+                }
+        }
+        lastVisible.let {
+            val v = allSubviews.lastOrNull()?.index?.times(columns)?.plus(columns - 1) ?: -1
+            if (v != it.value) it.value = v
+        }
+    }
+
+    fun populateDown() {
+        var anchor = allSubviews.lastOrNull() ?: makeFirst() ?: return
+        var bottom = anchor.startPosition + anchor.size
+        while ((bottom < viewportSize + viewportOffset + beyondEdgeRendering)) {
+            val nextIndex = anchor.index + 1
+            if (nextIndex > dataDirect.max) break
+            // Get the element to place
+            val element: Subview = allSubviews.first().takeIf {
+                (it.startPosition + it.size < viewportOffset)
+            }?.also {
+                it.index = nextIndex
+                it.element.withoutAnimation {
+                    rendererDirect.updateAny(this, it.element, dataDirect[nextIndex])
+                }
+                allSubviews.removeFirst()
+                allSubviews.add(it)
+            } ?: makeSubview(nextIndex, false)
+            element.measure()
+            bottom = element.placeAfter(bottom)
+            anchor = element
+        }
+    }
+
+    fun populateUp() {
+        var anchor = allSubviews.firstOrNull() ?: makeFirst() ?: return
+        var top = anchor.startPosition
+        while ((top > viewportOffset - beyondEdgeRendering)) {
+            val nextIndex = anchor.index - 1
+            if (nextIndex < dataDirect.min) break
+            // Get the element to place
+            val element: Subview = allSubviews.last().takeIf {
+                it.startPosition > viewportOffset + viewportSize
+            }?.also {
+                it.index = nextIndex
+                it.element.withoutAnimation {
+                    rendererDirect.updateAny(this, it.element, dataDirect[nextIndex])
+                }
+                allSubviews.removeLast()
+                allSubviews.add(0, it)
+            } ?: makeSubview(nextIndex, true)
+            element.measure()
+            top = element.placeBefore(top)
+            anchor = element
+        }
+    }
+
+    val anchorPosition: Align = Align.Start
+    fun relayout() {
+        if (allSubviews.isEmpty()) return
+        when (anchorPosition) {
+            Align.Start -> relayoutDown(0)
+            Align.End -> relayoutUp(allSubviews.lastIndex)
+            else -> {
+                val centeredIndex = allSubviews.size / 2
+                relayoutUp(centeredIndex)
+                relayoutDown(centeredIndex)
+            }
+        }
+        populate()
+    }
+
+    fun relayoutDown(startingIndex: Int) {
+        var bottom = allSubviews[startingIndex].let { anchor -> anchor.startPosition + anchor.size }
+        for (index in (startingIndex + 1)..allSubviews.lastIndex) {
+            val element = allSubviews[index]
+            bottom = element.placeAfter(bottom)
+        }
+    }
+
+    fun relayoutUp(startingIndex: Int) {
+        var top = allSubviews[startingIndex].let { anchor -> anchor.startPosition }
+        for (index in (startingIndex - 1) downTo 0) {
+            val element = allSubviews[index]
+            top = element.placeBefore(top)
+        }
+    }
+
+    override fun scrollViewDidScroll(scrollView: UIScrollView) {
+        if (suppressTrueScroll) {
+            suppressTrueScroll = false
+            suppressTrueScrollEnd = true
+            return
+        }
+        suppressTrueScrollEnd = false
+        lock("onscroll") {
+            _viewportOffsetField = contentOffset.useContents { if(vertical) y else x }
+            populate()
+            emergencyEdges()
+            updateVisibleIndexes()
+        }
+        enqueuedJump = null
+    }
+
+    override fun scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+        if (suppressTrueScrollEnd) {
+            suppressTrueScrollEnd = false
+            return
+        }
+        forceCenteringHandler()
+    }
+
+    override fun scrollViewWillEndDragging(
+        scrollView: UIScrollView,
+        withVelocity: CValue<CGPoint>,
+        targetContentOffset: CPointer<CGPoint>?
+    ) {
+        if(targetContentOffset != null) {
+            if (forceCentering) {
+                if (vertical) {
+                    val c = targetContentOffset.pointed.y
+                    val closestToTarget = allSubviews.minBy { ((it.startPosition + it.size / 2) - (c + viewportSize / 2)).absoluteValue }
+                    targetContentOffset.pointed.y = closestToTarget.let { it.startPosition + it.size / 2  } - viewportSize / 2
+                } else {
+                    val c = targetContentOffset.pointed.x
+                    val closestToTarget = allSubviews.minBy { ((it.startPosition + it.size / 2) - (c + viewportSize / 2)).absoluteValue }
+                    targetContentOffset.pointed.x = closestToTarget.let { it.startPosition + it.size / 2  } - viewportSize / 2
+                }
+            }
+        }
+    }
+
+    val fakeScrollIndicator = UIView(CGRectMake(0.0,0.0,0.0,0.0)).also {
+        it.layer.cornerRadius = 2.0
+        it.backgroundColor = UIColor.grayColor.colorWithAlphaComponent(0.5)
+        addSubview(it)
+    }
+
+    var lastOrthoSize: CGFloat = -1.0
+    override fun layoutSubviews() {
+        super.layoutSubviews()
+        val orthoSize = bounds.useContents { if(vertical) size.width else size.height }
+        if(lastOrthoSize != orthoSize) {
+            allSubviews.forEach {
+                it.measure()
+            }
+        }
+        viewportSize = bounds.useContents { if(vertical) size.height else size.width }
+        updateFakeScroll()
+    }
+
+    init {
+        this.delegate = this
+        showsHorizontalScrollIndicator = false
+        showsVerticalScrollIndicator = false
+        setContentSize(if(vertical) CGSizeMake(0.0, reservedScrollingSpace) else CGSizeMake(reservedScrollingSpace,  0.0))
+        setContentOffset(if(vertical) CGPointMake(0.0, reservedScrollingSpace / 2) else CGPointMake(reservedScrollingSpace / 2,  0.0))
+        ready = true
+    }
+}

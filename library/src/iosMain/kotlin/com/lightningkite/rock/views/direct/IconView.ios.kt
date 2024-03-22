@@ -59,6 +59,9 @@ actual class NIconView(): NView(CGRectMake(0.0,0.0,0.0,0.0)) {
     override fun sizeThatFits(size: CValue<CGSize>): CValue<CGSize> {
         return CGSizeMake(icon?.width?.value ?: 0.0, icon?.height?.value ?: 0.0)
     }
+
+    override fun hitTest(point: CValue<CGPoint>, withEvent: UIEvent?): UIView? = null
+    override fun pointInside(point: CValue<CGPoint>, withEvent: UIEvent?): Boolean = false
 }
 
 @ViewDsl

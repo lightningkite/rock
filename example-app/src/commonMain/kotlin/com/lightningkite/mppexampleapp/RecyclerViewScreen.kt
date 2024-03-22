@@ -104,17 +104,6 @@ object RecyclerViewScreen : RockScreen {
                     }
                 }
             }
-//            horizontalRecyclerView {
-//                children(items) {
-//                    text { ::content { "Item ${it.await()}" } }
-//                }
-//            } in weight(1f)
-//            gridRecyclerView {
-//                columns = 4
-//                children(items) {
-//                    text { ::content { "Item ${it.await()}" } }
-//                }
-//            } in weight(1f)
         }
     }
 }

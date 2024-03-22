@@ -297,7 +297,7 @@ actual fun ViewWriter.textPopover(message: String): ViewWrapper {
 @ViewModifierDsl3
 actual fun ViewWriter.onlyWhen(default: Boolean, condition: suspend () -> Boolean): ViewWrapper {
     beforeNextElementSetup {
-        exists = true
+        exists = default
         ::exists.invoke(condition)
     }
     return ViewWrapper

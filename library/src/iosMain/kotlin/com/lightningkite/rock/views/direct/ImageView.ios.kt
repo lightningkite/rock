@@ -60,7 +60,7 @@ actual inline var ImageView.source: ImageSource?
             }
 
             is ImageRaw -> {
-                animateIfAllowed { native.image = UIImage(data = value.data.toNSData()) }
+                animateIfAllowed { native.image = UIImage(data = value.data.data) }
                 native.informParentOfSizeChange()
             }
 

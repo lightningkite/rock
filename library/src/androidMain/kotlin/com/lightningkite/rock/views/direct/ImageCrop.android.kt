@@ -20,7 +20,7 @@ actual class ImageCrop actual constructor(native: NImageCrop) : RView<NImageCrop
         get() = TODO("Not yet implemented")
         set(value) {}
 
-    actual suspend fun crop(): Blob? {
+    actual suspend fun crop(): ImageRaw? {
         TODO("Not yet implemented")
     }
 }

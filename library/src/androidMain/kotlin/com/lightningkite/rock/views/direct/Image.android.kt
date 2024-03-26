@@ -43,7 +43,7 @@ actual var ImageView.source: ImageSource?
                 native.transition(null)
             }
             is ImageRaw -> {
-                val imageData = value.data
+                val imageData = value.data.data
                 native.transition {
                     try {
                         setImageDrawable(

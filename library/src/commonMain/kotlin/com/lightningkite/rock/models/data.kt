@@ -1,5 +1,6 @@
 package com.lightningkite.rock.models
 
+import com.lightningkite.rock.Blob
 import com.lightningkite.rock.FileReference
 import com.lightningkite.rock.ViewWrapper
 import com.lightningkite.rock.navigation.RockScreen
@@ -77,7 +78,7 @@ data class ImageVector(
     data class Path(val fillColor: Paint? = null, val strokeColor: Color? = null, val strokeWidth: Double? = null, val path: String)
 }
 data class ImageRemote(val url: String) : ImageSource()
-class ImageRaw(val data: ByteArray) : ImageSource()
+class ImageRaw(val data: Blob) : ImageSource()
 class ImageLocal(val file: FileReference) : ImageSource()
 expect class ImageResource : ImageSource
 

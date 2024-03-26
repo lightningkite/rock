@@ -46,6 +46,7 @@ object RootScreen : RockScreen {
                     }
                 } in card
 
+                linkScreen(HorizontalRecyclerViewScreen)
                 linkScreen(InfiniteImagesScreen)
                 linkScreen(PlatformSpecificScreen)
                 linkScreen(VideoElementScreen)

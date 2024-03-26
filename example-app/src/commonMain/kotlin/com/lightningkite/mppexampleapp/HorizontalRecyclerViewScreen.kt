@@ -11,8 +11,8 @@ import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.direct.*
 import com.lightningkite.rock.views.l2.lazyExpanding
 
-@Routable("recycler-view")
-object RecyclerViewScreen : RockScreen {
+@Routable("recycler-view/horizontal")
+object HorizontalRecyclerViewScreen : RockScreen {
     override val title: Readable<String>
         get() = super.title
 
@@ -46,7 +46,7 @@ object RecyclerViewScreen : RockScreen {
                     }
                 }
             }
-            recyclerView {
+            horizontalRecyclerView {
                 recyclerView = this
                 spacing = 0.5.rem
                 columns = 2
@@ -68,30 +68,7 @@ object RecyclerViewScreen : RockScreen {
                             }
                         }
                         lazyExpanding(shared { expanded.await() == it.await() }) {
-                            col {
-                                ::exists
-                                text { ::content { "Content for ${it.await()} == ${expanded.await()}" } }
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
-                                text("More Content")
+                            row {
                                 text("More Content")
                             }
                         }

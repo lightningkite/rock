@@ -8,6 +8,7 @@ import com.lightningkite.rock.navigation.RockScreen
 import com.lightningkite.rock.reactive.invoke
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
+import platform.UIKit.UIButton
 import platform.UIKit.UITapGestureRecognizer
 import platform.darwin.NSObject
 import platform.objc.sel_registerName
@@ -70,14 +71,15 @@ actual fun ViewWriter.hasPopover(
     setup: ViewWriter.(popoverContext: PopoverContext) -> Unit
 ): ViewWrapper {
     beforeNextElementSetup {
-        val actionHolder = object : NSObject() {
-            @ObjCAction
-            fun eventHandler() {
-                navigator.dialog.navigate(object : RockScreen {
-                    override fun ViewWriter.render() {
-                        stack {
-                            centered - stack {
-                                setup(object: PopoverContext {
+        val originalNavigator = navigator
+        fun openDialog() {
+            navigator.dialog.navigate(object : RockScreen {
+                override fun ViewWriter.render() {
+                    dismissBackground {
+                        centered - stack {
+                            with(split()) {
+                                navigator = originalNavigator
+                                setup(object : PopoverContext {
                                     override fun close() {
                                         navigator.dialog.dismiss()
                                     }
@@ -85,11 +87,19 @@ actual fun ViewWriter.hasPopover(
                             }
                         }
                     }
-                })
-            }
+                }
+            })
         }
-        val rec = UITapGestureRecognizer(actionHolder, sel_registerName("eventHandler"))
-        addGestureRecognizer(rec)
+        if(this is NButton) {
+            Button(this).onClick { openDialog() }
+        } else {
+            val actionHolder = object : NSObject() {
+                @ObjCAction
+                fun eventHandler() = openDialog()
+            }
+            val rec = UITapGestureRecognizer(actionHolder, sel_registerName("eventHandler"))
+            addGestureRecognizer(rec)
+        }
     }
     return ViewWrapper
 }

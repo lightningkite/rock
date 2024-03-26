@@ -157,16 +157,16 @@ fun <T> Indexed<T>.columned(count: Int): Indexed<Indexed<T>> = object : Indexed<
     override fun copy(): Indexed<Indexed<T>> = original.copy().columned(count)
 }
 
-fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
+fun <T> ItemRenderer<T>.columned(count: Int, vertical: Boolean) = ItemRenderer<Indexed<T>>(
     create = { parent, data ->
         LinearLayout().apply {
             this.spacing = parent.spacing
-            horizontal = true
+            horizontal = vertical
             repeat(count) {
                 if (it in data.min..data.max) {
-                    insertSubview(this@columned.create(parent, data[it]).apply { extensionWeight = 1f }, 0L)
+                    addSubview(this@columned.create(parent, data[it]).apply { extensionWeight = 1f })
                 } else {
-                    insertSubview(NSpace().apply { extensionWeight = 1f }, 0L)
+                    addSubview(NSpace().apply { extensionWeight = 1f })
                 }
             }
         }
@@ -177,8 +177,8 @@ fun <T> ItemRenderer<T>.columned(count: Int) = ItemRenderer<Indexed<T>>(
             if (index in data.min..data.max) {
                 val sub = data[index]
                 if (child is NSpace) {
-                    child.removeFromSuperview()
                     element.insertSubview(this.create(parent, sub), index.toLong())
+                    child.removeFromSuperview()
                 } else {
                     this.update(parent, child, sub)
                 }
@@ -260,12 +260,12 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
     val spacingRaw: CGFloat get() = spacing.value
 
     override fun subviewDidChangeSizing(view: UIView?) {
-        allSubviews.find { it.element === view }?.let {
-            it.needsLayout = true
-            afterTimeout(16) {
-                if(it.needsLayout) setNeedsLayout()
-            }
-        }
+//        allSubviews.find { it.element === view }?.let {
+//            it.needsLayout = true
+//            afterTimeout(16) {
+//                if(it.needsLayout) setNeedsLayout()
+//            }
+//        }
     }
 
     inner class Subview(
@@ -286,25 +286,27 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
             }
 
         fun measure() {
+            if(!needsLayout) return
             needsLayout = false
+            val p = extensionPadding ?: 0.0
             if(elementsMatchSize) {
                 if(vertical) {
                     size = this@NRecyclerView.bounds.useContents { size.height }
-                    element.setFrame(CGRectMake(0.0, startPosition, this@NRecyclerView.bounds.useContents { size.width }, size))
+                    element.setFrame(CGRectMake(p, startPosition, this@NRecyclerView.bounds.useContents { size.width - p * 2 }, size))
                     element.layoutSubviews()
                 } else {
                     size = this@NRecyclerView.bounds.useContents { size.width }
-                    element.setFrame(CGRectMake(startPosition, 0.0, size, this@NRecyclerView.bounds.useContents { size.height }))
+                    element.setFrame(CGRectMake(startPosition, p, size, this@NRecyclerView.bounds.useContents { size.height - p * 2 }))
                     element.layoutSubviews()
                 }
             } else {
                 if(vertical) {
                     size = element.sizeThatFits(CGSizeMake(this@NRecyclerView.bounds.useContents { size.width }, 10000.0)).useContents { height }
-                    element.setFrame(CGRectMake(0.0, startPosition, this@NRecyclerView.bounds.useContents { size.width }, size))
+                    element.setFrame(CGRectMake(p, startPosition, this@NRecyclerView.bounds.useContents { size.width - p * 2 }, size))
                     element.layoutSubviews()
                 } else {
                     size = element.sizeThatFits(CGSizeMake(10000.0, this@NRecyclerView.bounds.useContents { size.height })).useContents { width }
-                    element.setFrame(CGRectMake(startPosition, 0.0, size, this@NRecyclerView.bounds.useContents { size.height }))
+                    element.setFrame(CGRectMake(startPosition, p, size, this@NRecyclerView.bounds.useContents { size.height - p * 2 }))
                     element.layoutSubviews()
                 }
             }
@@ -335,7 +337,7 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
                     rendererDirect = renderer
                     dataDirect = data
                 } else {
-                    rendererDirect = renderer.columned(columns)
+                    rendererDirect = renderer.columned(columns, vertical)
                     dataDirect = data.columned(columns)
                 }
             }
@@ -356,7 +358,7 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
             if (columns == 1) {
                 rendererDirect = value
             } else {
-                rendererDirect = value.columned(columns)
+                rendererDirect = value.columned(columns, vertical)
             }
         }
     var rendererDirect: ItemRenderer<*> =
@@ -390,6 +392,7 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
                             (value.max - allSubviews.last().index).coerceAtLeast(value.min - allSubviews.first().index)
                         } else 0
                         allSubviews.forEach {
+                            println("PERFORMING SHIFT C $shift")
                             it.index += shift
                             if (it.index in value.min..value.max) {
                                 it.visible = true
@@ -501,10 +504,12 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
         if (allSubviews.isEmpty()) return
         if (index !in dataDirect.min..dataDirect.max) return
         if (viewportSize < 1) return
+        if(enqueuedJump != null) println("Enqueued jump activated")
         enqueuedJump = null
         lock("jump $index $align") {
+            val rowIndex = index / columns
             if (animate) {
-                allSubviews.find { it.index == index }?.let {
+                allSubviews.find { it.index == rowIndex }?.let {
                     when (align) {
                         Align.Start -> scrollTo(it.startPosition.toDouble(), animate)
                         Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), animate)
@@ -515,12 +520,13 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
                 fun move() {
                     val existingTop = allSubviews.first().index
                     val existingBottom = allSubviews.last().index
-                    val shift = if (index < existingTop)
-                        (index - existingTop)
-                    else if (index > existingBottom)
-                        (index - existingBottom)
+                    val shift = if (rowIndex < existingTop)
+                        (rowIndex - existingTop)
+                    else if (rowIndex > existingBottom)
+                        (rowIndex - existingBottom)
                     else 0
                     allSubviews.forEach {
+                        println("PERFORMING SHIFT B $shift")
                         it.index += shift
                         if (it.index in dataDirect.min..dataDirect.max) {
                             it.visible = true
@@ -538,7 +544,7 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
                 updateVisibleIndexes()
                 forceCenteringHandler()
                 move()
-                allSubviews.find { it.index == index }?.let {
+                allSubviews.find { it.index == rowIndex }?.let {
                     when (align) {
                         Align.Start -> scrollTo(it.startPosition.toDouble(), true)
                         Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), true)
@@ -552,12 +558,13 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
                     else -> (allSubviews.first().index + allSubviews.last().index) / 2
                 }
                 var target: Subview? = null
-                val shift = (index - existingIndex)
+                val shift = (rowIndex - existingIndex)
                     .coerceAtMost(dataDirect.max - allSubviews.last().index)
                     .coerceAtLeast(dataDirect.min - allSubviews.first().index)
                 allSubviews.forEach {
+                    println("PERFORMING SHIFT A $shift")
                     it.index += shift
-                    if (it.index == index) target = it
+                    if (it.index == rowIndex) target = it
                     if (it.index in dataDirect.min..dataDirect.max) {
                         it.visible = true
                         it.element.withoutAnimation {
@@ -671,8 +678,9 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
             if (nextIndex > dataDirect.max) break
             // Get the element to place
             val element: Subview = allSubviews.first().takeIf {
-                (it.startPosition + it.size < viewportOffset)
+                (it.startPosition + it.size < viewportOffset - beyondEdgeRendering)
             }?.also {
+                println("populateDown $nextIndex")
                 it.index = nextIndex
                 it.element.withoutAnimation {
                     rendererDirect.updateAny(this, it.element, dataDirect[nextIndex])
@@ -694,8 +702,9 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
             if (nextIndex < dataDirect.min) break
             // Get the element to place
             val element: Subview = allSubviews.last().takeIf {
-                it.startPosition > viewportOffset + viewportSize
+                it.startPosition > viewportOffset + viewportSize + beyondEdgeRendering
             }?.also {
+                println("populateUp $nextIndex")
                 it.index = nextIndex
                 it.element.withoutAnimation {
                     rendererDirect.updateAny(this, it.element, dataDirect[nextIndex])
@@ -753,6 +762,9 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
             emergencyEdges()
             updateVisibleIndexes()
         }
+    }
+
+    override fun scrollViewWillBeginDragging(scrollView: UIScrollView) {
         enqueuedJump = null
     }
 
@@ -794,13 +806,17 @@ actual class NRecyclerView(val vertical: Boolean = true, val newViews: ViewWrite
     override fun layoutSubviews() {
         super.layoutSubviews()
         val orthoSize = bounds.useContents { if(vertical) size.width else size.height }
-        if(lastOrthoSize != orthoSize) {
-            allSubviews.forEach {
-                it.measure()
-            }
+        allSubviews.forEach {
+            if(lastOrthoSize != orthoSize) it.needsLayout = true
+            it.measure()
         }
         viewportSize = bounds.useContents { if(vertical) size.height else size.width }
         updateFakeScroll()
+        afterTimeout(10) {
+            enqueuedJump?.let {
+                jump(it, Align.Center, false)
+            }
+        }
     }
 
     init {

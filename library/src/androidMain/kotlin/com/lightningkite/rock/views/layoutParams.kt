@@ -7,10 +7,12 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.core.widget.NestedScrollView
+import com.lightningkite.rock.views.direct.DesiredSizeView
 
 val View.lparams: ViewGroup.LayoutParams get() {
-    if(layoutParams != null) return layoutParams
     val parent = parent
+    if(parent is DesiredSizeView) return parent.lparams
+    if(layoutParams != null) return layoutParams
     val newParams = when(parent) {
         is LinearLayout -> LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         is FrameLayout -> FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

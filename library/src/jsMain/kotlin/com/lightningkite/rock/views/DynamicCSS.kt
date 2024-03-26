@@ -35,7 +35,7 @@ object DynamicCSS {
         style("*", mapOf(
             "box-sizing" to "border-box",
             "line-height" to "unset",
-            "overflow-x" to "visible",
+            "overflow" to "hidden",
         ))
         style("h1", mapOf("font-size" to "2rem"))
         style("h2", mapOf("font-size" to "1.6rem"))
@@ -852,11 +852,13 @@ object DynamicCSS {
             "display" to "flex",
             "flex-direction" to "row",
             "gap" to "var(--spacing, 0)",
+            "height" to "max-content"
         ))
         style(".contentScroll-H > .recyclerViewGridSub",  mapOf(
             "display" to "flex",
             "flex-direction" to "column",
             "gap" to "var(--spacing, 0)",
+            "width" to "max-content"
         ))
         style(".recyclerViewGridSub > *",  mapOf(
             "flex-grow" to "1",

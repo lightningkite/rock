@@ -3,6 +3,8 @@ package com.lightningkite.rock
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.cache.*
+import io.ktor.client.plugins.cache.storage.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -19,6 +21,21 @@ import platform.posix.memcpy
 
 val client = HttpClient {
     install(WebSockets)
+    install(HttpCache) {
+//        publicStorage(object: CacheStorage {
+//            override suspend fun find(url: Url, varyKeys: Map<String, String>): CachedResponseData? {
+//                TODO("Not yet implemented")
+//            }
+//
+//            override suspend fun findAll(url: Url): Set<CachedResponseData> {
+//                TODO("Not yet implemented")
+//            }
+//
+//            override suspend fun store(url: Url, data: CachedResponseData) {
+//                TODO("Not yet implemented")
+//            }
+//        })
+    }
 }
 
 actual suspend fun fetch(

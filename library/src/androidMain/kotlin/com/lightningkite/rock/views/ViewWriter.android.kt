@@ -19,7 +19,10 @@ import com.lightningkite.rock.reactive.Property
 import com.lightningkite.rock.views.direct.HasSpacingMultiplier
 import com.lightningkite.rock.views.direct.RockLayoutTransition
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.cache.*
+import io.ktor.client.plugins.cache.storage.*
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.http.*
 import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 import java.util.WeakHashMap
@@ -38,8 +41,13 @@ object AndroidAppContext {
     val density: Float by lazy { res.displayMetrics.density }
     val oneRem: Float by lazy { density * 14 }
     var autoCompleteLayoutResource: Int = android.R.layout.simple_list_item_1
-    var ktorClient: HttpClient = HttpClient() {
-        install(WebSockets)
+    val ktorClient: HttpClient by lazy {
+        HttpClient() {
+            install(WebSockets)
+            install(HttpCache) {
+                publicStorage(FileStorage(applicationCtx.cacheDir.resolve("cachehttp")))
+            }
+        }
     }
     var activityCtxRef: WeakReference<RockActivity>? = null
     var activityCtx: RockActivity?

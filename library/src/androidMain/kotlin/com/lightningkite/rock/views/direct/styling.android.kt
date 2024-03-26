@@ -126,14 +126,12 @@ inline fun <T : NView> ViewWriter.handleTheme(
         val usePadding = (mightTransition && !isRoot || viewForcePadding || parentIsSwap)
 
         if (usePadding) {
-            view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt().also {
-                if(parentIsSwap) println("Using padding of $it on a $view")
-            })
+            view.setPaddingAll(((view as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value.toInt())
         } else {
             view.setPaddingAll(0)
         }
 
-        val parentSpacing = ((view.parent as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value
+        val parentSpacing = if(isRoot) 0f else ((view.parent as? HasSpacingMultiplier)?.spacingOverride?.await() ?: theme.spacing).value
 
         if (viewLoads && view.androidCalculationContext.loading.await()) {
 

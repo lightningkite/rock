@@ -81,7 +81,7 @@ fun ViewWriter.handleTheme(
             view.extensionPadding = 0.0
         }
 
-        val parentSpacing = (view.superview?.spacingOverride?.await() ?: theme.spacing).value
+        val parentSpacing = if(isRoot) 0.0 else (view.superview?.spacingOverride?.await() ?: theme.spacing).value
         val loading = viewLoads && view.iosCalculationContext.loading.await()
 
         animateAfterFirst {
@@ -160,6 +160,15 @@ private fun applyThemeBackground(
         is CornerRadii.Constant -> min(parentSpacing, it.value.value)
         is CornerRadii.RatioOfSpacing -> it.value * parentSpacing
     }
+    if (borders) {
+        view.layer.apply {
+            cornerRadius = cr
+            shadowColor = UIColor.grayColor.CGColor
+            shadowOpacity = 1f
+            shadowOffset = CGSizeMake(0.0, theme.elevation.value)
+            shadowRadius = theme.elevation.value
+        }
+    }
     when (val b = theme.background) {
         is Color -> {
             view.layer.apply {
@@ -168,27 +177,15 @@ private fun applyThemeBackground(
                 if (borders) {
                     borderWidth = theme.outlineWidth.value
                     borderColor = theme.outline.closestColor().toUiColor().CGColor
-                    cornerRadius = cr
-                    shadowColor = UIColor.grayColor.CGColor
-                    shadowOpacity = 1f
-                    shadowOffset = CGSizeMake(0.0, theme.elevation.value)
-                    shadowRadius = theme.elevation.value
                 }
             }
         }
 
         is LinearGradient -> {
             view.layer.apply {
-                backgroundColor = null
                 borderWidth = 0.0
-                borderColor = null
-                cornerRadius = 0.0
-                shadowColor = null
-                shadowOpacity = 0f
-                shadowOffset = CGSizeMake(0.0, 0.0)
-                shadowRadius = 0.0
                 sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
-                addSublayer(CAGradientLayerResizing().apply {
+                insertSublayer(CAGradientLayerResizing().apply {
                     this.type = kCAGradientLayerAxial
                     this.locations = b.stops.map {
                         NSNumber.numberWithFloat(it.ratio)
@@ -202,27 +199,16 @@ private fun applyThemeBackground(
                         borderWidth = theme.outlineWidth.value
                         borderColor = theme.outline.closestColor().toUiColor().CGColor
                         cornerRadius = cr
-                        shadowColor = UIColor.grayColor.CGColor
-                        shadowOpacity = 1f
-                        shadowOffset = CGSizeMake(0.0, theme.elevation.value)
-                        shadowRadius = theme.elevation.value
                     }
-                })
+                }, atIndex = 0.toUInt())
             }
         }
 
         is RadialGradient -> {
             view.layer.apply {
-                backgroundColor = null
                 borderWidth = 0.0
-                borderColor = null
-                cornerRadius = 0.0
-                shadowColor = null
-                shadowOpacity = 0f
-                shadowOffset = CGSizeMake(0.0, 0.0)
-                shadowRadius = 0.0
                 sublayers?.forEach { if(it is CAGradientLayerResizing) it.removeFromSuperlayer() }
-                addSublayer(CAGradientLayerResizing().apply {
+                insertSublayer(CAGradientLayerResizing().apply {
                     this.type = kCAGradientLayerRadial
                     this.locations = b.stops.map {
                         NSNumber.numberWithFloat(it.ratio)
@@ -240,7 +226,7 @@ private fun applyThemeBackground(
                         shadowOffset = CGSizeMake(0.0, theme.elevation.value)
                         shadowRadius = theme.elevation.value
                     }
-                })
+                }, atIndex = 0.toUInt())
             }
         }
     }

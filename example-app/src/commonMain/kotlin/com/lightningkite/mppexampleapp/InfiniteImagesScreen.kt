@@ -15,13 +15,13 @@ object InfiniteImagesScreen : RockScreen {
 
     object ReturnIndexList: List<Int>{
         override val size: Int
-            get() = Int.MAX_VALUE
+            get() = 10_000
         override fun get(index: Int): Int = index
         override fun isEmpty(): Boolean = false
-        override fun iterator(): Iterator<Int> = (0..<Int.MAX_VALUE).iterator()
+        override fun iterator(): Iterator<Int> = (0..<10_000).iterator()
         override fun listIterator(): ListIterator<Int> = object: ListIterator<Int> {
             var n = -1
-            override fun hasNext(): Boolean = n < Int.MAX_VALUE
+            override fun hasNext(): Boolean = n < 10_000
             override fun hasPrevious(): Boolean = n > 0
             override fun next(): Int = ++n
             override fun nextIndex(): Int = ++n
@@ -30,7 +30,7 @@ object InfiniteImagesScreen : RockScreen {
         }
         override fun listIterator(index: Int): ListIterator<Int> = object: ListIterator<Int> {
             var n = index - 1
-            override fun hasNext(): Boolean = n < Int.MAX_VALUE
+            override fun hasNext(): Boolean = n < 10_000
             override fun hasPrevious(): Boolean = n > 0
             override fun next(): Int = ++n
             override fun nextIndex(): Int = ++n
@@ -49,6 +49,7 @@ object InfiniteImagesScreen : RockScreen {
             columns = 4
             children(Constant(ReturnIndexList)) {
                 button {
+                    spacing = 0.px
                     sizeConstraints(height = 16.rem) - image {
                         scaleType = ImageScaleType.Crop
                         ::source { ImageRemote("https://picsum.photos/seed/${it.await()}/100/100") }
@@ -70,10 +71,12 @@ class ImageViewPager(val initialIndex: Int) : RockScreen {
         stack {
             viewPager {
                 children(Constant(InfiniteImagesScreen.ReturnIndexList)) { currImage ->
+                    val renders = Property(0)
                     stack {
                         spacing = 0.25.rem
                         image {
                             reactiveScope {
+                                renders.value++
                                 val index = currImage.await()
                                 source = ImageRemote("https://picsum.photos/seed/${index}/100/100")
                                 delay(1)
@@ -81,6 +84,7 @@ class ImageViewPager(val initialIndex: Int) : RockScreen {
                             }
                             scaleType = ImageScaleType.Fit
                         }
+                        h2 { ::content { renders.await().toString() } }
                     }
                 }
                 index bind currentPage

@@ -25,7 +25,7 @@ actual val Double.dp: Dimension
 
 actual inline operator fun Dimension.plus(other: Dimension): Dimension = Dimension(this.value + other.value)
 actual inline operator fun Dimension.minus(other: Dimension): Dimension = Dimension(this.value - other.value)
-actual inline operator fun Dimension.times(other: Float): Dimension = Dimension(this.value * other.toInt())
+actual inline operator fun Dimension.times(other: Float): Dimension = Dimension(this.value * other)
 actual inline operator fun Dimension.div(other: Float): Dimension = Dimension(
     if (other != 0f) {
         val dimenValue = this.value / other

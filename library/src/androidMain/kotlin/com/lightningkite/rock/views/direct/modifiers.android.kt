@@ -52,7 +52,7 @@ actual fun ViewWriter.weight(amount: Float): ViewWrapper {
                 lp.height = 0
             }
         } catch (ex: Throwable) {
-            throw RuntimeException("Weight is only available within a column or row, but the parent is a ${parent?.let { it::class.simpleName }}")
+            RuntimeException("Weight is only available within a column or row, but the parent is a ${parent?.let { it::class.simpleName }}").printStackTrace()
         }
     }
     return ViewWrapper
@@ -138,6 +138,10 @@ class DesiredSizeView(context: Context) : ViewGroup(context) {
         }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        getChildAt(0).measure(
+            MeasureSpec.makeMeasureSpec(r-l, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(b-t, MeasureSpec.EXACTLY)
+        )
         getChildAt(0).layout(0, 0,  r - l, b - t)
     }
 
@@ -265,17 +269,21 @@ actual fun ViewWriter.hasPopover(
     preferredDirection: PopoverPreferredDirection,
     setup: ViewWriter.(popoverContext: PopoverContext) -> Unit,
 ): ViewWrapper {
+    val originalNavigator = navigator
     beforeNextElementSetup {
         setOnClickListener {
             navigator.dialog.navigate(object : RockScreen {
                 override fun ViewWriter.render() {
-                    stack {
+                    dismissBackground {
                         centered - stack {
-                            setup(object: PopoverContext {
-                                override fun close() {
-                                    navigator.dialog.dismiss()
-                                }
-                            })
+                            with(split()) {
+                                navigator = originalNavigator
+                                setup(object : PopoverContext {
+                                    override fun close() {
+                                        navigator.dialog.dismiss()
+                                    }
+                                })
+                            }
                         }
                     }
                 }

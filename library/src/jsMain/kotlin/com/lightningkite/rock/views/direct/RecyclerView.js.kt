@@ -637,8 +637,9 @@ class RecyclerController2(
         if (viewportSize < 1) return
         enqueuedJump = null
         lock("jump $index $align") {
+            val rowIndex = index / columns
             if (animate) {
-                allSubviews.find { it.index == index }?.let {
+                allSubviews.find { it.index == rowIndex }?.let {
                     when (align) {
                         Align.Start -> scrollTo(it.startPosition.toDouble(), animate)
                         Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), animate)
@@ -649,10 +650,10 @@ class RecyclerController2(
                 fun move() {
                     val existingTop = allSubviews.first().index
                     val existingBottom = allSubviews.last().index
-                    val shift = if (index < existingTop)
-                        (index - existingTop)
-                    else if (index > existingBottom)
-                        (index - existingBottom)
+                    val shift = if (rowIndex < existingTop)
+                        (rowIndex - existingTop)
+                    else if (rowIndex > existingBottom)
+                        (rowIndex - existingBottom)
                     else 0
                     allSubviews.forEach {
                         it.index += shift
@@ -672,7 +673,7 @@ class RecyclerController2(
                 updateVisibleIndexes()
                 forceCenteringHandler()
                 move()
-                allSubviews.find { it.index == index }?.let {
+                allSubviews.find { it.index == rowIndex }?.let {
                     when (align) {
                         Align.Start -> scrollTo(it.startPosition.toDouble(), true)
                         Align.End -> scrollTo((it.startPosition + it.size - viewportSize).toDouble(), true)
@@ -686,12 +687,12 @@ class RecyclerController2(
                     else -> (allSubviews.first().index + allSubviews.last().index) / 2
                 }
                 var target: Subview? = null
-                val shift = (index - existingIndex)
+                val shift = (rowIndex - existingIndex)
                     .coerceAtMost(dataDirect.max - allSubviews.last().index)
                     .coerceAtLeast(dataDirect.min - allSubviews.first().index)
                 allSubviews.forEach {
                     it.index += shift
-                    if (it.index == index) target = it
+                    if (it.index == rowIndex) target = it
                     if (it.index in dataDirect.min..dataDirect.max) {
                         it.visible = true
                         it.element.withoutAnimation {
@@ -836,7 +837,7 @@ class RecyclerController2(
             if (nextIndex > dataDirect.max) break
             // Get the element to place
             val element: Subview = allSubviews.first().takeIf {
-                (it.startPosition + it.size < viewportOffset)
+                (it.startPosition + it.size < viewportOffset - beyondEdgeRendering)
             }?.also {
                 it.index = nextIndex
                 it.element.withoutAnimation {
@@ -859,7 +860,7 @@ class RecyclerController2(
             if (nextIndex < dataDirect.min) break
             // Get the element to place
             val element: Subview = allSubviews.last().takeIf {
-                it.startPosition > viewportOffset + viewportSize
+                it.startPosition > viewportOffset + viewportSize + beyondEdgeRendering
             }?.also {
                 it.index = nextIndex
                 it.element.withoutAnimation {

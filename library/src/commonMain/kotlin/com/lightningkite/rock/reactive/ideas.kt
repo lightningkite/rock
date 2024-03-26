@@ -108,6 +108,11 @@ class Property<T>(startValue: T) : ImmediateWritable<T>, ReadWriteProperty<Any?,
         this.value = value
     }
 
+    infix fun update(action: T.() -> Unit) {
+        action(value)
+        listeners.toList().forEach { it() }
+    }
+
     override suspend fun awaitRaw(): T = value
 
     override fun addListener(listener: () -> Unit): () -> Unit {

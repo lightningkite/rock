@@ -1,4 +1,4 @@
-# Rock
+# KiteUI
 
 A Kotlin Multiplatform UI Framework inspired by Solid.js.
 
@@ -30,21 +30,21 @@ Early in development.  Web is basically usable at this point, but everything is 
 
 ## Take a look!
 
-You can look at the [example project we're hosting](https://rock.cs.lightningkite.com/) to get an idea of what you can do.
+You can look at the [example project we're hosting](https://kiteui.cs.lightningkite.com/) to get an idea of what you can do.
 
 Click the magnifying glass in the app to see the source!
 
 ### One example directly on this page:
 
-[See for yourself](https://rock.cs.lightningkite.com/sample/login)
+[See for yourself](https://kiteui.cs.lightningkite.com/sample/login)
 
-If you want to try another theme, start [here](https://rock.cs.lightningkite.com/), change the theme, then go to the "Sample Log In" sreen.
+If you want to try another theme, start [here](https://kiteui.cs.lightningkite.com/), change the theme, then go to the "Sample Log In" sreen.
 
 ![Screenshot 1](docs/SampleLoginScreen_A.png) ![Screenshot 2](docs/SampleLoginScreen_B.png)
 
 ```kotlin
 @Routable("sample/login")
-object SampleLogInScreen : RockScreen {
+object SampleLogInScreen : KiteUiScreen {
     override fun ViewContext.render() {
         val email = Property("")
         val password = Property("")

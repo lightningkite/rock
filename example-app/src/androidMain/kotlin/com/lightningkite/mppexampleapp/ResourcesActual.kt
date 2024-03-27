@@ -1,7 +1,7 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.views.AndroidAppContext
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.views.AndroidAppContext
 
 actual object Resources {
     actual val fontsMontserrat: Font = AndroidAppContext.applicationCtx.resources.getFont(R.font.fonts_montserrat)

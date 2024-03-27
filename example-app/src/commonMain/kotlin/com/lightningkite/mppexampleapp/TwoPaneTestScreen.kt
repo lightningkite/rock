@@ -1,13 +1,13 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.rem
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.rem
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("twopane")
-object TwoPaneTestScreen : RockScreen {
+object TwoPaneTestScreen : KiteUiScreen {
     override fun ViewWriter.render() {
         this.twoPane(
             setup = {},

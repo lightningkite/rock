@@ -1,15 +1,15 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("layout-examples")
-object LayoutExamplesScreen : RockScreen {
+object LayoutExamplesScreen : KiteUiScreen {
     override fun ViewWriter.render() {
         col {
             h1 { content = "Sampling" }

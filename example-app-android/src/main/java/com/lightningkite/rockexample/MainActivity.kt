@@ -1,16 +1,16 @@
-package com.lightningkite.rockexample
+package com.lightningkite.kiteuiexample
 
 import android.os.Bundle
 import android.widget.FrameLayout
 import com.lightningkite.mppexampleapp.*
-import com.lightningkite.rock.RockActivity
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.models.Theme
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.KiteUiActivity
+import com.lightningkite.kiteui.models.Align
+import com.lightningkite.kiteui.models.Theme
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
-class MainActivity : RockActivity() {
+class MainActivity : KiteUiActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         codeCacheDir.setReadOnly()

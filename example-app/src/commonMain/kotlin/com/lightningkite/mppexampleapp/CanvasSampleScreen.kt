@@ -1,16 +1,16 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.canvas.*
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.clockMillis
-import com.lightningkite.rock.reactive.*
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.canvas.*
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.clockMillis
+import com.lightningkite.kiteui.reactive.*
 
 @Routable("sample/canvas")
-object CanvasSampleScreen : RockScreen {
+object CanvasSampleScreen : KiteUiScreen {
     data class Point(val x: Double, val y: Double)
 
     override fun ViewWriter.render() = stack {

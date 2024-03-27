@@ -1,4 +1,4 @@
-package com.lightningkite.rock
+package com.lightningkite.kiteui
 
 import org.apache.fontbox.ttf.OTFParser
 import org.apache.fontbox.ttf.TTFParser
@@ -9,17 +9,17 @@ import org.gradle.api.tasks.Copy
 import java.io.File
 import java.util.HashMap
 
-interface RockPluginExtension {
+interface KiteUiPluginExtension {
     var packageName: String
     var iosProjectRoot: File
 }
 
 // Test Note
 
-class RockPlugin : Plugin<Project> {
+class KiteUiPlugin : Plugin<Project> {
     override fun apply(project: Project) = with(project) {
-        val ext = extensions.create("rock", RockPluginExtension::class.java)
-        tasks.create("rockResourcesCommon", Task::class.java).apply {
+        val ext = extensions.create("kiteui", KiteUiPluginExtension::class.java)
+        tasks.create("kiteuiResourcesCommon", Task::class.java).apply {
             group = "build"
             val resourceFolder = project.file("src/commonMain/resources")
             inputs.files(resourceFolder)
@@ -43,7 +43,7 @@ class RockPlugin : Plugin<Project> {
                         """
 package ${ext.packageName}
 
-import com.lightningkite.rock.models.*
+import com.lightningkite.kiteui.models.*
 
 expect object Resources {
     $lines
@@ -54,8 +54,8 @@ expect object Resources {
             }
         }
 
-        tasks.create("rockResourcesJs", Copy::class.java).apply {
-            dependsOn("rockResourcesCommon")
+        tasks.create("kiteuiResourcesJs", Copy::class.java).apply {
+            dependsOn("kiteuiResourcesCommon")
             group = "build"
             from("src/commonMain/resources")
             into("src/jsMain/resources/common")
@@ -102,7 +102,7 @@ expect object Resources {
                         """
 package ${ext.packageName}
 
-import com.lightningkite.rock.models.*
+import com.lightningkite.kiteui.models.*
 
 actual object Resources {
     $lines
@@ -113,8 +113,8 @@ actual object Resources {
             }
         }
 
-        tasks.create("rockResourcesIos").apply {
-            dependsOn("rockResourcesCommon")
+        tasks.create("kiteuiResourcesIos").apply {
+            dependsOn("kiteuiResourcesCommon")
             group = "build"
 
             afterEvaluate {
@@ -217,7 +217,7 @@ actual object Resources {
                         """
 package ${ext.packageName}
 
-import com.lightningkite.rock.models.*
+import com.lightningkite.kiteui.models.*
 
 actual object Resources {
     $lines
@@ -228,8 +228,8 @@ actual object Resources {
             }
         }
 
-        tasks.create("rockResourcesAndroid").apply {
-            dependsOn("rockResourcesCommon")
+        tasks.create("kiteuiResourcesAndroid").apply {
+            dependsOn("kiteuiResourcesCommon")
             group = "build"
             val resourceFolder = project.file("src/commonMain/resources")
             inputs.files(resourceFolder)
@@ -321,8 +321,8 @@ ${variants.joinToString("\n")}
                         """
 package ${ext.packageName}
 
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.views.AndroidAppContext
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.views.AndroidAppContext
 
 actual object Resources {
     $lines
@@ -333,12 +333,12 @@ actual object Resources {
             }
         }
 
-        tasks.create("rockResourcesAll").apply {
+        tasks.create("kiteuiResourcesAll").apply {
             group = "build"
-            dependsOn("rockResourcesCommon")
-            dependsOn("rockResourcesJs")
-            dependsOn("rockResourcesIos")
-            dependsOn("rockResourcesAndroid")
+            dependsOn("kiteuiResourcesCommon")
+            dependsOn("kiteuiResourcesJs")
+            dependsOn("kiteuiResourcesIos")
+            dependsOn("kiteuiResourcesAndroid")
         }
 
         Unit

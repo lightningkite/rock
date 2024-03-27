@@ -1,11 +1,11 @@
 package com.lightningkite.mppexampleapp.docs
 
-import com.lightningkite.rock.ExternalServices
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.ExternalServices
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 import kotlin.random.Random
 
 @Routable("docs/image")

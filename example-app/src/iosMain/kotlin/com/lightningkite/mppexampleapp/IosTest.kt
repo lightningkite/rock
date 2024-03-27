@@ -1,14 +1,14 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.clockMillis
-import com.lightningkite.rock.delay
-import com.lightningkite.rock.gc
-import com.lightningkite.rock.models.px
-import com.lightningkite.rock.reactive.CalculationContextStack
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.*
+import com.lightningkite.kiteui.clockMillis
+import com.lightningkite.kiteui.delay
+import com.lightningkite.kiteui.gc
+import com.lightningkite.kiteui.models.px
+import com.lightningkite.kiteui.reactive.CalculationContextStack
+import com.lightningkite.kiteui.reactive.Property
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGRectMake
 import platform.UIKit.UIView

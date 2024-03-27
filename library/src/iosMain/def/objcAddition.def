@@ -1,5 +1,5 @@
 language = Objective-C
-package = com.lightningkite.rock.objc
+package = com.lightningkite.kiteui.objc
 ---
 #import <objc/runtime.h>
 #import <UIKit/UIView.h>

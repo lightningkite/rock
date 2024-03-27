@@ -1,4 +1,4 @@
-package com.lightningkite.rock
+package com.lightningkite.kiteui
 
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.*
@@ -29,7 +29,7 @@ class RouterGeneration(
             .filter { it.annotation("FallbackRoute") != null }
             .toList()
             .singleOrNull()
-            ?: resolver.getClassDeclarationByName("com.lightningkite.rock.navigation.RockScreen.Empty")!!
+            ?: resolver.getClassDeclarationByName("com.lightningkite.kiteui.navigation.KiteUiScreen.Empty")!!
 
         val topPackage = allRoutables
             .takeIf { it.isNotEmpty() }
@@ -47,7 +47,7 @@ class RouterGeneration(
                 with(TabAppendable(it)) {
                     appendLine("package $topPackage")
                     appendLine("")
-                    appendLine("import com.lightningkite.rock.navigation.*")
+                    appendLine("import com.lightningkite.kiteui.navigation.*")
                     for (r in allRoutables) appendLine("import ${r.source.qualifiedName!!.asString()}")
                     appendLine("import ${fallbackRoute.qualifiedName!!.asString()}")
                     allRoutables.asSequence().flatMap {

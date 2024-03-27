@@ -1,20 +1,20 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.ExternalServices
-import com.lightningkite.rock.FileReference
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.ImageLocal
-import com.lightningkite.rock.models.ImageRaw
-import com.lightningkite.rock.models.rem
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.awaitNotNull
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.ExternalServices
+import com.lightningkite.kiteui.FileReference
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.ImageLocal
+import com.lightningkite.kiteui.models.ImageRaw
+import com.lightningkite.kiteui.models.rem
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.Property
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.reactive.awaitNotNull
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("image-crop")
-object ImageCropScreen : RockScreen {
+object ImageCropScreen : KiteUiScreen {
     override fun ViewWriter.render() {
         val image = Property<FileReference?>(null)
         val croppedImage = Property<ImageRaw?>(null)

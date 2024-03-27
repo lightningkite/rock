@@ -1,12 +1,12 @@
 package com.lightningkite.mppexampleapp.docs
 
-import com.lightningkite.rock.ViewWrapper
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.ViewWrapper
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
-interface DocScreen: RockScreen {
+interface DocScreen: KiteUiScreen {
     val covers: List<String>
 }
 

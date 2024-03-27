@@ -1,15 +1,15 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.*
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.l2.lazyExpanding
+import com.lightningkite.kiteui.*
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.l2.lazyExpanding
 
 @Routable("recycler-view-infinite-images")
-object InfiniteImagesScreen : RockScreen {
+object InfiniteImagesScreen : KiteUiScreen {
     override val title: Readable<String>
         get() = super.title
 
@@ -64,7 +64,7 @@ object InfiniteImagesScreen : RockScreen {
     }
 }
 
-class ImageViewPager(val initialIndex: Int) : RockScreen {
+class ImageViewPager(val initialIndex: Int) : KiteUiScreen {
     val currentPage = Property(initialIndex)
 
     override fun ViewWriter.render() {

@@ -1,15 +1,15 @@
 package com.lightningkite.mppexampleapp.docs
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.models.SizeConstraints
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.bind
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.models.SizeConstraints
+import com.lightningkite.kiteui.reactive.Property
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.reactive.bind
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("docs/view-modifiers")
 object ViewModifiersScreen : DocScreen {
@@ -19,7 +19,7 @@ object ViewModifiersScreen : DocScreen {
     override fun ViewWriter.render() {
         article {
             h1("View Modifiers")
-            text("Rock has a number of view modifiers that can be used to modify the look, behavior and position of views.")
+            text("KiteUI has a number of view modifiers that can be used to modify the look, behavior and position of views.")
             h2("Syntax")
             text("There are two different syntaxes for using view modifiers.  You can either use the prefix annotation or the annotation, and they are fully equivalent.")
             example(

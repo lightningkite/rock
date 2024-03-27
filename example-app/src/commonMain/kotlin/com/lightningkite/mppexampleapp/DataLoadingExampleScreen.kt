@@ -1,22 +1,22 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.reactive.shared
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.card
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.expanding
-import com.lightningkite.rock.views.minus
+import com.lightningkite.kiteui.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.Readable
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.reactive.invoke
+import com.lightningkite.kiteui.reactive.shared
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.card
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.expanding
+import com.lightningkite.kiteui.views.minus
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
 @Routable("sample/data")
-object DataLoadingExampleScreen : RockScreen {
+object DataLoadingExampleScreen : KiteUiScreen {
     @Serializable data class Post(val userId: Int, val id: Int, val title: String, val body: String)
 
     override fun ViewWriter.render() {

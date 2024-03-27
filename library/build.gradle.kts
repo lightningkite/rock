@@ -108,8 +108,8 @@ kotlin {
     }
 
 //    cocoapods {
-//        summary = "Rock"
-//        homepage = "https://github.com/lightningkite/rock"
+//        summary = "KiteUI"
+//        homepage = "https://github.com/lightningkite/kiteui"
 //        ios.deploymentTarget = "12.0"
 //
 //        pod("FlexLayout") { version = "2.0.03" }
@@ -145,7 +145,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.lightningkite.rock"
+    namespace = "com.lightningkite.kiteui"
     compileSdk = 34
 
     defaultConfig {
@@ -162,9 +162,9 @@ android {
 }
 
 standardPublishing {
-    name.set("Rock")
+    name.set("KiteUI")
     description.set("A lightweight, highly opinionated UI framework for Kotlin Multiplatform")
-    github("lightningkite", "rock")
+    github("lightningkite", "kiteui")
 
     licenses {
         mit()

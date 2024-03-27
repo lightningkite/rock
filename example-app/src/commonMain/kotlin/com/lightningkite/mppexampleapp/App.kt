@@ -1,11 +1,11 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.docs.DocSearchScreen
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.l2.*
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.l2.*
 
 val appTheme = Property<Theme>(
     MaterialLikeTheme(
@@ -20,7 +20,7 @@ val appTheme = Property<Theme>(
 fun ViewWriter.app() {
 
     appNav(AutoRoutes) {
-        appName = "Rock Sample App"
+        appName = "KiteUI Sample App"
         ::navItems {
             listOf(
                 NavLink(title = { "Home" }, icon = { Icon.home }) { RootScreen },

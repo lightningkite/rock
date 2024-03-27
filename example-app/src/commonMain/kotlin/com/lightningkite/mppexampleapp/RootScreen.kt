@@ -2,20 +2,20 @@ package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.docs.VideoElementScreen
 import com.lightningkite.mppexampleapp.docs.ViewPagerElementScreen
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.*
-import com.lightningkite.rock.models.Icon
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.card
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.l2.icon
-import com.lightningkite.rock.views.minus
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.*
+import com.lightningkite.kiteui.models.Icon
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.card
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.l2.icon
+import com.lightningkite.kiteui.views.minus
 
 @Routable("/")
-object RootScreen : RockScreen {
+object RootScreen : KiteUiScreen {
     override fun ViewWriter.render() {
         scrolls - col {
             col {
@@ -23,7 +23,7 @@ object RootScreen : RockScreen {
                 separator()
                 text {
                     content =
-                        "In Rock, styling is beautiful without effort.  No styling or CSS is required to get beautiful layouts.  Just how it should be."
+                        "In KiteUI, styling is beautiful without effort.  No styling or manual CSS is required to get beautiful layouts.  Just how it should be."
                 }
                 text {
                     content = "Take a look below at some examples."
@@ -35,7 +35,7 @@ object RootScreen : RockScreen {
             }
             col {
 
-                fun ViewWriter.linkScreen(screen: RockScreen) = link {
+                fun ViewWriter.linkScreen(screen: KiteUiScreen) = link {
                     to = screen
                     row {
                         text {

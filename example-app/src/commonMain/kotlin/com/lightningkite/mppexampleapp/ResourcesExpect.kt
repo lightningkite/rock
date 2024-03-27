@@ -1,6 +1,6 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.models.*
+import com.lightningkite.kiteui.models.*
 
 expect object Resources {
     val fontsMontserrat: Font

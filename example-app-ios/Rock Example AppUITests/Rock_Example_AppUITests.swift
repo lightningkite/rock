@@ -1,13 +1,13 @@
 //
-//  Rock_Example_AppUITests.swift
-//  Rock Example AppUITests
+//  KiteUi_Example_AppUITests.swift
+//  KiteUI Example AppUITests
 //
 //  Created by Joseph Ivie on 12/14/23.
 //
 
 import XCTest
 
-final class Rock_Example_AppUITests: XCTestCase {
+final class KiteUi_Example_AppUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

@@ -1,11 +1,11 @@
 package com.lightningkite.mppexampleapp.docs
 
-import com.lightningkite.rock.ExternalServices
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.ExternalServices
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 import kotlin.random.Random
 
 @Routable("docs/text")
@@ -15,7 +15,7 @@ object TextElementScreen : DocScreen {
     override fun ViewWriter.render() {
         article {
             h1("Text Elements")
-            text("Rock has a number of text elements to help you display text in a variety of ways.")
+            text("KiteUI has a number of text elements to help you display text in a variety of ways.")
             h2("Text")
             text("The most basic text element is the text element.  It simply displays text.")
             example("text(\"Hello, world!\")") {
@@ -27,7 +27,7 @@ object TextElementScreen : DocScreen {
                 subtext("This is a subtext element.")
             }
             h2("Headers")
-            text("Rock has the standard header elements from HTML, h1, h2, h3, h4, h5, and h6.")
+            text("KiteUI has the standard header elements from HTML, h1, h2, h3, h4, h5, and h6.")
             example("h1(\"This is an h1 header\")") {
                 h1("This is an h1 header")
             }

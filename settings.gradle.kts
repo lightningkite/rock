@@ -12,11 +12,11 @@ pluginManagement {
     plugins {
         kotlin("plugin.serialization") version kotlinVersion
         id("com.google.devtools.ksp") version kspVersion
-        id("com.lightningkite.rock") version "main-SNAPSHOT"
+        id("com.lightningkite.kiteui") version "main-SNAPSHOT"
     }
 }
 
-rootProject.name = "rock"
+rootProject.name = "kiteui"
 
 include(":library")
 include(":example-app")

@@ -19,9 +19,9 @@ dependencies {
 }
 
 standardPublishing {
-    name.set("Rock-Processor")
+    name.set("KiteUI-Processor")
     description.set("Automatically create your routers")
-    github("lightningkite", "rock")
+    github("lightningkite", "kiteui")
 
     licenses {
         mit()

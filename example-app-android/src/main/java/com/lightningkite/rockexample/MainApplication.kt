@@ -1,4 +1,4 @@
-package com.lightningkite.rockexample
+package com.lightningkite.kiteuiexample
 
 import android.app.Application
 import java.io.File

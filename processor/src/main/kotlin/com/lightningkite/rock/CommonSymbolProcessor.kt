@@ -1,4 +1,4 @@
-package com.lightningkite.rock
+package com.lightningkite.kiteui
 
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
@@ -41,7 +41,7 @@ abstract class CommonSymbolProcessor(
         val common = resolver.getAllFiles().any { it.filePath?.contains("/src/common", true) == true }
 
         // Acquire lock
-        val lockFile = projectFolder.resolve("build/generated/ksp/.rock-lock")
+        val lockFile = projectFolder.resolve("build/generated/ksp/.kiteui-lock")
         if(lockFile.exists()) {
             // A different process is doing KSP for us; bail after waiting a bit
             while(lockFile.exists()) {
@@ -66,7 +66,7 @@ abstract class CommonSymbolProcessor(
                     .bufferedWriter()
             }
             process2(resolver)
-            val manifest = outFolder.parentFile!!.resolve("rock-manifest.txt")
+            val manifest = outFolder.parentFile!!.resolve("kiteui-manifest.txt")
             manifest.takeIf { it.exists() }?.readLines()
                 ?.map { File(it) }
                 ?.toSet()

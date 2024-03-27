@@ -1,4 +1,4 @@
-package com.lightningkite.rock.navigation
+package com.lightningkite.kiteui.navigation
 
 import org.junit.Assert.*
 

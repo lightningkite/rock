@@ -1,20 +1,20 @@
 package com.lightningkite.mppexampleapp
 
 import com.lightningkite.mppexampleapp.Resources
-import com.lightningkite.rock.*
-import com.lightningkite.rock.models.ImageScaleType
-import com.lightningkite.rock.models.SizeConstraints
-import com.lightningkite.rock.models.rem
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.*
+import com.lightningkite.kiteui.models.ImageScaleType
+import com.lightningkite.kiteui.models.SizeConstraints
+import com.lightningkite.kiteui.models.rem
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.random.Random
 
 @Routable("load-animation-test")
-object LoadAnimationTestScreen : RockScreen {
+object LoadAnimationTestScreen : KiteUiScreen {
     @Serializable data class Post(val userId: Int, val id: Int, val title: String, val body: String)
 
     override fun ViewWriter.render() {

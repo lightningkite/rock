@@ -1,2 +1,2 @@
-package com.lightningkite.rock
+package com.lightningkite.kiteui
 

@@ -1,14 +1,14 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.Icon
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.direct.col
-import com.lightningkite.rock.views.direct.row
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.Icon
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.direct.col
+import com.lightningkite.kiteui.views.direct.row
 
 @Routable("test")
-class TestScreen: RockScreen {
+class TestScreen: KiteUiScreen {
     override fun ViewWriter.render() {
         col {
             row {

@@ -26,9 +26,9 @@ buildscript {
 
 gradlePlugin {
     plugins {
-        create("lightningkite-rock") {
-            id = "com.lightningkite.rock"
-            implementationClass = "com.lightningkite.rock.RockPlugin"
+        create("lightningkite-kiteui") {
+            id = "com.lightningkite.kiteui"
+            implementationClass = "com.lightningkite.kiteui.KiteUiPlugin"
         }
     }
 }
@@ -44,9 +44,9 @@ tasks.validatePlugins {
 }
 
 standardPublishing {
-    name.set("Rock-Gradle-Plugin")
+    name.set("KiteUI-Gradle-Plugin")
     description.set("Automatically create your routers")
-    github("lightningkite", "rock")
+    github("lightningkite", "kiteui")
 
     licenses {
         mit()
@@ -67,7 +67,7 @@ standardPublishing {
 }
 
 tasks.create("publishLocally", Copy::class.java) {
-    from(file("src/main/kotlin/RockPlugin.kt"))
+    from(file("src/main/kotlin/KiteUiPlugin.kt"))
     into(rootProject.file("buildSrc/src/main/kotlin"))
 }
 
@@ -77,7 +77,7 @@ afterEvaluate {
             it.dependsOn(signingTask)
         }
     }
-    tasks.findByName("signLightningkite-rockPluginMarkerMavenPublication")?.let { signingTask ->
+    tasks.findByName("signLightningkite-kiteuiPluginMarkerMavenPublication")?.let { signingTask ->
         tasks.findByName("publishPluginMavenPublicationToMavenLocal")?.dependsOn(signingTask)
         tasks.findByName("publishPluginMavenPublicationToSonatypeRepository")?.dependsOn(signingTask)
     }

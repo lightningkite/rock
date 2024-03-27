@@ -1,10 +1,10 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.direct.col
-import com.lightningkite.rock.views.direct.hasPopover
-import com.lightningkite.rock.views.direct.onlyWhen
-import com.lightningkite.rock.views.direct.text
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.direct.col
+import com.lightningkite.kiteui.views.direct.hasPopover
+import com.lightningkite.kiteui.views.direct.onlyWhen
+import com.lightningkite.kiteui.views.direct.text
 import kotlinx.browser.document
 
 fun main() {

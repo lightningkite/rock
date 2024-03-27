@@ -1,13 +1,13 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.navigation.PlatformNavigator
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.l2.appBase
-import com.lightningkite.rock.views.l2.navigatorViewDialog
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.navigation.PlatformNavigator
+import com.lightningkite.kiteui.reactive.Property
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.l2.appBase
+import com.lightningkite.kiteui.views.l2.navigatorViewDialog
 import kotlinx.browser.document
 
 fun main() {

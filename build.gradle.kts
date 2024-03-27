@@ -1,5 +1,5 @@
 
-group = "com.lightningkite.rock"
+group = "com.lightningkite.kiteui"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -20,7 +20,7 @@ buildscript {
     }
 }
 allprojects {
-    group = "com.lightningkite.rock"
+    group = "com.lightningkite.kiteui"
     repositories {
         mavenLocal()
 //        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots/")

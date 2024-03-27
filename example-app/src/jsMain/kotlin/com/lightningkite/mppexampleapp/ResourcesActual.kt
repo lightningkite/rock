@@ -1,6 +1,6 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.models.*
+import com.lightningkite.kiteui.models.*
 
 actual object Resources {
     actual val fontsMontserrat: Font = Font(cssFontFamilyName = "fontsMontserrat", direct = FontDirect(normal = "common/fonts/montserrat/normal.ttf", bold = "common/fonts/montserrat/bold.ttf", italic = "common/fonts/montserrat/italic.ttf", boldItalic = "common/fonts/montserrat/bold-italic.ttf"))

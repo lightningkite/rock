@@ -1,0 +1,65 @@
+package com.lightningkite.kiteui.views.direct
+
+import com.lightningkite.kiteui.models.Align
+import com.lightningkite.kiteui.models.Dimension
+import com.lightningkite.kiteui.views.ViewDsl
+import com.lightningkite.kiteui.views.ViewWriter
+import kotlinx.browser.window
+import org.w3c.dom.HTMLElement
+
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual typealias NTextView = HTMLElement
+
+@ViewDsl
+actual inline fun ViewWriter.h1Actual(crossinline setup: TextView.() -> Unit): Unit = headerElement("h1", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.h2Actual(crossinline setup: TextView.() -> Unit): Unit = headerElement("h2", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.h3Actual(crossinline setup: TextView.() -> Unit): Unit = headerElement("h3", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.h4Actual(crossinline setup: TextView.() -> Unit): Unit = headerElement("h4", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.h5Actual(crossinline setup: TextView.() -> Unit): Unit = headerElement("h5", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.h6Actual(crossinline setup: TextView.() -> Unit): Unit = headerElement("h6", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.textActual(crossinline setup: TextView.() -> Unit): Unit = textElement("p", setup)
+
+@ViewDsl
+actual inline fun ViewWriter.subtextActual(crossinline setup: TextView.() -> Unit): Unit = textElement("span") {
+    native.classList.add("subtext")
+    setup()
+}
+
+actual inline var TextView.content: String
+    get() = native.innerText
+    set(value) {
+        native.innerText = value
+    }
+actual inline var TextView.align: Align
+    get() = when (window.getComputedStyle(native).textAlign) {
+        "start" -> Align.Start
+        "center" -> Align.Center
+        "end" -> Align.End
+        "justify" -> Align.Stretch
+        else -> Align.Start
+    }
+    set(value) {
+        native.style.textAlign = when (value) {
+            Align.Start -> "start"
+            Align.Center -> "center"
+            Align.End -> "end"
+            Align.Stretch -> "justify"
+        }
+    }
+actual inline var TextView.textSize: Dimension
+    get() = Dimension(window.getComputedStyle(native).fontSize)
+    set(value) {
+        native.style.fontSize = value.value
+    }

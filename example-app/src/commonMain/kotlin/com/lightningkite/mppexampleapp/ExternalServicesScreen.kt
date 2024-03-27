@@ -1,13 +1,13 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("external-services")
-object ExternalServicesScreen : RockScreen {
+object ExternalServicesScreen : KiteUiScreen {
     override val title: Readable<String>
         get() = super.title
 

@@ -1,5 +1,5 @@
-import com.lightningkite.rock.RockPlugin
-import com.lightningkite.rock.RockPluginExtension
+import com.lightningkite.kiteui.KiteUiPlugin
+import com.lightningkite.kiteui.KiteUiPluginExtension
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
@@ -13,7 +13,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
 }
-apply<RockPlugin>()
+apply<KiteUiPlugin>()
 
 group = "com.lightningkite"
 version = "1.0-SNAPSHOT"
@@ -134,9 +134,9 @@ dependencies {
     }
 }
 
-configure<RockPluginExtension> {
+configure<KiteUiPluginExtension> {
     this.packageName = "com.lightningkite.mppexampleapp"
-    this.iosProjectRoot = project.file("../example-app-ios/Rock Example App")
+    this.iosProjectRoot = project.file("../example-app-ios/KiteUI Example App")
 }
 
 android {

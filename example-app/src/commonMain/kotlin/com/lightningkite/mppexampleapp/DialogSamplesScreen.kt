@@ -1,13 +1,13 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("sample/dialog")
-object DialogSamplesScreen : RockScreen {
+object DialogSamplesScreen : KiteUiScreen {
     override fun ViewWriter.render() {
         col {
             h1 { content = "Dialog Samples" }
@@ -30,7 +30,7 @@ object DialogSamplesScreen : RockScreen {
     }
 }
 
-@Routable("sample/dialog/1") object DialogSampleScreen1: RockScreen {
+@Routable("sample/dialog/1") object DialogSampleScreen1: KiteUiScreen {
     override fun ViewWriter.render() {
         dismissBackground {
             centered - card - col {

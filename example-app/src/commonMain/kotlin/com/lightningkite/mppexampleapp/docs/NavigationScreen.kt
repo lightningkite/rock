@@ -1,16 +1,16 @@
 package com.lightningkite.mppexampleapp.docs
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.Icon
-import com.lightningkite.rock.models.rem
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Constant
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.l2.icon
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.Icon
+import com.lightningkite.kiteui.models.rem
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.Constant
+import com.lightningkite.kiteui.reactive.Property
+import com.lightningkite.kiteui.reactive.Readable
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.l2.icon
 
 @Routable("docs/navigation")
 object NavigationScreen: DocScreen {
@@ -20,7 +20,7 @@ object NavigationScreen: DocScreen {
 
     override val covers: List<String> = listOf(
         "Screen",
-        "RockScreen",
+        "KiteUiScreen",
         "Navigator",
         "PlatformNavigator",
         "navigate",
@@ -36,7 +36,7 @@ object NavigationScreen: DocScreen {
             space()
             h2("Navigate with Links")
             text("You can navigate between screens using links.  These are preferred as they render as proper links in web.")
-            text("The destinations of links are instances of RockScreen, which ensures at the compilation level that you can't produce invalid links.")
+            text("The destinations of links are instances of KiteUiScreen, which ensures at the compilation level that you can't produce invalid links.")
             example(
                 """
             link {
@@ -155,7 +155,7 @@ object NavigationScreen: DocScreen {
                 button {
                     text("Open a dialog")
                     onClick {
-                        navigator.dialog.navigate(object: RockScreen {
+                        navigator.dialog.navigate(object: KiteUiScreen {
                             override fun ViewWriter.render() {
                                 stack {
                                     centered - card - col {
@@ -178,7 +178,7 @@ object NavigationScreen: DocScreen {
                 button {
                     text("Open a dialog")
                     onClick {
-                        navigator.dialog.navigate(object: RockScreen {
+                        navigator.dialog.navigate(object: KiteUiScreen {
                             override fun ViewWriter.render() {
                                 stack {
                                     centered - card - col {

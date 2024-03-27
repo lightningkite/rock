@@ -1,13 +1,13 @@
 //
-//  Rock_Example_AppUITestsLaunchTests.swift
-//  Rock Example AppUITests
+//  KiteUi_Example_AppUITestsLaunchTests.swift
+//  KiteUI Example AppUITests
 //
 //  Created by Joseph Ivie on 12/14/23.
 //
 
 import XCTest
 
-final class Rock_Example_AppUITestsLaunchTests: XCTestCase {
+final class KiteUi_Example_AppUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

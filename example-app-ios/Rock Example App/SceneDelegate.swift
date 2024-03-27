@@ -1,6 +1,6 @@
 //
 //  SceneDelegate.swift
-//  Rock Example App
+//  KiteUI Example App
 //
 //  Created by Joseph Ivie on 12/14/23.
 //

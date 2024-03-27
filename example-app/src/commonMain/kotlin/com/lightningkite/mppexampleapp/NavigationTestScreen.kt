@@ -1,17 +1,17 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.contains
-import com.lightningkite.rock.models.Align
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.card
-import com.lightningkite.rock.views.direct.*
-import com.lightningkite.rock.views.l2.*
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.contains
+import com.lightningkite.kiteui.models.Align
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.card
+import com.lightningkite.kiteui.views.direct.*
+import com.lightningkite.kiteui.views.l2.*
 
 
 @Routable("navigation")
-object NavigationTestScreen : RockScreen {
+object NavigationTestScreen : KiteUiScreen {
 
     override fun ViewWriter.render() {
         col {

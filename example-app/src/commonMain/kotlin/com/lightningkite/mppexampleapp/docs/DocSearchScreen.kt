@@ -1,15 +1,15 @@
 package com.lightningkite.mppexampleapp.docs
 
-import com.lightningkite.rock.QueryParameter
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.models.*
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.*
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.QueryParameter
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.models.*
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("docs")
-object DocSearchScreen : RockScreen {
+object DocSearchScreen : KiteUiScreen {
 
     @QueryParameter
     val query = Property<String>("")
@@ -18,7 +18,7 @@ object DocSearchScreen : RockScreen {
         stack {
             gravity(Align.Center, Align.Stretch) - sizedBox(SizeConstraints(width = 80.rem)) - col  {
                 h1("Documentation")
-                text("Here you can find many helpful pages for understanding Rock and its tools.")
+                text("Here you can find many helpful pages for understanding KiteUI and its tools.")
                 row {
                     centered - icon { source = Icon.search }
                     expanding - textField {

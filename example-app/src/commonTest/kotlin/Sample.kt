@@ -1,8 +1,8 @@
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.views.ViewWriter
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.views.ViewWriter
 
-class Sample: RockScreen {
+class Sample: KiteUiScreen {
     override fun ViewWriter.render() {
         TODO("Not yet implemented")
     }

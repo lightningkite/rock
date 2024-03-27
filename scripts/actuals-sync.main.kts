@@ -5,7 +5,7 @@ import kotlin.math.min
 
 object Stuff {
     val outFile =
-        File("/Users/jivie/Projects/rock/library/src/commonMain/kotlin/com/lightningkite/rock/views/direct/generated.kt")
+        File("/Users/jivie/Projects/kiteui/library/src/commonMain/kotlin/com/lightningkite/kiteui/views/direct/generated.kt")
     val out = outFile.printWriter()
     val implementations: List<Implementation> = listOf(Implementation("js", "HTMLElement"))
 }
@@ -13,20 +13,20 @@ object Stuff {
 
 class Implementation(val variant: String, val todoElementType: String) {
     val outFile =
-        File("/Users/jivie/Projects/rock/library/src/${variant}Main/kotlin/com/lightningkite/rock/views/direct/generated.kt")
+        File("/Users/jivie/Projects/kiteui/library/src/${variant}Main/kotlin/com/lightningkite/kiteui/views/direct/generated.kt")
     val existing = outFile.readText()
     val out = outFile.printWriter()
     var lastMark = 0
 
     init {
         out.appendLine(existing.lineSequence().takeWhile { it.isBlank() || it.startsWith("package ") || it.startsWith("import ") }.toList().dropLastWhile { it.isBlank() }.joinToString("\n").takeIf { it.isNotBlank() } ?: """
-            package com.lightningkite.rock.views.direct
+            package com.lightningkite.kiteui.views.direct
 
-            import com.lightningkite.rock.*
-            import com.lightningkite.rock.models.*
-            import com.lightningkite.rock.navigation.*
-            import com.lightningkite.rock.reactive.*
-            import com.lightningkite.rock.views.*
+            import com.lightningkite.kiteui.*
+            import com.lightningkite.kiteui.models.*
+            import com.lightningkite.kiteui.navigation.*
+            import com.lightningkite.kiteui.reactive.*
+            import com.lightningkite.kiteui.views.*
             import kotlinx.datetime.*
         """.trimIndent())
         out.appendLine()
@@ -145,14 +145,14 @@ fun modifierVal(name: String) {
 
 CodeEmitter.common(
     """
-    package com.lightningkite.rock.views.direct
+    package com.lightningkite.kiteui.views.direct
 
-    import com.lightningkite.rock.*
-    import com.lightningkite.rock.models.*
-    import com.lightningkite.rock.navigation.*
-    import com.lightningkite.rock.reactive.*
-    import com.lightningkite.rock.views.*
-    import com.lightningkite.rock.views.canvas.*
+    import com.lightningkite.kiteui.*
+    import com.lightningkite.kiteui.models.*
+    import com.lightningkite.kiteui.navigation.*
+    import com.lightningkite.kiteui.reactive.*
+    import com.lightningkite.kiteui.views.*
+    import com.lightningkite.kiteui.views.canvas.*
     import kotlinx.datetime.*
 """.trimIndent()
 )
@@ -162,7 +162,7 @@ CodeEmitter.common(
     specialConstructor("grid", "columns" ofType "Int")
 }
 "Link" {
-    prop("to", "RockScreen")
+    prop("to", "KiteUiScreen")
     prop("newTab", "Boolean")
 }
 "ExternalLink" {

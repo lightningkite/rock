@@ -5,10 +5,10 @@ import java.net.URL
 
 fun String.snakeToCamel(): String = replace(Regex("_([a-zA-Z])")) { it.groupValues[1].uppercase() }
 
-File("/Users/jivie/Projects/rock/library/src/commonMain/kotlin/com/lightningkite/rock/models/Icons.kt").printWriter()
+File("/Users/jivie/Projects/kiteui/library/src/commonMain/kotlin/com/lightningkite/kiteui/models/Icons.kt").printWriter()
     .use {
         with(it) {
-            appendLine("""package com.lightningkite.rock.models""")
+            appendLine("""package com.lightningkite.kiteui.models""")
             appendLine("""""")
             appendLine("""object Icons {""")
             fun download(url: String, name: String = url.substringAfterLast("materialsymbolsoutlined/").substringBefore('/').snakeToCamel()) {

@@ -1,7 +1,7 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.views.*
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.views.*
+import com.lightningkite.kiteui.views.direct.*
 
 actual fun ViewWriter.platformSpecific() {
     text("Nothing yet")

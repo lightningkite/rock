@@ -1,17 +1,17 @@
 package com.lightningkite.mppexampleapp
 
-import com.lightningkite.rock.QueryParameter
-import com.lightningkite.rock.Routable
-import com.lightningkite.rock.navigation.RockScreen
-import com.lightningkite.rock.reactive.Property
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.bind
-import com.lightningkite.rock.reactive.invoke
-import com.lightningkite.rock.views.ViewWriter
-import com.lightningkite.rock.views.direct.*
+import com.lightningkite.kiteui.QueryParameter
+import com.lightningkite.kiteui.Routable
+import com.lightningkite.kiteui.navigation.KiteUiScreen
+import com.lightningkite.kiteui.reactive.Property
+import com.lightningkite.kiteui.reactive.await
+import com.lightningkite.kiteui.reactive.bind
+import com.lightningkite.kiteui.reactive.invoke
+import com.lightningkite.kiteui.views.ViewWriter
+import com.lightningkite.kiteui.views.direct.*
 
 @Routable("arguments-example/{id}")
-class ArgumentsExampleScreen(val id: String): RockScreen {
+class ArgumentsExampleScreen(val id: String): KiteUiScreen {
 
     @QueryParameter
     val toAdd = Property("")

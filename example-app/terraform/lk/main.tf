@@ -18,7 +18,7 @@ terraform {
 terraform {
   backend "s3" {
     bucket = "lightningkite-terraform"
-    key    = "rock"
+    key    = "kiteui"
     region = "us-west-2"
   }
 }
@@ -37,9 +37,9 @@ module "web" {
     aws = aws
     aws.acm = aws.acm
   }
-  deployment_name = "rock"
+  deployment_name = "kiteui"
   dist_folder = "../../build/dist/js/productionExecutable"
-  domain_name = "rock.cs.lightningkite.com"
+  domain_name = "kiteui.cs.lightningkite.com"
   domain_name_zone = "cs.lightningkite.com"
   react_mode = true
 }

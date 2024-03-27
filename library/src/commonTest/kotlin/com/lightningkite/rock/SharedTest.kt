@@ -86,4 +86,62 @@ class SharedTest {
         }.cancel()
         assertEquals(3, hits)
     }
+
+    @Test fun sharedSharesWithLaunch() {
+        // Note that it can only share if it doesn't complete yet.
+        // This is because it's considered 'inactive' once it completes the first time if there are no stable listeners.
+        val delayed = VirtualDelay { 1 }
+        var starts = 0
+        var hits = 0
+        val a = shared {
+            starts++
+            delayed.await()
+            hits++
+        }
+        testContext {
+            launch {
+                a.await()
+            }
+            reactiveScope {
+                a.await()
+            }
+            assertEquals(1, starts)
+            assertEquals(0, hits)
+            delayed.go()
+            assertEquals(1, starts)
+            assertEquals(1, hits)
+
+        }.cancel()
+    }
+
+    @Test fun sharedWorksWithLaunch() {
+        val delayed = VirtualDelay { 1 }
+        var starts = 0
+        var hits = 0
+        val a = shared {
+            starts++
+            delayed.await()
+            hits++
+        }
+        testContext {
+            launch { a.await() }
+            launch { a.await() }
+            launch { a.await() }
+            assertEquals(1, starts)
+            assertEquals(0, hits)
+            delayed.go()
+            assertEquals(1, starts)
+            assertEquals(1, hits)
+
+            delayed.clear()
+            launch { a.await() }
+            launch { a.await() }
+            launch { a.await() }
+            assertEquals(2, starts)
+            assertEquals(1, hits)
+            delayed.go()
+            assertEquals(2, starts)
+            assertEquals(2, hits)
+        }
+    }
 }

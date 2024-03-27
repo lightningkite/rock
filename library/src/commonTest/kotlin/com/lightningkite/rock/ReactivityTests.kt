@@ -238,6 +238,9 @@ class VirtualDelay<T>(val action: () -> T) {
             return@suspendCoroutineCancellable {}
         }
     }
+    fun clear() {
+        ready = false
+    }
     fun go() {
         val value = action()
         this.value = value

@@ -28,6 +28,28 @@ class SharedTest {
         }
     }
 
+    @Test fun sharedDoesNotEmitSameValue() {
+        val a = LateInitProperty<Int?>()
+        val b = shared { a.await() }
+        var starts = 0
+        var hits = 0
+        with(CalculationContext.Standard()) {
+            reactiveScope {
+                starts++
+                b.await()
+                hits++
+            }
+            assertEquals(0, hits)
+            assertEquals(1, starts)
+            a.value = null
+            assertEquals(1, hits)
+            assertEquals(1, starts)
+            a.value = null
+            assertEquals(1, hits)
+            assertEquals(1, starts)
+        }
+    }
+
     @Test fun sharedTerminatesWhenNoOneIsListening() {
         var onRemoveCalled = 0
         var scopeCalled = 0

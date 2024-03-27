@@ -23,10 +23,10 @@ object SampleLogInScreen : RockScreen {
                 source = Resources.imagesSolera
                 scaleType = ImageScaleType.Crop
                 opacity = 0.5
-            } 
-            col {
-                space {} in weight(1f)
-                col {
+            }
+            padded - scrolls - col {
+                expanding - space()
+                centered - sizeConstraints(maxWidth = 50.rem) - card - col {
                     h1 { content = "My App" }
                     label {
                         content = "Email"
@@ -49,16 +49,16 @@ object SampleLogInScreen : RockScreen {
                             )
                         }
                     }
-                    button {
+                    important - button {
                         h6 { content = "Log In" }
                         onClick {
                             delay(1000)
                             fakeLogin(email)
                         }
-                    } in important
-                } in card in sizedBox(SizeConstraints(maxWidth = 50.rem)) in gravity(Align.Center, Align.Center)
-                space {} in weight(1f)
-            } in scrolls in padded
+                    }
+                }
+                expanding - space()
+            }
         } 
     }
 

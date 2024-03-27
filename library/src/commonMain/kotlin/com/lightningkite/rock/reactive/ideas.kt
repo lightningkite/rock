@@ -79,8 +79,10 @@ abstract class BaseReadable<T>(start: ReadableState<T> = ReadableState.notReady)
     private val listeners = ArrayList<() -> Unit>()
     override var state: ReadableState<T> = start
         protected set(value) {
-            field = value
-            listeners.toList().forEach { it() }
+            if(field != value) {
+                field = value
+                listeners.toList().forEach { it() }
+            }
         }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
@@ -98,8 +100,10 @@ abstract class BaseImmediateReadable<T>(start: T): ImmediateReadable<T> {
     private val listeners = ArrayList<() -> Unit>()
     override var value: T = start
         set(value) {
-            field = value
-            listeners.toList().forEach { it() }
+            if(field != value) {
+                field = value
+                listeners.toList().forEach { it() }
+            }
         }
 
     override fun addListener(listener: () -> Unit): () -> Unit {
@@ -135,28 +139,10 @@ class LateInitProperty<T>() : Writable<T>, ReadWriteProperty<Any?, T>, BaseReada
     }
 }
 
-class Property<T>(startValue: T) : ImmediateWritable<T>, ReadWriteProperty<Any?, T> {
-    private val listeners = ArrayList<() -> Unit>()
-    override var value: T = startValue
-        set(value) {
-            field = value
-            listeners.toList().forEach { it() }
-        }
-
+class Property<T>(startValue: T) : ImmediateWritable<T>, BaseImmediateReadable<T>(startValue), ReadWriteProperty<Any?, T> {
     override suspend infix fun set(value: T) {
         this.value = value
     }
-
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        listeners.add(listener)
-        return {
-            val pos = listeners.indexOfFirst { it === listener }
-            if (pos != -1) {
-                listeners.removeAt(pos)
-            }
-        }
-    }
-
     override fun getValue(thisRef: Any?, property: KProperty<*>): T = value
     override fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         this.value = value
@@ -282,6 +268,8 @@ suspend fun rerunOn(listenable: Listenable) {
         it.latestPass.add(listenable)
     }
 }
+
+suspend inline operator fun <T> Readable<T>.invoke(): T = await()
 
 suspend fun <T> Readable<T>.await(): T {
     return coroutineContext[ReactiveScopeData.Key]?.let {

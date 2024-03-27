@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.await
 import com.lightningkite.rock.models.ImageLocal
+import com.lightningkite.rock.models.ImageRaw
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.views.canvas.clear
 import kotlinx.browser.window
@@ -262,7 +263,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
         }
     }
 
-    actual suspend fun crop(): Blob? {
+    actual suspend fun crop(): ImageRaw? {
         val bitmap = bitmap ?: return null
         val scale: Double = if (fitHorizontal) {
             native.js.width.toDouble() / bitmap.width
@@ -288,7 +289,7 @@ actual class ImageCrop actual constructor(actual override val native: NImageCrop
             dh = resultHeight.toDouble()
         )
 
-        return cropCanvas.convertToBlob().await()
+        return ImageRaw(cropCanvas.convertToBlob().await())
     }
 }
 

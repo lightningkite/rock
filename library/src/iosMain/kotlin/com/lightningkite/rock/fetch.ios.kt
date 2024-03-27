@@ -18,6 +18,8 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import platform.Foundation.*
 import platform.UniformTypeIdentifiers.*
 import platform.posix.memcpy
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 val client = HttpClient {
     install(WebSockets)
@@ -69,10 +71,14 @@ actual suspend fun fetch(
                             val mime = body.content.suggestedType
                                 ?: (body.content.provider.registeredContentTypes.firstOrNull() as? UTType ?: UTTypeData)
                             contentType(ContentType.parse(mime.preferredMIMEType!!))
-                            body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
-                                if (error != null) throw Exception(error?.description)
-                                setBody(data!!.toByteArray())
+                            val fileData = suspendCoroutine {
+                                body.content.provider.loadDataRepresentationForContentType(mime) { data, error ->
+                                    if (error != null) throw Exception(error?.description)
+                                    val rawData = data!!.toByteArray()
+                                    it.resume(rawData)
+                                }
                             }
+                            setBody(fileData)
                         }
 
                         is RequestBodyText -> {

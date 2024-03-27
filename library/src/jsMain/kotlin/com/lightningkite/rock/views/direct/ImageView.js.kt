@@ -1,6 +1,5 @@
 package com.lightningkite.rock.views.direct
 
-import com.lightningkite.rock.Blob
 import com.lightningkite.rock.clockMillis
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.navigation.PlatformNavigator
@@ -33,7 +32,7 @@ actual inline var ImageView.source: ImageSource?
                 setSrc(value.url)
             }
             is ImageRaw -> {
-                setSrc(URL.createObjectURL(Blob(arrayOf(value.data))))
+                setSrc(URL.createObjectURL(value.data))
             }
             is ImageResource -> {
                 setSrc(PlatformNavigator.basePath + value.relativeUrl)

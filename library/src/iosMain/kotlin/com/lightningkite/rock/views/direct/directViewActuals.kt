@@ -5,6 +5,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.views.*
 import com.lightningkite.rock.objc.KeyValueObserverProtocol
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.await
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.COpaquePointer
@@ -86,7 +87,8 @@ fun NSObject.observe(key: String, action: ()->Unit): ()->Unit {
 
 val UIControl.stateReadable: Readable<UIControlState> get() {
     return object: Readable<UIControlState> {
-        override suspend fun awaitRaw(): UIControlState = this@stateReadable.state
+        override val state: ReadableState<UIControlState>
+            get() = ReadableState(this@stateReadable.state)
         override fun addListener(listener: () -> Unit): () -> Unit {
             val toCall = listOf(
                 this@stateReadable.observe("highlighted", listener),

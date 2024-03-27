@@ -14,7 +14,8 @@ import platform.darwin.NSObject
 import platform.darwin.sel_registerName
 
 @OptIn(ExperimentalForeignApi::class)
-actual object SoftInputOpen : Readable<Boolean>, Writable<Boolean> {
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual object SoftInputOpen : BaseImmediateReadable<Boolean>(false), Writable<Boolean> {
     @OptIn(BetaInteropApi::class)
     val observer: NSObject = object: NSObject() {
         @ObjCAction fun keyboardWillShowNotification() {
@@ -38,27 +39,7 @@ actual object SoftInputOpen : Readable<Boolean>, Writable<Boolean> {
             `object` = null
         )
     }
-
-    private val listeners = ArrayList<() -> Unit>()
-    var value: Boolean = false
-        set(value) {
-            field = value
-            listeners.toList().forEach { it() }
-        }
-
     override suspend infix fun set(value: Boolean) {
         this.value = value
-    }
-
-    override suspend fun awaitRaw(): Boolean = value
-
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        listeners.add(listener)
-        return {
-            val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
-                listeners.removeAt(pos)
-            }
-        }
     }
 }

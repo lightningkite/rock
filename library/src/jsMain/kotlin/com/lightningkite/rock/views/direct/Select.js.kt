@@ -4,6 +4,7 @@ import com.lightningkite.rock.models.WidgetOption
 import com.lightningkite.rock.reactive.Readable
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
+import com.lightningkite.rock.reactive.awaitOnce
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
 import com.lightningkite.rock.views.launch
@@ -30,7 +31,7 @@ actual fun <T> Select.bind(
             list.mapIndexed { index, t ->
                 WidgetOption(index.toString(), render(t))
             },
-            list.indexOf(edits.awaitRaw()).toString()
+            list.indexOf(edits.awaitOnce()).toString()
         )
     }
     native.onchange = {

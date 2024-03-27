@@ -23,6 +23,7 @@ import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.reactive.await
 import java.util.*
 import com.lightningkite.rock.models.rem
+import com.lightningkite.rock.reactive.awaitOnce
 import com.lightningkite.rock.views.*
 
 @Suppress("ACTUAL_WITHOUT_EXPECT")
@@ -80,7 +81,7 @@ actual fun <T> Select.bind(
     reactiveScope {
         list = data.await()
         adapter.notifyDataSetChanged()
-        val currentlySelected = edits.awaitRaw()  // explicitly DO NOT LISTEN.  We'll handle it on the other side.
+        val currentlySelected = edits.awaitOnce()
         val index = list.indexOf(currentlySelected)
         if(index != -1 && !suppressChange) {
             suppressChange = true

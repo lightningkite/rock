@@ -15,65 +15,11 @@ actual object AnimationFrame : Listenable {
     }
 }
 
-actual object WindowInfo: Readable<WindowStatistics> {
-    private val listeners = ArrayList<() -> Unit>()
-    var value: WindowStatistics = WindowStatistics(Dimension(1920f), Dimension(1080f), 1f)
-        set(value) {
-            field = value
-            listeners.toList().forEach { it() }
-        }
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual object WindowInfo: BaseImmediateReadable<WindowStatistics>(WindowStatistics(Dimension(1920f), Dimension(1080f), 1f))
 
-    override suspend fun awaitRaw(): WindowStatistics = value
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual object InForeground: BaseImmediateReadable<Boolean>(true)
 
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        listeners.add(listener)
-        return {
-            val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
-                listeners.removeAt(pos)
-            }
-        }
-    }
-}
-
-actual object InForeground: Readable<Boolean> {
-    private val listeners = ArrayList<() -> Unit>()
-    var value: Boolean = false
-        set(value) {
-            field = value
-            listeners.toList().forEach { it() }
-        }
-
-    override suspend fun awaitRaw(): Boolean = value
-
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        listeners.add(listener)
-        return {
-            val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
-                listeners.removeAt(pos)
-            }
-        }
-    }
-}
-
-actual object SoftInputOpen : Readable<Boolean> {
-    private val listeners = ArrayList<() -> Unit>()
-    var value: Boolean = false
-        set(value) {
-            field = value
-            listeners.toList().forEach { it() }
-        }
-
-    override suspend fun awaitRaw(): Boolean = value
-
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        listeners.add(listener)
-        return {
-            val pos = listeners.indexOfFirst { it === listener }
-            if(pos != -1) {
-                listeners.removeAt(pos)
-            }
-        }
-    }
-}
+@Suppress("ACTUAL_WITHOUT_EXPECT")
+actual object SoftInputOpen : BaseImmediateReadable<Boolean>(false)

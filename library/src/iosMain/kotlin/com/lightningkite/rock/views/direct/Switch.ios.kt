@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -26,7 +27,7 @@ actual inline var Switch.enabled: Boolean
 actual val Switch.checked: Writable<Boolean>
     get() {
         return object : Writable<Boolean> {
-            override suspend fun awaitRaw(): Boolean = native.on
+            override val state: ReadableState<Boolean> get() = ReadableState(native.on)
             override fun addListener(listener: () -> Unit): () -> Unit {
                 return native.onEvent(UIControlEventValueChanged) { listener() }
             }

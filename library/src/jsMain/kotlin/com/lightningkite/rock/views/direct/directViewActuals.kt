@@ -2,6 +2,7 @@ package com.lightningkite.rock.views.direct
 
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.Readable
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.reactiveScope
 import com.lightningkite.rock.views.*
 import kotlinx.browser.document
@@ -86,7 +87,8 @@ external interface ResizeObserverEntryBoxSize {
 }
 
 data class SizeReader(val native: HTMLElement, val key: String): Readable<Double> {
-    override suspend fun awaitRaw(): Double = native.asDynamic()[key].unsafeCast<Int>().toDouble()
+    override val state: ReadableState<Double>
+        get() = ReadableState(native.asDynamic()[key].unsafeCast<Int>().toDouble())
     override fun addListener(listener: () -> Unit): () -> Unit {
         val o = ResizeObserver { _, _ ->
             listener()

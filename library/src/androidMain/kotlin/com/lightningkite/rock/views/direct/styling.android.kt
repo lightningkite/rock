@@ -12,10 +12,7 @@ import android.view.animation.Animation
 import android.widget.*
 import androidx.core.view.setMargins
 import com.lightningkite.rock.models.*
-import com.lightningkite.rock.reactive.Readable
-import com.lightningkite.rock.reactive.Writable
-import com.lightningkite.rock.reactive.await
-import com.lightningkite.rock.reactive.reactiveScope
+import com.lightningkite.rock.reactive.*
 import com.lightningkite.rock.views.*
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -28,11 +25,8 @@ val NView.selected: Writable<Boolean>
         override fun addListener(listener: () -> Unit): () -> Unit {
             return addListener(View::setOnClickListener, { View.OnClickListener { it() } }, listener)
         }
-
-        override suspend fun awaitRaw(): Boolean {
-            return this@selected.isSelected
-        }
-
+        override val state: ReadableState<Boolean>
+            get() = ReadableState(this@selected.isSelected)
         override suspend fun set(value: Boolean) {
             this@selected.isSelected = value
         }
@@ -43,10 +37,8 @@ val NView.hovered: Readable<Boolean>
         override fun addListener(listener: () -> Unit): () -> Unit {
             return addListener(View::setOnHoverListener, { View.OnHoverListener { _, _ -> it(); true } }, listener)
         }
-
-        override suspend fun awaitRaw(): Boolean {
-            return this@hovered.isHovered
-        }
+        override val state: ReadableState<Boolean>
+            get() = ReadableState(this@hovered.isHovered)
     }
 
 

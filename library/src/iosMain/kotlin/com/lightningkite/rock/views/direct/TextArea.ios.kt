@@ -3,6 +3,7 @@ package com.lightningkite.rock.views.direct
 import com.lightningkite.rock.models.KeyboardCase
 import com.lightningkite.rock.models.KeyboardHints
 import com.lightningkite.rock.models.KeyboardType
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import platform.UIKit.*
@@ -26,7 +27,7 @@ actual inline fun ViewWriter.textAreaActual(crossinline setup: TextArea.() -> Un
 
 actual val TextArea.content: Writable<String>
     get() = object : Writable<String> {
-        override suspend fun awaitRaw(): String = native.text ?: ""
+        override val state get() = ReadableState(native.text)
         override fun addListener(listener: () -> Unit): () -> Unit {
             // TODO: Multiple listeners
             native.setDelegate(object : NSObject(), UITextViewDelegateProtocol {

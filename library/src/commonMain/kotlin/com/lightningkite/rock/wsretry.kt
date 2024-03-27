@@ -136,9 +136,7 @@ interface TypedWebSocket<SEND, RECEIVE> : ResourceUse {
 }
 
 val <RECEIVE> TypedWebSocket<*, RECEIVE>.mostRecentMessage: Readable<RECEIVE?>
-    get() = object : Readable<RECEIVE?> {
-        var value: RECEIVE? = null
-            private set
+    get() = object : BaseImmediateReadable<RECEIVE?>(null) {
 
         val listeners = ArrayList<() -> Unit>()
 
@@ -149,20 +147,12 @@ val <RECEIVE> TypedWebSocket<*, RECEIVE>.mostRecentMessage: Readable<RECEIVE?>
             }
         }
 
-        override suspend fun awaitRaw(): RECEIVE? = value
-
-        override fun addListener(listener: () -> Unit): () -> Unit {
-            listeners.add(listener)
-            val parent = this@mostRecentMessage.start()
-            return { listeners.remove(listener); parent() }
-        }
-
         override fun hashCode(): Int {
-            return super.hashCode()
+            return this@mostRecentMessage.hashCode()
         }
 
         override fun equals(other: Any?): Boolean {
-            return super.equals(other)
+            return this@mostRecentMessage.equals(other)
         }
     }
 

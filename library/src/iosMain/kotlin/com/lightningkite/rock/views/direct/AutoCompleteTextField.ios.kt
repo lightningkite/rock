@@ -4,6 +4,7 @@ import com.lightningkite.rock.models.Action
 import com.lightningkite.rock.models.KeyboardCase
 import com.lightningkite.rock.models.KeyboardHints
 import com.lightningkite.rock.models.KeyboardType
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import platform.UIKit.*
@@ -27,7 +28,7 @@ actual inline fun ViewWriter.autoCompleteTextFieldActual(crossinline setup: Auto
 
 actual val AutoCompleteTextField.content: Writable<String>
     get() = object : Writable<String> {
-        override suspend fun awaitRaw(): String = native.text ?: ""
+        override val state: ReadableState<String> get() = ReadableState(native.text ?: "")
         override fun addListener(listener: () -> Unit): () -> Unit {
             return native.onEvent(UIControlEventEditingChanged) {
                 listener()

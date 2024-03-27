@@ -1,5 +1,6 @@
 package com.lightningkite.rock.views.direct
 
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -16,7 +17,7 @@ fun <T : HTMLElement, V> T.vprop(
     set: T.(V) -> Unit
 ): Writable<V> {
     return object : Writable<V> {
-        override suspend fun awaitRaw(): V = get(this@vprop)
+        override val state: ReadableState<V> get() = ReadableState(get(this@vprop))
         override suspend fun set(value: V) {
             set(this@vprop, value)
         }

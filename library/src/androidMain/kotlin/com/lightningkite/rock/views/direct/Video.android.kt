@@ -6,6 +6,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.lightningkite.rock.models.*
 import com.lightningkite.rock.reactive.AnimationFrame
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.NView
 import com.lightningkite.rock.views.ViewDsl
@@ -51,9 +52,7 @@ actual val Video.time: Writable<Double> get() = object: Writable<Double> {
         native.player!!.seekTo((value * 1000.0).toLong())
     }
 
-    override suspend fun awaitRaw(): Double {
-        return native.player!!.currentPosition / 1000.0
-    }
+    override val state get() = ReadableState(native.player!!.currentPosition / 1000.0)
 
     override fun addListener(listener: () -> Unit): () -> Unit {
         var remover: (()->Unit)? = null
@@ -79,9 +78,7 @@ actual val Video.playing: Writable<Boolean> get() = object: Writable<Boolean> {
         }
     }
 
-    override suspend fun awaitRaw(): Boolean {
-        return native.player!!.isPlaying
-    }
+    override val state: ReadableState<Boolean> get() = ReadableState(native.player!!.isPlaying)
 
     override fun addListener(listener: () -> Unit): () -> Unit {
         val l = object: Player.Listener {

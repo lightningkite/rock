@@ -8,6 +8,7 @@ import com.lightningkite.rock.objc.UIViewWithSizeOverridesProtocol
 import com.lightningkite.rock.objc.UIViewWithSpacingRulesProtocol
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.reactive.Property
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.*
 import kotlinx.cinterop.*
@@ -58,7 +59,7 @@ class FrameLayoutToggleButton: UIButton(CGRectZero.readValue()), UIViewWithSizeO
     }
 
     val checkedWritable: Writable<Boolean> = object : Writable<Boolean> {
-        override suspend fun awaitRaw(): Boolean = on
+        override val state: ReadableState<Boolean> get() = ReadableState(on)
         override fun addListener(listener: () -> Unit): () -> Unit {
             return onEvent(UIControlEventValueChanged) { listener() }
         }

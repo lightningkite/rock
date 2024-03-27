@@ -10,24 +10,19 @@ class PersistentProperty<T>(
     private val key: String,
     defaultValue: T,
     private val serializer: KSerializer<T>,
-) : Writable<T> {
+) : ImmediateWritable<T>, BaseImmediateReadable<T>(defaultValue) {
     private val listeners = ArrayList<() -> Unit>()
 
-    private var initialized = false
-        private set
-
-    private var once: T = defaultValue
-        private set(value) {
-            field = value
+    override var value: T
+        get() = super.value
+        set(value) {
             PlatformStorage.set(key, DefaultJson.encodeToString(serializer, value))
-            listeners.toList().forEach { it() }
+            super.value = value
         }
 
     override suspend infix fun set(value: T) {
-        this.once = value
+        this.value = value
     }
-
-    override suspend fun awaitRaw(): T = once
 
     override fun addListener(listener: () -> Unit): () -> Unit {
         listeners.add(listener)
@@ -40,9 +35,9 @@ class PersistentProperty<T>(
         val stored = PlatformStorage.get(key)
         if (stored != null)
             try {
-                once = DefaultJson.decodeFromString(serializer, stored)
-            } catch (e: Exception) { }
-        initialized = true
+                super.value = DefaultJson.decodeFromString(serializer, stored)
+            } catch (e: Exception) {
+            }
     }
 }
 

@@ -62,6 +62,63 @@ class ReactivityTests {
         assertEquals(1, onRemoveCalled)
     }
 
+    @Test fun basicer() {
+        val a = Property(1)
+        val b = Property(2)
+
+        with(CalculationContext.Standard()) {
+            reactiveScope {
+                println("Got ${a.await() + b.await()}")
+            }
+        }
+        println("Done.")
+    }
+
+    @Test fun basics() {
+        val a = Property(1)
+        val b = shared { println("CALC a"); a.await() }
+        val c = shared { println("CALC b"); b.await() }
+        var hits = 0
+
+        with(CalculationContext.Standard()) {
+            reactiveScope {
+                println("#1 Got ${c.await()}")
+                hits++
+            }
+            reactiveScope {
+                println("#2 Got ${c.await()}")
+                hits++
+            }
+            assertEquals(2, hits)
+            a.value = 2
+            assertEquals(4, hits)
+        }
+        println("Done.")
+    }
+
+    @Test fun lateinit() {
+        val a = LateInitProperty<Int>()
+        var hits = 0
+
+        with(CalculationContext.Standard()) {
+            launch {
+                println("launch ${a.await()}")
+                hits++
+            }
+            reactiveScope {
+                println("scope ${a.await()}")
+                hits++
+            }
+
+            assertEquals(0, hits)
+            a.value = 1
+            assertEquals(2, hits)
+            a.value = 2
+            assertEquals(3, hits)
+        }
+        println("Done.")
+    }
+
     @Test fun sharedTest() {
         val a = Property(1)
         val b = Property(2)
@@ -93,6 +150,7 @@ class ReactivityTests {
             assertEquals(3, dInvocations)
             assertEquals(3, eInvocations)
         }
+        println("Done.")
     }
 
     @Test fun sharedTest2() {
@@ -138,6 +196,34 @@ class ReactivityTests {
             println("Ready... GO!")
             a.go()
         }
+    }
+
+    @Test fun sharedTest4() {
+        val property = LateInitProperty<LateInitProperty<Int>>()
+        val shared = shared { property.await().await() }
+        var completions = 0
+        testContext {
+            reactiveScope { println("reactiveScope got " + shared.await()); completions++ }
+            launch { println("launch got " + shared.await()); completions++ }
+            println("Ready... GO!")
+            val lp2 = LateInitProperty<Int>()
+            property.value = lp2
+            lp2.value = 1
+        }
+        assertEquals(completions, 2)
+    }
+
+    @Test fun sharedTest5() {
+        val property = LateInitProperty<Int>()
+        val shared = shared { property.await() }
+        var completions = 0
+        testContext {
+            launch { println("launchA got " + shared.await()); completions++ }
+            launch { println("launchB got " + shared.await()); completions++ }
+            println("Ready... GO!")
+            property.value = 1
+        }
+        assertEquals(completions, 2)
     }
 }
 

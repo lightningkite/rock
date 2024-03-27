@@ -7,14 +7,7 @@ import kotlinx.browser.window
 import org.w3c.dom.Document
 import org.w3c.dom.events.Event
 
-actual object SoftInputOpen : Readable<Boolean> {
-    override fun addListener(listener: () -> Unit): () -> Unit {
-        return {}
-    }
-
-    override suspend fun awaitRaw(): Boolean = false
-}
-
+actual object SoftInputOpen : Readable<Boolean> by Constant(false)
 
 actual object AnimationFrame: Listenable {
     override fun addListener(listener: () -> Unit): () -> Unit {
@@ -56,7 +49,8 @@ actual object WindowInfo: Readable<WindowStatistics> by (Property(
 val Document.visibilityState: String get() = visibilityState(this)
 private fun visibilityState(document: Document): String = js("document.visibilityState")
 actual object InForeground: Readable<Boolean> {
-    override suspend fun awaitRaw(): Boolean = document.visibilityState != "hidden"
+    override val state: ReadableState<Boolean>
+        get() = ReadableState(document.visibilityState != "hidden")
 
     override fun addListener(listener: () -> Unit): () -> Unit {
         val l = { _: Event -> listener(); Unit }

@@ -8,7 +8,7 @@ import kotlin.jvm.JvmName
 
 
 infix fun <T> Writable<T>.equalTo(value: T): Writable<Boolean> = object : Writable<Boolean> {
-    override suspend fun awaitRaw(): Boolean = this@equalTo.awaitRaw() == value
+    override val state: ReadableState<Boolean> get() = this@equalTo.state.map { it == value }
     override fun addListener(listener: () -> Unit): () -> Unit = this@equalTo.addListener(listener)
     val target = value
     override suspend fun set(value: Boolean) {
@@ -105,43 +105,17 @@ data class DebounceListenable(val source: Listenable, val milliseconds: Long) : 
 }
 
 data class DebounceReadable<T>(val source: Readable<T>, val milliseconds: Long) : Readable<T> {
-    private var lastRead: T? = null
-    var ready = false
-        private set
-    private var waiters = ArrayList<Continuation<T>>()
-
-    override suspend fun awaitRaw(): T {
-        return if(ready) lastRead as T
-        else {
-            if(waiters.isNotEmpty()) {
-                suspendCoroutineCancellable<T> {
-                    waiters.add(it)
-                    return@suspendCoroutineCancellable {
-                        waiters.remove(it)
-                    }
-                }
-            } else {
-                val result = source.awaitRaw()
-                lastRead = result
-                ready = true
-                val old = waiters
-                waiters = ArrayList()
-                old.forEach { it.resume(result) }
-                result
-            }
-        }
-    }
+    override var state: ReadableState<T> = ReadableState.notReady
 
     private var changeCount = 0
+    private val listeners = ArrayList<() -> Unit>()
     override fun addListener(listener: () -> Unit): () -> Unit {
         var second: Cancellable? = null
         val first = source.addListener {
             val num = ++changeCount
             second = launchGlobal {
                 delay(milliseconds)
-                val value = source.await()
-                lastRead = value
-                ready = true
+                state = source.state
                 if (num == changeCount) listener()
             }
         }
@@ -149,6 +123,10 @@ data class DebounceReadable<T>(val source: Readable<T>, val milliseconds: Long) 
             first()
             second?.cancel()
         }
+    }
+
+    fun invokeAll() {
+        listeners.toList().forEach { it() }
     }
 }
 

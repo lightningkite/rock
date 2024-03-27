@@ -13,6 +13,7 @@ import androidx.core.widget.addTextChangedListener
 import com.lightningkite.rock.models.Align
 import com.lightningkite.rock.models.Dimension
 import com.lightningkite.rock.models.rem
+import com.lightningkite.rock.reactive.ReadableState
 import com.lightningkite.rock.reactive.Writable
 import com.lightningkite.rock.views.ViewDsl
 import com.lightningkite.rock.views.ViewWriter
@@ -112,7 +113,8 @@ val CompoundButton.checked: Writable<Boolean>
         return object : EquatableByRef("checked", this), Writable<Boolean> {
             override fun addListener(listener: () -> Unit): () -> Unit =
                 addListener(CompoundButton::setOnCheckedChangeListener, { CompoundButton.OnCheckedChangeListener { _, _ -> listener() } }, listener)
-            override suspend fun awaitRaw(): Boolean = this@checked.isChecked
+
+            override val state get() = ReadableState(this@checked.isChecked)
             override suspend fun set(value: Boolean) { this@checked.isChecked = value }
         }
     }
@@ -128,7 +130,7 @@ val android.widget.TextView.content: Writable<String>
                 addTextChangedListener(watcher)
                 return { removeTextChangedListener(watcher) }
             }
-            override suspend fun awaitRaw(): String = this@content.text?.toString() ?: ""
+            override val state get() = ReadableState(this@content.text?.toString() ?: "")
             override suspend fun set(value: String) { this@content.text = value }
         }
     }

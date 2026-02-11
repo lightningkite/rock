@@ -20,7 +20,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.lightningkite:deploy-helpers:master-SNAPSHOT")
+        classpath("com.lightningkite:deploy-helpers:0.0.7")
     }
 }
 
